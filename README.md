@@ -4,6 +4,7 @@ usine à paquets PHP
 ## Infos pratique
 
 * Build PHP 5.2 : https://svn.epiconcept.fr/outils_internes/ansible-deploy/specifique/php52_jessie/
+* IP serveur AWS de build : 34.240.2.84 (compte "cdt")
 
 ## Cahier des charges
 
