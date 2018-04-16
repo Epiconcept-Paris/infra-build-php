@@ -15,7 +15,7 @@ usine à paquets PHP
 * phase 1
   * reprendre le script actuel
   * l'étendre pour permettre de builder une version quelconque (télécharger l'archive depuis php.net, builder, jouer les tests PHP, builder le paquet DEB)
-  * le principe idéal serait de passer la version à builder
+  * le principe idéal serait de passer la version à builder, et de n'avoir en spécifique 
     * le script actuel de build est dans https://github.com/Epiconcept-Paris/infra-build-php/blob/master/docker/docker-entrypoint.sh
     * la doc d'utilisation est dans https://github.com/Epiconcept-Paris/infra-build-php/blob/master/docker/README.md
   * documenter les commandes de build, d'ajout d'une version, etc...
