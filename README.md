@@ -5,7 +5,7 @@ usine à paquets PHP
 
 * Build PHP 5.2 : https://svn.epiconcept.fr/outils_internes/ansible-deploy/specifique/php52_jessie/
 * IP serveur AWS de build : 34.240.2.84 (compte "cdt")
-* source pour le build PHP5.2, utilisateur "cdt", url Subversion : https://svn.epiconcept.fr/outils_internes/ansible-deploy/specifique/php52_jessie/
+* source pour le build PHP5.2, utilisateur "cdt", url Subversion : https://svn.epiconcept.fr/outils_internes/ansible-deploy/specifique/php52_jessie/ (le but n'est vraiment pas d'intégrer directement, mais de reprendre les éléments et de les intégrer)
 
 ## Cahier des charges
 
