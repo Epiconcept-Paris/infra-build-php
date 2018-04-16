@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  phpcli71:
+    build: ./
+    image: epi-php-cli-7-1
+    container_name: epi-php-cli-7-1
+    volumes:
+      - /tmp/epi-php-cli-7-1:/opt/output
+      

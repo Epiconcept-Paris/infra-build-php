@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+a2enmod php7
+apache2ctl graceful #voir si c'est suffisant
+
+exit 0

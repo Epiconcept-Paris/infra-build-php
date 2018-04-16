@@ -1,0 +1,73 @@
+---
+- hosts: build
+  gather_facts: True
+
+  vars: 
+    http_proxy: http://proxy.admin2.oxa.tld:3128
+    path_php: /opt/php-to-build
+    packjessie: [vim, autoconf, curl, file, libjpeg62-turbo, libpng12-0, libxml2, make, pkg-config, bzip2, apache2-dev, apache2, libmcrypt-dev, libmhash-dev, libxslt1-dev, libxpm-dev, tar, build-essential, curl, libbz2-dev, libfreetype6-dev, libmysqlclient-dev, libmysqlclient18, libcurl4-openssl-dev, libjpeg-dev, libpng-dev, libreadline6-dev, libssl-dev, libxml2-dev]
+    packstretch: [vim, autoconf, curl, file, libjpeg62-turbo, libpng16-16, libxml2, make, pkg-config, bzip2, apache2-dev, apache2, libmcrypt-dev, libmhash-dev, libxslt1-dev, libxpm-dev, tar, build-essential, curl, libbz2-dev, libfreetype6-dev, default-libmysqlclient-dev, libcurl4-openssl-dev, libjpeg-dev, libpng-dev, libreadline6-dev, libssl-dev, libxml2-dev]
+
+  tasks:
+    - name: apt update
+      tags: packages
+      become: True
+      apt:
+        update_cache: yes
+
+    - name: install dependencies
+      tags: packages
+      become: True
+      apt:
+        name: '{{ item }}'
+        state: present
+        force: yes
+      with_items: '{{ packjessie }}'
+      when: ansible_distribution_release != 'stretch'
+
+    - name: install dependencies
+      tags: packages
+      become: True
+      apt:
+        name: '{{ item }}'
+        state: present
+        force: yes
+      with_items: '{{ packstretch }}'
+      when: ansible_distribution_release == 'stretch'
+
+    - name: create {{ path_php }}
+      become: True
+      file: 
+        path: "{{ path_php }}"
+        state: directory
+
+    - name: copy build script
+      tags: copy
+      become: True
+      copy: 
+        src: "{{ playbook_dir }}/files/build.sh"
+        dest: "{{ path_php }}/build.sh"
+
+    - stat: path=/usr/bin/php
+      register: p
+      tags: compil
+      
+    - name: compil 7.1
+      tags: compil
+      shell: "/bin/bash {{ path_php }}/build.sh"
+      become: True
+      args:
+        chdir: "{{ path_php }}"
+      when: p.stat.exists == False
+      environment:
+        http_proxy: "{{ http_proxy }}"
+        https_proxy: "{{ http_proxy }}"
+
+    - name: check version
+      tags: version
+      become: True
+      shell: php --version
+      register: shell_php
+      
+    - debug: { var: shell_php.stdout_lines }
+      tags: version

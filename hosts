@@ -1,0 +1,8 @@
+# -*- Mode: conf; -*-
+localhost ansible_connection=local
+
+[build]
+b1 ansible_ssh_host=192.168.1.229 ansible_become_pass="{{ lookup('pipe', 'pass sudo/charenton') }}"
+b2 ansible_ssh_host=192.168.1.99 ansible_become_pass="{{ lookup('pipe', 'pass sudo/charenton') }}"
+
+prephp7a1 ansible_ssh_host=prephp7a1.oxa ansible_become_pass="{{ lookup('pipe', 'pass sudo/nodes') }}"
