@@ -1,0 +1,71 @@
+---
+
+- hosts: all
+  gather_facts: True
+
+  vars:
+
+    http_proxy: http://proxy.admin2.oxa.tld:3128
+    workdir: "{{ ansible_env.HOME }}/build_php52"
+
+  tasks:
+
+    - apt: name={{ item }} update_cache=yes state=latest
+      become: true
+      with_items: [ php5, php5-cli, php5-mcrypt, php5-mysql ]
+
+    - name: check version
+      shell: php --version
+      register: shell_php
+      changed_when: false
+
+    - file: >
+        path="{{ workdir }}" state=directory
+      when: shell_php.stdout.find('5.2.17') == -1
+
+    - template: src="files/build.sh" dest="{{ workdir }}/build.sh"
+      when: shell_php.stdout.find('5.2.17') == -1
+
+    - copy: >
+        src="files/{{ item }}" dest="{{ workdir }}"
+      with_items: [ libmysqlclient15-dev_5.0.51a-24+lenny5_amd64.deb, libmysqlclient15off_5.0.51a-24+lenny5_amd64.deb, php-5.2.17-libxml2.patch, php-5.2.17-openssl.patch ]
+      when: shell_php.stdout.find('5.2.17') == -1
+
+    - name: compilation de PHP 5.2
+      shell: "/bin/bash {{ workdir }}/build.sh"
+      become: true
+      args:
+        chdir: "{{ workdir }}"
+      when: shell_php.stdout.find('5.2.17') == -1
+
+    - set_fact:
+        tabDeletedFiles: [ '05-opcache.ini', '20-apcu.ini', '20-gd.ini', '20-mcrypt.ini', '20-mysqli.ini', '20-pdo_mysql.ini', '20-xsl.ini', '10-pdo.ini', '20-curl.ini', '20-json.ini', '20-mysql.ini', '20-oauth.ini', '20-readline.ini' ]
+
+    - name: suppression fichiers de conf paquets php5*
+      become: true
+      file: >
+        path="/etc/php5/mods-available/{{ item }}" state=absent
+      with_items: [ 'curl.ini', 'gd.ini', 'json.ini', 'mcrypt.ini', 'mysql.ini', 'mysqli.ini', 'opcache.ini', 'pdo_mysql.ini', 'pdo_mysqli.ini', 'readline.ini', 'xsl.ini' ]
+
+    - name: suppression fichiers de conf paquets php5*, mode apache
+      become: true
+      file: >
+        path="/etc/php5/apache2/conf.d/{{ item }}" state=absent
+      with_items: "{{ tabDeletedFiles }}"
+
+    - name: suppression fichiers de conf paquets php5*, mode cli
+      become: true
+      file: >
+        path="/etc/php5/cli/conf.d/{{ item }}" state=absent
+      with_items: "{{ tabDeletedFiles }}"
+
+    - name: check version
+      shell: php --version
+      register: shell_php
+      failed_when: shell_php.stdout.find('5.2.17') == -1
+ 
+    # on garde le dossier de build pour remettre rapidement en cas de soucis
+    #- name: nettoyage dossiers
+    #  become: true
+    #  file: path={{ item }} state=absent
+    #  with_items: [ "{{ workdir }}", "/usr/src/php" ]
