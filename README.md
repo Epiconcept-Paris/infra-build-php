@@ -32,4 +32,4 @@ usine à paquets PHP
   
 * phase 3
   * tester l'ajout de l'extension Mysql sur PHP7 (obsolète mais on risque d'en avoir besoin pour un code legacy, il existe des tutoriels en ligne sur le sujet)
-  
+  * builder certains modules en dynamique (mdbtools, mysql, subversion, etc...)
