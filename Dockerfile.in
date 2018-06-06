@@ -1,0 +1,21 @@
+FROM debian:$DEBVER
+MAINTAINER Epiconcept
+
+ENV TZ=Europe/Paris
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
+RUN echo "export TERM=xterm" >>/root/.bashrc
+
+# Update/upgrade
+RUN apt-get update
+RUN apt-get upgrade -y
+
+# Tools and build deps
+RUN apt-get install -y --no-install-recommends $BUILD_REQ
+
+RUN mkdir -p $BUILD_TOP/files $BUILD_TOP/dist
+COPY $PHPSRC $BUILD_TOP/files
+COPY pkgs $BUILD_TOP/pkgs
+COPY php/mk $BUILD_TOP
+$EXTCOPY
+
+CMD $BUILD_TOP/mk $PHPVER

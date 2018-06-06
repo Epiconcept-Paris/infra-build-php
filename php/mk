@@ -1,0 +1,22 @@
+#!/bin/sh
+
+Dir=`dirname $0`
+Prg=`basename $0`
+Ver=$1
+echo "Dir=$Dir"
+echo "0:$0"
+n=1
+for dummy in "$@"       # Just to loop on the real arguments
+do
+    echo "$n:>>$1<<"
+    n=`expr $n + 1`
+    shift
+done
+date >$Dir/dist/now
+cd $Dir/pkgs
+for pkg in *
+do
+    cd $pkg
+    echo ./mkpkg $Ver
+    cd ..
+done
