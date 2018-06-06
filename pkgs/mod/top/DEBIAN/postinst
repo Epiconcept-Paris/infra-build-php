@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
-a2enmod php7
-apache2ctl graceful #voir si c'est suffisant
+a2enmod php%PHPMAJ%
+apache2ctl graceful	# TODO Is that enough ?
 
 exit 0

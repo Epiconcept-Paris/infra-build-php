@@ -1,5 +1,5 @@
 Package: epi-php-cli-7-1
-Version: 7.1.11
+Version: %VERSION%
 Priority: optional
 Architecture: amd64
 Section: admin

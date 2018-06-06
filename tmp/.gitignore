@@ -1,2 +1,3 @@
 Dockerfile
-docker.out
+docker-build.out
+run.sh

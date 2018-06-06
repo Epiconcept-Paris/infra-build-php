@@ -1,6 +1,7 @@
 #!/bin/sh
 
 export PHP_INI_DIR="/etc/php"
+exit 0
 
 fileArkPHP=/tmp/php.tar.bz2
 cheminPack=/opt/debbuild

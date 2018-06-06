@@ -1,0 +1,1 @@
+LoadModule php%PHPMAJ%_module        /usr/lib/apache2/modules/libphp%PHPMAJ%.so

@@ -1,27 +1,21 @@
 #!/bin/sh
 
+Top=`dirname $0`/top
+Dir=`realpath $Top/../../..`
+Ver=$1
+Maj=`echo $Ver | awk -F. '{print $1}'`
+
+test -d /usr/src/php && rm -rvf /usr/src/php/php-* || mkdir /usr/src/php
+tar xf $Dir/files/php-$Ver.tar.bz2 -C /usr/src/php
+cd /usr/src/php/php-$Ver
+
 export PHP_INI_DIR="/etc/php"
-
-fileArkPHP=/tmp/php.tar.bz2
-cheminPack=/opt/debbuild
-
-if [ ! -f php.tar.bz2 ]; then 
-	curl -SL "http://fr2.php.net/get/php-7.1.11.tar.bz2/from/this/mirror" -o $fileArkPHP
-fi
-
-rm -rf /usr/src/php
-mkdir -p /usr/src/php
-tar -xf $fileArkPHP -C /usr/src/php --strip-components=1
-cd /usr/src/php
-
-
 ./configure	\
-	--prefix=/opt/debbuild/usr \
+	--prefix=$Top/usr \
 	--with-config-file-path="$PHP_INI_DIR" \
 	--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
-	--with-libdir=/lib/x86_64-linux-gnu\
+	--with-libdir=/lib/x86_64-linux-gnu \
 	--with-apxs2=/usr/bin/apxs \
-	--with-apache2=/opt/debbuild/usr/lib/apache2 \
 	--with-bz2 \
 	--with-curl \
 	--enable-ctype \
@@ -34,7 +28,6 @@ cd /usr/src/php
 	--with-zlib-dir=/usr \
 	--with-gettext \
 	--enable-json \
-	--enable-oauth \
 	--enable-hash \
 	--with-iconv \
 	--enable-libxml \
@@ -64,29 +57,31 @@ cd /usr/src/php
 	--enable-zip \
 	--with-zlib \
 	--disable-debug \
-	--enable-bcmath
+	--enable-bcmath \
+>$Dir/dist/config.out 2>&1
 
-mkdir -p $cheminPack/etc/apache2/mods-available/
+make >$Dir/dist/make.out 2>&1
 
-make -j"$(nproc)"
-touch /opt/debbuild/etc/apache2/mods-available/apache2.conf
-
+touch $Top/etc/apache2/mods-available/apache2.conf
 make install
-INSTALL_ROOT=/opt/debbuild make install
+INSTALL_ROOT=$Top make install >$Dir/dist/make-install.out 2>&1
+rm $Top/etc/apache2/mods-available/apache2.conf
 
-rm /opt/debbuild/etc/apache2/mods-available/apache2.conf
-make clean
+make clean >$Dir/dist/make-clean.out 2>&1
 
-cheminPack=/opt/debbuild
-sed -i $cheminPack/etc/apache2/mods-available/php7.load -e "s#/opt/debbuild##"
-cp -r /paquet/* $cheminPack
-find $cheminPack -type d -exec chmod 755 {} \;
-find $cheminPack -type f ! -path "${cheminPack}/DEBIAN/*" ! -path "${cheminPack}/usr/local/bin/*" -exec chmod 644 {} \;
-chmod 755 ${cheminPack}/DEBIAN/*
-chmod 755 $cheminPack/usr/bin/* 
-rm -rf $cheminPack$cheminPack
-sortie=$(fakeroot dpkg-deb -Zgzip --build $cheminPack /opt/output/)
-fichier=$(echo $sortie | grep "building package" | sed -e "s/.*in '//g" -e 's/deb.*/deb/g')
-echo -e $sortie
+sed -i "s/%VERSION%/$Ver/" $Top/DEBIAN/control
+sed -i "s/%PHPMAJ%/$Maj/" $Top/DEBIAN/postinst
+sed -i "s/%PHPMAJ%/$Maj/g" $Top/etc/apache2/mods-available/php.load.us
+mv $Top/etc/apache2/mods-available/php.load.us $Top/etc/apache2/mods-available/php$Maj.load.us
+mv $Top/etc/apache2/mods-available/php.conf $Top/etc/apache2/mods-available/php$Maj.conf
+find $Top/opt -depth -type d | xargs rmdir
+#sed -i $Top/etc/apache2/mods-available/php7.load -e "s#/opt/debbuild##"
+#find $cheminPack -type d -exec chmod 755 {} \;
+#find $cheminPack -type f ! -path "${cheminPack}/DEBIAN/*" ! -path "${cheminPack}/usr/local/bin/*" -exec chmod 644 {} \;
+#chmod 755 ${cheminPack}/DEBIAN/*
+#chmod 755 $cheminPack/usr/bin/*
+out=$(fakeroot dpkg-deb -Zgzip --build $Top $Dir/dist | tee $Dir/dist/dpkg-deb.out)
+file=$(echo $out | grep "building package" | sed -e "s/.*in '//g" -e 's/deb.*/deb/g')
+echo -e $out
 
-lintian $fichier
+lintian $file
