@@ -1,9 +1,10 @@
-Package: epi-php-cli-7-1
+Package: %NAME%
 Version: %VERSION%
 Priority: optional
 Architecture: amd64
 Section: admin
-Depends: libjpeg62-turbo, libpng16-16, libxml2, make, pkg-config, bzip2, libmcrypt-dev, libmhash-dev, libxslt1-dev, libxpm-dev, tar, build-essential, curl, libbz2-dev, libfreetype6-dev, default-libmysqlclient-dev, libcurl4-openssl-dev, libjpeg-dev, libpng-dev, libreadline6-dev, libssl-dev, libxml2-dev
+Depends: libjpeg62-turbo, libpng16-16, libxml2, libc6
 Conflicts: php7.0, php5
 Maintainer: cedric <c.girard@epiconcept.fr>
-Description: PHP CLI build par Epiconcept
+Description: PHP CLI build by Epiconcept
+ This package provides the PHP Command Line Interface

@@ -2,7 +2,7 @@
 
 set -e
 
-a2enmod php%PHPMAJ%
+a2enmod php%MAJ%
 apache2ctl graceful	# TODO Is that enough ?
 
 exit 0

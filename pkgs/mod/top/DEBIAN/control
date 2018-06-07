@@ -1,10 +1,10 @@
-Package: epi-php-7-1
+Package: %NAME%
 Version: %VERSION%
 Priority: optional
 Architecture: amd64
 Section: admin
-Depends: libjpeg62-turbo, libpng16-16, libxml2, apache2
+Depends: apache2, apache2-api-20120211, libjpeg62-turbo, libpng16-16, libxml2, libc6
 Conflicts: php7.0, php5
 Maintainer: Cedric <c.girard@epiconcept.fr>
-Description: PHP build by Epiconcept
+Description: PHP Apache module build by Epiconcept
  This package provides the PHP module for the Apache 2 webserver

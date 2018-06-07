@@ -1,0 +1,2 @@
+PHP module for Apache 2 (%VERSION%) %DEBVER; urgency=low
+ * Specific version for Epiconcept use

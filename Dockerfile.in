@@ -1,6 +1,7 @@
 FROM debian:$DEBVER
 MAINTAINER Epiconcept
 
+ENV DEBVER $DEBVER
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm" >>/root/.bashrc
@@ -12,10 +13,11 @@ RUN apt-get upgrade -y
 # Tools and build deps
 RUN apt-get install -y --no-install-recommends $BUILD_REQ
 
-RUN mkdir -p $BUILD_TOP/files $BUILD_TOP/dist
+RUN mkdir -p $BUILD_TOP/dist $BUILD_TOP/files
 COPY $PHPSRC $BUILD_TOP/files
 COPY pkgs $BUILD_TOP/pkgs
-COPY php/mk $BUILD_TOP
+RUN rm $BUILD_TOP/pkgs/.gitignore
+COPY mk $BUILD_TOP
 $EXTCOPY
 
 CMD $BUILD_TOP/mk $PHPVER

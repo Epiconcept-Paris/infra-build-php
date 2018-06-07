@@ -1,87 +1,94 @@
 #!/bin/sh
 
-Top=`dirname $0`/top
-Dir=`realpath $Top/../../..`
-Ver=$1
+Dir=`dirname $0`
+Pkg=`basename $Dir`
+Bld=`dirname \`dirname $Dir\``
+Top="$Dir/top"
+Dist="$Bld/dist"
+Ver="$1"
 Maj=`echo $Ver | awk -F. '{print $1}'`
+Min=`echo $Ver | awk -F. '{print $2}'`
+Name=epi-php
 
-test -d /usr/src/php && rm -rvf /usr/src/php/php-* || mkdir /usr/src/php
-tar xf $Dir/files/php-$Ver.tar.bz2 -C /usr/src/php
+test -d /usr/src/php && rm -rf /usr/src/php/php-* || mkdir /usr/src/php
+tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src/php
 cd /usr/src/php/php-$Ver
 
+echo "Configuring package '$Pkg'..."
 export PHP_INI_DIR="/etc/php"
 ./configure	\
-	--prefix=$Top/usr \
+	--prefix=/usr \
 	--with-config-file-path="$PHP_INI_DIR" \
 	--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
 	--with-libdir=/lib/x86_64-linux-gnu \
 	--with-apxs2=/usr/bin/apxs \
 	--with-bz2 \
 	--with-curl \
-	--enable-ctype \
-	--enable-ftp \
 	--with-gd \
-	--enable-gd-native-ttf \
 	--with-jpeg-dir=/usr --with-png-dir=/usr \
 	--with-freetype-dir=/usr \
 	--with-xpm-dir=/usr,/usr/X11R6 \
 	--with-zlib-dir=/usr \
 	--with-gettext \
-	--enable-json \
-	--enable-hash \
 	--with-iconv \
-	--enable-libxml \
-	--enable-dom \
-	--enable-mbstring \
 	--with-mcrypt \
 	--with-mhash \
 	--with-pcre-regex \
-	--enable-pdo \
 	--with-pdo-mysql=/usr \
 	--with-mysqli=/usr/bin/mysql_config \
 	--with-libdir=lib \
 	--with-openssl \
+	--with-xsl \
+	--with-zlib \
+	--enable-bcmath \
+	--enable-ctype \
+	--enable-dom \
+	--enable-ftp \
+	--enable-gd-native-ttf \
+	--enable-hash \
+	--enable-json \
+	--enable-libxml \
+	--enable-mbstring \
+	--enable-pdo \
 	--enable-posix \
 	--enable-session \
+	--enable-simplexml \
+	--enable-soap \
 	--enable-sockets \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
+	--enable-wddx \
 	--enable-xml \
 	--enable-xmlreader \
 	--enable-xmlwriter \
-	--with-xsl \
-	--enable-simplexml \
-	--enable-soap \
-	--enable-wddx \
 	--enable-zip \
-	--with-zlib \
 	--disable-debug \
-	--enable-bcmath \
->$Dir/dist/config.out 2>&1
+>$Dist/config_$Pkg.out 2>&1
 
-make >$Dir/dist/make.out 2>&1
+echo "Building package '$Pkg'..."
+make >$Dist/make_$Pkg.out 2>&1
 
-touch $Top/etc/apache2/mods-available/apache2.conf
-make install
-INSTALL_ROOT=$Top make install >$Dir/dist/make-install.out 2>&1
-rm $Top/etc/apache2/mods-available/apache2.conf
+echo "Installing package '$Pkg'..."
+ModDir=$Top/etc/apache2/mods-available
+mv $ModDir/php.conf $ModDir/php$Maj.conf
+touch $ModDir/apache2.conf
+INSTALL_ROOT=$Top make install >$Dist/make-install_$Pkg.out 2>&1
+rm $ModDir/apache2.conf
+sed -i -e "s/%VERSION%/$Ver/" -e "s/%NAME%/$Name-$Maj-$Min/" $Top/DEBIAN/control
+sed -i "s/%MAJ%/$Maj/" $Top/DEBIAN/postinst
+sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
+sed -i -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" $Top/usr/share/doc/pkgname/changelog
+sed -i "s;$Top;;g" $ModDir/php$Maj.load
+gzip -9 <$Top/usr/share/doc/pkgname/changelog >$Top/usr/share/doc/pkgname/changelog.gz
+rm $Top/usr/share/doc/pkgname/changelog
+mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name-$Maj-$Min
 
-make clean >$Dir/dist/make-clean.out 2>&1
+make clean >$Dist/make-clean_$Pkg.out 2>&1
 
-sed -i "s/%VERSION%/$Ver/" $Top/DEBIAN/control
-sed -i "s/%PHPMAJ%/$Maj/" $Top/DEBIAN/postinst
-sed -i "s/%PHPMAJ%/$Maj/g" $Top/etc/apache2/mods-available/php.load.us
-mv $Top/etc/apache2/mods-available/php.load.us $Top/etc/apache2/mods-available/php$Maj.load.us
-mv $Top/etc/apache2/mods-available/php.conf $Top/etc/apache2/mods-available/php$Maj.conf
-find $Top/opt -depth -type d | xargs rmdir
-#sed -i $Top/etc/apache2/mods-available/php7.load -e "s#/opt/debbuild##"
-#find $cheminPack -type d -exec chmod 755 {} \;
-#find $cheminPack -type f ! -path "${cheminPack}/DEBIAN/*" ! -path "${cheminPack}/usr/local/bin/*" -exec chmod 644 {} \;
-#chmod 755 ${cheminPack}/DEBIAN/*
-#chmod 755 $cheminPack/usr/bin/*
-out=$(fakeroot dpkg-deb -Zgzip --build $Top $Dir/dist | tee $Dir/dist/dpkg-deb.out)
-file=$(echo $out | grep "building package" | sed -e "s/.*in '//g" -e 's/deb.*/deb/g')
-echo -e $out
+echo "Assembling package '$Pkg'..."
+out=$(fakeroot dpkg-deb -Zgzip --build $Top $Dist)
+pkg=$(echo $out | sed "s/^.*building package '[^']*' in '\([^']*\)'\.$/\1/p")
+echo "$out"
 
-lintian $file
+lintian $pkg
