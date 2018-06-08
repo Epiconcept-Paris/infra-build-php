@@ -98,6 +98,7 @@ fi
 #
 BUILD_TOP=/opt/build
 BUILD_IMG=epi-build-php
+BUILD_NUM=`cat BUILD_NUM`
 . $DebDir/Dockervars.sh
 . php/$PhpMaj/Dockervars.sh
 
@@ -114,7 +115,7 @@ if docker images | grep $BUILD_IMG >/dev/null; then
     docker rmi $BUILD_IMG >/dev/null
 fi
 echo "Building '$BUILD_IMG' image..."
-DEBVER="$DebVer" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpDir/$PhpSrc" EXTCOPY="$EXTCOPY" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_REQ $PHPSRC $EXTCOPY $BUILD_TOP $PHPVER' <Dockerfile.in | tee tmp/Dockerfile | docker build -f - -t $BUILD_IMG . >tmp/docker-build.out 2>&1
+DEBVER="$DebVer" BUILD_NUM="$BUILD_NUM" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpDir/$PhpSrc" EXTCOPY="$EXTCOPY" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_NUM $BUILD_REQ $PHPSRC $EXTCOPY $BUILD_TOP $PHPVER' <Dockerfile.in | tee tmp/Dockerfile | docker build -f - -t $BUILD_IMG . >tmp/docker-build.out 2>&1
 
 echo "Running '$BUILD_IMG' container..."
 Cmd="docker run -ti -v `pwd`/$DebDir/dist:$BUILD_TOP/dist --name $BUILD_IMG --rm $BUILD_IMG"

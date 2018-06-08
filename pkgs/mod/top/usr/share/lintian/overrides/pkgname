@@ -1,0 +1,3 @@
+%NAME%: non-standard-apache2-module-package-name %NAME% != libapache2-libphp7
+%NAME%: embedded-library usr/lib/apache2/modules/libphp7.so: libgd
+%NAME%: embedded-library usr/lib/apache2/modules/libphp7.so: file

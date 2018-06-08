@@ -13,32 +13,43 @@ Name=epi-php-cli
 test -d /usr/src/php && rm -rf /usr/src/php/php-* || mkdir /usr/src/php
 tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src/php
 cd /usr/src/php/php-$Ver
+if [ -d $Bld/hooks ]; then
+    for hook in $Bld/hooks/*
+    do
+	. $hook
+    done
+    echo "ExtOpts=$ExtOpts"
+fi
 
 echo "Configuring package '$Pkg'..."
-export PHP_INI_DIR="/etc/php"
+export SysConfDir="/etc/php"
+ManDir="/usr/share/man"
 ./configure	\
 	--prefix=/usr \
-	--with-config-file-path="$PHP_INI_DIR" \
-	--with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
+	--mandir="$ManDir" \
+	--with-config-file-path="$SysConfDir" \
+	--with-config-file-scan-dir="$SysConfDir/conf.d" \
 	--with-libdir=/lib/x86_64-linux-gnu \
+	--with-libdir=lib \
+	--with-jpeg-dir=/usr \
+	--with-freetype-dir=/usr \
+	--with-png-dir=/usr \
+	--with-xpm-dir=/usr,/usr/X11R6 \
+	--with-zlib-dir=/usr \
+	--with-pdo-mysql=/usr \
+	--with-mysqli=/usr/bin/mysql_config \
 	--with-bz2 \
 	--with-curl \
 	--with-gd \
-	--with-jpeg-dir=/usr --with-png-dir=/usr \
-	--with-freetype-dir=/usr \
-	--with-xpm-dir=/usr,/usr/X11R6 \
-	--with-zlib-dir=/usr \
 	--with-gettext \
 	--with-iconv \
 	--with-mcrypt \
 	--with-mhash \
 	--with-pcre-regex \
-	--with-pdo-mysql=/usr \
-	--with-mysqli=/usr/bin/mysql_config \
-	--with-libdir=lib \
 	--with-openssl \
 	--with-xsl \
 	--with-zlib \
+	$ExtOpts \
 	--enable-bcmath \
 	--enable-ctype \
 	--enable-dom \
@@ -69,20 +80,28 @@ echo "Building package '$Pkg'..."
 make >$Dist/make_$Pkg.out 2>&1
 
 echo "Installing package '$Pkg'..."
-INSTALL_ROOT=$Top make install >$Dist/make-install_$Pkg.out 2>&1
-sed -i -e "s/%VERSION%/$Ver/" -e "s/%NAME%/$Name-$Maj-$Min/" $Top/DEBIAN/control
-sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
-sed -i -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" $Top/usr/share/doc/pkgname/changelog
-gzip -9 <$Top/usr/share/doc/pkgname/changelog >$Top/usr/share/doc/pkgname/changelog.gz
-rm $Top/usr/share/doc/pkgname/changelog
-mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name-$Maj-$Min
-strip $Top/usr/bin/php $Top/usr/bin/php-cgi $Top/usr/bin/phpdbg
+INSTALL_ROOT=$Top make -k install >$Dist/make-install_$Pkg.out 2>&1
 
-make clean >$Dist/make-clean_$Pkg.out 2>&1
+sed -i -e "s/%VERSION%/$Ver-$BUILD_NUM/" -e "s/%NAME%/$Name-$Maj-$Min/" $Top/DEBIAN/control
+sed -i -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" $Top/usr/share/doc/pkgname/changelog.Debian
+sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
+sed -i "s/%NAME%/$Name-$Maj-$Min/g" $Top/usr/share/lintian/overrides/pkgname
+gzip -n9 $Top/usr/share/doc/pkgname/changelog* $Top/usr/share/man/man1/*
+mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name-$Maj-$Min
+mv $Top/usr/share/lintian/overrides/pkgname $Top/usr/share/lintian/overrides/$Name-$Maj-$Min
+strip $Top/usr/bin/php $Top/usr/bin/php-cgi $Top/usr/bin/phpdbg
+(cd $Top; rm -rf .channels .registry .depdb* .filemap .lock)
+test -d $Top/usr/var && find $Top/usr/var -depth -type d | xargs rmdir
+test -f $Top/usr/etc/pear.conf && { mv $Top/usr/etc/pear.conf $Top/etc; rmdir $Top/usr/etc; }
+find $Top/usr/lib/php -name '*.a' | xargs rm
+find $Top/usr/lib/php -name '*.so' | xargs strip
+
+#make clean >$Dist/make-clean_$Pkg.out 2>&1
 
 echo "Assembling package '$Pkg'..."
 out=$(fakeroot dpkg-deb -Zgzip --build $Top $Dist)
 pkg=$(echo $out | sed "s/^.*building package '[^']*' in '\([^']*\)'\.$/\1/p")
 echo "$out"
 
-lintian $pkg
+echo "Checking package '$Pkg'..."
+lintian --allow-root $pkg >$Dist/lintian_$Pkg.out
