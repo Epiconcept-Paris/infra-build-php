@@ -83,6 +83,7 @@ sed -i "s;$Top;;g" $ModDir/php$Maj.load
 gzip -9 <$Top/usr/share/doc/pkgname/changelog >$Top/usr/share/doc/pkgname/changelog.gz
 rm $Top/usr/share/doc/pkgname/changelog
 mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name-$Maj-$Min
+strip $Top/usr/lib/apache2/modules/libphp$Maj.so
 
 make clean >$Dist/make-clean_$Pkg.out 2>&1
 
