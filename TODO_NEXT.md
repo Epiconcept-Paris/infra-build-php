@@ -1,8 +1,7 @@
 ## A faire dans l'ordre (ou presque)
 
-Une seule compil avec liste de fichiers
 pb nom de module
-BUILD_NUM spécifique à chaque version de PHP
+Une seule compil avec liste de fichiers
+chroot plutot que INSTALL_ROOT ?
 grep -v sur logs pour isoler les erreurs
 verif des SKIP sur make test
-chroot plutot que INSTALL_ROOT ?
