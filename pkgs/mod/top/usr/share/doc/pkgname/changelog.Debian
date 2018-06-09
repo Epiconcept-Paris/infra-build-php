@@ -1,2 +1,4 @@
-PHP module for Apache 2 (%VERSION%) %DEBVER%; urgency=low
- * Specific version for Epiconcept use
+%NAME% (%VERSION%) %DEBVER%; urgency=low
+  * PHP module for Apache 2
+    Specific version for Epiconcept use
+ -- Cedric <c.girard@epiconcept.fr>  %DATE%

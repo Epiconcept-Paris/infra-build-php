@@ -2,14 +2,16 @@
 
 Dir=`dirname $0`
 Pkg=`basename $Dir`
-Bld=`dirname \`dirname $Dir\``
 Top="$Dir/top"
-Dist="$Bld/dist"
+Bld=`dirname \`dirname $Dir\``
+Logs="$Bld/dist/.latest_logs"
 Ver="$1"
 Maj=`echo $Ver | awk -F. '{print $1}'`
 Min=`echo $Ver | awk -F. '{print $2}'`
 Name=epi-php-cli
 
+test -d $Logs || mkdir $Logs
+echo "Extracting php-$Ver source for package '$Pkg'..."
 test -d /usr/src/php && rm -rf /usr/src/php/php-* || mkdir /usr/src/php
 tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src/php
 cd /usr/src/php/php-$Ver
@@ -18,7 +20,7 @@ if [ -d $Bld/hooks ]; then
     do
 	. $hook
     done
-    echo "ExtOpts=$ExtOpts"
+    #echo "ExtOpts=$ExtOpts"
 fi
 
 echo "Configuring package '$Pkg'..."
@@ -74,34 +76,38 @@ ManDir="/usr/share/man"
 	--enable-xmlwriter \
 	--enable-zip \
 	--disable-debug \
->$Dist/config_$Pkg.out 2>&1
+>$Logs/config_$Pkg.out 2>&1
 
 echo "Building package '$Pkg'..."
-make >$Dist/make_$Pkg.out 2>&1
+make >$Logs/make_$Pkg.out 2>&1
+
+echo "Testing package '$Pkg'..."
+echo "s" | make test >$Logs/make-test_$Pkg.out 2>&1
+test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs
 
 echo "Installing package '$Pkg'..."
-INSTALL_ROOT=$Top make -k install >$Dist/make-install_$Pkg.out 2>&1
+INSTALL_ROOT=$Top make -k install >$Logs/make-install_$Pkg.out 2>&1
 
 sed -i -e "s/%VERSION%/$Ver-$BUILD_NUM/" -e "s/%NAME%/$Name-$Maj-$Min/" $Top/DEBIAN/control
-sed -i -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" $Top/usr/share/doc/pkgname/changelog.Debian
+sed -i -e "s/%NAME%/$Name-$Maj-$Min/g" -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Bld/date`/" $Top/usr/share/doc/pkgname/changelog.Debian
 sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
 sed -i "s/%NAME%/$Name-$Maj-$Min/g" $Top/usr/share/lintian/overrides/pkgname
 gzip -n9 $Top/usr/share/doc/pkgname/changelog* $Top/usr/share/man/man1/*
 mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name-$Maj-$Min
 mv $Top/usr/share/lintian/overrides/pkgname $Top/usr/share/lintian/overrides/$Name-$Maj-$Min
 strip $Top/usr/bin/php $Top/usr/bin/php-cgi $Top/usr/bin/phpdbg
-(cd $Top; rm -rf .channels .registry .depdb* .filemap .lock)
+(cd $Top; rm -rvf .channels .registry .depdb* .filemap .lock) >$Logs/rmed_$Pkg.out
 test -d $Top/usr/var && find $Top/usr/var -depth -type d | xargs rmdir
-test -f $Top/usr/etc/pear.conf && { mv $Top/usr/etc/pear.conf $Top/etc; rmdir $Top/usr/etc; }
-find $Top/usr/lib/php -name '*.a' | xargs rm
+test -f $Top/usr/etc/pear.conf && { mv $Top/usr/etc/pear.conf $Top/etc/php; rmdir $Top/usr/etc; }
+find $Top/usr/lib/php -name '*.a' | xargs rm >>$Logs/rmed_$Pkg.out
 find $Top/usr/lib/php -name '*.so' | xargs strip
 
-#make clean >$Dist/make-clean_$Pkg.out 2>&1
+#make clean >$Logs/make-clean_$Pkg.out 2>&1
 
 echo "Assembling package '$Pkg'..."
-out=$(fakeroot dpkg-deb -Zgzip --build $Top $Dist)
+out=$(fakeroot dpkg-deb -Zgzip --build $Top $Bld/dist)
 pkg=$(echo $out | sed "s/^.*building package '[^']*' in '\([^']*\)'\.$/\1/p")
 echo "$out"
 
 echo "Checking package '$Pkg'..."
-lintian --allow-root $pkg >$Dist/lintian_$Pkg.out
+lintian --allow-root $pkg >$Logs/lintian_$Pkg.out

@@ -96,9 +96,17 @@ fi
 #
 #   Build image and start container
 #
+Num=$PhpDir/BUILD_NUM
+Log="`git log -n1 --date=iso $Num 2>/dev/null`"
+if [ $? -eq 0 -a "$Log" ]; then
+    touch -d "`echo "$Log" | sed -n 's/^Date: *//p'`" tmp/date
+else
+    test -f $Num || echo 1 >$Num
+    touch -r $Num tmp/date
+fi
 BUILD_TOP=/opt/build
 BUILD_IMG=epi-build-php
-BUILD_NUM=`cat BUILD_NUM`
+BUILD_NUM=`cat $Num`
 . $DebDir/Dockervars.sh
 . php/$PhpMaj/Dockervars.sh
 
@@ -115,7 +123,7 @@ if docker images | grep $BUILD_IMG >/dev/null; then
     docker rmi $BUILD_IMG >/dev/null
 fi
 echo "Building '$BUILD_IMG' image..."
-DEBVER="$DebVer" BUILD_NUM="$BUILD_NUM" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpDir/$PhpSrc" EXTCOPY="$EXTCOPY" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_NUM $BUILD_REQ $PHPSRC $EXTCOPY $BUILD_TOP $PHPVER' <Dockerfile.in | tee tmp/Dockerfile | docker build -f - -t $BUILD_IMG . >tmp/docker-build.out 2>&1
+DEBVER="$DebVer" BUILD_NUM="$BUILD_NUM" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpDir/$PhpSrc" EXTCOPY="$EXTCOPY" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_NUM $BUILD_REQ $PHPSRC $EXTCOPY $BUILD_TOP $PHPVER' <Dockerfile-build.in | tee tmp/Dockerfile-build | docker build -f - -t $BUILD_IMG . >tmp/docker-build.out 2>&1
 
 echo "Running '$BUILD_IMG' container..."
 Cmd="docker run -ti -v `pwd`/$DebDir/dist:$BUILD_TOP/dist --name $BUILD_IMG --rm $BUILD_IMG"

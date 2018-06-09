@@ -1,8 +1,8 @@
 ## Infos pratiques
 
-* IP serveur AWS de build : 34.240.2.84 (compte "cdt")
+x IP serveur AWS de build : 34.240.2.84 (compte "cdt")
 * source pour le build PHP5.2, utilisateur "cdt", url Subversion : https://svn.epiconcept.fr/outils_internes/ansible-deploy/specifique/php52_jessie/ (le but n'est vraiment pas d'intégrer directement, mais de reprendre les éléments et de les intégrer)
-* le script actuel de build est dans mod/docker-entrypoint.sh
+x le script actuel de build est dans mod/docker-entrypoint.sh
 * doc d'utilisation ci-dessous
 
 # Notes 
@@ -10,29 +10,29 @@
 Lancement du build paquet :
 
 ```console
-docker kill epi-build-php71; \
-docker rm epi-build-php71; \ 
-docker rmi --force epi-build-php71 &>/dev/null; \ 
-docker-compose up --force-recreate`
+x docker kill epi-build-php71; \
+x docker rm epi-build-php71; \ 
+x docker rmi --force epi-build-php71 &>/dev/null; \ 
+x docker-compose up --force-recreate`
 ```
 
 * paquet à trouver dans `/tmp/epi-build-php71`
 
 Pour la mise au point --with-apache2:
 ```console
-docker-compose build
-docker run -ti -v /tmp/epi-build-php71:/opt/output epi-build-php71 bash
-bash -x /docker-entrypoint.sh
-bash -x /build_paquet.sh
+x docker-compose build
+x docker run -ti -v /tmp/epi-build-php71:/opt/output epi-build-php71 bash
+x bash -x /docker-entrypoint.sh
+x bash -x /build_paquet.sh
 ```
 
 Pour la mise au point --no-apache2:
 
 ```console
-docker-compose build
-docker run -ti -v /tmp/epi-php-cli-7-1:/opt/output epi-php-cli-7-1 bash
-bash -x /docker-entrypoint.sh
-bash -x /build_paquet.sh
+x docker-compose build
+x docker run -ti -v /tmp/epi-php-cli-7-1:/opt/output epi-php-cli-7-1 bash
+x bash -x /docker-entrypoint.sh
+x bash -x /build_paquet.sh
 ```
 
 ## Plan simple pour tester le paquet
@@ -146,7 +146,7 @@ Makefile:162: recipe for target 'install-sapi' failed
 make: *** [install-sapi] Error 25
 ```
 
-==>> make install suivi du make install dans le dossier du paquet
+NON ! ==>> make install suivi du make install dans le dossier du paquet
 ```console
 libtool: link: `Zend/zend_execute.lo' is not a valid libtool object
 Makefile:285: recipe for target 'sapi/cli/php' failed

@@ -2,7 +2,7 @@ FROM debian:$DEBVER
 MAINTAINER Epiconcept
 
 ENV DEBVER $DEBVER
-ENV BUILD_NUM $DEBVER
+ENV BUILD_NUM $BUILD_NUM
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm" >>/root/.bashrc
@@ -19,6 +19,7 @@ COPY $PHPSRC $BUILD_TOP/files
 COPY pkgs $BUILD_TOP/pkgs
 RUN rm $BUILD_TOP/pkgs/.gitignore
 COPY mk $BUILD_TOP
+COPY tmp/date $BUILD_TOP
 $EXTCOPY
 
 CMD $BUILD_TOP/mk $PHPVER

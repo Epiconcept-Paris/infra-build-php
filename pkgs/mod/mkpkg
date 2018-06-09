@@ -2,14 +2,16 @@
 
 Dir=`dirname $0`
 Pkg=`basename $Dir`
-Bld=`dirname \`dirname $Dir\``
 Top="$Dir/top"
-Dist="$Bld/dist"
+Bld=`dirname \`dirname $Dir\``
+Logs="$Bld/dist/.latest_logs"
 Ver="$1"
 Maj=`echo $Ver | awk -F. '{print $1}'`
 Min=`echo $Ver | awk -F. '{print $2}'`
 Name=epi-php
 
+test -d $Logs || mkdir $Logs
+echo "Extracting php-$Ver source for package '$Pkg'..."
 test -d /usr/src/php && rm -rf /usr/src/php/php-* || mkdir /usr/src/php
 tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src/php
 cd /usr/src/php/php-$Ver
@@ -18,13 +20,16 @@ if [ -d $Bld/hooks ]; then
     do
 	. $hook
     done
-    echo "ExtOpts=$ExtOpts"
+    #echo "ExtOpts=$ExtOpts"
 fi
 
 echo "Configuring package '$Pkg'..."
 export SysConfDir="/etc/php"
 ./configure	\
 	--prefix=/usr \
+	--disable-cli \
+	--disable-cgi \
+	--disable-phpdbg \
 	--with-apxs2=/usr/bin/apxs \
 	--with-config-file-path="$SysConfDir" \
 	--with-config-file-scan-dir="$SysConfDir/conf.d" \
@@ -73,20 +78,24 @@ export SysConfDir="/etc/php"
 	--enable-xmlwriter \
 	--enable-zip \
 	--disable-debug \
->$Dist/config_$Pkg.out 2>&1
+>$Logs/config_$Pkg.out 2>&1
 
 echo "Building package '$Pkg'..."
-make >$Dist/make_$Pkg.out 2>&1
+make >$Logs/make_$Pkg.out 2>&1
+
+echo "Testing package '$Pkg'..."
+echo "s" | make test >$Logs/make-test_$Pkg.out 2>&1
+test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs
 
 echo "Installing package '$Pkg'..."
 ModDir=$Top/etc/apache2/mods-available
 mv $ModDir/php.conf $ModDir/php$Maj.conf
 touch $ModDir/apache2.conf
-INSTALL_ROOT=$Top make -k install >$Dist/make-install_$Pkg.out 2>&1
+INSTALL_ROOT=$Top make -k install >$Logs/make-install_$Pkg.out 2>&1
 rm $ModDir/apache2.conf
 
 sed -i -e "s/%VERSION%/$Ver-$BUILD_NUM/" -e "s/%NAME%/$Name-$Maj-$Min/" $Top/DEBIAN/control
-sed -i -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" $Top/usr/share/doc/pkgname/changelog.Debian
+sed -i -e "s/%NAME%/$Name-$Maj-$Min/g" -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Bld/date`/" $Top/usr/share/doc/pkgname/changelog.Debian
 sed -i "s/%MAJ%/$Maj/" $Top/DEBIAN/postinst
 sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
 sed -i "s/%NAME%/$Name-$Maj-$Min/g" $Top/usr/share/lintian/overrides/pkgname
@@ -95,13 +104,14 @@ gzip -n9 $Top/usr/share/doc/pkgname/changelog*
 mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name-$Maj-$Min
 mv $Top/usr/share/lintian/overrides/pkgname $Top/usr/share/lintian/overrides/$Name-$Maj-$Min
 strip $Top/usr/lib/apache2/modules/libphp$Maj.so
+(cd $Top; rm -rvf usr/bin usr/lib/php usr/include usr/php) >$Logs/rmed_$Pkg.out
 
-#make clean >$Dist/make-clean_$Pkg.out 2>&1
+#make clean >$Logs/make-clean_$Pkg.out 2>&1
 
 echo "Assembling package '$Pkg'..."
-out=$(fakeroot dpkg-deb -Zgzip --build $Top $Dist)
+out=$(fakeroot dpkg-deb -Zgzip --build $Top $Bld/dist)
 pkg=$(echo $out | sed "s/^.*building package '[^']*' in '\([^']*\)'\.$/\1/p")
 echo "$out"
 
 echo "Checking package '$Pkg'..."
-lintian --allow-root $pkg >$Dist/lintian_$Pkg.out
+lintian --allow-root $pkg >$Logs/lintian_$Pkg.out

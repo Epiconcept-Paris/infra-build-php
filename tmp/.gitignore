@@ -1,2 +1,4 @@
-Dockerfile
+Dockerfile-build
+Dockerfile-test
 docker-build.out
+date
