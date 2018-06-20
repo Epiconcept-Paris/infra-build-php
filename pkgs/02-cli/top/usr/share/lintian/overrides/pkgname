@@ -1,0 +1,2 @@
+%NAME%: embedded-library usr/bin/php: file
+%NAME%: embedded-library usr/bin/php: libgd

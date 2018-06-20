@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+Bld=`dirname $0`
+Ver="$1"
+
+Cmd="$Bld/mk $Ver"
+test -f $Bld/pkgs/.norun && echo "Only showing mk command as pkgs/.norun is present: $Cmd" || $Cmd

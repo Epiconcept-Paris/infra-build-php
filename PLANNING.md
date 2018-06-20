@@ -9,7 +9,7 @@
   * Documentation des commandes de build, ajout de version, etc
 
 * Phase 2 - Amélirations et corrections version PHP 7 : 2j 
-  * Ajout des tests de build (make test) et extraction des erreurs
+  x Ajout des tests de build (make test) et extraction des erreurs
   - Analyser et résoudre/ignorer les warnings au make install de PHP7
   * Ajouter la signature des paquets
 
@@ -18,5 +18,8 @@
   * Ajout de l'extension APC à PHP 5.2.x
   
 * Phase 4 - Ajout du paquet d'extension MySQL sur PHP 7 : 2j
-  * Ajout de la génération de paquets pour des modules PHP dynamiques
-  * Cas particulier de mysql
+  x Ajout de la génération de paquets pour des modules PHP dynamiques
+  x Cas particulier de mysql
+
+* Phase 5 - Compléments : 1j
+  x Ajout de l'extension OAuth en static

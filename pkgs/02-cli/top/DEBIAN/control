@@ -4,7 +4,7 @@ Priority: optional
 Architecture: amd64
 Section: admin
 Depends: libjpeg62-turbo, libpng16-16, libxml2, libc6
-Conflicts: php7.0, php5
+Conflicts: php7.1, php7.0, php5
 Maintainer: cedric <c.girard@epiconcept.fr>
 Description: PHP CLI build by Epiconcept
  This package provides the PHP Command Line Interface

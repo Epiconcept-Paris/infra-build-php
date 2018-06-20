@@ -1,0 +1,4 @@
+#!/bin/sh
+
+find $Top/usr/lib -name '*.so' | xargs strip -v >>$Logs/striped_$Pkg.out
+find $Top/usr/lib -name '*.so' | xargs chmod -x

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+sed -i -e "s;install-pear-nozlib.phar -d;install-pear-nozlib.phar -m /usr/share/php -D /usr/share/doc/$Name -M /usr/share/man/man1 -d;" Makefile
+# Skip install-sapi install-build install-headers install-pdo-headers
+INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=/etc/pear make install-modules install-cli install-programs install-pear install-pharcmd >$Logs/make-install_$Pkg.out 2>&1
+
+while read d f p
+do
+    File=`cd $Top; find $d -type f -name $f`
+    Ext=$Bld/pkgs/$p/top/`dirname $File`
+    mkdir -p $Ext
+    mv $Top/$File $Ext
+done <$dir/moves
+
+file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs strip -v >$Logs/striped_$Pkg.out
+find $Top/usr/lib -name '*.so' | xargs strip -v >>$Logs/striped_$Pkg.out
+find $Top/usr/lib -name '*.so' | xargs chmod -x
+(cd $Top; rm -rvf .channels .registry .depdb* .filemap .lock) >$Logs/rmed_$Pkg.out
+gzip -n9 $Top/usr/share/man/man1/*

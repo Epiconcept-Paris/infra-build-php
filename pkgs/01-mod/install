@@ -1,0 +1,15 @@
+#!/bin/sh
+
+ModDir=$Top/etc/apache2/mods-available
+EnaDir=$Top/etc/apache2/mods-enabled
+test -d $EnaDir || mkdir $EnaDir
+mv $ModDir/php.conf $ModDir/php$Maj.conf
+INSTALL_ROOT=$Top APACHE_CONFDIR=$Top/etc/apache2 make install-sapi >$Logs/make-install_$Pkg.out 2>&1
+
+sed -i "s;$Top;;g" $ModDir/php$Maj.load
+find $EnaDir -type l | xargs rm -v >$Logs/rmed_$Pkg.out
+rmdir -v $EnaDir >>$Logs/rmed_$Pkg.out
+test -d $Top/usr/var && find $Top/usr/var -depth -type d | xargs rmdir -v >>$Logs/rmed_$Pkg.out
+find $Top/usr/lib -name '*.so' | xargs strip -v >$Logs/striped_$Pkg.out
+
+sed -i "s/%MAJ%/$Maj/" $Top/DEBIAN/postinst

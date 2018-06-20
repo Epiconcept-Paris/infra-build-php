@@ -1,7 +1,0 @@
-%NAME%: embedded-library usr/bin/php: file
-%NAME%: embedded-library usr/bin/php: libgd
-%NAME%: embedded-library usr/bin/php-cgi: file
-%NAME%: embedded-library usr/bin/php-cgi: libgd
-%NAME%: embedded-library usr/bin/phpdbg: file
-%NAME%: embedded-library usr/bin/phpdbg: libgd
-

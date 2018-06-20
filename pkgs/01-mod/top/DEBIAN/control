@@ -3,8 +3,8 @@ Version: %VERSION%
 Priority: optional
 Architecture: amd64
 Section: admin
-Depends: apache2, apache2-api-20120211, libjpeg62-turbo, libpng16-16, libxml2, libc6
-Conflicts: php7.0, php5
+Depends: apache2, apache2-api-20120211, %CLI%, libc6
+Conflicts: php7.1, php7.0, php5
 Maintainer: Cedric <c.girard@epiconcept.fr>
 Description: PHP Apache module build by Epiconcept
  This package provides the PHP module for the Apache 2 webserver

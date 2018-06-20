@@ -1,3 +1,2 @@
 /etc/apache2/mods-available/php7.conf
 /etc/apache2/mods-available/php7.load
-/etc/php/php.ini

@@ -17,9 +17,10 @@ RUN apt-get install -y --no-install-recommends $BUILD_REQ
 RUN mkdir -p $BUILD_TOP/dist $BUILD_TOP/files
 COPY $PHPSRC $BUILD_TOP/files
 COPY pkgs $BUILD_TOP/pkgs
-RUN rm $BUILD_TOP/pkgs/.gitignore
-COPY mk $BUILD_TOP
+COPY php/mk $BUILD_TOP
+COPY php/run $BUILD_TOP
 COPY tmp/date $BUILD_TOP
+RUN rm $BUILD_TOP/pkgs/.gitignore
 $EXTCOPY
 
-CMD $BUILD_TOP/mk $PHPVER
+CMD $BUILD_TOP/run $PHPVER

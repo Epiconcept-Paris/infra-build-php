@@ -1,0 +1,135 @@
+#!/bin/sh
+#
+#	mk - Configure, compile and test from PHP source
+#	     Install and build all packages in pkgs
+#
+Prg=`basename $0`
+Bld=`dirname $0`
+Top="$Bld/top"
+Logs="$Bld/dist/.latest_logs"
+Ver="$1"
+Maj=`echo $Ver | awk -F. '{print $1}'`
+Min=`echo $Ver | awk -F. '{print $2}'`
+
+set -e	# Stop on errors
+test -d $Logs || mkdir $Logs
+echo "Extracting php-$Ver source..."
+test -d /usr/src/php && rm -rf /usr/src/php/php-* || mkdir /usr/src/php
+tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src/php
+cd /usr/src/php/php-$Ver
+if [ -d $Bld/hooks ]; then
+    for hook in $Bld/hooks/*
+    do
+	test "$ExtShow" && ExtShow="$ExtShow + " || ExtShow=" with "
+	test "$ExtOpts" && ExtOpts="$ExtOpts "
+	. $hook
+    done
+    if [ "$ExtOpts" ]; then
+	#cp -p configure $Logs/configure0
+	./buildconf --force >$Logs/buildconf.out
+	#cp -p configure $Logs
+    fi
+fi
+
+echo "Configuring php-$Ver$ExtShow..."
+(cd /usr/include; test -h curl || ln -s x86_64-linux-gnu/curl .)	# For OAuth
+test -d /var/run/apache2 || mkdir /var/run/apache2	# For apache2 -V
+eval `grep '^export APACHE_' /etc/apache2/envvars`	# For apache2 -V
+export PHP_SYSCONFDIR="/etc/php"
+./configure	\
+	--prefix=/usr \
+	--mandir=/usr/share/man \
+	--disable-cgi \
+	--disable-phpdbg \
+	--with-pear=/usr/share/php \
+	--with-apxs2=/usr/bin/apxs \
+	--with-config-file-path="$PHP_SYSCONFDIR" \
+	--with-config-file-scan-dir="$PHP_SYSCONFDIR/conf.d" \
+	--with-libdir=/lib/x86_64-linux-gnu \
+	--with-jpeg-dir=/usr \
+	--with-freetype-dir=/usr \
+	--with-png-dir=/usr \
+	--with-xpm-dir=/usr,/usr/X11R6 \
+	--with-zlib-dir=/usr \
+	--with-pdo-mysql=/usr \
+	--with-mysqli=/usr/bin/mysql_config \
+	--with-bz2 \
+	--with-curl \
+	--with-gd \
+	--with-gettext \
+	--with-iconv \
+	--with-mcrypt \
+	--with-mhash \
+	--with-pcre-regex \
+	--with-openssl \
+	--with-xsl \
+	--with-zlib \
+	$ExtOpts \
+	--enable-bcmath \
+	--enable-ctype \
+	--enable-dom \
+	--enable-ftp \
+	--enable-gd-native-ttf \
+	--enable-hash \
+	--enable-json \
+	--enable-libxml \
+	--enable-mbstring \
+	--enable-pdo \
+	--enable-posix \
+	--enable-session \
+	--enable-simplexml \
+	--enable-soap \
+	--enable-sockets \
+	--enable-sysvmsg \
+	--enable-sysvsem \
+	--enable-sysvshm \
+	--enable-wddx \
+	--enable-xml \
+	--enable-xmlreader \
+	--enable-xmlwriter \
+	--enable-zip \
+	--disable-debug \
+>$Logs/config.out 2>&1
+
+echo "Building php-$Ver..."
+make >$Logs/make.out 2>&1
+
+set +e	# Continue on errors
+if [ -f $Bld/pkgs/.notest ]; then
+    echo "Skiping php-$Ver tests."
+else
+    echo "Testing php-$Ver..."
+    echo "s" | make test >$Logs/make-test.out 2>&1
+    test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs
+fi
+
+Cli="`cat $Bld/pkgs/02-cli/name`-$Maj-$Min"
+for dir in $Bld/pkgs/*
+do
+    Pkg=`basename $dir`
+    Top=$dir/top
+    Name="`cat $dir/name`-$Maj-$Min"
+
+    echo "Installing package '$Pkg'..."
+    sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
+    sed -i -e "s/%NAME%/$Name/g" -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Bld/date`/" $Top/usr/share/doc/pkgname/changelog.Debian
+    gzip -n9 $Top/usr/share/doc/pkgname/changelog*
+    mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name
+    if [ -f $Top/usr/share/lintian/overrides/pkgname ]; then
+	sed -i "s/%NAME%/$Name/g" $Top/usr/share/lintian/overrides/pkgname
+	mv $Top/usr/share/lintian/overrides/pkgname $Top/usr/share/lintian/overrides/$Name
+    fi
+    . $dir/install
+
+    sed -i -e "s/%VERSION%/$Ver-$BUILD_NUM/" -e "s/%NAME%/$Name/" -e "s/%CLI%/$Cli/" $Top/DEBIAN/control
+
+    echo "Assembling package '$Pkg'..."
+    out=$(fakeroot dpkg-deb -Zgzip --build $Top $Bld/dist)
+    deb=$(echo $out | sed "s/^.*building package '[^']*' in '\([^']*\)'\.$/\1/p")
+    echo "$out"
+
+    echo "Checking package '$Pkg'..."
+    lintian --allow-root $deb >$Logs/lintian_$Pkg.out
+done
+
+#make clean >$Logs/make-clean.out 2>&1
