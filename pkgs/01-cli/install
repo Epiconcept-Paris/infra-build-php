@@ -1,5 +1,7 @@
 #!/bin/sh
-
+#
+#	01-cli/install - Install php-cli files to $Top
+#
 sed -i "s;install-pear-nozlib.phar -d;install-pear-nozlib.phar -m /usr/share/php -D /usr/share/doc/$Name -M /usr/share/man -d;" Makefile
 mkdir $Top/usr/share/php
 # Skip install-sapi install-build install-headers install-pdo-headers
@@ -8,15 +10,25 @@ INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear make install-modules install-cli
 while read d f p
 do
     File=`cd $Top; find $d -type f -name $f`
-    Ext=$Bld/pkgs/$p/top/`dirname $File`
-    mkdir -p $Ext
-    Log=$Logs/make-install_$p.out
-    test -f $Log || echo "Installing $p package" >$Log
-    mv -v $Top/$File $Ext >>$Log 2>&1
+    if [ "$File" -a -f "$Top/$File" ]; then
+	Ext=$Bld/pkgs/$p/top/`dirname $File`
+	test -d $Ext || mkdir -p $Ext
+	Log=$Logs/make-install_$p.out
+	test -f $Log || echo "Installing $p package" >$Log
+	mv -v $Top/$File $Ext >>$Log 2>&1
+    else
+	echo "\aERROR: no File found in $Top for d=$d f=$f (p=$p)"
+	echo "Directory $d contains:"
+	(cd $Top; find $d -type f)
+    fi
 done <$dir/moves
 
-cp -rp pear/man $Top/usr/share
-find $Top/usr/share/man -name '*.[1-9]' | xargs gzip -n9
+if [ -d pear/man ]; then
+    cp -rp pear/man $Top/usr/share
+    find $Top/usr/share/man -name '*.[1-9]' | xargs gzip -n9
+else
+    echo "\aERROR: no directory pear/man in `pwd`"
+fi
 
 rmdir -v $Top/usr/share/php/.registry/.channel.* >$Logs/rmed_$Pkg.out
 file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs strip -v >$Logs/striped_$Pkg.out

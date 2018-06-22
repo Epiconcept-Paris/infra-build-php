@@ -1,0 +1,8 @@
+#!/bin/sh
+
+ini=/etc/php/php.ini
+mod=mysql.so
+
+grep "^extension *= *$mod *$" $ini >/dev/null && sed -i "/^extension *= *$mod *$/d" $ini
+service apache2 restart
+exit 0

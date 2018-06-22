@@ -5,7 +5,7 @@
   x Ajout de l'extension APCu
   x Hooks (shell scripts appelés si présents) pour config/customisation
   - Nettoyer les erreurs lintian (build du paquet DEB)
-  * Gérer l'incompatibilité des paquets epi-php* avec php5*/php7* des distros
+  - Gérer l'incompatibilité des paquets epi-php* avec php5*/php7* des distros
   * Documentation des commandes de build, ajout de version, etc
 
 * Phase 2 - Amélirations et corrections version PHP 7 : 2j 

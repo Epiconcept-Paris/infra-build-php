@@ -13,7 +13,6 @@ Min=`echo $Ver | awk -F. '{print $2}'`
 set -e	# Stop on errors
 test -d $Logs || mkdir $Logs
 
-service apache stop
 while read pkg
 do
     name=`echo $pkg | awk -F_ '{print $1}'`
@@ -21,8 +20,9 @@ do
 	echo "Package $pkg is installed."
     else
 	echo "Installing $pkg..."
-	dpkg -i $Tst/dist/$pkg
+	dpkg -i $Tst/dist/$pkg >>$Logs/dpkg-i.out 2>&1
     fi
 done <$Pkgs
-apt-get -yf install
-service apache start
+apt-get -yf install >$Logs/apt-get.out
+php /var/www/html/info.php >$Logs/info_01-cli.out
+curl -sSL http://localhost/info.php >$Logs/info_02-mod.out

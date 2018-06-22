@@ -110,7 +110,7 @@ else
 fi
 
 rm -f $Pkgs
-Cli="`cat $Bld/pkgs/02-cli/name`-$Maj-$Min"
+Cli="`cat $Bld/pkgs/01-cli/name`-$Maj-$Min"
 for dir in $Bld/pkgs/*
 do
     Pkg=`basename $dir`
@@ -140,9 +140,8 @@ do
     # Gather extra license files
     find $Top -type f -iname license | while read f
     do
-	fh=`echo $f | sed "s;^$Top/usr/share/doc/$Name/\(.*\)/license$;Files: \1/*;i"`
 	lf=`echo $f | sed "s;^$Top/usr/share/doc/$Name/;;"`
-	echo "Removing extra license file $lf (header \"$fh\")."
+	echo "Removing extra license file $lf."
 	rm -v $f >>$Logs/rmed_$Pkg.out
     done
 

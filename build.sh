@@ -95,6 +95,13 @@ if [ ! -f $PhpDir/$PhpSrc ]; then
     echo "Fetching $PhpSrc..."
     curl -sSL "http://$PHPSITE/get/$PhpSrc/from/this/mirror" -o $PhpDir/$PhpSrc
 fi
+if [ -f $DebDir/Dockervars.sh ]; then
+    . $DebDir/Dockervars.sh
+else
+    echo "$Prg: missing $DebDir/Dockervars.sh" >&2
+    exit 1
+fi
+
 #
 #   Make build image and start container
 #
@@ -106,11 +113,17 @@ else
     test -f $Num || echo 1 >$Num
     touch -r $Num tmp/.date
 fi
+
 BUILD_TOP=/opt/build
 BUILD_IMG=epi-build-php
 BUILD_NUM=`cat $Num`
-. $DebDir/Dockervars.sh
-. php/$PhpMaj/Dockervars.sh
+
+if [ -f php/$PhpMaj/Dockervars.sh ]; then
+    . php/$PhpMaj/Dockervars.sh
+else
+    echo "$Prg: missing php/$PhpMaj/Dockervars.sh" >&2
+    exit 1
+fi
 
 if docker ps | grep $BUILD_IMG >/dev/null; then
     echo "Stopping running '$BUILD_IMG' container..."
@@ -137,6 +150,7 @@ echo "Running '$BUILD_IMG' container..."
 Cmd="docker run -ti -v `pwd`/$DebDir/dist:$BUILD_TOP/dist --name $BUILD_IMG --rm $BUILD_IMG"
 $Cmd
 test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
+
 #
 #   Make tests image and start container
 #
@@ -160,13 +174,16 @@ test -f .norun && EXTCOPY="$EXTCOPY
 COPY .norun $TESTS_TOP
 "
 echo "Building '$TESTS_IMG' image..."
-DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $EXTCOPY $PHPVER' <Dockerfile-tests.in | tee tmp/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >tmp/docker-tests.out 2>&1
+DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $EXTCOPY $PHPVER' <Dockerfile-tests.in | tee tmp/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >tmp/docker-tests.out 2>&1
 
 echo "Running '$TESTS_IMG' container..."
 Cmd="docker run -ti -v `pwd`/$DebDir/dist:$TESTS_TOP/dist --name $TESTS_IMG --rm $TESTS_IMG"
 $Cmd
 test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
 
+#
+#   End
+#
 date '+===== %Y-%m-%d %H:%M:%S %Z'
 End=`date '+%s'`
 Len=`expr $End - $Now`

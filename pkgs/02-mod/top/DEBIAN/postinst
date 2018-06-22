@@ -3,6 +3,6 @@
 set -e
 
 a2enmod php%MAJ%
-apache2ctl graceful	# TODO Is that enough ?
+service apache2 restart
 
 exit 0

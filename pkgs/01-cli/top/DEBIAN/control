@@ -3,7 +3,7 @@ Version: %VERSION%
 Priority: optional
 Architecture: amd64
 Section: admin
-Depends: libjpeg62-turbo, libpng16-16, libxml2, libc6
+Depends: libjpeg62-turbo, libpng16-16, libxpm4, libmcrypt4, libxslt1.1, libcurl3, libfreetype6, libmariadbclient18, libxml2, libc6
 Conflicts: php7.1, php7.0, php5
 Maintainer: cedric <c.girard@epiconcept.fr>
 Description: PHP CLI build by Epiconcept

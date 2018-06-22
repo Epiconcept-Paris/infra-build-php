@@ -9,9 +9,12 @@ RUN echo "export TERM=xterm\nalias l='ls -al'" >>/root/.bashrc
 # Update/upgrade
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install -y --no-install-recommends apache2 vim
+
+# Tools and tests deps
+RUN apt-get install -y --no-install-recommends $TESTS_REQ
 
 RUN mkdir -p $TESTS_TOP/dist
+COPY php/info.php /var/www/html
 COPY php/tst $TESTS_TOP
 COPY run $TESTS_TOP
 $EXTCOPY
