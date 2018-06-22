@@ -1,14 +1,14 @@
 #!/bin/sh
 #
-#	mk - Configure, compile and test from PHP source
-#	     Install and build all packages in pkgs
+#	build - Configure, compile and test from PHP source
+#		Install and build all packages in pkgs
 #
 Prg=`basename $0`
 Bld=`dirname $0`
-Top="$Bld/top"
-Pkgs="$Bld/dist/.latest_pkgs"
-Logs="$Bld/dist/.latest_logs"
 Ver="$1"
+Pkgs="$Bld/dist/.pkgs-$Ver"
+Logs="$Bld/dist/.logs-$Ver"
+Top="$Bld/top"
 Maj=`echo $Ver | awk -F. '{print $1}'`
 Min=`echo $Ver | awk -F. '{print $2}'`
 

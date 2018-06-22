@@ -1,17 +1,20 @@
 #!/bin/sh
 #
-#	tst - Test packages in $Tst/dist
+#	tests - Test packages in $Tst/dist
 #
 Prg=`basename $0`
 Tst=`dirname $0`
-Pkgs="$Tst/dist/.latest_pkgs"
-Logs="$Tst/dist/.latest_logs"
 Ver="$1"
-Maj=`echo $Ver | awk -F. '{print $1}'`
-Min=`echo $Ver | awk -F. '{print $2}'`
+Pkgs="$Tst/dist/.pkgs-$Ver"
+Logs="$Tst/dist/.logs-$Ver"
 
 set -e	# Stop on errors
 test -d $Logs || mkdir $Logs
+
+if [ ! -f $Pkgs ]; then
+    echo "$Prg: cannot find $Pkgs file" >&2
+    exit 1
+fi
 
 while read pkg
 do

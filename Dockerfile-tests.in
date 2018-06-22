@@ -15,7 +15,7 @@ RUN apt-get install -y --no-install-recommends $TESTS_REQ
 
 RUN mkdir -p $TESTS_TOP/dist
 COPY php/info.php /var/www/html
-COPY php/tst $TESTS_TOP
+COPY php/tests $TESTS_TOP
 COPY run $TESTS_TOP
 $EXTCOPY
 
