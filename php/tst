@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+#	tst - Test packages in $Tst/dist
+#
+Prg=`basename $0`
+Tst=`dirname $0`
+Pkgs="$Tst/dist/.latest_pkgs"
+Logs="$Tst/dist/.latest_logs"
+Ver="$1"
+Maj=`echo $Ver | awk -F. '{print $1}'`
+Min=`echo $Ver | awk -F. '{print $2}'`
+
+set -e	# Stop on errors
+test -d $Logs || mkdir $Logs
+
+service apache stop
+while read pkg
+do
+    name=`echo $pkg | awk -F_ '{print $1}'`
+    if dpkg -l $name >/dev/null 2>&1; then
+	echo "Package $pkg is installed."
+    else
+	echo "Installing $pkg..."
+	dpkg -i $Tst/dist/$pkg
+    fi
+done <$Pkgs
+apt-get -yf install
+service apache start

@@ -84,6 +84,8 @@ DebVer="`cat debian/$DebNum/name`"
 #
 #   Fetch PHP source
 #
+date '+===== %Y-%m-%d %H:%M:%S %Z'
+Now=`date '+%s'`
 PhpDir=php/$PhpMaj/$PhpVer 
 DebDir=debian/$DebNum
 test -d $PhpDir || mkdir $PhpDir
@@ -94,15 +96,15 @@ if [ ! -f $PhpDir/$PhpSrc ]; then
     curl -sSL "http://$PHPSITE/get/$PhpSrc/from/this/mirror" -o $PhpDir/$PhpSrc
 fi
 #
-#   Build image and start container
+#   Make build image and start container
 #
 Num=$PhpDir/BUILD_NUM
 Log="`git log -n1 --date=iso $Num 2>/dev/null`"
 if [ $? -eq 0 -a "$Log" ]; then
-    touch -d "`echo "$Log" | sed -n 's/^Date: *//p'`" tmp/date
+    touch -d "`echo "$Log" | sed -n 's/^Date: *//p'`" tmp/.date
 else
     test -f $Num || echo 1 >$Num
-    touch -r $Num tmp/date
+    touch -r $Num tmp/.date
 fi
 BUILD_TOP=/opt/build
 BUILD_IMG=epi-build-php
@@ -122,10 +124,52 @@ if docker images | grep $BUILD_IMG >/dev/null; then
     echo "Deleting existing '$BUILD_IMG' image..."
     docker rmi $BUILD_IMG >/dev/null
 fi
+test -f .norun && EXTCOPY="$EXTCOPY
+COPY .norun $BUILD_TOP
+"
+test -f php/.notest && EXTCOPY="$EXTCOPY
+COPY php/.notest $BUILD_TOP
+"
 echo "Building '$BUILD_IMG' image..."
 DEBVER="$DebVer" BUILD_NUM="$BUILD_NUM" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpDir/$PhpSrc" EXTCOPY="$EXTCOPY" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_NUM $BUILD_REQ $PHPSRC $EXTCOPY $BUILD_TOP $PHPVER' <Dockerfile-build.in | tee tmp/Dockerfile-build | docker build -f - -t $BUILD_IMG . >tmp/docker-build.out 2>&1
 
 echo "Running '$BUILD_IMG' container..."
 Cmd="docker run -ti -v `pwd`/$DebDir/dist:$BUILD_TOP/dist --name $BUILD_IMG --rm $BUILD_IMG"
 $Cmd
-test -f pkgs/.norun && echo "Use:\n    $Cmd bash\nto run the container again"
+test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
+#
+#   Make tests image and start container
+#
+TESTS_TOP=/opt/tests
+TESTS_IMG=epi-tests-php
+EXTCOPY=
+
+if docker ps | grep $TESTS_IMG >/dev/null; then
+    echo "Stopping running '$TESTS_IMG' container..."
+    docker stop $TESTS_IMG >/dev/null
+fi
+if docker ps -a | grep $TESTS_IMG >/dev/null; then
+    echo "Deleting existing '$TESTS_IMG' container..."
+    docker rm $TESTS_IMG >/dev/null
+fi
+if docker images | grep $TESTS_IMG >/dev/null; then
+    echo "Deleting existing '$TESTS_IMG' image..."
+    docker rmi $TESTS_IMG >/dev/null
+fi
+test -f .norun && EXTCOPY="$EXTCOPY
+COPY .norun $TESTS_TOP
+"
+echo "Building '$TESTS_IMG' image..."
+DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $EXTCOPY $PHPVER' <Dockerfile-tests.in | tee tmp/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >tmp/docker-tests.out 2>&1
+
+echo "Running '$TESTS_IMG' container..."
+Cmd="docker run -ti -v `pwd`/$DebDir/dist:$TESTS_TOP/dist --name $TESTS_IMG --rm $TESTS_IMG"
+$Cmd
+test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
+
+date '+===== %Y-%m-%d %H:%M:%S %Z'
+End=`date '+%s'`
+Len=`expr $End - $Now`
+Min=`expr $Len / 60`
+Sec=`expr $Len - '(' $Min '*' 60 ')'`
+printf "Duration: %d:%02d\n" $Min $Sec

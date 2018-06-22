@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+#	run - Run the main build/test script in container, unless a .norun file exists
+#
+Dir=`dirname $0`
+Ver="$1"
+
+test -f $Dir/mk && Bin="mk" || Bin="tst"
+Cmd="$Dir/$Bin $Ver"
+test -f $Dir/.norun && echo "Only showing $Bin command as .norun is present: $Cmd" || $Cmd

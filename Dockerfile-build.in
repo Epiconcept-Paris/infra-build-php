@@ -5,7 +5,7 @@ ENV DEBVER $DEBVER
 ENV BUILD_NUM $BUILD_NUM
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
-RUN echo "export TERM=xterm" >>/root/.bashrc
+RUN echo "export TERM=xterm\nalias l='ls -al'" >>/root/.bashrc
 
 # Update/upgrade
 RUN apt-get update
@@ -18,9 +18,8 @@ RUN mkdir -p $BUILD_TOP/dist $BUILD_TOP/files
 COPY $PHPSRC $BUILD_TOP/files
 COPY pkgs $BUILD_TOP/pkgs
 COPY php/mk $BUILD_TOP
-COPY php/run $BUILD_TOP
-COPY tmp/date $BUILD_TOP
-RUN rm $BUILD_TOP/pkgs/.gitignore
+COPY run $BUILD_TOP
+COPY tmp/.date $BUILD_TOP
 $EXTCOPY
 
 CMD $BUILD_TOP/run $PHPVER

@@ -6,22 +6,28 @@
 Prg=`basename $0`
 Bld=`dirname $0`
 Top="$Bld/top"
+Pkgs="$Bld/dist/.latest_pkgs"
 Logs="$Bld/dist/.latest_logs"
 Ver="$1"
 Maj=`echo $Ver | awk -F. '{print $1}'`
 Min=`echo $Ver | awk -F. '{print $2}'`
 
 set -e	# Stop on errors
-test -d $Logs || mkdir $Logs
+echo "Logs in $Logs/"
+test -d $Logs && rm -f $Logs/*.out || mkdir $Logs
+
 echo "Extracting php-$Ver source..."
 test -d /usr/src/php && rm -rf /usr/src/php/php-* || mkdir /usr/src/php
 tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src/php
+
 cd /usr/src/php/php-$Ver
 if [ -d $Bld/hooks ]; then
     for hook in $Bld/hooks/*
     do
-	test "$ExtShow" && ExtShow="$ExtShow + " || ExtShow=" with "
-	test "$ExtOpts" && ExtOpts="$ExtOpts "
+	if grep ExtShow $hook >/dev/null; then
+	    test "$ExtShow" && ExtShow="$ExtShow + " || ExtShow=" with "
+	    test "$ExtOpts" && ExtOpts="$ExtOpts "
+	fi
 	. $hook
     done
     if [ "$ExtOpts" ]; then
@@ -33,8 +39,8 @@ fi
 
 echo "Configuring php-$Ver$ExtShow..."
 (cd /usr/include; test -h curl || ln -s x86_64-linux-gnu/curl .)	# For OAuth
-test -d /var/run/apache2 || mkdir /var/run/apache2	# For apache2 -V
-eval `grep '^export APACHE_' /etc/apache2/envvars`	# For apache2 -V
+test -d /var/run/apache2 || mkdir /var/run/apache2	# For apache2 -V in configure
+eval `grep '^export APACHE_' /etc/apache2/envvars`	# For apache2 -V in configure
 export PHP_SYSCONFDIR="/etc/php"
 ./configure	\
 	--prefix=/usr \
@@ -95,7 +101,7 @@ echo "Building php-$Ver..."
 make >$Logs/make.out 2>&1
 
 set +e	# Continue on errors
-if [ -f $Bld/pkgs/.notest ]; then
+if [ -f $Bld/.notest ]; then
     echo "Skiping php-$Ver tests."
 else
     echo "Testing php-$Ver..."
@@ -103,6 +109,7 @@ else
     test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs
 fi
 
+rm -f $Pkgs
 Cli="`cat $Bld/pkgs/02-cli/name`-$Maj-$Min"
 for dir in $Bld/pkgs/*
 do
@@ -111,25 +118,43 @@ do
     Name="`cat $dir/name`-$Maj-$Min"
 
     echo "Installing package '$Pkg'..."
+
+    # doc directory
     sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
-    sed -i -e "s/%NAME%/$Name/g" -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Bld/date`/" $Top/usr/share/doc/pkgname/changelog.Debian
+    sed -i -e "s/%NAME%/$Name/g" -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Bld/.date`/" $Top/usr/share/doc/pkgname/changelog.Debian
     gzip -n9 $Top/usr/share/doc/pkgname/changelog*
     mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name
+
+    # lintian overrides
     if [ -f $Top/usr/share/lintian/overrides/pkgname ]; then
 	sed -i "s/%NAME%/$Name/g" $Top/usr/share/lintian/overrides/pkgname
 	mv $Top/usr/share/lintian/overrides/pkgname $Top/usr/share/lintian/overrides/$Name
     fi
+
+    # specific package install
     . $dir/install
 
+    # DEBIAN directory
     sed -i -e "s/%VERSION%/$Ver-$BUILD_NUM/" -e "s/%NAME%/$Name/" -e "s/%CLI%/$Cli/" $Top/DEBIAN/control
+
+    # Gather extra license files
+    find $Top -type f -iname license | while read f
+    do
+	fh=`echo $f | sed "s;^$Top/usr/share/doc/$Name/\(.*\)/license$;Files: \1/*;i"`
+	lf=`echo $f | sed "s;^$Top/usr/share/doc/$Name/;;"`
+	echo "Removing extra license file $lf (header \"$fh\")."
+	rm -v $f >>$Logs/rmed_$Pkg.out
+    done
 
     echo "Assembling package '$Pkg'..."
     out=$(fakeroot dpkg-deb -Zgzip --build $Top $Bld/dist)
-    deb=$(echo $out | sed "s/^.*building package '[^']*' in '\([^']*\)'\.$/\1/p")
-    echo "$out"
+    deb=$(echo $out | sed "s/^.*building package '[^']*' in '\([^']*\)'\.$/\1/")
 
-    echo "Checking package '$Pkg'..."
-    lintian --allow-root $deb >$Logs/lintian_$Pkg.out
+    if [ "$deb" -a -f "$deb" ]; then
+	echo "Checking package '$Pkg' -> $deb..."
+	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
+	echo "`basename $deb`" >>$Pkgs
+    fi
 done
 
 #make clean >$Logs/make-clean.out 2>&1

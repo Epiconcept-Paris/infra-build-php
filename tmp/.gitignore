@@ -1,4 +1,5 @@
 Dockerfile-build
-Dockerfile-test
+Dockerfile-tests
 docker-build.out
-date
+docker-tests.out
+.date

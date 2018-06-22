@@ -4,7 +4,7 @@
 Dir=php/7
 
 #
-#	Add hooks for PHP extensions
+#    Add hooks for PHP extensions
 #
 PECLGET="http://pecl.php.net/get"
 EXTCOPY="RUN mkdir $BUILD_TOP/hooks"
@@ -25,11 +25,13 @@ AddHook()
 }
 
 #
-#   Add PHP shared extensions
+#   Add other files
 #
-AddMySQL()
+AddExtra()
 {
     local Tgz
+
+    #	MySQL legacy PHP extension
     Tgz=mysql.tgz
     if [ ! -f $Dir/$Tgz ]; then
 	echo "Fetching MySQL legacy extension..."
@@ -38,8 +40,20 @@ AddMySQL()
     EXTCOPY="$EXTCOPY
     COPY $Dir/$Tgz $BUILD_TOP/files
     COPY $Dir/mysql.sh $BUILD_TOP/hooks"
-}
 
+    #	PEAR man pages
+    Tgz="PEAR_Manpages-1.10.0.tgz"
+    if [ ! -f $Dir/$Tgz ]; then
+	echo "Fetching PEAR manpages..."
+	curl -sSL "http://download.pear.php.net/package/$Tgz" -o $Dir/$Tgz
+    fi
+    EXTCOPY="$EXTCOPY
+    COPY $Dir/$Tgz $BUILD_TOP/files
+    COPY $Dir/pearman.sh $BUILD_TOP/hooks"
+}
+#
+#   Main
+#
 AddHook APCu apcu APCu apcu
 AddHook oauth oauth OAuth oauth
-AddMySQL
+AddExtra
