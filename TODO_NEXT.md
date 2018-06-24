@@ -1,5 +1,6 @@
 ## A faire dans l'ordre (ou presque)
 
+Err 500 sur voozanoo.net ?
 DEBIAN/control Conflicts:
 PHP 5
 jessie build/run deps
