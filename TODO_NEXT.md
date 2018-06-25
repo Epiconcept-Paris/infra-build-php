@@ -11,4 +11,4 @@
 
 ## A voir ensuite (pas forcément pour Christophe)
 
-* masquer le warning sur l'état deprecated de mysql, sans masquer les autres
+* CGD DONE masquer le warning sur l'état deprecated de mysql, sans masquer les autres
