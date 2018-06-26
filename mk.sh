@@ -118,10 +118,10 @@ else
     touch -r $Num tmp/.date
 fi
 
-BUILD_TOP=/opt/build
+BUILD_TOP=/opt/php
 BUILD_IMG=epi-build-php
 BUILD_NUM=`cat $Num`
-echo "Making PHP $PhpVer-$BUILD_NUM packages..."
+echo "Making PHP $PhpVer-$BUILD_NUM packages for Debian $DebVer..."
 
 if [ -f php/$PhpMaj/Dockervars.sh ]; then
     . php/$PhpMaj/Dockervars.sh
@@ -157,7 +157,7 @@ test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
 #
 #   Make tests image and start container
 #
-TESTS_TOP=/opt/tests
+TESTS_TOP=/opt/php
 TESTS_IMG=epi-tests-php
 EXTCOPY=
 
