@@ -27,5 +27,7 @@ do
     fi
 done <$Pkgs
 apt-get -yf install >$Logs/apt-get.out
+echo "Testing PHP CLI..."
 php /var/www/html/info.php >$Logs/info_01-cli.out
+echo "Testing PHP apache module..."
 curl -sSL http://localhost/info.php >$Logs/info_02-mod.out

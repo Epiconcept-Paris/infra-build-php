@@ -1,0 +1,14 @@
+diff -urN mysql.orig/php_mysql.c mysql/php_mysql.c
+--- ext/mysql.orig/php_mysql.c	2018-02-26 16:48:07.000000000 +0000
++++ ext/mysql/php_mysql.c	2018-06-25 16:08:21.920000000 +0000
+@@ -740,10 +740,6 @@
+ 	zend_string *hashed_details = NULL;
+ 	zend_bool free_host = 0, new_link = 0;
+ 
+-    php_error_docref(NULL,
+-                     E_DEPRECATED,
+-                     "The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead");
+-
+ #if !defined(MYSQL_USE_MYSQLND)
+ 	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
+ 		php_error_docref(NULL, E_WARNING,

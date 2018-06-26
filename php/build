@@ -21,6 +21,10 @@ test -d /usr/src/php && rm -rf /usr/src/php/php-* || mkdir /usr/src/php
 tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src/php
 
 cd /usr/src/php/php-$Ver
+Opt='--with-mcrypt'
+grep -- $Opt configure >/dev/null && WithMCrypt=$Opt || echo "No '$Opt' option in 'configure'. Using extension."
+Opt='--enable-gd-native-ttf'
+grep -- $Opt configure >/dev/null && EnaGdTtf=$Opt || echo "No '$Opt' option in 'configure'. Discarded."
 if [ -d $Bld/hooks ]; then
     for hook in $Bld/hooks/*
     do
@@ -64,18 +68,18 @@ export PHP_SYSCONFDIR="/etc/php"
 	--with-gd \
 	--with-gettext \
 	--with-iconv \
-	--with-mcrypt \
 	--with-mhash \
 	--with-pcre-regex \
 	--with-openssl \
 	--with-xsl \
 	--with-zlib \
+	$WithMCrypt \
 	$ExtOpts \
+	$EnaGdTtf \
 	--enable-bcmath \
 	--enable-ctype \
 	--enable-dom \
 	--enable-ftp \
-	--enable-gd-native-ttf \
 	--enable-hash \
 	--enable-json \
 	--enable-libxml \
@@ -96,6 +100,7 @@ export PHP_SYSCONFDIR="/etc/php"
 	--enable-zip \
 	--disable-debug \
 >$Logs/config.out 2>&1
+grep 'WARNING:' $Logs/config.out | egrep -v 'bison version|need re2c'
 
 echo "Building php-$Ver..."
 make >$Logs/make.out 2>&1

@@ -4,24 +4,24 @@
 Dir=php/7
 
 #
-#    Add hooks for PHP extensions
+#    Add hooks for PECL PHP extensions
 #
 PECLGET="http://pecl.php.net/get"
 EXTCOPY="RUN mkdir $BUILD_TOP/hooks"
 
-#   AddHook <URL-file> <Src-base> <Hook-name> <Hook-file>
-AddHook()
+#   AddPECL <URL-file> <Src-base> <Hook-name> <Hook-file>
+AddPECL()
 {
     local Tgz
     Tgz=`curl -sISL "$PECLGET/$1" | sed -n 's/^Content-Disposition:.*filename=\(.*\)$/\1/p'`
-    if [ ! -f $Dir/$Tgz ]; then
-	rm -f $Dir/$2-*.tgz
+    if [ ! -f $Dir/files/$Tgz ]; then
+	rm -f $Dir/files/$2-*.tgz
 	echo "Fetching $3 `expr $Tgz : "$2-\(.*\).tgz"` extension..."
-	curl -sSL "$PECLGET/$1" -o $Dir/$Tgz
+	curl -sSL "$PECLGET/$1" -o $Dir/files/$Tgz
     fi
     EXTCOPY="$EXTCOPY
-    COPY $Dir/$Tgz $BUILD_TOP/files
-    COPY $Dir/$4.sh $BUILD_TOP/hooks"
+COPY $Dir/files/$Tgz $BUILD_TOP/files
+COPY $Dir/hooks/$4.sh $BUILD_TOP/hooks"
 }
 
 #
@@ -33,27 +33,29 @@ AddExtra()
 
     #	MySQL legacy PHP extension
     Tgz=mysql.tgz
-    if [ ! -f $Dir/$Tgz ]; then
+    if [ ! -f $Dir/files/$Tgz ]; then
 	echo "Fetching MySQL legacy extension..."
-	curl -sSL "https://github.com/php/pecl-database-mysql/archive/master.tar.gz" -o $Dir/$Tgz
+	curl -sSL "https://github.com/php/pecl-database-mysql/archive/master.tar.gz" -o $Dir/files/$Tgz
     fi
     EXTCOPY="$EXTCOPY
-    COPY $Dir/$Tgz $BUILD_TOP/files
-    COPY $Dir/mysql.sh $BUILD_TOP/hooks"
+COPY $Dir/files/$Tgz $BUILD_TOP/files
+COPY $Dir/files/mysql.patch $BUILD_TOP/files
+COPY $Dir/hooks/mysql.sh $BUILD_TOP/hooks"
 
     #	PEAR man pages
     Tgz="PEAR_Manpages-1.10.0.tgz"
-    if [ ! -f $Dir/$Tgz ]; then
+    if [ ! -f $Dir/files/$Tgz ]; then
 	echo "Fetching PEAR manpages..."
-	curl -sSL "http://download.pear.php.net/package/$Tgz" -o $Dir/$Tgz
+	curl -sSL "http://download.pear.php.net/package/$Tgz" -o $Dir/files/$Tgz
     fi
     EXTCOPY="$EXTCOPY
-    COPY $Dir/$Tgz $BUILD_TOP/files
-    COPY $Dir/pearman.sh $BUILD_TOP/hooks"
+COPY $Dir/files/$Tgz $BUILD_TOP/files
+COPY $Dir/hooks/pearman.sh $BUILD_TOP/hooks"
 }
 #
 #   Main
 #
-AddHook APCu apcu APCu apcu
-AddHook oauth oauth OAuth oauth
+AddPECL APCu apcu APCu apcu
+AddPECL oauth oauth OAuth oauth
+AddPECL mcrypt mcrypt MCrypt mcrypt
 AddExtra

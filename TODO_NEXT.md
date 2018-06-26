@@ -1,6 +1,5 @@
 ## A faire dans l'ordre (ou presque)
 
-* Err 500 sur voozanoo.net ?
 * DEBIAN/control Conflicts:
 * PHP 5
 * jessie build/run deps
@@ -11,4 +10,3 @@
 
 ## A voir ensuite (pas forcément pour Christophe)
 
-* CGD DONE masquer le warning sur l'état deprecated de mysql, sans masquer les autres

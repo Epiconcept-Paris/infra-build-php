@@ -44,7 +44,7 @@ if [ $# -ne 1 -a $# -ne 2 ]; then
     echo "Usage: ./$Prg <PHP-version> [ <Debian-version> ]" >&2
     echo "Latest PHP 5/7 versions:" >&2
     echo "$Latest" | sed 's/^/    /' >&2
-    echo "Supported Debian versions:" >&2
+    echo "Supported Debian versions (default = latest):" >&2
     ls debian | sort -n | while read v; do printf "    %2d (`cat debian/$v/name`)\n" $v; done
     exit 1
 fi
@@ -138,11 +138,9 @@ if docker images | grep $BUILD_IMG >/dev/null; then
     docker rmi $BUILD_IMG >/dev/null
 fi
 test -f .norun && EXTCOPY="$EXTCOPY
-COPY .norun $BUILD_TOP
-"
+COPY .norun $BUILD_TOP"
 test -f php/.notest && EXTCOPY="$EXTCOPY
-COPY php/.notest $BUILD_TOP
-"
+COPY php/.notest $BUILD_TOP"
 echo "Building '$BUILD_IMG' image..."
 DEBVER="$DebVer" BUILD_NUM="$BUILD_NUM" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpDir/$PhpSrc" EXTCOPY="$EXTCOPY" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_NUM $BUILD_REQ $PHPSRC $EXTCOPY $BUILD_TOP $PHPVER' <Dockerfile-build.in | tee tmp/Dockerfile-build | docker build -f - -t $BUILD_IMG . >tmp/docker-build.out 2>&1
 
@@ -171,8 +169,7 @@ if docker images | grep $TESTS_IMG >/dev/null; then
     docker rmi $TESTS_IMG >/dev/null
 fi
 test -f .norun && EXTCOPY="$EXTCOPY
-COPY .norun $TESTS_TOP
-"
+COPY .norun $TESTS_TOP"
 echo "Building '$TESTS_IMG' image..."
 DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $EXTCOPY $PHPVER' <Dockerfile-tests.in | tee tmp/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >tmp/docker-tests.out 2>&1
 

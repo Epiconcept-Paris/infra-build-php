@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 ini=/etc/php/php.ini
 mod=mysql.so
 
