@@ -15,6 +15,10 @@ version-Debian est sous la forme numérique n, par défaut la plus récente gér
 Les packages résultants sont produits dans debian/<version-Debian>/dist (répertoire partagé avec le container docker)
 Les logs du build et des tests sont dans debian/<version-Debian>/dist/.logs-<version-PHP>/
 
+Les packages produits comportent un numéro de build après la version-PHP.
+Ce numéro de build est incrémenté automatiquement après son dernier commit,
+mais ce commit doit être fait manuellement, ce qui vaut validation du build portant ce numéro.
+
 ## Mise au point
 
 Elle se fait en créant un fichier .norun (vide) dans le répertoire du script mk.sh
