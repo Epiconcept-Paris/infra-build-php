@@ -108,6 +108,10 @@ fi
 Num=$PhpDir/BUILD_NUM
 Log="`git log -n1 --date=iso $Num 2>/dev/null`"
 if [ $? -eq 0 -a "$Log" ]; then
+    Cmt="`echo "$Log" | sed -n 's/^commit //p'`"
+    Old=`git show $Cmt:$Num`
+    test -f $Num && New=`cat $Num` || New=$Old
+    test $New -gt $Old || echo `expr $Old + 1` >$Num
     touch -d "`echo "$Log" | sed -n 's/^Date: *//p'`" tmp/.date
 else
     test -f $Num || echo 1 >$Num
@@ -117,6 +121,7 @@ fi
 BUILD_TOP=/opt/build
 BUILD_IMG=epi-build-php
 BUILD_NUM=`cat $Num`
+echo "Making PHP $PhpVer-$BUILD_NUM packages..."
 
 if [ -f php/$PhpMaj/Dockervars.sh ]; then
     . php/$PhpMaj/Dockervars.sh
