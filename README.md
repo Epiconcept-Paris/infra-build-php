@@ -13,8 +13,8 @@ _\<version-Debian>_ est sous la forme numérique n, par défaut la plus récente
 
 ````./mk.sh```` (sans arguments) affiche la liste des dernières versions disponibles de PHP et celle des versions gérées de Debian
 
-Les packages résultants sont produits dans ````debian/\<version-Debian>/dist```` (répertoire partagé avec le container docker) \
-Les logs du build et des tests sont dans ````debian/<version-Debian>/dist/.logs-<version-PHP>/````
+Les packages résultants sont produits dans ````debian/\<version-Debian>/dist/<version-PHP>-<BUILD_NUM>```` (répertoire partagé avec le container docker) \
+Les logs du build et des tests sont dans ````debian/<version-Debian>/dist/<version-PHP>-<BUILD_NUM>/.logs````
 
 Le nom des packages produits comporte un numéro de build après la _\<version-PHP>_.
 Ce numéro de build, contenu dans ````php/<version-majeure-PHP>/<version-PHP>/BUILD_NUM```` est incrémenté automatiquement au premier ````./mk.sh ...```` suivant son dernier commit,

@@ -6,14 +6,13 @@
 Prg=`basename $0`
 Bld=`dirname $0`
 Ver="$1"
-Pkgs="$Bld/dist/.pkgs-$Ver"
-Logs="$Bld/dist/.logs-$Ver"
+Logs="$Bld/dist/.logs"
+Pkgs="$Bld/dist/.pkgs"
 Top="$Bld/top"
 Maj=`echo $Ver | awk -F. '{print $1}'`
 Min=`echo $Ver | awk -F. '{print $2}'`
 
 set -e	# Stop on errors
-test -d $Logs && rm -f $Logs/*.out || mkdir $Logs
 
 echo "Extracting php-$Ver source..."
 test -d /usr/src/php && rm -rf /usr/src/php/php-* || mkdir /usr/src/php
@@ -130,7 +129,7 @@ do
 
     # doc directory
     sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
-    sed -i -e "s/%NAME%/$Name/g" -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Bld/.date`/" $Top/usr/share/doc/pkgname/changelog.Debian
+    sed -i -e "s/%NAME%/$Name/g" -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Bld/dist/.date`/" $Top/usr/share/doc/pkgname/changelog.Debian
     gzip -n9 $Top/usr/share/doc/pkgname/changelog*
     mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name
 

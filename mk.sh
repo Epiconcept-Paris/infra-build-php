@@ -83,7 +83,6 @@ else
 fi
 DebVer="`cat debian/$DebNum/name`"
 DebDir=debian/$DebNum
-test -d $DebDir || mkdir $DebDir
 #echo "DebVer=$DebVer PhpVer=$PhpVer PhpMaj=$PhpMaj PhpMin=$PhpMin PhpSub=$PhpSub"
 
 #
@@ -101,6 +100,14 @@ fi
 #   Make build image and start container
 #
 Num=$PhpDir/BUILD_NUM
+BUILD_TOP=/opt/php-mk
+BUILD_IMG=epi-build-php
+BUILD_NUM=`cat $Num`
+Dist=$DebDir/dist/$PhpVer-$BUILD_NUM
+test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir -p $Dist/.logs
+
+echo "Making PHP $PhpVer-$BUILD_NUM packages for Debian $DebVer..."
+echo "Logs will be in $Dist/.logs/"
 Cmt="`git log -n1 $Num | sed -n 's/^commit //p' 2>/dev/null`"
 if [ "$Cmt" ]; then
     Old=`git show $Cmt:$Num`
@@ -109,12 +116,8 @@ if [ "$Cmt" ]; then
 else
     test -f $Num || echo 1 >$Num
 fi
-touch -r $Num tmp/.date
+touch -r $Num $Dist/.date
 
-BUILD_TOP=/opt/php-mk
-BUILD_IMG=epi-build-php
-BUILD_NUM=`cat $Num`
-echo "Making PHP $PhpVer-$BUILD_NUM packages for Debian $DebVer..."
 
 if [ -f $DebDir/Dockervars.sh ]; then
     . $DebDir/Dockervars.sh
@@ -146,12 +149,11 @@ if docker images | grep $BUILD_IMG >/dev/null; then
     docker rmi $BUILD_IMG >/dev/null
 fi
 
-Log=tmp/docker-build.out
-echo "Building '$BUILD_IMG' image (log in $Log)..."
-DEBVER="$DebVer" BUILD_NUM="$BUILD_NUM" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" CLI_DEPS="$CLI_DEPS" PHPSRC="$PhpDir/$PhpSrc" PHPVER="$PhpVer" EXTCOPY="$EXTCOPY" envsubst '$DEBVER $BUILD_NUM $BUILD_TOP $BUILD_REQ $CLI_DEPS $PHPSRC $PHPVER $EXTCOPY' <Dockerfile-build.in | tee tmp/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Log 2>&1
+echo "Building '$BUILD_IMG' image..."
+DEBVER="$DebVer" BUILD_NUM="$BUILD_NUM" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" CLI_DEPS="$CLI_DEPS" PHPSRC="$PhpDir/$PhpSrc" PHPVER="$PhpVer" EXTCOPY="$EXTCOPY" envsubst '$DEBVER $BUILD_NUM $BUILD_TOP $BUILD_REQ $CLI_DEPS $PHPSRC $PHPVER $EXTCOPY' <Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
 
-echo "Running '$BUILD_IMG' container (logs in $DebDir/dist)..."
-Cmd="docker run -ti -v `pwd`/$DebDir/dist:$BUILD_TOP/dist --name $BUILD_IMG --rm $BUILD_IMG"
+echo "Running '$BUILD_IMG' container..."
+Cmd="docker run -ti -v `pwd`/$Dist:$BUILD_TOP/dist --name $BUILD_IMG --rm $BUILD_IMG"
 $Cmd
 test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
 
@@ -175,12 +177,11 @@ if docker images | grep $TESTS_IMG >/dev/null; then
     docker rmi $TESTS_IMG >/dev/null
 fi
 
-Log=tmp/docker-tests.out
-echo "Building '$TESTS_IMG' image (log in $Log)..."
-DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $EXTCOPY $PHPVER' <Dockerfile-tests.in | tee tmp/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Log 2>&1
+echo "Building '$TESTS_IMG' image..."
+DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $EXTCOPY $PHPVER' <Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
 
-echo "Running '$TESTS_IMG' container (logs in $DebDir/dist)..."
-Cmd="docker run -ti -v `pwd`/$DebDir/dist:$TESTS_TOP/dist --name $TESTS_IMG --rm $TESTS_IMG"
+echo "Running '$TESTS_IMG' container..."
+Cmd="docker run -ti -v `pwd`/$Dist:$TESTS_TOP/dist --name $TESTS_IMG --rm $TESTS_IMG"
 $Cmd
 test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
 

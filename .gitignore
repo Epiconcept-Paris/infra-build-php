@@ -3,8 +3,3 @@ php/.notest
 debian/*/dist
 php/[5-9]/files/*.tgz
 php/[5-9]/[5-9].*/php-*.tar.bz2
-tmp/Dockerfile-build
-tmp/Dockerfile-tests
-tmp/docker-build.out
-tmp/docker-tests.out
-tmp/.date
