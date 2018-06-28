@@ -1,9 +1,8 @@
 ## A faire dans l'ordre (ou presque)
 
-* DEBIAN/control Conflicts:
 * PHP 5
-* jessie build/run deps
-* binary-or-shlib-defines-rpath
+* signature packages
+* jessie lintian warning: hardening-no-relro
 * grep -v sur logs pour isoler les erreurs
 * verif des SKIP sur make test
 * Pear install warnings

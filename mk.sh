@@ -2,7 +2,7 @@
 #
 #	Make PHP packages for a given set of PHP and Debian versions
 #
-#	Usage:	./build.sh <PHP-version> [<Debian-version>]
+#	Usage:	./mk.sh <PHP-version> [<Debian-version>]
 #
 #	PHP-version is checked to be available in PHP sources
 #	Debian-version is checked to be supported and defaults to 'stretch'
@@ -17,7 +17,7 @@ Dir=`dirname $0`
 #
 Versions="`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -n 's/^.*<h[1-4]>Version \([^ ]*\) *<\/h[1-4]>/\1/p' | sort -nr -t. -k 1,1 -k 2,2 -k 3,3`"
 if [ -z "$Versions" ]; then
-    echo "$Prg: unable to fetch the latest list of PHP versions from \"$PHPSITE\"" >&2
+    echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"" >&2
     exit 1
 fi
 #
@@ -65,6 +65,8 @@ if ! echo "$Versions" | grep "$1" >/dev/null; then
     exit 1
 fi
 PhpVer="$1"
+PhpDir=php/$PhpMaj/$PhpVer 
+test -d $PhpDir || mkdir $PhpDir
 #
 #   Check Debian version
 #
@@ -80,55 +82,56 @@ else
     DebNum=`ls debian | sort -n | tail -1`
 fi
 DebVer="`cat debian/$DebNum/name`"
+DebDir=debian/$DebNum
+test -d $DebDir || mkdir $DebDir
 #echo "DebVer=$DebVer PhpVer=$PhpVer PhpMaj=$PhpMaj PhpMin=$PhpMin PhpSub=$PhpSub"
+
 #
 #   Fetch PHP source
 #
 date '+===== %Y-%m-%d %H:%M:%S %Z'
 Now=`date '+%s'`
-PhpDir=php/$PhpMaj/$PhpVer 
-DebDir=debian/$DebNum
-test -d $PhpDir || mkdir $PhpDir
-test -d $DebDir || mkdir $DebDir
 PhpSrc=php-$PhpVer.tar.bz2
 if [ ! -f $PhpDir/$PhpSrc ]; then
     echo "Fetching $PhpSrc..."
     curl -sSL "http://$PHPSITE/get/$PhpSrc/from/this/mirror" -o $PhpDir/$PhpSrc
-fi
-if [ -f $DebDir/Dockervars.sh ]; then
-    . $DebDir/Dockervars.sh
-else
-    echo "$Prg: missing $DebDir/Dockervars.sh" >&2
-    exit 1
 fi
 
 #
 #   Make build image and start container
 #
 Num=$PhpDir/BUILD_NUM
-Log="`git log -n1 --date=iso $Num 2>/dev/null`"
-if [ $? -eq 0 -a "$Log" ]; then
-    Cmt="`echo "$Log" | sed -n 's/^commit //p'`"
+Cmt="`git log -n1 $Num | sed -n 's/^commit //p' 2>/dev/null`"
+if [ "$Cmt" ]; then
     Old=`git show $Cmt:$Num`
     test -f $Num && New=`cat $Num` || New=$Old
     test $New -gt $Old || echo `expr $Old + 1` >$Num
-    touch -d "`echo "$Log" | sed -n 's/^Date: *//p'`" tmp/.date
 else
     test -f $Num || echo 1 >$Num
-    touch -r $Num tmp/.date
 fi
+touch -r $Num tmp/.date
 
-BUILD_TOP=/opt/php
+BUILD_TOP=/opt/php-mk
 BUILD_IMG=epi-build-php
 BUILD_NUM=`cat $Num`
 echo "Making PHP $PhpVer-$BUILD_NUM packages for Debian $DebVer..."
 
+if [ -f $DebDir/Dockervars.sh ]; then
+    . $DebDir/Dockervars.sh
+else
+    echo "$Prg: missing $DebDir/Dockervars.sh" >&2
+    exit 1
+fi
 if [ -f php/$PhpMaj/Dockervars.sh ]; then
     . php/$PhpMaj/Dockervars.sh
 else
     echo "$Prg: missing php/$PhpMaj/Dockervars.sh" >&2
     exit 1
 fi
+test -f .norun && EXTCOPY="$EXTCOPY
+COPY .norun $BUILD_TOP"
+test -f php/.notest && EXTCOPY="$EXTCOPY
+COPY php/.notest $BUILD_TOP"
 
 if docker ps | grep $BUILD_IMG >/dev/null; then
     echo "Stopping running '$BUILD_IMG' container..."
@@ -142,14 +145,12 @@ if docker images | grep $BUILD_IMG >/dev/null; then
     echo "Deleting existing '$BUILD_IMG' image..."
     docker rmi $BUILD_IMG >/dev/null
 fi
-test -f .norun && EXTCOPY="$EXTCOPY
-COPY .norun $BUILD_TOP"
-test -f php/.notest && EXTCOPY="$EXTCOPY
-COPY php/.notest $BUILD_TOP"
-echo "Building '$BUILD_IMG' image..."
-DEBVER="$DebVer" BUILD_NUM="$BUILD_NUM" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpDir/$PhpSrc" EXTCOPY="$EXTCOPY" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_NUM $BUILD_REQ $PHPSRC $EXTCOPY $BUILD_TOP $PHPVER' <Dockerfile-build.in | tee tmp/Dockerfile-build | docker build -f - -t $BUILD_IMG . >tmp/docker-build.out 2>&1
 
-echo "Running '$BUILD_IMG' container..."
+Log=tmp/docker-build.out
+echo "Building '$BUILD_IMG' image (log in $Log)..."
+DEBVER="$DebVer" BUILD_NUM="$BUILD_NUM" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" CLI_DEPS="$CLI_DEPS" PHPSRC="$PhpDir/$PhpSrc" PHPVER="$PhpVer" EXTCOPY="$EXTCOPY" envsubst '$DEBVER $BUILD_NUM $BUILD_TOP $BUILD_REQ $CLI_DEPS $PHPSRC $PHPVER $EXTCOPY' <Dockerfile-build.in | tee tmp/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Log 2>&1
+
+echo "Running '$BUILD_IMG' container (logs in $DebDir/dist)..."
 Cmd="docker run -ti -v `pwd`/$DebDir/dist:$BUILD_TOP/dist --name $BUILD_IMG --rm $BUILD_IMG"
 $Cmd
 test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
@@ -157,9 +158,9 @@ test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
 #
 #   Make tests image and start container
 #
-TESTS_TOP=/opt/php
+TESTS_TOP=/opt/php-mk
 TESTS_IMG=epi-tests-php
-EXTCOPY=
+test -f .norun && EXTCOPY="COPY .norun $TESTS_TOP" || EXTCOPY=
 
 if docker ps | grep $TESTS_IMG >/dev/null; then
     echo "Stopping running '$TESTS_IMG' container..."
@@ -173,12 +174,12 @@ if docker images | grep $TESTS_IMG >/dev/null; then
     echo "Deleting existing '$TESTS_IMG' image..."
     docker rmi $TESTS_IMG >/dev/null
 fi
-test -f .norun && EXTCOPY="$EXTCOPY
-COPY .norun $TESTS_TOP"
-echo "Building '$TESTS_IMG' image..."
-DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $EXTCOPY $PHPVER' <Dockerfile-tests.in | tee tmp/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >tmp/docker-tests.out 2>&1
 
-echo "Running '$TESTS_IMG' container..."
+Log=tmp/docker-tests.out
+echo "Building '$TESTS_IMG' image (log in $Log)..."
+DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $EXTCOPY $PHPVER' <Dockerfile-tests.in | tee tmp/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Log 2>&1
+
+echo "Running '$TESTS_IMG' container (logs in $DebDir/dist)..."
 Cmd="docker run -ti -v `pwd`/$DebDir/dist:$TESTS_TOP/dist --name $TESTS_IMG --rm $TESTS_IMG"
 $Cmd
 test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"

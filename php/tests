@@ -15,6 +15,9 @@ if [ ! -f $Pkgs ]; then
     echo "$Prg: cannot find $Pkgs file" >&2
     exit 1
 fi
+echo "Setting Apache 2 to prefork mode..."
+a2dismod mpm_event >$Logs/a2mod.out 2>&1
+a2enmod mpm_prefork >>$Logs/a2mod.out 2>&1
 
 while read pkg
 do

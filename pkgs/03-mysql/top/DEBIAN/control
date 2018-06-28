@@ -4,7 +4,7 @@ Priority: optional
 Architecture: amd64
 Section: admin
 Depends: %CLI%, libc6
-Conflicts: php7.1, php7.0, php5
+Conflicts: php7.0-cli, php7.1-cli, php7.2-cli, php5-cli
 Maintainer: cedric <c.girard@epiconcept.fr>
 Description: PHP MySQL extension build by Epiconcept
  This package provides the PHP MySQL shared extension

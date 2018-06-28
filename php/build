@@ -13,7 +13,6 @@ Maj=`echo $Ver | awk -F. '{print $1}'`
 Min=`echo $Ver | awk -F. '{print $2}'`
 
 set -e	# Stop on errors
-echo "Logs in $Logs/"
 test -d $Logs && rm -f $Logs/*.out || mkdir $Logs
 
 echo "Extracting php-$Ver source..."
@@ -25,14 +24,19 @@ Opt='--with-mcrypt'
 grep -- $Opt configure >/dev/null && WithMCrypt=$Opt || echo "No '$Opt' option in 'configure'. Using extension."
 Opt='--enable-gd-native-ttf'
 grep -- $Opt configure >/dev/null && EnaGdTtf=$Opt || echo "No '$Opt' option in 'configure'. Discarded."
+
 if [ -d $Bld/hooks ]; then
     for hook in $Bld/hooks/*
     do
-	if grep ExtShow $hook >/dev/null; then
-	    test "$ExtShow" && ExtShow="$ExtShow + " || ExtShow=" with "
-	    test "$ExtOpts" && ExtOpts="$ExtOpts "
-	fi
+	Show=
+	Opt=
 	. $hook
+	if [ "$Show" ]; then
+	    test "$ExtShow" && ExtShow="$ExtShow + $Show" || ExtShow=" with $Show"
+	fi
+	if [ "$Opt" ]; then
+	    test "$ExtOpts" && ExtOpts="$ExtOpts $Opt" || ExtOpts="$Opt"
+	fi
     done
     if [ "$ExtOpts" ]; then
 	#cp -p configure $Logs/configure0
@@ -42,22 +46,22 @@ if [ -d $Bld/hooks ]; then
 fi
 
 echo "Configuring php-$Ver$ExtShow..."
-(cd /usr/include; test -h curl || ln -s x86_64-linux-gnu/curl .)	# For OAuth
+(cd /usr/include; test -d curl -o -h curl || ln -s x86_64-linux-gnu/curl .)	# For OAuth
 test -d /var/run/apache2 || mkdir /var/run/apache2	# For apache2 -V in configure
 eval `grep '^export APACHE_' /etc/apache2/envvars`	# For apache2 -V in configure
 export PHP_SYSCONFDIR="/etc/php"
 ./configure	\
 	--prefix=/usr \
 	--mandir=/usr/share/man \
+	--disable-rpath \
 	--disable-cgi \
 	--disable-phpdbg \
 	--with-pear=/usr/share/php \
 	--with-apxs2=/usr/bin/apxs \
 	--with-config-file-path="$PHP_SYSCONFDIR" \
 	--with-config-file-scan-dir="$PHP_SYSCONFDIR/conf.d" \
-	--with-libdir=/lib/x86_64-linux-gnu \
-	--with-jpeg-dir=/usr \
 	--with-freetype-dir=/usr \
+	--with-jpeg-dir=/usr \
 	--with-png-dir=/usr \
 	--with-xpm-dir=/usr,/usr/X11R6 \
 	--with-zlib-dir=/usr \
@@ -140,7 +144,7 @@ do
     . $dir/install
 
     # DEBIAN directory
-    sed -i -e "s/%VERSION%/$Ver-$BUILD_NUM/" -e "s/%NAME%/$Name/" -e "s/%CLI%/$Cli/" $Top/DEBIAN/control
+    sed -i -e "s/%VERSION%/$Ver-$BUILD_NUM/" -e "s/%NAME%/$Name/" -e "s/%DEPS%/$CLI_DEPS/" -e "s/%CLI%/$Cli/" $Top/DEBIAN/control
 
     # Gather extra license files
     find $Top -type f -iname license | while read f
@@ -152,12 +156,14 @@ do
 
     echo "Assembling package '$Pkg'..."
     out=$(fakeroot dpkg-deb -Zgzip --build $Top $Bld/dist)
-    deb=$(echo $out | sed "s/^.*building package '[^']*' in '\([^']*\)'\.$/\1/")
+    deb=$(echo $out | sed "s/^.*building package ['\`][^']*' in ['\`]\([^']*\)'\.$/\1/")
 
-    if [ "$deb" -a -f "$deb" ]; then
+    if [ -f "$deb" ]; then
 	echo "Checking package '$Pkg' -> $deb..."
 	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
 	echo "`basename $deb`" >>$Pkgs
+    else
+	echo "out=\"$out\" deb=\"$deb\""
     fi
 done
 

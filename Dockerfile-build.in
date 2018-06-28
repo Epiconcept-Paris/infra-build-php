@@ -3,6 +3,7 @@ MAINTAINER Epiconcept
 
 ENV DEBVER $DEBVER
 ENV BUILD_NUM $BUILD_NUM
+ENV CLI_DEPS $CLI_DEPS
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm\nalias l='ls -al'" >>/root/.bashrc
