@@ -1,4 +1,9 @@
-%NAME%: non-standard-apache2-module-package-name %NAME% != libapache2-libphp7
-%NAME%: apache2-module-does-not-ship-load-file libphp7
+#   E: Our PHP module includes file/libgd on purpose
 %NAME%: embedded-library usr/lib/apache2/modules/libphp7.so: libgd
 %NAME%: embedded-library usr/lib/apache2/modules/libphp7.so: file
+
+#   E: This is due to our custom module naming
+%NAME%: apache2-module-does-not-ship-load-file libphp7
+
+#   W: We want our custom package naming style
+%NAME%: non-standard-apache2-module-package-name %NAME% != libapache2-libphp7

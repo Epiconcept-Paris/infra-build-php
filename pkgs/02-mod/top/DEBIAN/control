@@ -3,7 +3,7 @@ Version: %VERSION%
 Priority: optional
 Architecture: amd64
 Section: admin
-Depends: apache2, %CLI%, libc6
+Depends: apache2, %API%, %CLI%, libc6
 Conflicts: php7.0-cli, php7.1-cli, php7.2-cli, php5-cli
 Maintainer: Cedric <c.girard@epiconcept.fr>
 Description: PHP Apache module build by Epiconcept

@@ -4,8 +4,8 @@
 #
 #	Usage:	./mk.sh <PHP-version> [<Debian-version>]
 #
-#	PHP-version is checked to be available in PHP sources
-#	Debian-version is checked to be supported and defaults to 'stretch'
+#	PHP-version is checked to be available in PHP sources on $PHPSITE
+#	Debian-version is checked to be supported and defaults to latest version
 #
 PHPSITE='fr.php.net'
 PHP5URL="http://museum.php.net/php5"
@@ -40,84 +40,96 @@ END {
 #   Check usage
 #
 test "$Dir" = '.' || cd "$Dir"
+test -d debian || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
+DebNum=`ls debian | sort -n | tail -1`	# Default = latest
 if [ $# -ne 1 -a $# -ne 2 ]; then
-    echo "Usage: ./$Prg <PHP-version> [ <Debian-version> ]" >&2
+    echo "Usage: $Dir/$Prg <PHP-version> [ <Debian-version> ]" >&2
     echo "Latest PHP 5/7 versions:" >&2
     echo "$Latest" | sed 's/^/    /' >&2
-    echo "Supported Debian versions (default = latest):" >&2
-    ls debian | sort -n | while read v; do printf "    %2d (`cat debian/$v/name`)\n" $v; done
+    echo "Supported Debian versions (default $DebNum):" >&2
+    ls debian | sort -n | while read v; do test -f debian/$v/name && printf "    %2d (`cat debian/$v/name`)\n" $v; done >&2
     exit 1
 fi
 
 #
 #   Check PHP version
 #
-split="`echo "$1" | sed -nr 's/^([57])\.([0-9]+)\.([0-9]+)$/PhpMaj=\1 PhpMin=\2 PhpSub=\3/p'`"
+split="`echo "$1" | sed -nr 's/^([57])\.([0-9]+)\.([0-9]+)$/Maj=\1 Min=\2 Sub=\3/p'`"
 if [ -z "$split" ]; then
     echo "$Prg: invalid PHP version \"$1\" ([57].x.y)" >&2
     exit 1
 fi
 eval "$split"
-if ! echo "$Versions" | grep "$1" >/dev/null; then
+if echo "$Versions" | grep "^$Maj\.$Min\.$Sub$" >/dev/null; then
+    PhpVer="$1"
+    PhpDir=php/$Maj/$PhpVer
+else
     echo "$Prg: unknown PHP version \"$1\"" >&2
     echo "Latest PHP 5/7 versions:" >&2
     echo "$Latest" | sed 's/^/    /' >&2
     exit 1
 fi
-PhpVer="$1"
-PhpDir=php/$PhpMaj/$PhpVer 
-test -d $PhpDir || mkdir $PhpDir
 #
 #   Check Debian version
 #
 if [ "$2" ]; then
-    DebNum="$2"
-    if [ ! -f debian/$2/name ]; then
+    if [ -f debian/$2/name ]; then
+	DebNum="$2"
+    else
 	echo "$Prg: unsupported Debian version \"$2\"" >&2
-	echo "Supported Debian versions:" >&2
-	ls debian | sort -n | while read v; do printf "    %2d (`cat debian/$v/name`)\n" $v; done
+	echo "Supported Debian versions (default $DebNum):" >&2
+	ls debian | sort -n | while read v; do test -f debian/$v/name && printf "    %2d (`cat debian/$v/name`)\n" $v; done >&2
 	exit 1
     fi
-else
-    DebNum=`ls debian | sort -n | tail -1`
 fi
 DebVer="`cat debian/$DebNum/name`"
 DebDir=debian/$DebNum
-#echo "DebVer=$DebVer PhpVer=$PhpVer PhpMaj=$PhpMaj PhpMin=$PhpMin PhpSub=$PhpSub"
+#echo "DebVer=$DebVer PhpVer=$PhpVer Maj=$Maj Min=$Min Sub=$Sub"
 
 #
 #   Fetch PHP source
 #
 date '+===== %Y-%m-%d %H:%M:%S %Z'
 Now=`date '+%s'`
+test -d $PhpDir || mkdir $PhpDir
 PhpSrc=php-$PhpVer.tar.bz2
 if [ ! -f $PhpDir/$PhpSrc ]; then
     echo "Fetching $PhpSrc..."
-    curl -sSL "http://$PHPSITE/get/$PhpSrc/from/this/mirror" -o $PhpDir/$PhpSrc
+    if [ $Maj -le 5 ]; then
+	curl -sSL "http://$PHP5URL/$PhpSrc" -o $PhpDir/$PhpSrc
+    else
+	curl -sSL "http://$PHPSITE/get/$PhpSrc/from/this/mirror" -o $PhpDir/$PhpSrc
+    fi
 fi
+
+#
+#   Determine build number and build date
+#
+Num=$PhpDir/BUILD_NUM
+Cmt="`git log -n1 --format=%H -- $Num 2>/dev/null`"
+if [ "$Cmt" ]; then
+    Log=`git show $Cmt:$Num`
+    if [ -f $Num ]; then	# If $Num exists and is $Log, set it's mtime to $Cmt's
+	test "`cat $Num`" = "$Log" && touch -d "`git show -s --format=%ci $Cmt`" $Num
+    else			# else set $Num = $Log + 1
+	echo `expr $Log + 1` >$Num
+    fi
+else				# No log yet: keep $Num or create it if needed
+    test -f $Num || echo 1 >$Num
+fi
+Bld=`cat $Num`			# For package names
+Dist=$DebDir/dist/$PhpVer-$Bld
+touch -r $Num $Dist/.date	# For package dates in changelog.Debian
 
 #
 #   Make build image and start container
 #
-Num=$PhpDir/BUILD_NUM
 BUILD_TOP=/opt/php-mk
 BUILD_IMG=epi-build-php
-BUILD_NUM=`cat $Num`
-Dist=$DebDir/dist/$PhpVer-$BUILD_NUM
-test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir -p $Dist/.logs
 
-echo "Making PHP $PhpVer-$BUILD_NUM packages for Debian $DebVer..."
+echo "Making PHP $PhpVer-$Bld packages for Debian $DebVer..."
 echo "Logs will be in $Dist/.logs/"
-Cmt="`git log -n1 $Num | sed -n 's/^commit //p' 2>/dev/null`"
-if [ "$Cmt" ]; then
-    Old=`git show $Cmt:$Num`
-    test -f $Num && New=`cat $Num` || New=$Old
-    test $New -gt $Old || echo `expr $Old + 1` >$Num
-else
-    test -f $Num || echo 1 >$Num
-fi
-touch -r $Num $Dist/.date
-
+test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir -p $Dist/.logs
 
 if [ -f $DebDir/Dockervars.sh ]; then
     . $DebDir/Dockervars.sh
@@ -125,10 +137,10 @@ else
     echo "$Prg: missing $DebDir/Dockervars.sh" >&2
     exit 1
 fi
-if [ -f php/$PhpMaj/Dockervars.sh ]; then
-    . php/$PhpMaj/Dockervars.sh
+if [ -f php/$Maj/Dockervars.sh ]; then
+    . php/$Maj/Dockervars.sh
 else
-    echo "$Prg: missing php/$PhpMaj/Dockervars.sh" >&2
+    echo "$Prg: missing php/$Maj/Dockervars.sh" >&2
     exit 1
 fi
 test -f .norun && EXTCOPY="$EXTCOPY
@@ -150,7 +162,8 @@ if docker images | grep $BUILD_IMG >/dev/null; then
 fi
 
 echo "Building '$BUILD_IMG' image..."
-DEBVER="$DebVer" BUILD_NUM="$BUILD_NUM" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" CLI_DEPS="$CLI_DEPS" PHPSRC="$PhpDir/$PhpSrc" PHPVER="$PhpVer" EXTCOPY="$EXTCOPY" envsubst '$DEBVER $BUILD_NUM $BUILD_TOP $BUILD_REQ $CLI_DEPS $PHPSRC $PHPVER $EXTCOPY' <Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
+#   Variables are by order of appearance in Dockerfile-build.in
+DEBVER="$DebVer" BUILD_NUM="$Bld" CLI_DEPS="$CLI_DEPS" BUILD_REQ="$BUILD_REQ" BUILD_TOP="$BUILD_TOP" PHPSRC="$PhpDir/$PhpSrc" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_NUM $CLI_DEPS $BUILD_REQ $BUILD_TOP $PHPSRC $EXTCOPY $PHPVER' <Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
 
 echo "Running '$BUILD_IMG' container..."
 Cmd="docker run -ti -v `pwd`/$Dist:$BUILD_TOP/dist --name $BUILD_IMG --rm $BUILD_IMG"

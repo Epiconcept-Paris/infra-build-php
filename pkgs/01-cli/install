@@ -31,6 +31,7 @@ else
 fi
 
 rmdir -v $Top/usr/share/php/.registry/.channel.* >$Logs/rmed_$Pkg.out
+rm -vf $Top/.depdb* >>$Logs/rmed_$Pkg.out
 file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs strip -v >$Logs/striped_$Pkg.out
 find $Top/usr/lib -name '*.so' | xargs strip -v >>$Logs/striped_$Pkg.out
 find $Top/usr/lib -name '*.so' | xargs chmod -x
