@@ -119,6 +119,7 @@ else				# No log yet: keep $Num or create it if needed
 fi
 Bld=`cat $Num`			# For package names
 Dist=$DebDir/dist/$PhpVer-$Bld
+test -d $Dist || mkdir -p $Dist
 touch -r $Num $Dist/.date	# For package dates in changelog.Debian
 
 #
@@ -129,7 +130,7 @@ BUILD_IMG=epi-build-php
 
 echo "Making PHP $PhpVer-$Bld packages for Debian $DebVer..."
 echo "Logs will be in $Dist/.logs/"
-test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir -p $Dist/.logs
+test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir $Dist/.logs
 
 if [ -f $DebDir/Dockervars.sh ]; then
     . $DebDir/Dockervars.sh

@@ -1,6 +1,6 @@
 ## A faire dans l'ordre (ou presque)
 
-* PHP 5
+* PHP 5 + APC
 * signature packages
 * jessie lintian warning: hardening-no-relro
 * grep -v sur logs pour isoler les erreurs
