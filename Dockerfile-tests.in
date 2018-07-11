@@ -17,6 +17,6 @@ RUN mkdir -p $TESTS_TOP/dist
 COPY php/info.php /var/www/html
 COPY php/tests $TESTS_TOP
 COPY run $TESTS_TOP
-$EXTCOPY
+$TSTCOPY
 
 CMD $TESTS_TOP/run $PHPVER

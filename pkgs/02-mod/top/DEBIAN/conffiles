@@ -1,2 +1,2 @@
-/etc/apache2/mods-available/php7.conf
-/etc/apache2/mods-available/php7.load
+/etc/apache2/mods-available/php%MAJ%.conf
+/etc/apache2/mods-available/php%MAJ%.load

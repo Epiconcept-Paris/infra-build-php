@@ -5,10 +5,16 @@
 sed -i "s;install-pear-nozlib.phar -d;install-pear-nozlib.phar -m /usr/share/php -D /usr/share/doc/$Name -M /usr/share/man -d;" Makefile
 mkdir $Top/usr/share/php
 # Skip install-sapi install-build install-headers install-pdo-headers
-INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear make install-modules install-cli install-programs install-pear install-pharcmd >$Logs/make-install_$Pkg.out 2>&1
+for tgt in install-cli install-binaries install-programs install-modules install-pear install-pharcmd
+do
+    grep "^install_targets = .* $tgt" Makefile >/dev/null && Tgts="$Tgts $tgt"
+done
+test "$Dbg" && echo "Tgts=\"$Tgts\""
+INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear PHP_PEAR_INSTALL_DIR=usr/share/php make$Tgts >$Logs/make-install_$Pkg.out 2>&1
 
 while read d f p
 do
+    test -f $Bld/pkgs/$p/skip && continue
     File=`cd $Top; find $d -type f -name $f`
     if [ "$File" -a -f "$Top/$File" ]; then
 	Ext=$Bld/pkgs/$p/top/`dirname $File`
@@ -30,8 +36,9 @@ else
     echo "\aERROR: no directory pear/man in `pwd`"
 fi
 
-rmdir -v $Top/usr/share/php/.registry/.channel.* >$Logs/rmed_$Pkg.out
+find $Top -type d -empty | xargs -r rmdir -v >$Logs/rmed_$Pkg.out
 rm -vf $Top/.depdb* >>$Logs/rmed_$Pkg.out
-file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs strip -v >$Logs/striped_$Pkg.out
-find $Top/usr/lib -name '*.so' | xargs strip -v >>$Logs/striped_$Pkg.out
-find $Top/usr/lib -name '*.so' | xargs chmod -x
+file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs -r strip -v >$Logs/striped_$Pkg.out
+find $Top -name '*.so' | xargs -r strip -v >>$Logs/striped_$Pkg.out
+find $Top -name '*.so' | xargs -r chmod -x
+find $Top -name '*.sh' | xargs -r chmod +x

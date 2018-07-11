@@ -11,8 +11,8 @@ INSTALL_ROOT=$Top APACHE_CONFDIR=$Top/etc/apache2 make install-sapi >$Logs/make-
 sed -i "s;$Top;;g" $ModDir/php$Maj.load
 find $EnaDir -type l | xargs rm -v >$Logs/rmed_$Pkg.out
 rmdir -v $EnaDir >>$Logs/rmed_$Pkg.out
-test -d $Top/usr/var && find $Top/usr/var -depth -type d | xargs rmdir -v >>$Logs/rmed_$Pkg.out
-find $Top/usr/lib -name '*.so' | xargs strip -v >$Logs/striped_$Pkg.out
+find $Top/usr/lib -name '*.so' | xargs -r strip -v >$Logs/striped_$Pkg.out
 
 sed -i "s/%API%/`dpkg-query -W -f='${Provides}' apache2-bin`/" $Top/DEBIAN/control
+sed -i "s/%MAJ%/$Maj/" $Top/DEBIAN/conffiles
 sed -i "s/%MAJ%/$Maj/" $Top/DEBIAN/postinst

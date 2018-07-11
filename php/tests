@@ -14,14 +14,17 @@ if [ ! -f $Pkgs ]; then
     echo "$Prg: cannot find $Pkgs file" >&2
     exit 1
 fi
+
 echo "Setting Apache 2 to prefork mode..."
 a2dismod mpm_event >$Logs/a2mod.out 2>&1
 a2enmod mpm_prefork >>$Logs/a2mod.out 2>&1
 
+echo "Installing packages..."
+test -d $Tst/pkgs && dpkg -i $Tst/pkgs/*.deb >$Logs/dpkg-i.out 2>&1
+
 while read pkg
 do
-    name=`echo $pkg | awk -F_ '{print $1}'`
-    if dpkg -l $name >/dev/null 2>&1; then
+    if dpkg -l `echo $pkg | awk -F_ '{print $1}'` >/dev/null 2>&1; then
 	echo "Package $pkg is installed."
     else
 	echo "Installing $pkg..."
@@ -29,7 +32,9 @@ do
     fi
 done <$Pkgs
 apt-get -yf install >$Logs/apt-get.out
+
 echo "Testing PHP CLI..."
 php /var/www/html/info.php >$Logs/info_01-cli.out
+
 echo "Testing PHP apache module..."
 curl -sSL http://localhost/info.php >$Logs/info_02-mod.out

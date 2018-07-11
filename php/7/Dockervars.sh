@@ -7,7 +7,6 @@ Dir=php/7
 #    Add hooks for PECL PHP extensions
 #
 PECLGET="http://pecl.php.net/get"
-EXTCOPY="RUN mkdir $BUILD_TOP/hooks"
 
 #   AddPECL <URL-file> <Src-base> <Hook-name> <Hook-file>
 AddPECL()
@@ -19,7 +18,7 @@ AddPECL()
 	echo "Fetching $3 `expr $Tgz : "$2-\(.*\).tgz"` extension..."
 	curl -sSL "$PECLGET/$1" -o $Dir/files/$Tgz
     fi
-    EXTCOPY="$EXTCOPY
+    BLDCOPY="$BLDCOPY
 COPY $Dir/files/$Tgz $BUILD_TOP/files
 COPY $Dir/hooks/$4.sh $BUILD_TOP/hooks"
 }
@@ -37,7 +36,7 @@ AddExtra()
 	echo "Fetching MySQL legacy extension..."
 	curl -sSL "https://github.com/php/pecl-database-mysql/archive/master.tar.gz" -o $Dir/files/$Tgz
     fi
-    EXTCOPY="$EXTCOPY
+    BLDCOPY="$BLDCOPY
 COPY $Dir/files/$Tgz $BUILD_TOP/files
 COPY $Dir/files/mysql.patch $BUILD_TOP/files
 COPY $Dir/hooks/mysql.sh $BUILD_TOP/hooks"
@@ -48,7 +47,7 @@ COPY $Dir/hooks/mysql.sh $BUILD_TOP/hooks"
 	echo "Fetching PEAR manpages..."
 	curl -sSL "http://download.pear.php.net/package/$Tgz" -o $Dir/files/$Tgz
     fi
-    EXTCOPY="$EXTCOPY
+    BLDCOPY="$BLDCOPY
 COPY $Dir/files/$Tgz $BUILD_TOP/files
 COPY $Dir/hooks/pearman.sh $BUILD_TOP/hooks"
 }
@@ -56,6 +55,8 @@ COPY $Dir/hooks/pearman.sh $BUILD_TOP/hooks"
 #
 #   Main
 #
+BLDCOPY="RUN mkdir $BUILD_TOP/hooks"
+
 AddPECL APCu apcu APCu apcu
 AddPECL oauth oauth OAuth oauth
 AddPECL mcrypt mcrypt MCrypt mcrypt

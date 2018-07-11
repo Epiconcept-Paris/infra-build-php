@@ -1,6 +1,8 @@
 #   E: Our PHP binary includes file/libgd on purpose
-%NAME%: embedded-library usr/bin/php: file
 %NAME%: embedded-library usr/bin/php: libgd
+%NAME%: embedded-library usr/bin/php: file
+%NAME%: embedded-library usr/bin/php: pcre3
+%NAME%: embedded-library usr/bin/php: sqlite
 
 #   E: Pointless as phar is included in this cli package
-%NAME%: php-script-but-no-php-cli-dep usr/bin/phar.phar
+%NAME%: php-script-but-no-phpX-cli-dep usr/bin/phar.phar

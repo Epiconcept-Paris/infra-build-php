@@ -1,9 +1,11 @@
-#   E: Our PHP module includes file/libgd on purpose
-%NAME%: embedded-library usr/lib/apache2/modules/libphp7.so: libgd
-%NAME%: embedded-library usr/lib/apache2/modules/libphp7.so: file
+#   E: Our PHP module includes libgd/file/sqlite/pcre3 on purpose
+%NAME%: embedded-library usr/lib/apache2/modules/libphp%MAJ%.so: libgd
+%NAME%: embedded-library usr/lib/apache2/modules/libphp%MAJ%.so: file
+%NAME%: embedded-library usr/lib/apache2/modules/libphp%MAJ%.so: pcre3
+%NAME%: embedded-library usr/lib/apache2/modules/libphp%MAJ%.so: sqlite
 
 #   E: This is due to our custom module naming
-%NAME%: apache2-module-does-not-ship-load-file libphp7
+%NAME%: apache2-module-does-not-ship-load-file libphp%MAJ%
 
 #   W: We want our custom package naming style
-%NAME%: non-standard-apache2-module-package-name %NAME% != libapache2-libphp7
+%NAME%: non-standard-apache2-module-package-name %NAME% != libapache2-libphp%MAJ%

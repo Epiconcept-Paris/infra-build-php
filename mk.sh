@@ -8,7 +8,7 @@
 #	Debian-version is checked to be supported and defaults to latest version
 #
 PHPSITE='fr.php.net'
-PHP5URL="http://museum.php.net/php5"
+PHP5URL="museum.php.net/php5"
 #
 Prg=`basename $0`
 Dir=`dirname $0`
@@ -103,6 +103,25 @@ if [ ! -f $PhpDir/$PhpSrc ]; then
 fi
 
 #
+#   Source debian and PHP hooks (in that order)
+#
+BUILD_TOP=/opt/php-mk
+TESTS_TOP=/opt/php-mk
+
+if [ -f $DebDir/Dockervars.sh ]; then
+    . $DebDir/Dockervars.sh
+else
+    echo "$Prg: missing $DebDir/Dockervars.sh" >&2
+    exit 1
+fi
+if [ -f php/$Maj/Dockervars.sh ]; then
+    . php/$Maj/Dockervars.sh
+else
+    echo "$Prg: missing php/$Maj/Dockervars.sh" >&2
+    exit 1
+fi
+
+#
 #   Determine build number and build date
 #
 Num=$PhpDir/BUILD_NUM
@@ -122,31 +141,18 @@ Dist=$DebDir/dist/$PhpVer-$Bld
 test -d $Dist || mkdir -p $Dist
 touch -r $Num $Dist/.date	# For package dates in changelog.Debian
 
-#
-#   Make build image and start container
-#
-BUILD_TOP=/opt/php-mk
-BUILD_IMG=epi-build-php
-
 echo "Making PHP $PhpVer-$Bld packages for Debian $DebVer..."
 echo "Logs will be in $Dist/.logs/"
 test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir $Dist/.logs
 
-if [ -f $DebDir/Dockervars.sh ]; then
-    . $DebDir/Dockervars.sh
-else
-    echo "$Prg: missing $DebDir/Dockervars.sh" >&2
-    exit 1
-fi
-if [ -f php/$Maj/Dockervars.sh ]; then
-    . php/$Maj/Dockervars.sh
-else
-    echo "$Prg: missing php/$Maj/Dockervars.sh" >&2
-    exit 1
-fi
-test -f .norun && EXTCOPY="$EXTCOPY
+#
+#   Make build image and start container
+#
+BUILD_IMG=epi-build-php
+
+test -f .norun && BLDCOPY="$BLDCOPY
 COPY .norun $BUILD_TOP"
-test -f php/.notest && EXTCOPY="$EXTCOPY
+test -f php/.notest && BLDCOPY="$BLDCOPY
 COPY php/.notest $BUILD_TOP"
 
 if docker ps | grep $BUILD_IMG >/dev/null; then
@@ -164,7 +170,7 @@ fi
 
 echo "Building '$BUILD_IMG' image..."
 #   Variables are by order of appearance in Dockerfile-build.in
-DEBVER="$DebVer" BUILD_NUM="$Bld" CLI_DEPS="$CLI_DEPS" BUILD_REQ="$BUILD_REQ" BUILD_TOP="$BUILD_TOP" PHPSRC="$PhpDir/$PhpSrc" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_NUM $CLI_DEPS $BUILD_REQ $BUILD_TOP $PHPSRC $EXTCOPY $PHPVER' <Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
+DEBVER="$DebVer" BUILD_NUM="$Bld" CLI_DEPS="$CLI_DEPS" BUILD_REQ="$BUILD_REQ" BUILD_TOP="$BUILD_TOP" PHPSRC="$PhpDir/$PhpSrc" BLDCOPY="$BLDCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_NUM $CLI_DEPS $BUILD_REQ $BUILD_TOP $PHPSRC $BLDCOPY $PHPVER' <Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
 
 echo "Running '$BUILD_IMG' container..."
 Cmd="docker run -ti -v `pwd`/$Dist:$BUILD_TOP/dist --name $BUILD_IMG --rm $BUILD_IMG"
@@ -174,9 +180,10 @@ test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
 #
 #   Make tests image and start container
 #
-TESTS_TOP=/opt/php-mk
 TESTS_IMG=epi-tests-php
-test -f .norun && EXTCOPY="COPY .norun $TESTS_TOP" || EXTCOPY=
+
+test -f .norun && TSTCOPY="$TSTCOPY
+COPY .norun $TESTS_TOP"
 
 if docker ps | grep $TESTS_IMG >/dev/null; then
     echo "Stopping running '$TESTS_IMG' container..."
@@ -192,7 +199,7 @@ if docker images | grep $TESTS_IMG >/dev/null; then
 fi
 
 echo "Building '$TESTS_IMG' image..."
-DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" EXTCOPY="$EXTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $EXTCOPY $PHPVER' <Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
+DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $TSTCOPY $PHPVER' <Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
 
 echo "Running '$TESTS_IMG' container..."
 Cmd="docker run -ti -v `pwd`/$Dist:$TESTS_TOP/dist --name $TESTS_IMG --rm $TESTS_IMG"

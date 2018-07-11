@@ -11,18 +11,28 @@ Pkgs="$Bld/dist/.pkgs"
 Top="$Bld/top"
 Maj=`echo $Ver | awk -F. '{print $1}'`
 Min=`echo $Ver | awk -F. '{print $2}'`
+test "$2" = 'debug' && Dbg=y
 
 set -e	# Stop on errors
+
+# In dir $1, if $2 doesn't exist, link it to $3/$2
+chkln()
+{
+   (test -d $1 || mkdir -p $1; cd $1; test -e $2 || ln -s $3/$2 $2)
+}
 
 echo "Extracting php-$Ver source..."
 test -d /usr/src/php && rm -rf /usr/src/php/php-* || mkdir /usr/src/php
 tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src/php
 
 cd /usr/src/php/php-$Ver
-Opt='--with-mcrypt'
-grep -- $Opt configure >/dev/null && WithMCrypt=$Opt || echo "No '$Opt' option in 'configure'. Using extension."
-Opt='--enable-gd-native-ttf'
-grep -- $Opt configure >/dev/null && EnaGdTtf=$Opt || echo "No '$Opt' option in 'configure'. Discarded."
+for Opt in '--with-mcrypt ' '--with-ttf ' '--enable-gd-native-ttf '
+do
+    if grep -- $Opt configure >/dev/null; then
+	echo "Using ${Opt}option found in 'configure'"
+	ExtOpts="$ExtOpts$Opt"
+    fi
+done
 
 if [ -d $Bld/hooks ]; then
     for hook in $Bld/hooks/*
@@ -31,30 +41,40 @@ if [ -d $Bld/hooks ]; then
 	Opt=
 	. $hook
 	if [ "$Show" ]; then
-	    test "$ExtShow" && ExtShow="$ExtShow + $Show" || ExtShow=" with $Show"
+	    test "$HookShow" && HookShow="$HookShow + $Show" || HookShow=" with $Show"
 	fi
-	if [ "$Opt" ]; then
-	    test "$ExtOpts" && ExtOpts="$ExtOpts $Opt" || ExtOpts="$Opt"
-	fi
+	test "$Opt" && HookOpts="$HookOpts$Opt "
     done
-    if [ "$ExtOpts" ]; then
+    if [ "$HookOpts" ]; then
 	#cp -p configure $Logs/configure0
 	./buildconf --force >$Logs/buildconf.out
 	#cp -p configure $Logs
     fi
 fi
+echo "Configuring php-$Ver$HookShow..."
+test "$Dbg" && echo "ExtOpts=\"$ExtOpts\" HookOpts=\"$HookOpts\""
 
-echo "Configuring php-$Ver$ExtShow..."
-(cd /usr/include; test -d curl -o -h curl || ln -s x86_64-linux-gnu/curl .)	# For OAuth
+chkln /usr/lib libjpeg.a  x86_64-linux-gnu		# For PHP5
+chkln /usr/lib libjpeg.so x86_64-linux-gnu
+chkln /usr/lib libpng.a   x86_64-linux-gnu
+chkln /usr/lib libpng.so  x86_64-linux-gnu
+chkln /usr/lib libXpm.a   x86_64-linux-gnu
+chkln /usr/include/freetype2/freetype freetype.h ..
+
+chkln /usr/include curl x86_64-linux-gnu	# For OAuth
+
 test -d /var/run/apache2 || mkdir /var/run/apache2	# For apache2 -V in configure
 eval `grep '^export APACHE_' /etc/apache2/envvars`	# For apache2 -V in configure
 export PHP_SYSCONFDIR="/etc/php"
-./configure	\
+./configure --help >$Logs/config-help.out
+./configure \
 	--prefix=/usr \
 	--mandir=/usr/share/man \
+	--localstatedir=/var \
+	--disable-debug \
 	--disable-rpath \
 	--disable-cgi \
-	--disable-phpdbg \
+	--with-pic \
 	--with-pear=/usr/share/php \
 	--with-apxs2=/usr/bin/apxs \
 	--with-config-file-path="$PHP_SYSCONFDIR" \
@@ -76,9 +96,8 @@ export PHP_SYSCONFDIR="/etc/php"
 	--with-openssl \
 	--with-xsl \
 	--with-zlib \
-	$WithMCrypt \
+	$HookOpts \
 	$ExtOpts \
-	$EnaGdTtf \
 	--enable-bcmath \
 	--enable-ctype \
 	--enable-dom \
@@ -103,7 +122,16 @@ export PHP_SYSCONFDIR="/etc/php"
 	--enable-zip \
 	--disable-debug \
 >$Logs/config.out 2>&1
-grep 'WARNING:' $Logs/config.out | egrep -v 'bison version|need re2c'
+grep 'WARNING:' $Logs/config.out | egrep -v 'bison version|need re2c' || true	# true for set -e
+
+# Add debian stuff to shutdown lintian's "hardening-no-relro" on jessie
+# Taken from https://wiki.debian.org/Hardening so should work on all debian versions
+sed -i '1i# Add debian hardening stuff\
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all\
+DPKG_EXPORT_BUILDFLAGS = 1\
+include /usr/share/dpkg/buildflags.mk\
+' Makefile
+grep '^EXTRA_LIBS = .* -lssl -lcrypto' Makefile >/dev/null || sed -i 's/-lxml2 -lxml2 -lxml2/-lssl -lcrypto/' Makefile
 
 echo "Building php-$Ver..."
 make >$Logs/make.out 2>&1
@@ -125,6 +153,10 @@ do
     Top=$dir/top
     Name="`cat $dir/name`-$Maj-$Min"
 
+    if [ -f $dir/skip ]; then
+	echo "Skipping package '$Pkg'..."
+	continue
+    fi
     echo "Installing package '$Pkg'..."
 
     # doc directory
@@ -135,7 +167,7 @@ do
 
     # lintian overrides
     if [ -f $Top/usr/share/lintian/overrides/pkgname ]; then
-	sed -i "s/%NAME%/$Name/g" $Top/usr/share/lintian/overrides/pkgname
+	sed -i -e "s/%NAME%/$Name/g" -e "s/%MAJ%/$Maj/" $Top/usr/share/lintian/overrides/pkgname
 	mv $Top/usr/share/lintian/overrides/pkgname $Top/usr/share/lintian/overrides/$Name
     fi
 
