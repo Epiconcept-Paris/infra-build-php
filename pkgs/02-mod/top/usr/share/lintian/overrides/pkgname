@@ -1,4 +1,4 @@
-#   E: Our PHP module includes libgd/file/sqlite/pcre3 on purpose
+#   E: Our PHP module includes libgd/file/pcre3/sqlite on purpose
 %NAME%: embedded-library usr/lib/apache2/modules/libphp%MAJ%.so: libgd
 %NAME%: embedded-library usr/lib/apache2/modules/libphp%MAJ%.so: file
 %NAME%: embedded-library usr/lib/apache2/modules/libphp%MAJ%.so: pcre3

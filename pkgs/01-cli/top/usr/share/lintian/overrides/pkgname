@@ -1,4 +1,4 @@
-#   E: Our PHP binary includes file/libgd on purpose
+#   E: Our PHP cli includes libgd/file/pcre3/sqlite on purpose
 %NAME%: embedded-library usr/bin/php: libgd
 %NAME%: embedded-library usr/bin/php: file
 %NAME%: embedded-library usr/bin/php: pcre3

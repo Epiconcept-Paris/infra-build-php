@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-#	03-mysql/install - Install php-mysql files to $Top
+#	04-mysql/install - Install php-mysql files to $Top
 #
 if [ -d $Top/usr/lib ]; then
     find $Top/usr/lib -name '*.so' | xargs -r strip -v >>$Logs/striped_$Pkg.out
     find $Top/usr/lib -name '*.so' | xargs -r chmod -x
 else
-    echo "\aERROR: no $Top/usr/lib directory. Package will be empty."
+    echo "\aERROR: no $Top/usr/lib directory. Package will be useless."
 fi

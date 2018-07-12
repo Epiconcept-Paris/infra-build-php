@@ -27,7 +27,7 @@ tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src
 mv /usr/src/php-$Ver /usr/src/php
 
 cd /usr/src/php
-for Opt in '--with-mysql ' '--with-mcrypt ' '--with-ttf ' '--enable-gd-native-ttf '
+for Opt in '--with-mysql ' '--with-mcrypt ' '--with-ttf ' '--enable-gd-native-ttf ' '--enable-fpm '
 do
     if grep -- $Opt configure >/dev/null; then
 	echo "Using ${Opt}option found in 'configure'"
@@ -36,6 +36,7 @@ do
 done
 # Skip *-mysql package generation if --with-mysql known
 echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`ls -d $Bld/pkgs/*-mysql`/skip	
+echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`ls -d $Bld/pkgs/*-fpm`/skip	
 
 if [ -d $Bld/hooks ]; then
     for hook in $Bld/hooks/*
