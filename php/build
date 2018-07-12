@@ -22,17 +22,20 @@ chkln()
 }
 
 echo "Extracting php-$Ver source..."
-test -d /usr/src/php && rm -rf /usr/src/php/php-* || mkdir /usr/src/php
-tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src/php
+test -d /usr/src/php && rm -rf /usr/src/php
+tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src
+mv /usr/src/php-$Ver /usr/src/php
 
-cd /usr/src/php/php-$Ver
-for Opt in '--with-mcrypt ' '--with-ttf ' '--enable-gd-native-ttf '
+cd /usr/src/php
+for Opt in '--with-mysql ' '--with-mcrypt ' '--with-ttf ' '--enable-gd-native-ttf '
 do
     if grep -- $Opt configure >/dev/null; then
 	echo "Using ${Opt}option found in 'configure'"
 	ExtOpts="$ExtOpts$Opt"
     fi
 done
+# Skip *-mysql package generation if --with-mysql known
+echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`ls -d $Bld/pkgs/*-mysql`/skip	
 
 if [ -d $Bld/hooks ]; then
     for hook in $Bld/hooks/*
@@ -46,9 +49,11 @@ if [ -d $Bld/hooks ]; then
 	test "$Opt" && HookOpts="$HookOpts$Opt "
     done
     if [ "$HookOpts" ]; then
-	#cp -p configure $Logs/configure0
+	grep ' need autoconf version 2.13 or' build/buildcheck.sh >/dev/null && export PHP_AUTOCONF='/usr/bin/autoconf2.13'
+	mv configure configure0
+	test "$Dbg" && cp -p configure0 $Logs
 	./buildconf --force >$Logs/buildconf.out
-	#cp -p configure $Logs
+	test "$Dbg" && cp -p configure $Logs
     fi
 fi
 echo "Configuring php-$Ver$HookShow..."
@@ -65,20 +70,27 @@ chkln /usr/include curl x86_64-linux-gnu	# For OAuth
 
 test -d /var/run/apache2 || mkdir /var/run/apache2	# For apache2 -V in configure
 eval `grep '^export APACHE_' /etc/apache2/envvars`	# For apache2 -V in configure
-export PHP_SYSCONFDIR="/etc/php"
+SysconfDir='etc/php'
+DataDir='usr/share/php'
+PearDir="$DataDir"
+ManDir='usr/share/man'
+DocDir='usr/share/doc'
+VarDir='var'
 ./configure --help >$Logs/config-help.out
 ./configure \
 	--prefix=/usr \
-	--mandir=/usr/share/man \
-	--localstatedir=/var \
+	--sysconfdir=/$SysconfDir \
+	--with-config-file-path=/$SysconfDir \
+	--with-config-file-scan-dir=/$SysconfDir/conf.d \
+	--datadir=/$DataDir \
+	--mandir=/$ManDir \
+	--localstatedir=/$VarDir \
 	--disable-debug \
 	--disable-rpath \
 	--disable-cgi \
 	--with-pic \
-	--with-pear=/usr/share/php \
+	--with-pear=/$PearDir \
 	--with-apxs2=/usr/bin/apxs \
-	--with-config-file-path="$PHP_SYSCONFDIR" \
-	--with-config-file-scan-dir="$PHP_SYSCONFDIR/conf.d" \
 	--with-freetype-dir=/usr \
 	--with-jpeg-dir=/usr \
 	--with-png-dir=/usr \
@@ -96,8 +108,8 @@ export PHP_SYSCONFDIR="/etc/php"
 	--with-openssl \
 	--with-xsl \
 	--with-zlib \
-	$HookOpts \
 	$ExtOpts \
+	$HookOpts \
 	--enable-bcmath \
 	--enable-ctype \
 	--enable-dom \
@@ -134,7 +146,11 @@ include /usr/share/dpkg/buildflags.mk\
 grep '^EXTRA_LIBS = .* -lssl -lcrypto' Makefile >/dev/null || sed -i 's/-lxml2 -lxml2 -lxml2/-lssl -lcrypto/' Makefile
 
 echo "Building php-$Ver..."
-make >$Logs/make.out 2>&1
+if ! make -k >$Logs/make.out 2>&1; then
+    echo "\aBuilding php-$Ver FAILED:"
+    grep "error:" $Logs/make.out
+    exit 1
+fi
 
 set +e	# Continue on errors
 if [ -f $Bld/.notest ]; then
@@ -154,7 +170,7 @@ do
     Name="`cat $dir/name`-$Maj-$Min"
 
     if [ -f $dir/skip ]; then
-	echo "Skipping package '$Pkg'..."
+	echo "Skipping package '$Pkg'"
 	continue
     fi
     echo "Installing package '$Pkg'..."
@@ -194,7 +210,7 @@ do
 	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
 	echo "`basename $deb`" >>$Pkgs
     else
-	echo "out=\"$out\" deb=\"$deb\""
+	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""
     fi
 done
 

@@ -1,6 +1,7 @@
 ## A faire dans l'ordre (ou presque)
 
-* PHP5 stretch
+* PHP 5.2 pear metadata_dir
+* PHP5 stretch: openssl.c
 * signature packages
 * grep -v sur logs pour isoler les erreurs
 * verif des SKIP sur make test

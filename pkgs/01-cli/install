@@ -2,15 +2,15 @@
 #
 #	01-cli/install - Install php-cli files to $Top
 #
-sed -i "s;install-pear-nozlib.phar -d;install-pear-nozlib.phar -m /usr/share/php -D /usr/share/doc/$Name -M /usr/share/man -d;" Makefile
-mkdir $Top/usr/share/php
+sed -i "s;install-pear-nozlib.phar -d;install-pear-nozlib.phar -m /$PearDir -D /$DocDir/$Name -M /$ManDir -d;" Makefile
+mkdir -p $Top/$PearDir
 # Skip install-sapi install-build install-headers install-pdo-headers
 for tgt in install-cli install-binaries install-programs install-modules install-pear install-pharcmd
 do
     grep "^install_targets = .* $tgt" Makefile >/dev/null && Tgts="$Tgts $tgt"
 done
 test "$Dbg" && echo "Tgts=\"$Tgts\""
-INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear PHP_PEAR_INSTALL_DIR=usr/share/php make$Tgts >$Logs/make-install_$Pkg.out 2>&1
+INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear make$Tgts >$Logs/make-install_$Pkg.out 2>&1
 
 while read d f p
 do
@@ -31,12 +31,12 @@ done <$dir/moves
 
 if [ -d pear/man ]; then
     cp -rp pear/man $Top/usr/share
-    find $Top/usr/share/man -name '*.[1-9]' | xargs gzip -n9
+    find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
 else
     echo "\aERROR: no directory pear/man in `pwd`"
 fi
 
-find $Top -type d -empty | xargs -r rmdir -v >$Logs/rmed_$Pkg.out
+test -d $Top/$VarDir && find $Top/$VarDir -depth -type d | xargs -r rmdir -v >$Logs/rmed_$Pkg.out
 rm -vf $Top/.depdb* >>$Logs/rmed_$Pkg.out
 file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs -r strip -v >$Logs/striped_$Pkg.out
 find $Top -name '*.so' | xargs -r strip -v >>$Logs/striped_$Pkg.out
