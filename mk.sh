@@ -150,6 +150,8 @@ test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir $Dist/.logs
 #
 BUILD_IMG=epi-build-php
 
+test -f .debug && BLDCOPY="$BLDCOPY
+COPY .debug $BUILD_TOP"
 test -f .norun && BLDCOPY="$BLDCOPY
 COPY .norun $BUILD_TOP"
 test -f php/.notest && BLDCOPY="$BLDCOPY

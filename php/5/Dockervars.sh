@@ -36,28 +36,30 @@ AddExtra()
 {
     local file lib off cmn
 
-    #   For PHP 5.2-
-    if [ $Min -le 2 ]; then
-	# Packages (*.deb) are from http://archive.debian.org/debian/pool/main/m/mysql-dfsg-5.0
-	for file in $Dir/files/*.deb $Dir/files/*.patch
+    #   Handle specific patch/package files
+    if [ -d $Dir/files/5.$Min ]; then
+	for file in $Dir/files/5.$Min/*
 	do
+	    # Packages (*.deb) are from http://archive.debian.org/debian/pool/main/m/mysql-dfsg-5.0
 	    case $file in
-		*.patch) ;;
-		*-dev_*.deb) ;;
-		*-common*.deb) cmn=$file;;
-		*) off=$file; lib=`basename "$file" | awk -F_ '{print $1}'`;;
+		*.patch)	;;
+		*-dev_*.deb)	;;
+		*-common*.deb)	cmn=$file;;
+		*)		off=$file; lib=`basename "$file" | awk -F_ '{print $1}'`;;
 	    esac
 	    BLDCOPY="$BLDCOPY
 COPY $file $BUILD_TOP/files"
 	done
 	BLDCOPY="$BLDCOPY
 COPY $Dir/hooks/files.sh $BUILD_TOP/hooks"
-	TSTCOPY="RUN mkdir $BUILD_TOP/pkgs
+	if [ "$cmn" -a "$off" ]; then
+	    TSTCOPY="RUN mkdir $BUILD_TOP/pkgs
 COPY $cmn $TESTS_TOP/pkgs
 COPY $off $TESTS_TOP/pkgs"
-	BUILD_REQ=`echo "$BUILD_REQ" | sed 's/ [^ ]*libmysqlclient-dev//'`
-	TESTS_REQ=`echo "$TESTS_REQ" | sed -r 's/ lib(mysql|mariadb)client[^ ]*//'`
-	CLI_DEPS=`echo "$CLI_DEPS"   | sed -r "s/ lib(mysql|mariadb)client[^ ]*/ $lib,/"`
+	    BUILD_REQ=`echo "$BUILD_REQ" | sed 's/ [^ ]*libmysqlclient-dev//'`
+	    TESTS_REQ=`echo "$TESTS_REQ" | sed -r 's/ lib(mysql|mariadb)client[^ ]*//'`
+	    CLI_DEPS=`echo "$CLI_DEPS"   | sed -r "s/ lib(mysql|mariadb)client[^ ]*/ $lib,/"`
+	fi
     fi
     #   PHP 5.3- uses autoconf 2.13
     test $Min -le 3 && BUILD_REQ=`echo "$BUILD_REQ" | sed 's/ autoconf/ autoconf2.13/'`

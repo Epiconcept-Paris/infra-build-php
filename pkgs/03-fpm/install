@@ -7,6 +7,12 @@ if [ -d $Top/usr/sbin ]; then
 else
     echo "\aERROR: no $Top/usr/sbin directory. Package will be useless."
 fi
+#   Add extra config files
+(cd $Top; find etc -type f) | while read f
+do
+    grep "^/$f\$" $Top/DEBIAN/conffiles >/dev/null || echo "/$f" >>$Top/DEBIAN/conffiles
+done
+#   Compress our manual page(s)
 find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
 #   Replace link to w3.org icon with an embedded 26-byte GIF image
 sed -i 's|src="http://www.w3.org/Icons/valid-xhtml10"|src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="|' $Top/$DataDir/fpm/status.html

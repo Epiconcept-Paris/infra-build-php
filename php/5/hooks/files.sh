@@ -1,8 +1,11 @@
 #!/bin/sh
 #
-#	files.sh - Install old .deb packages and patches for PHP 5.2-
+#	files.sh - Install old .deb packages and patches for PHP 5.2/5.6
 #
-dpkg -i $Bld/files/*.deb >$Logs/dpkg-i_build.out
+if ls $Bld/files/*.deb >/dev/null 2>&1; then
+    test "$Dbg" && echo "Installing extra .deb packages"
+    dpkg -i $Bld/files/*.deb >$Logs/dpkg-i_build.out
+fi
 for f in $Bld/files/*.patch
 do
     test "$Dbg" && echo "Applying `basename $f`"

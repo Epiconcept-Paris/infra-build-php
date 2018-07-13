@@ -8,10 +8,9 @@ Bld=`dirname $0`
 Ver="$1"
 Logs="$Bld/dist/.logs"
 Pkgs="$Bld/dist/.pkgs"
-Top="$Bld/top"
 Maj=`echo $Ver | awk -F. '{print $1}'`
 Min=`echo $Ver | awk -F. '{print $2}'`
-test "$2" = 'debug' && Dbg=y
+test "$2" = 'debug' -o -f $Bld/.debug && Dbg=y
 
 set -e	# Stop on errors
 
@@ -27,13 +26,22 @@ tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src
 mv /usr/src/php-$Ver /usr/src/php
 
 cd /usr/src/php
-for Opt in '--with-mysql ' '--with-mcrypt ' '--with-ttf ' '--enable-gd-native-ttf ' '--enable-fpm '
+ConfigHelp=$Logs/config-help.out
+./configure --help >$ConfigHelp
+for Opt in '--with-mysql' '--with-mcrypt' '--with-ttf' '--enable-gd-native-ttf' '--enable-fpm'
 do
-    if grep -- $Opt configure >/dev/null; then
-	echo "Using ${Opt}option found in 'configure'"
-	ExtOpts="$ExtOpts$Opt"
+    case "$Opt" in
+	--with-*)   Sep='[=[]';;
+	*)	    Sep=' ';;
+    esac
+    if grep -- "$Opt$Sep" $ConfigHelp >/dev/null; then
+	echo "Using ${Opt} option found in 'configure'"
+	ExtOpts="$ExtOpts$Opt "
     fi
 done
+if grep -- "--enable-phpdbg " $ConfigHelp >/dev/null; then
+    ExtOpts="$ExtOpts--disable-phpdbg "
+fi
 # Skip *-mysql package generation if --with-mysql known
 echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`ls -d $Bld/pkgs/*-mysql`/skip	
 echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`ls -d $Bld/pkgs/*-fpm`/skip	
@@ -55,6 +63,8 @@ if [ -d $Bld/hooks ]; then
 	test "$Dbg" && cp -p configure0 $Logs
 	./buildconf --force >$Logs/buildconf.out
 	test "$Dbg" && cp -p configure $Logs
+	mv $ConfigHelp $Logs/config0-help.out
+	./configure --help >$ConfigHelp
     fi
 fi
 echo "Configuring php-$Ver$HookShow..."
@@ -77,7 +87,6 @@ PearDir="$DataDir"
 ManDir='usr/share/man'
 DocDir='usr/share/doc'
 VarDir='var'
-./configure --help >$Logs/config-help.out
 ./configure \
 	--prefix=/usr \
 	--sysconfdir=/$SysconfDir \

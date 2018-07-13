@@ -1,5 +1,6 @@
-usr/sbin php-fpm 03-fpm
-usr/share/man/man8 php-fpm.8 03-fpm
-usr/share/php/fpm status.html 03-fpm
-etc/php php-fpm.conf.default 03-fpm
-usr/lib	mysql.so 04-mysql
+usr/sbin	    php-fpm		    03-fpm	y
+usr/share/man/man8  php-fpm.8		    03-fpm	y
+usr/share/php/fpm   status.html		    03-fpm	y
+etc/php		    php-fpm.conf.default    03-fpm	y
+etc/php/php-fpm.d   www.conf.default	    03-fpm
+usr/lib		    mysql.so		    04-mysql	y

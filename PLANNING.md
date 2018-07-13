@@ -14,12 +14,13 @@
   * __Ajouter la signature des paquets__
 
 * Phase 3 - Version quelconque PHP 5.2 : 2j
-  * __Ajout du build (mod+CLI) de toute version 5.2.x de PHP__
-  * __Ajout de l'extension APC à PHP 5.2.x__
+  * x Ajout du build (mod+CLI) de toute version 5.2.x de PHP (sur jessie)
+  * x Ajout de l'extension APC à PHP 5.2.x
   
 * Phase 4 - Ajout du paquet d'extension MySQL sur PHP 7 : 2j
   * x Ajout de la génération de paquets pour des modules PHP dynamiques
   * x Cas particulier de mysql
 
-* Phase 5 - Compléments : 1j
+* Phase 5 - Compléments : 2j
   * x Ajout de l'extension OAuth en static
+  * x Ajout de la géneration d'un prototype de paquet FPM

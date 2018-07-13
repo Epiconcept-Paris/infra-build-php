@@ -28,3 +28,5 @@ Le script affiche alors les commandes docker à lancer au lieu de les exécuter,
 ainsi que les commandes bash à lancer pour le build et les tests
 
 Il est possible de sauter le "make test" du build en créant de même un fichier ````php/.notest````.
+
+Enfin, on peut également créer un fichier ````.debug```` (vide), qui active des traces supplémentaires dans le container de build
