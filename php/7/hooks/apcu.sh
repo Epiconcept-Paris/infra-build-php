@@ -2,6 +2,5 @@
 #	apcu.sh - Install APCu static extension
 #
 tar xf $Bld/files/apcu-*.tgz -C ext
-mv ext/apcu-* ext/apcu
 Show="APCu"
 Opt="--enable-apcu"

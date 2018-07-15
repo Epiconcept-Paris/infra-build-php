@@ -19,6 +19,10 @@ INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear make$Tgts >$Logs/make-install_$P
 while read d f p m	# Dir File Pkg Mandatory
 do
     test -f $Bld/pkgs/$p/skip && continue
+    if [ ! -d $Top/$d ]; then
+	test "$m" && echo "\aERROR: no d=$d in $Top (f=$f p=$p)"
+	continue
+    fi
     File=`cd $Top; find $d -type f -name $f`
     if [ "$File" -a -f "$Top/$File" ]; then
 	Ext=$Bld/pkgs/$p/top/`dirname $File`

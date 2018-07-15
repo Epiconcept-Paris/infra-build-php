@@ -31,11 +31,11 @@ ConfigHelp=$Logs/config-help.out
 for Opt in '--with-mysql' '--with-mcrypt' '--with-ttf' '--enable-gd-native-ttf' '--enable-fpm'
 do
     case "$Opt" in
-	--with-*)   Sep='[=[]';;
+	--with-*)   Sep='[ =[]';;
 	*)	    Sep=' ';;
     esac
     if grep -- "$Opt$Sep" $ConfigHelp >/dev/null; then
-	echo "Using ${Opt} option found in 'configure'"
+	echo "Using ${Opt} option found in 'configure --help'"
 	ExtOpts="$ExtOpts$Opt "
     fi
 done
