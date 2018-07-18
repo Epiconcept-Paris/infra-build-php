@@ -1,4 +1,6 @@
-## Planning
+# Planning
+
+## Première partie
 
 * Phase 1 - Version quelconque PHP7 : 4j dont 1j preparation/évaluation
   * x Génération des paquets DEB (mod + CLI) pour toute version 7.[12].x de PHP passée en argument
@@ -24,3 +26,21 @@
 * Phase 5 - Compléments : 2j
   * x Ajout de l'extension OAuth en static
   * x Ajout de la géneration d'un prototype de paquet FPM
+  
+## Seconde partie
+
+* build des paquets PHP 5.6 et PHP 7.x
+  * avec le binaire FPM
+  * un service gérant le daemon
+  * une configuration minimale
+  * pas de blocage ni d'interactions si on installe toutes les versions sur un même serveur
+  * pour Debian Stretch
+* modification sur les paquets php-cli
+  * pouvoir les installer en parallèle (binaire et configuration)
+  * choix du PHP via Debian alternatives
+* la configuration PHP doit être
+  * propre à chaque version
+  * commune à PHP CLI et PHP FPM
+  * stockée par exemple dans /etc/php/7.1/php.ini et /etc/php/7.1/conf.d/*.ini
+  * si possible, modifier la conf pour mod_php pour qu'elle utilise le même fichier (et qu'on soit en cohérence)
+* utilisation du container Docker de test pour tester le déploiement et les bascules, avec un POC (deux vhosts utilisant des versions différentes de PHP). Notre script de gestion des vhosts intégrera cela.
