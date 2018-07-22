@@ -19,7 +19,7 @@ RUN mkdir -p $BUILD_TOP/dist $BUILD_TOP/files
 COPY $PHPSRC $BUILD_TOP/files
 COPY pkgs $BUILD_TOP/pkgs
 COPY php/build $BUILD_TOP
-COPY run $BUILD_TOP
+COPY php/run $BUILD_TOP
 $BLDCOPY
 
 CMD $BUILD_TOP/run $PHPVER
