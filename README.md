@@ -30,3 +30,11 @@ ainsi que les commandes bash à lancer pour le build et les tests
 Il est possible de sauter le "make test" du build en créant de même un fichier ````php/.notest````.
 
 Enfin, on peut également créer un fichier ````.debug```` (vide), qui active des traces supplémentaires dans le container de build
+
+## Notes
+
+* Serveur AWS de build : cdt@34.243.220.28
+* voir si on peut optimiser la phase de build en fonction du nombre de cores CPU
+* voir s'il faut builder pour autre chose que amd64 (arm par ex)
+* déployer sur prephp7a1 et tester
+* déployer sur (https://github.com/Epiconcept-Paris/infra-packages-check)
