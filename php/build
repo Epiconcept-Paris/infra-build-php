@@ -178,12 +178,14 @@ else
 fi
 
 rm -f $Pkgs
-Cli="`cat $Bld/pkgs/01-cli/name`-$Maj-$Min"
+Base='epi-php'
 for dir in $Bld/pkgs/*
 do
-    Pkg=`basename $dir`
+    PkgDir=`basename $dir`
+    Pkg=`expr "$PkgDir" : '[0-9][0-9]-\(.*\)'`
     Top=$dir/top
-    Name="`cat $dir/name`-$Maj-$Min"
+    Name="$Base-$Maj.$Min-$Pkg"
+    test "$Pkg" = 'cli' && Cli="$Name"
 
     if [ -f $dir/skip ]; then
 	echo "Skipping package '$Pkg'"

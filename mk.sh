@@ -90,7 +90,7 @@ Tag=$DebVer-$PhpVer
 #
 #   Fetch PHP source
 #
-date '+===== %Y-%m-%d %H:%M:%S %Z'
+date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 Now=`date '+%s'`
 test -d $PhpDir || mkdir $PhpDir
 PhpSrc=php-$PhpVer.tar.bz2
@@ -185,6 +185,7 @@ echo "Running '$BUILD_NAME' container..."
 Cmd="docker run -ti -v `pwd`/$Dist:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
 $Cmd
 test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
+echo "------------------------------------------------"
 
 #
 #   Make tests image and start container
@@ -224,7 +225,7 @@ test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
 #
 #   End
 #
-date '+===== %Y-%m-%d %H:%M:%S %Z'
+date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 End=`date '+%s'`
 Len=`expr $End - $Now`
 Min=`expr $Len / 60`

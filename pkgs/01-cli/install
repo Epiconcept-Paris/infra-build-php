@@ -16,26 +16,41 @@ done
 test "$Dbg" && echo "Tgts=\"$Tgts\""
 INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear make$Tgts >$Logs/make-install_$Pkg.out 2>&1
 
-while read d f p m	# Dir File Pkg Mandatory
-do
-    test -f $Bld/pkgs/$p/skip && continue
-    if [ ! -d $Top/$d ]; then
-	test "$m" && echo "\aERROR: no d=$d in $Top (f=$f p=$p)"
-	continue
-    fi
-    File=`cd $Top; find $d -type f -name $f`
-    if [ "$File" -a -f "$Top/$File" ]; then
-	Ext=$Bld/pkgs/$p/top/`dirname $File`
-	test -d $Ext || mkdir -p $Ext
-	Log=$Logs/make-install_$p.out
-	test -f $Log || echo "Installing $p package" >$Log
-	mv -v $Top/$File $Ext >>$Log 2>&1
-    elif [ "$m" ]; then
-	echo "\aERROR: no File found in $Top for d=$d f=$f (p=$p)"
-	echo "Directory $d contains:"
-	(cd $Top; find $d -type f)
-    fi
-done <$dir/moves
+MoveFiles()
+{
+    # global Bld Top Logs
+    local Dir File Pkg Must Cmnt Name Path New Log
+
+    while read Dir File Pkg Must Cmnt
+    do
+	test "$Dir" || continue					# Empty line
+	expr "$Dir" : '[ 	]*#.*' >/dev/null && continue	# Comment 
+	if [ ! -d $Bld/pkgs/$Pkg ]; then
+	    echo "\aERROR: no Pkg=$Pkg in $Bld/pkgs (Dir=$Dir File=$File)"
+	    continue
+	fi
+	test -f $Bld/pkgs/$Pkg/skip && continue
+	Name=`expr "$Pkg" : '[0-9][0-9]-\(.*\)'`
+	if [ ! -d $Top/$Dir ]; then
+	    test "$Must" = 'y' && echo "\aERROR: no Dir=$Dir in $Top (File=$File Pkg=$Pkg)"
+	    continue
+	fi
+	Path=`cd $Top; find $Dir -type f -name $File`
+	if [ "$Path" -a -f "$Top/$Path" ]; then
+	    New=$Bld/pkgs/$Pkg/top/`dirname $Path`
+	    test -d $New || mkdir -p $New
+	    Log=$Logs/make-install_$Name.out
+	    test -f $Log || echo "Installing $Name package" >$Log
+	    mv -v $Top/$Path $New >>$Log 2>&1
+	elif [ "$Must" = 'y' ]; then
+	    echo "\aERROR: no Path found in $Top for Dir=$Dir File=$File (Pkg=$Pkg)"
+	    echo "Directory $Dir contains:"
+	    (cd $Top; find $Dir -type f)
+	fi
+    done <$1
+}
+
+MoveFiles $dir/moves
 
 if [ -d pear/man ]; then
     cp -rp pear/man $Top/usr/share
