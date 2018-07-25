@@ -94,12 +94,15 @@ date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 Now=`date '+%s'`
 test -d $PhpDir || mkdir $PhpDir
 PhpSrc=php-$PhpVer.tar.bz2
+PhpLst=php-$PhpVer.files
 if [ ! -f $PhpDir/$PhpSrc ]; then
     echo "Fetching $PhpSrc..."
-    if [ $Maj -le 5 ]; then
-	curl -sSL "http://$PHP5URL/$PhpSrc" -o $PhpDir/$PhpSrc
-    else
-	curl -sSL "http://$PHPSITE/get/$PhpSrc/from/this/mirror" -o $PhpDir/$PhpSrc
+    test $Maj -le 5 && PhpUrl="http://$PHP5URL/$PhpSrc" || PhpUrl="http://$PHPSITE/get/$PhpSrc/from/this/mirror"
+    curl -sSL $PhpUrl -o $PhpDir/$PhpSrc
+    if ! tar tf $PhpDir/$PhpSrc >$PhpDir/$PhpLst 2>/dev/null; then
+	echo "$Prg: cannot fetch $PhpUrl" >&2
+	rm -f $PhpDir/$PhpSrc $PhpDir/$PhpLst
+	exit 1
     fi
 fi
 

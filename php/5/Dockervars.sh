@@ -81,7 +81,7 @@ COPY $Dir/hooks/pearman.sh $BUILD_TOP/hooks"
 BLDCOPY="RUN mkdir $BUILD_TOP/hooks"
 
 echo "Checking $PhpSrc for OpCache..."
-if tar tf $PhpDir/$PhpSrc | grep '/ext/opcache/' >/dev/null; then
+if grep '/ext/opcache/' $PhpDir/$PhpLst >/dev/null; then
     AddPECL APCu apcu APCu apcu 4.0.11	# Last version to support PHP5
 else
     AddPECL APC APC APC apc
