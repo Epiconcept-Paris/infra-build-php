@@ -230,6 +230,12 @@ do
     else
 	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""
     fi
+    if [ "$Dbg" ]; then
+	(cd $Top;
+	 find . -type f | sed 's/^..//' | sort >$Debug/files_$Pkg
+	 find . -type l | sed 's/^..//' | sort >$Debug/links_$Pkg)
+	test -s $Debug/links_$Pkg || rm $Debug/links_$Pkg
+    fi
 done
 test "$Dbg" && cp -p Makefile $Debug
 

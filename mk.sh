@@ -99,6 +99,8 @@ if [ ! -f $PhpDir/$PhpSrc ]; then
     echo "Fetching $PhpSrc..."
     test $Maj -le 5 && PhpUrl="http://$PHP5URL/$PhpSrc" || PhpUrl="http://$PHPSITE/get/$PhpSrc/from/this/mirror"
     curl -sSL $PhpUrl -o $PhpDir/$PhpSrc
+fi
+if [ ! -f $PhpDir/$PhpLst ]; then
     if ! tar tf $PhpDir/$PhpSrc >$PhpDir/$PhpLst 2>/dev/null; then
 	echo "$Prg: cannot fetch $PhpUrl" >&2
 	rm -f $PhpDir/$PhpSrc $PhpDir/$PhpLst
