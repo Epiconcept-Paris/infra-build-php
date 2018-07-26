@@ -53,4 +53,3 @@ find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
 file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs -r strip -v >$Logs/striped_$Pkg.out
 find $Top -name '*.so' | xargs -r strip -v >>$Logs/striped_$Pkg.out
 find $Top -name '*.so' | xargs -r chmod -x
-find $Top -name '*.sh' | xargs -r chmod +x

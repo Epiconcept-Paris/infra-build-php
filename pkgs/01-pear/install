@@ -26,3 +26,4 @@ for d in .channels .registry; do
     find $Top/$d -depth -type d | xargs rmdir -v
 done >>$Logs/rmed_$Pkg.out
 rmdir -v $Pear/.registry/.channel.* >>$Logs/rmed_$Pkg.out
+find $Top -name '*.sh' | xargs -r chmod +x
