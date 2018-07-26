@@ -1,10 +1,11 @@
 Package: %NAME%
 Version: %VERSION%
-Priority: optional
 Architecture: amd64
-Section: admin
-Depends: %CLI%, libc6
-Conflicts: php7.0-fpm, php7.1-fpm, php7.2-fpm, php5-fpm
 Maintainer: Cedric <c.girard@epiconcept.fr>
+Depends: %CLI%, libc6
+Provides: php-fpm, phpapi-%PHPAPI%
+Conflicts: php7.0-fpm, php7.1-fpm, php7.2-fpm, php5-fpm
+Section: admin
+Priority: optional
 Description: PHP FastCGI Process Manager build by Epiconcept
  This package provides the PHP FastCGI Process Manager

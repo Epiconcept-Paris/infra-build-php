@@ -1,22 +1,17 @@
 #!/bin/sh
 #
-#	01-cli/install - Install php-cli files to $Top
+#	00-cli/install - Install php-cli files to $Top
 #
-Phar='install-pear-nozlib.phar'
-Pear=$Top/$PearDir
-if grep metadata_dir pear/$Phar >/dev/null; then
-    sed -i "s;$Phar -d;$Phar -m /$PearDir -D /$DocDir/$Name -M /$ManDir -d;" Makefile
-fi
-mkdir -p $Pear
-# Skip install-sapi install-build install-headers install-pdo-headers
-for tgt in install-cli install-binaries install-programs install-modules install-pear install-pharcmd
+# Skip install-pear install-sapi install-build install-headers install-pdo-headers
+for tgt in install-cli install-binaries install-programs install-modules install-pharcmd
 do
     grep "^install_targets = .* $tgt" Makefile >/dev/null && Tgts="$Tgts $tgt"
 done
 test "$Dbg" && echo "Tgts=\"$Tgts\""
-INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear make$Tgts >$Logs/make-install_$Pkg.out 2>&1
+INSTALL_ROOT=$Top make$Tgts >$Logs/make-install_$Pkg.out 2>&1
 
-MoveFiles()
+#   Use function to avoid polluting global namespace
+InstFiles()
 {
     # global Bld Top Logs
     local Dir File Pkg Must Cmnt Name Path New Log
@@ -50,30 +45,11 @@ MoveFiles()
     done <$1
 }
 
-MoveFiles $dir/moves
+InstFiles $dir/moves
 
-if [ -d pear/man ]; then
-    cp -rp pear/man $Top/usr/share
-    find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
-else
-    echo "\aERROR: no directory pear/man in `pwd`"
-fi
+test -d $Top/$VarDir && find $Top/$VarDir -depth -type d | xargs -r rmdir -v >$Logs/rmed_$Pkg.out
 
->$Logs/rmed_$Pkg.out
-
-#   Cleanup PEAR (mostly 1.9.1) junk
-rm -vf $Top/.filemap $Top/.depdb* $Top/.lock $Pear/.depdb* $Pear/.lock >>$Logs/rmed_$Pkg.out
-for d in .channels .registry; do
-    test -d $Top/$d || continue
-    (cd $Top; find $d -type f | while read f; do
-	test -f $Pear/$f && cmp $Top/$f $Pear/$f >/dev/null && rm -v $Top/$f
-    done)
-    find $Top/$d -depth -type d | xargs rmdir -v
-done >>$Logs/rmed_$Pkg.out
-rmdir -v $Pear/.registry/.channel.* >>$Logs/rmed_$Pkg.out
-
-test -d $Top/$VarDir && find $Top/$VarDir -depth -type d | xargs -r rmdir -v >>$Logs/rmed_$Pkg.out
-
+find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
 file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs -r strip -v >$Logs/striped_$Pkg.out
 find $Top -name '*.so' | xargs -r strip -v >>$Logs/striped_$Pkg.out
 find $Top -name '*.so' | xargs -r chmod -x

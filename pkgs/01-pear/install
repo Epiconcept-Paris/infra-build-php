@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+#	01-pear/install - Install php-pear files to $Top
+#
+if grep metadata_dir pear/$Phar >/dev/null; then
+    sed -i "s;$Phar -d;$Phar -m /$PearDir -D /$DocDir/$Name -M /$ManDir -d;" Makefile
+fi
+Pear=$Top/$PearDir
+mkdir -p $Pear
+INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear make install-pear >$Logs/make-install_$Pkg.out 2>&1
+
+if [ -d pear/man ]; then
+    cp -rp pear/man $Top/usr/share
+    find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
+else
+    echo "\aERROR: no directory pear/man in `pwd`"
+fi
+
+#   Cleanup PEAR junk (mostly 1.9.1)
+rm -vf $Top/.filemap $Top/.depdb* $Top/.lock $Pear/.depdb* $Pear/.lock >$Logs/rmed_$Pkg.out
+for d in .channels .registry; do
+    test -d $Top/$d || continue
+    (cd $Top; find $d -type f | while read f; do
+	test -f $Pear/$f && cmp $Top/$f $Pear/$f >/dev/null && rm -v $Top/$f
+    done)
+    find $Top/$d -depth -type d | xargs rmdir -v
+done >>$Logs/rmed_$Pkg.out
+rmdir -v $Pear/.registry/.channel.* >>$Logs/rmed_$Pkg.out

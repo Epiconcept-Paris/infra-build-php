@@ -10,7 +10,7 @@ Logs="$Bld/dist/.logs"				# Directory for log files
 Pkgs="$Bld/dist/.pkgs"				# List of packages built
 Debug="$Bld/dist/.debug"			# Directory for debug files
 Maj=`echo $Ver | awk -F. '{print $1}'`
-Min=`echo $Ver | awk -F. '{print $2}'`
+MajMin=`echo $Ver | awk -F. '{print $1 "." $2}'`
 if [ -f $Bld/.debug -o "$2" = 'debug' ]; then
     Dbg=y					# Debug option
     test -d $Debug || mkdir $Debug
@@ -30,6 +30,8 @@ tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src
 mv /usr/src/php-$Ver /usr/src/php
 
 cd /usr/src/php
+PhpAPI=`sed -n 's/ *#define ZEND_MODULE_API_NO //p' Zend/zend_modules.h`
+
 ConfigHelp=$Logs/config-help.out
 ./configure --help >$ConfigHelp
 for Opt in '--with-mysql' '--with-mcrypt' '--with-ttf' '--enable-gd-native-ttf' '--enable-fpm'
@@ -46,9 +48,10 @@ done
 if grep -- "--enable-phpdbg " $ConfigHelp >/dev/null; then
     ExtOpts="$ExtOpts--disable-phpdbg "
 fi
+# Skip *-fpm package generation if --enable-fpm unknown
+echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`ls -d $Bld/pkgs/*-fpm`/skip
 # Skip *-mysql package generation if --with-mysql known
-echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`ls -d $Bld/pkgs/*-mysql`/skip	
-echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`ls -d $Bld/pkgs/*-fpm`/skip	
+echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`ls -d $Bld/pkgs/*-mysql`/skip
 
 if [ -d $Bld/hooks ]; then
     for hook in $Bld/hooks/*
@@ -85,13 +88,13 @@ chkln /usr/include curl x86_64-linux-gnu	# For OAuth
 
 test -d /var/run/apache2 || mkdir /var/run/apache2	# For apache2 -V in configure
 eval `grep '^export APACHE_' /etc/apache2/envvars`	# For apache2 -V in configure
-SysconfDir='etc/php'
-DataDir='usr/share/php'
+SysconfDir="etc/php"
+DataDir="usr/share/php"
 PearDir="$DataDir"
 ManDir='usr/share/man'
 DocDir='usr/share/doc'
 VarDir='var'
-./configure \
+EXTENSION_DIR=/usr/lib/php/$PhpAPI ./configure \
 	--prefix=/usr \
 	--sysconfdir=/$SysconfDir \
 	--with-config-file-path=/$SysconfDir \
@@ -179,14 +182,22 @@ fi
 
 rm -f $Pkgs
 Base='epi-php'
+Phar='install-pear-nozlib.phar'
 for dir in $Bld/pkgs/*
 do
     PkgDir=`basename $dir`
     Pkg=`expr "$PkgDir" : '[0-9][0-9]-\(.*\)'`
     Top=$dir/top
-    Name="$Base-$Maj.$Min-$Pkg"
-    test "$Pkg" = 'cli' && Cli="$Name"
-
+    if [ "$Pkg" = 'pear' ]; then
+	Name="$Base-$Pkg"
+	PkgVer=`sed -n "s;^.*//$Phar/PEAR-\(.*\)\.tar.*$;\1;p" pear/$Phar`
+	PkgNum=`cat $dir/BUILD_NUM`
+    else
+	Name="$Base-$MajMin-$Pkg"
+	PkgVer=$Ver
+	PkgNum=$BUILD_NUM
+	test "$Pkg" = 'cli' && Cli="$Name"
+    fi
     if [ -f $dir/skip ]; then
 	echo "Skipping package '$Pkg'"
 	continue
@@ -195,7 +206,7 @@ do
 
     # doc directory
     sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
-    sed -i -e "s/%NAME%/$Name/g" -e "s/%VERSION%/$Ver/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Bld/dist/.date`/" $Top/usr/share/doc/pkgname/changelog.Debian
+    sed -i -e "s/%NAME%/$Name/g" -e "s/%VERSION%/$PkgVer/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Bld/dist/.date`/" $Top/usr/share/doc/pkgname/changelog.Debian
     gzip -n9 $Top/usr/share/doc/pkgname/changelog*
     mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name
 
@@ -209,7 +220,7 @@ do
     . $dir/install
 
     # DEBIAN directory
-    sed -i -e "s/%VERSION%/$Ver-$BUILD_NUM/" -e "s/%NAME%/$Name/" -e "s/%DEPS%/$CLI_DEPS/" -e "s/%CLI%/$Cli/" $Top/DEBIAN/control
+    sed -i -e "s/%VERSION%/$PkgVer-$PkgNum/" -e "s/%NAME%/$Name/" -e "s/%DEPS%/$CLI_DEPS/" -e "s/%CLI%/$Cli/" -e "s/%PHPAPI%/$PhpAPI/" $Top/DEBIAN/control
 
     # Gather extra license files
     find $Top -type f -iname license | while read f

@@ -1,0 +1,11 @@
+Package: %NAME%
+Version: %VERSION%
+Architecture: all
+Maintainer: Cedric <c.girard@epiconcept.fr>
+Depends: php-cli
+Provides: php-console-getopt, php-structures-graph, php-xml-util
+Section: admin
+Priority: optional
+Description: PHP PEAR build by Epiconcept
+ This package provides the base system of the
+ PHP Extension and Application Repository

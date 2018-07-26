@@ -1,10 +1,11 @@
 Package: %NAME%
 Version: %VERSION%
-Priority: optional
 Architecture: amd64
-Section: admin
-Depends: apache2, %API%, %CLI%, libc6
-Conflicts: php7.0-cli, php7.1-cli, php7.2-cli, php5-cli
 Maintainer: Cedric <c.girard@epiconcept.fr>
+Depends: apache2, %API%, %CLI%, libc6
+Provides: libapache2-mod-php, phpapi-%PHPAPI%
+Conflicts: php7.0-cli, php7.1-cli, php7.2-cli, php5-cli
+Section: admin
+Priority: optional
 Description: PHP Apache module build by Epiconcept
  This package provides the PHP module for the Apache 2 webserver

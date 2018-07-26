@@ -233,6 +233,6 @@ test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
 date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 End=`date '+%s'`
 Len=`expr $End - $Now`
-Min=`expr $Len / 60`
+Min=`expr $Len / 60`	# $Min above not needed anymore
 Sec=`expr $Len - '(' $Min '*' 60 ')'`
 printf "Duration: %d:%02d\n" $Min $Sec
