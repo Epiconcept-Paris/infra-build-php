@@ -2,8 +2,9 @@
 #
 #	00-cli/install - Install php-cli files to $Top
 #
-# Skip install-pear install-sapi install-build install-headers install-pdo-headers
-for tgt in install-cli install-binaries install-programs install-modules install-pharcmd
+# Skip install-pear install-sapi
+# Discard install-build install-programs install-headers install-pdo-headers
+for tgt in install-cli install-binaries install-modules install-pharcmd
 do
     grep "^install_targets = .* $tgt" Makefile >/dev/null && Tgts="$Tgts $tgt"
 done
@@ -47,8 +48,7 @@ InstFiles()
 
 InstFiles $dir/moves
 
-test -d $Top/$VarDir && find $Top/$VarDir -depth -type d | xargs -r rmdir -v >$Logs/rmed_$Pkg.out
-
+find $Top -type d -empty -delete -print | sed 's/^/find: removing empty directory /' >$Logs/rmed_$Pkg.out
 find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
 file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs -r strip -v >$Logs/striped_$Pkg.out
 find $Top -name '*.so' | xargs -r strip -v >>$Logs/striped_$Pkg.out

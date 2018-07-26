@@ -199,7 +199,7 @@ do
 	test "$Pkg" = 'cli' && Cli="$Name"
     fi
     if [ -f $dir/skip ]; then
-	echo "Skipping package '$Pkg'"
+	echo "Skipping   package '$Pkg'"
 	continue
     fi
     echo "Installing package '$Pkg'..."
@@ -225,7 +225,7 @@ do
     # Gather extra license files
     find $Top -type f -iname license | while read f
     do
-	lf=`echo $f | sed "s;^$Top/usr/share/doc/$Name/;;"`
+	lf=`echo $f | sed "s;^$Top/usr/share/;;"`
 	echo "Removing extra license file $lf."
 	rm -v $f >>$Logs/rmed_$Pkg.out
     done
@@ -235,7 +235,7 @@ do
     deb=$(echo $out | sed "s/^.*building package ['\`][^']*' in ['\`]\([^']*\)'\.$/\1/")
 
     if [ -f "$deb" ]; then
-	echo "Checking package '$Pkg' -> $deb..."
+	echo "Checking   package '$Pkg': `basename $deb`..."
 	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
 	echo "`basename $deb`" >>$Pkgs
     else
