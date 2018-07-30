@@ -88,9 +88,18 @@ chkln /usr/include curl x86_64-linux-gnu	# For OAuth
 
 test -d /var/run/apache2 || mkdir /var/run/apache2	# For apache2 -V in configure
 eval `grep '^export APACHE_' /etc/apache2/envvars`	# For apache2 -V in configure
-SysconfDir="etc/php"
-DataDir="usr/share/php"
-PearDir="$DataDir"
+if [ "$DEBVER" = 'jessie' ]; then
+    MM=""
+    MMD=""
+    MMJ="$Maj"
+else
+    MM="$MajMin"
+    MMD="/$MajMin"
+    MMJ="$MajMin"
+fi
+SysconfDir="etc/php$MMD"
+DataDir="usr/share/php$MMD"
+PearDir='usr/share/php'
 ManDir='usr/share/man'
 DocDir='usr/share/doc'
 VarDir='var'
@@ -212,7 +221,7 @@ do
 
     # lintian overrides
     if [ -f $Top/usr/share/lintian/overrides/pkgname ]; then
-	sed -i -e "s/%NAME%/$Name/g" -e "s/%MAJ%/$Maj/" $Top/usr/share/lintian/overrides/pkgname
+	sed -i -e "s/%NAME%/$Name/g" -e "s/%MM%/$MM/" -e "s/%MMJ%/$MMJ/" $Top/usr/share/lintian/overrides/pkgname
 	mv $Top/usr/share/lintian/overrides/pkgname $Top/usr/share/lintian/overrides/$Name
     fi
 

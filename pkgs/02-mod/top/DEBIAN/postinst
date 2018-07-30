@@ -2,7 +2,7 @@
 
 set -e
 
-a2enmod php%MAJ%
+a2enmod php%MMJ%
 service apache2 restart
 
 exit 0

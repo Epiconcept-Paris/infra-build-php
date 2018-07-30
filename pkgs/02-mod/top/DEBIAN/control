@@ -4,7 +4,7 @@ Architecture: amd64
 Maintainer: Cedric <c.girard@epiconcept.fr>
 Depends: apache2, %API%, %CLI%, libc6
 Provides: libapache2-mod-php, phpapi-%PHPAPI%
-Conflicts: php7.0-cli, php7.1-cli, php7.2-cli, php5-cli
+Conflicts: libapache2-mod-php5, libapache2-mod-php7.0, libapache2-mod-php7.1, libapache2-mod-php7.2
 Section: admin
 Priority: optional
 Description: PHP Apache module build by Epiconcept

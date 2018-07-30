@@ -1,16 +1,16 @@
 #
-#	php-fpm.service
+#	php%MM%-fpm.service
 #
 [Unit]
-Description=The PHP FastCGI Process Manager
+Description=The PHP%MMS% FastCGI Process Manager
+Documentation=man:php%MM%-fpm(8)
 After=network.target
 
 [Service]
-Type=simple
-PIDFile=/var/run/php-fpm.pid
-ExecStart=/usr/sbin/php-fpm --nodaemonize --fpm-config /etc/php/php-fpm.conf
+Type=notify
+PIDFile=/run/php/php%MM%-fpm.pid
+ExecStart=/usr/sbin/php%MM%-fpm --nodaemonize --fpm-config /etc/php%MMD%/php-fpm.conf
 ExecReload=/bin/kill -USR2 $MAINPID
-PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target

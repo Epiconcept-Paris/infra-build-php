@@ -3,6 +3,7 @@ Version: %VERSION%
 Architecture: amd64
 Maintainer: Cedric <c.girard@epiconcept.fr>
 Depends: %CLI%, libc6
+Conflicts: php5-mysql
 Section: admin
 Priority: optional
 Description: PHP MySQL extension build by Epiconcept

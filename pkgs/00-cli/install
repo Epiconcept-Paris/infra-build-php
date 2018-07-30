@@ -11,45 +11,77 @@ done
 test "$Dbg" && echo "Tgts=\"$Tgts\""
 INSTALL_ROOT=$Top make$Tgts >$Logs/make-install_$Pkg.out 2>&1
 
-#   Use function to avoid polluting global namespace
-InstFiles()
+#   Move file to other package
+InstFile()
 {
     # global Bld Top Logs
-    local Dir File Pkg Must Cmnt Name Path New Log
+    local Dir File Pkg Must Name Path New Log
 
-    while read Dir File Pkg Must Cmnt
-    do
-	test "$Dir" || continue					# Empty line
-	expr "$Dir" : '[ 	]*#.*' >/dev/null && continue	# Comment 
-	if [ ! -d $Bld/pkgs/$Pkg ]; then
-	    echo "\aERROR: no Pkg=$Pkg in $Bld/pkgs (Dir=$Dir File=$File)"
-	    continue
-	fi
-	test -f $Bld/pkgs/$Pkg/skip && continue
-	Name=`expr "$Pkg" : '[0-9][0-9]-\(.*\)'`
-	if [ ! -d $Top/$Dir ]; then
-	    test "$Must" = 'y' && echo "\aERROR: no Dir=$Dir in $Top (File=$File Pkg=$Pkg)"
-	    continue
-	fi
-	Path=`cd $Top; find $Dir -type f -name $File`
-	if [ "$Path" -a -f "$Top/$Path" ]; then
-	    New=$Bld/pkgs/$Pkg/top/`dirname $Path`
-	    test -d $New || mkdir -p $New
-	    Log=$Logs/make-install_$Name.out
-	    test -f $Log || echo "Installing $Name package" >$Log
-	    mv -v $Top/$Path $New >>$Log 2>&1
-	elif [ "$Must" = 'y' ]; then
-	    echo "\aERROR: no Path found in $Top for Dir=$Dir File=$File (Pkg=$Pkg)"
-	    echo "Directory $Dir contains:"
-	    (cd $Top; find $Dir -type f)
-	fi
-    done <$1
+    Dir=$1
+    File=$2
+    Pkg=$3
+    Must=$4
+    if [ ! -d $Bld/pkgs/$Pkg ]; then
+	echo "\aERROR: no Pkg=$Pkg in $Bld/pkgs (Dir=$Dir File=$File)"
+	return
+    fi
+    test -f $Bld/pkgs/$Pkg/skip && return
+    Name=`expr "$Pkg" : '[0-9][0-9]-\(.*\)'`
+    if [ ! -d $Top/$Dir ]; then
+	test "$Must" = 'y' && echo "\aERROR: no Dir=$Dir in $Top (File=$File Pkg=$Pkg)"
+	return
+    fi
+    Path=`cd $Top; find $Dir -type f -name $File`
+    if [ "$Path" -a -f "$Top/$Path" ]; then
+	New=$Bld/pkgs/$Pkg/top/`dirname $Path`
+	test -d $New || mkdir -p $New
+	Log=$Logs/make-install_$Name.out
+	test -f $Log || echo "Installing $Name package" >$Log
+	mv -v $Top/$Path $New >>$Log 2>&1
+    elif [ "$Must" = 'y' ]; then
+	echo "\aERROR: no Path found in $Top for Dir=$Dir File=$File (Pkg=$Pkg)"
+	echo "Directory $Dir contains:"
+	(cd $Top; find $Dir -type f)
+    fi
 }
 
-InstFiles $dir/moves
+InstFile usr/sbin      php-fpm              03-fpm   y
+InstFile $ManDir/man8  php-fpm.8            03-fpm   y
+InstFile usr/share/php status.html          03-fpm   y
+InstFile etc/php$MMD   php-fpm.conf.default 03-fpm   y
+InstFile etc/php$MMD   www.conf.default     03-fpm   -
+InstFile usr/lib       mysql.so             04-mysql y
 
 find $Top -type d -empty -delete -print | sed 's/^/find: removing empty directory /' >$Logs/rmed_$Pkg.out
 find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
 file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs -r strip -v >$Logs/striped_$Pkg.out
 find $Top -name '*.so' | xargs -r strip -v >>$Logs/striped_$Pkg.out
 find $Top -name '*.so' | xargs -r chmod -x
+
+if [ "$MM" ]; then
+    mkdir $Top/etc/php/$MM
+    mv $Top/etc/php/php.ini $Top/etc/php/$MM
+    (cd $Top/usr/bin
+     mv php php$MM
+     if [ -e phar ]; then
+	mv phar.phar phar$MM.phar
+    	ln -sf phar$MM.phar phar$MM
+	rm phar
+     fi
+     cd $Top/$ManDir/man1
+     mv php.1.gz php$MM.1.gz
+     mv phar.1.gz phar$MM.1.gz
+     mv phar.phar.1.gz phar$MM.phar.1.gz
+    )
+    sed -i -e "s/%MM%/$MM/g" -e "s/%PRI%/`echo $MM | tr -d .`/" $Top/DEBIAN/postinst
+    sed -i "s/%MM%/$MM/g" $Top/DEBIAN/prerm
+else
+    for v in 5.2 5.6 7.1 7.2
+    do
+	test "$v" != "$MajMin" && Cfl="$Cfl, $Base-$v-$Pkg"
+    done
+    rm -v $Top/DEBIAN/p* >>$Logs/rmed_$Pkg.out
+fi
+sed -i "s;%MMD%;$MMD;" $Top/DEBIAN/conffiles
+sed -i "s/%CFL%/$Cfl/" $Top/DEBIAN/control
+test "$Dbg" && cp $Top/DEBIAN/control $Debug/control_$Pkg

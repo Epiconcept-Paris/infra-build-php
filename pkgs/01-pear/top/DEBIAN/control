@@ -4,6 +4,7 @@ Architecture: all
 Maintainer: Cedric <c.girard@epiconcept.fr>
 Depends: php-cli
 Provides: php-console-getopt, php-structures-graph, php-xml-util
+Conflicts: php-pear
 Section: admin
 Priority: optional
 Description: PHP PEAR build by Epiconcept

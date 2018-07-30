@@ -2,6 +2,7 @@ FROM debian:$DEBVER
 MAINTAINER Epiconcept
 
 ENV DEBVER $DEBVER
+ENV LANG=C
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm\nalias l='ls -al'" >>/root/.bashrc

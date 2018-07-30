@@ -2,17 +2,30 @@
 #
 #	03-fpm/install - Install php-fpm files to $Top
 #
+# There is no 'make install-..': files were moved to $Top by 00-cli/install
+#
 if [ -d $Top/usr/sbin ]; then
     file $Top/usr/sbin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs -r strip -v >$Logs/striped_$Pkg.out
 else
     echo "\aERROR: no $Top/usr/sbin directory. Package will be useless."
 fi
-#   Add extra config files
-(cd $Top; find etc -type f) | while read f
-do
-    grep "^/$f\$" $Top/DEBIAN/conffiles >/dev/null || echo "/$f" >>$Top/DEBIAN/conffiles
-done
+
 #   Compress our manual page(s)
 find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
+
 #   Replace link to w3.org icon with an embedded 26-byte GIF image
 sed -i 's|src="http://www.w3.org/Icons/valid-xhtml10"|src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="|' $Top/$DataDir/fpm/status.html
+
+sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" -e "s/%MMS%/ $MM/" $Top/lib/systemd/system/php-fpm.service 
+sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" $Top/etc/php/php-fpm.conf
+sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" $Top/etc/php/fpm.d/www.conf
+if [ "$MM" ]; then
+    mv $Top/usr/sbin/php-fpm $Top/usr/sbin/php$MM-fpm
+    mv $Top/$ManDir/man8/php-fpm.8.gz $Top/$ManDir/man8/php$MM-fpm.8.gz
+    mv $Top/lib/systemd/system/php-fpm.service $Top/lib/systemd/system/php$MM-fpm.service
+    mv $Top/etc/php/php-fpm.conf $Top/etc/php$MMD
+    mv $Top/etc/php/fpm.d $Top/etc/php$MMD
+fi
+test -f $Top/etc/php$MMD/php-fpm.d/www.conf.default && mv $Top/etc/php$MMD/php-fpm.d/www.conf.default $Top/etc/php$MMD/fpm.d
+
+(cd $Top; find etc -type f) | sed 's;^;/;' >$Top/DEBIAN/conffiles

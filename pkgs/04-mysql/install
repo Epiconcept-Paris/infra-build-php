@@ -2,6 +2,8 @@
 #
 #	04-mysql/install - Install php-mysql files to $Top
 #
+# There is no 'make install-..': files were moved to $Top by 00-cli/install
+#
 if [ -d $Top/usr/lib ]; then
     find $Top/usr/lib -name '*.so' | xargs -r strip -v >>$Logs/striped_$Pkg.out
     find $Top/usr/lib -name '*.so' | xargs -r chmod -x

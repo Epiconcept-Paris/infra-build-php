@@ -33,7 +33,6 @@ do
 	dpkg -i $Tst/dist/$pkg >>$Logs/dpkg-i.out 2>&1
     fi
 done <$Pkgs
-apt-get -yf install >$Logs/apt-get.out
 
 echo "Testing PHP CLI..."
 php /var/www/html/info.php >$Logs/info_cli.out

@@ -5,6 +5,7 @@
 #	Usage:	./mk.sh <PHP-version> [<Debian-version>]
 #
 #	PHP-version is checked to be available in PHP sources on $PHPSITE
+#	Supported PHP versions are 5.2, 5.6, 7.1+ on jessie, 5.6 and 7.1+ on later Debian
 #	Debian-version is checked to be supported and defaults to latest version
 #
 PHPSITE='fr.php.net'
@@ -44,8 +45,8 @@ test -d debian || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
 DebNum=`ls debian | sort -n | tail -1`	# Default = latest
 if [ $# -ne 1 -a $# -ne 2 ]; then
     echo "Usage: $Dir/$Prg <PHP-version> [ <Debian-version> ]" >&2
-    echo "Latest PHP 5/7 versions:" >&2
-    echo "$Latest" | sed 's/^/    /' >&2
+    echo "Latest supported PHP 5/7 versions:" >&2
+    echo "$Latest" | egrep -v '^(5\.[01345]|7\.0)\.' | sed 's/^/    /' >&2
     echo "Supported Debian versions (default $DebNum):" >&2
     ls debian | sort -n | while read v; do test -f debian/$v/name && printf "    %2d (`cat debian/$v/name`)\n" $v; done >&2
     exit 1

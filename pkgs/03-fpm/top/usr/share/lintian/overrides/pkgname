@@ -1,4 +1,4 @@
 #   E: Our PHP fpm includes libgd/file/sqlite on purpose
-%NAME%: embedded-library usr/sbin/php-fpm: libgd
-%NAME%: embedded-library usr/sbin/php-fpm: file
-%NAME%: embedded-library usr/sbin/php-fpm: sqlite
+%NAME%: embedded-library usr/sbin/php%MM%-fpm: libgd
+%NAME%: embedded-library usr/sbin/php%MM%-fpm: file
+%NAME%: embedded-library usr/sbin/php%MM%-fpm: sqlite

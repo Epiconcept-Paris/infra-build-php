@@ -5,14 +5,25 @@
 ModDir=$Top/etc/apache2/mods-available
 EnaDir=$Top/etc/apache2/mods-enabled
 test -d $EnaDir || mkdir $EnaDir
-mv $ModDir/php.conf $ModDir/php$Maj.conf
+mv $ModDir/php.conf $ModDir/php$MMJ.conf
 INSTALL_ROOT=$Top APACHE_CONFDIR=$Top/etc/apache2 make install-sapi >$Logs/make-install_$Pkg.out 2>&1
 
+Lib=`find $Top/usr/lib -name '*.so'`
+if [ "$Lib" ]; then
+    strip -v $Lib >$Logs/striped_$Pkg.out
+else
+    echo "\aERROR: no .so in $Top/usr/lib. Package will be useless."
+fi
 sed -i "s;$Top;;g" $ModDir/php$Maj.load
+if [ "$MMJ" != "$Maj" ]; then
+    mv $ModDir/php$Maj.load $ModDir/php$MMJ.load
+    Ren="s/libphp$Maj/libphp$MMJ/"
+    sed -i "$Ren" $ModDir/php$MMJ.load
+    test "$Lib" && mv $Lib `echo "$Lib" | sed "$Ren"`
+fi
 find $EnaDir -type l | xargs rm -v >$Logs/rmed_$Pkg.out
 rmdir -v $EnaDir >>$Logs/rmed_$Pkg.out
-find $Top/usr/lib -name '*.so' | xargs -r strip -v >$Logs/striped_$Pkg.out
 
 sed -i "s/%API%/`dpkg-query -W -f='${Provides}' apache2-bin`/" $Top/DEBIAN/control
-sed -i "s/%MAJ%/$Maj/" $Top/DEBIAN/conffiles
-sed -i "s/%MAJ%/$Maj/" $Top/DEBIAN/postinst
+sed -i "s/%MMJ%/$MMJ/" $Top/DEBIAN/conffiles
+sed -i "s/%MMJ%/$MMJ/" $Top/DEBIAN/postinst
