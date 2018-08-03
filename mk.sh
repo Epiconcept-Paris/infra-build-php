@@ -167,7 +167,7 @@ test -f php/.notest && BLDCOPY="$BLDCOPY
 COPY php/.notest $BUILD_TOP"
 
 if docker ps | grep $BUILD_NAME >/dev/null; then
-    echo "Stopping running '$BUILD_NAME' container..."
+    echo "Stopping the running '$BUILD_NAME' container..."
     docker stop -t 5 $BUILD_NAME >/dev/null
     while docker ps | grep $BUILD_NAME >/dev/null
     do
@@ -175,22 +175,24 @@ if docker ps | grep $BUILD_NAME >/dev/null; then
     done
 fi
 if docker ps -a | grep $BUILD_NAME >/dev/null; then
-    echo "Deleting existing '$BUILD_NAME' container..."
+    echo "Deleting the existing '$BUILD_NAME' container..."
     docker rm $BUILD_NAME >/dev/null
 fi
 if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
-    echo "Deleting existing '$BUILD_IMG' image..."
+    echo "Deleting the existing '$BUILD_IMG' image..."
     docker rmi $BUILD_IMG >/dev/null
 fi
 
-echo "Building '$BUILD_IMG' image..."
-#   Variables are by order of appearance in Dockerfile-build.in
-DEBVER="$DebVer" BUILD_NUM="$Bld" CLI_DEPS="$CLI_DEPS" BUILD_REQ="$BUILD_REQ" BUILD_TOP="$BUILD_TOP" PHPSRC="$PhpDir/$PhpSrc" BLDCOPY="$BLDCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $BUILD_NUM $CLI_DEPS $BUILD_REQ $BUILD_TOP $PHPSRC $BLDCOPY $PHPVER' <Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
+echo "Building the '$BUILD_IMG' image..."
+User=`id -un`
+AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
+#   Variables come in order of their appearance in Dockerfile-build.in
+CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" DEBVER="$DebVer" USER="$User" PHPVER="$PhpVer" ADDUSER="$AddUser" BUILD_REQ="$BUILD_REQ" BUILD_TOP="$BUILD_TOP" PHPSRC="$PhpDir/$PhpSrc" BLDCOPY="$BLDCOPY" envsubst '$CLI_DEPS $BUILD_NUM $DEBVER $USER $PHPVER $ADDUSER $BUILD_REQ $BUILD_TOP $PHPSRC $BLDCOPY' <Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
 
-echo "Running '$BUILD_NAME' container..."
+echo "Running the '$BUILD_NAME' container..."
 Cmd="docker run -ti -v `pwd`/$Dist:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
 $Cmd
-test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
+test -f .norun && echo "Use:\n    $Cmd bash\nto run the build container"
 echo "------------------------------------------------"
 
 #
@@ -204,7 +206,7 @@ test -f .norun && TSTCOPY="$TSTCOPY
 COPY .norun $TESTS_TOP"
 
 if docker ps | grep $TESTS_NAME >/dev/null; then
-    echo "Stopping running '$TESTS_NAME' container..."
+    echo "Stopping the running '$TESTS_NAME' container..."
     docker stop -t 5 $TESTS_NAME >/dev/null
     while docker ps | grep $TESTS_NAME >/dev/null
     do
@@ -212,21 +214,22 @@ if docker ps | grep $TESTS_NAME >/dev/null; then
     done
 fi
 if docker ps -a | grep $TESTS_NAME >/dev/null; then
-    echo "Deleting existing '$TESTS_NAME' container..."
+    echo "Deleting the existing '$TESTS_NAME' container..."
     docker rm $TESTS_NAME >/dev/null
 fi
 if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
-    echo "Deleting existing '$TESTS_IMG' image..."
+    echo "Deleting the existing '$TESTS_IMG' image..."
     docker rmi $TESTS_IMG >/dev/null
 fi
 
-echo "Building '$TESTS_IMG' image..."
-DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" PHPVER="$PhpVer" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $TSTCOPY $PHPVER' <Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
+echo "Building the '$TESTS_IMG' image..."
+#   Variables come in order of their appearance in Dockerfile-tests.in
+DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $TSTCOPY' <Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
 
-echo "Running '$TESTS_NAME' container..."
-Cmd="docker run -ti -v `pwd`/$Dist:$TESTS_TOP/dist --name $TESTS_NAME --rm $TESTS_IMG"
+echo "Running the '$TESTS_NAME' container..."
+Cmd="docker run -ti -p 80:80 -v `pwd`/$Dist:$TESTS_TOP/dist --name $TESTS_NAME --rm $TESTS_IMG"
 $Cmd
-test -f .norun && echo "Use:\n    $Cmd bash\nto run the container again"
+echo "Use:\n    $Cmd bash\nto run the tests container again"
 
 #
 #   End

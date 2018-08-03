@@ -6,6 +6,7 @@
 Prg=`basename $0`
 Bld=`dirname $0`
 Ver="$1"
+SupVer="5.2 5.6 7.1 7.2"			# UPDATE THIS on new version
 Logs="$Bld/dist/.logs"				# Directory for log files
 Pkgs="$Bld/dist/.pkgs"				# List of packages built
 Debug="$Bld/dist/.debug"			# Directory for debug files
@@ -13,7 +14,7 @@ Maj=`echo $Ver | awk -F. '{print $1}'`
 MajMin=`echo $Ver | awk -F. '{print $1 "." $2}'`
 if [ -f $Bld/.debug -o "$2" = 'debug' ]; then
     Dbg=y					# Debug option
-    test -d $Debug || mkdir $Debug
+    test -d $Debug || su -c "mkdir $Debug" $USER
 fi
 
 set -e	# Stop on errors
@@ -26,7 +27,8 @@ chkln()
 
 echo "Extracting php-$Ver source..."
 test -d /usr/src/php && rm -rf /usr/src/php
-tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src
+mkdir /usr/src/php-$Ver; chown $USER:`id -gn $USER` /usr/src/php-$Ver
+su -c "tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src" $USER
 mv /usr/src/php-$Ver /usr/src/php
 
 cd /usr/src/php
@@ -68,7 +70,7 @@ if [ -d $Bld/hooks ]; then
 	grep ' need autoconf version 2.13 or' build/buildcheck.sh >/dev/null && export PHP_AUTOCONF='/usr/bin/autoconf2.13'
 	mv configure configure0
 	test "$Dbg" && cp -p configure0 $Debug
-	./buildconf --force >$Logs/buildconf.out
+	su -c "./buildconf --force >$Logs/buildconf.out" $USER
 	test "$Dbg" && cp -p configure $Debug
 	mv $ConfigHelp $Logs/config0-help.out
 	./configure --help >$ConfigHelp
@@ -103,7 +105,7 @@ PearDir='usr/share/php'
 ManDir='usr/share/man'
 DocDir='usr/share/doc'
 VarDir='var'
-EXTENSION_DIR=/usr/lib/php/$PhpAPI ./configure \
+su -c "EXTENSION_DIR=/usr/lib/php/$PhpAPI ./configure \
 	--prefix=/usr \
 	--sysconfdir=/$SysconfDir \
 	--with-config-file-path=/$SysconfDir \
@@ -159,7 +161,7 @@ EXTENSION_DIR=/usr/lib/php/$PhpAPI ./configure \
 	--enable-xmlwriter \
 	--enable-zip \
 	--disable-debug \
->$Logs/config.out 2>&1
+>$Logs/config.out 2>&1" $USER
 grep 'WARNING:' $Logs/config.out | egrep -v 'bison version|need re2c' || true	# true for set -e
 test "$Dbg" && cp -p Makefile $Debug/Makefile0
 
@@ -174,7 +176,7 @@ include /usr/share/dpkg/buildflags.mk\
 grep '^EXTRA_LIBS = .* -lssl -lcrypto' Makefile >/dev/null || sed -i 's/-lxml2 -lxml2 -lxml2/-lssl -lcrypto/' Makefile
 
 echo "Building php-$Ver..."
-if ! make -k >$Logs/make.out 2>&1; then
+if ! su -c "make -k >$Logs/make.out 2>&1" $USER; then
     echo "\aBuilding php-$Ver FAILED:"
     grep "error:" $Logs/make.out
     exit 1
@@ -185,9 +187,11 @@ if [ -f $Bld/.notest ]; then
     echo "Skiping php-$Ver tests."
 else
     echo "Testing php-$Ver..."
-    echo "s" | make test >$Logs/make-test.out 2>&1
+    echo "s" | su -c "make test >$Logs/make-test.out 2>&1" $USER
+    sed -n '/^FAILED TEST /,'/^============/'p' $Logs/make-test.out
     test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs
 fi
+test "$Dbg" && find . ! -user $USER >$Debug/not-$USER
 
 rm -f $Pkgs
 Base='epi-php'

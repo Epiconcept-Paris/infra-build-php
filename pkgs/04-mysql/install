@@ -10,3 +10,5 @@ if [ -d $Top/usr/lib ]; then
 else
     echo "\aERROR: no $Top/usr/lib directory. Package will be useless."
 fi
+sed -i "s;%MMD%;$MMD;" $Top/DEBIAN/postinst
+sed -i "s;%MMD%;$MMD;" $Top/DEBIAN/postrm

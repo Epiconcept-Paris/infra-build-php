@@ -4,7 +4,6 @@
 #
 Prg=`basename $0`
 Tst=`dirname $0`
-Ver="$1"
 Logs="$Tst/dist/.logs"
 Pkgs="$Tst/dist/.pkgs"
 
@@ -14,8 +13,7 @@ if [ ! -f $Pkgs ]; then
     echo "$Prg: cannot find $Pkgs file" >&2
     exit 1
 fi
-sed -i '1i\
-Servername localhost' /etc/apache2/sites-available/000-default.conf
+sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf
 
 echo "Setting Apache 2 to prefork mode..."
 a2dismod mpm_event >$Logs/a2mod.out 2>&1

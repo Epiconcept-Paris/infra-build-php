@@ -2,6 +2,6 @@
 #	mcrypt.sh - Install MCrypt static extension
 #
 echo "$ExtOpts" | grep -- '--with-mcrypt ' >/dev/null && return 0
-tar xf $Bld/files/mcrypt-*.tgz -C ext
+su -c "tar xf `echo $Bld/files/mcrypt-*.tgz` -C ext" $USER
 Show="MCrypt"
 Opt="--with-mcrypt"

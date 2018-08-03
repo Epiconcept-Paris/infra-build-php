@@ -1,8 +1,8 @@
 #
 #	mysql.sh - Install MySQL shared extension
 #
-tar xf $Bld/files/mysql.tgz -C ext
+su -c "tar xf $Bld/files/mysql.tgz -C ext" $USER
 mv ext/pecl-database-mysql-master ext/mysql
-patch -p0 <$Bld/files/mysql.patch | sed 's/^p/P/'	# sed for cosmetics
+su -c "patch -p0 <$Bld/files/mysql.patch" $USER | sed 's/^p/P/'	# sed for cosmetics
 Show="MySQL(shared)"
 Opt="--with-mysql=shared"

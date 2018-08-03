@@ -76,7 +76,8 @@ if [ "$MM" ]; then
     sed -i -e "s/%MM%/$MM/g" -e "s/%PRI%/`echo $MM | tr -d .`/" $Top/DEBIAN/postinst
     sed -i "s/%MM%/$MM/g" $Top/DEBIAN/prerm
 else
-    for v in 5.2 5.6 7.1 7.2
+    #   Declare as Conflicts all other supported versions
+    for v in $SupVer
     do
 	test "$v" != "$MajMin" && Cfl="$Cfl, $Base-$v-$Pkg"
     done

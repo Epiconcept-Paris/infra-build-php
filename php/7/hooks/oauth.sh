@@ -1,6 +1,6 @@
 #
 #	oauth.sh - Install OAuth static extension
 #
-tar xf $Bld/files/oauth-*.tgz -C ext
+su -c "tar xf `echo $Bld/files/oauth-*.tgz` -C ext" $USER
 Show="OAuth"
 Opt="--enable-oauth"
