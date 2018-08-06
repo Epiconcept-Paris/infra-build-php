@@ -22,7 +22,7 @@ if [ -z "$Versions" ]; then
     exit 1
 fi
 #
-# From $Versions isolate latest sub for each Maj.min
+# From $Versions isolate latest rel for each Maj.min
 #
 Latest="`echo "$Versions" | awk -F. '{
     Mm = $1 "." $2
@@ -37,6 +37,25 @@ END {
     for (Mm in v)
 	printf("%s.%s\n", Mm, v[Mm]);
 }'`"
+
+SupPhp()
+{
+    # global Latest
+    local sup flt
+    test "$1" && sup=" supported" || sup=
+    test "$1" && flt="| egrep -v '^(5\.[01345]|7\.0)\.'" || flt=
+    echo "Latest$sup PHP 5/7 versions:" >&2
+    eval "echo \"$Latest\" $flt | sed 's/^/    /'" >&2
+}
+
+SupDeb()
+{
+    # global DebNum
+    local v
+    echo "Supported Debian versions (default $DebNum):" >&2
+    ls debian | sort -n | while read v; do test -f debian/$v/name && printf "    %2d (`cat debian/$v/name`)\n" $v; done >&2
+}
+
 #
 #   Check usage
 #
@@ -45,29 +64,26 @@ test -d debian || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
 DebNum=`ls debian | sort -n | tail -1`	# Default = latest
 if [ $# -ne 1 -a $# -ne 2 ]; then
     echo "Usage: $Dir/$Prg <PHP-version> [ <Debian-version> ]" >&2
-    echo "Latest supported PHP 5/7 versions:" >&2
-    echo "$Latest" | egrep -v '^(5\.[01345]|7\.0)\.' | sed 's/^/    /' >&2
-    echo "Supported Debian versions (default $DebNum):" >&2
-    ls debian | sort -n | while read v; do test -f debian/$v/name && printf "    %2d (`cat debian/$v/name`)\n" $v; done >&2
+    SupPhp -
+    SupDeb
     exit 1
 fi
 
 #
 #   Check PHP version
 #
-split="`echo "$1" | sed -nr 's/^([57])\.([0-9]+)\.([0-9]+)$/Maj=\1 Min=\2 Sub=\3/p'`"
+split="`echo "$1" | sed -nr 's/^([57])\.([0-9]+)\.([0-9]+)$/Maj=\1 Min=\2 Rel=\3/p'`"
 if [ -z "$split" ]; then
     echo "$Prg: invalid PHP version \"$1\" ([57].x.y)" >&2
     exit 1
 fi
 eval "$split"
-if echo "$Versions" | grep "^$Maj\.$Min\.$Sub$" >/dev/null; then
+if echo "$Versions" | grep "^$Maj\.$Min\.$Rel$" >/dev/null; then
     PhpVer="$1"
     PhpDir=php/$Maj/$PhpVer
 else
     echo "$Prg: unknown PHP version \"$1\"" >&2
-    echo "Latest PHP 5/7 versions:" >&2
-    echo "$Latest" | sed 's/^/    /' >&2
+    SupPhp
     exit 1
 fi
 #
@@ -78,15 +94,14 @@ if [ "$2" ]; then
 	DebNum="$2"
     else
 	echo "$Prg: unsupported Debian version \"$2\"" >&2
-	echo "Supported Debian versions (default $DebNum):" >&2
-	ls debian | sort -n | while read v; do test -f debian/$v/name && printf "    %2d (`cat debian/$v/name`)\n" $v; done >&2
+	SupDeb
 	exit 1
     fi
 fi
 DebVer="`cat debian/$DebNum/name`"
 DebDir=debian/$DebNum
 Tag=$DebVer-$PhpVer
-#echo "DebVer=$DebVer PhpVer=$PhpVer Maj=$Maj Min=$Min Sub=$Sub"
+#echo "DebVer=$DebVer PhpVer=$PhpVer Maj=$Maj Min=$Min Rel=$Rel"
 
 #
 #   Fetch PHP source

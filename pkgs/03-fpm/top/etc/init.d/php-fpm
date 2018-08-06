@@ -1,0 +1,133 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          php%MM%-fpm
+# Required-Start:    $remote_fs $network
+# Required-Stop:     $remote_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts php%MM%-fpm
+# Description:       Starts the PHP FastCGI Process Manager daemon
+### END INIT INFO
+
+NAME=php%MM%-fpm
+CONFFILE=/etc/php%MMD%/php-fpm.conf
+PIDFILE=`sed -n 's/^pid *= *//p' $CONFFILE`
+BIN=/usr/sbin/$NAME
+OPTS="--daemonize --fpm-config $CONFFILE"
+TIMEOUT=35
+
+WaitForPID()
+{
+    local try
+
+    try=0
+    while [ $try -lt $TIMEOUT ]
+    do
+	if [ "$1" = 'mk' ]; then
+	    test -f "$2" && return 0
+	elif [ "$1" = 'rm' ]; then
+	    test -f "$2" || return 0
+	fi
+	echo -n "."
+	try=`expr $try + 1`
+	sleep 1
+    done
+    return 1
+}
+
+# Exit if the package is not installed
+test -x "$BIN" || exit 0
+
+# Read configuration variable file if it is present
+test -r /etc/default/$NAME && . /etc/default/$NAME
+
+case "$1" in
+    start)
+	echo -n "Starting $NAME .."
+	if $BIN $OPTS && WaitForPID mk $PIDFILE; then
+	    echo " done."
+	    exit 0
+	fi
+	echo " failed."
+	exit 1
+	;;
+
+    stop)
+	echo -n "Gracefully shutting down $NAME .."
+	if [ ! -r $PIDFILE ] ; then
+	    echo "\nwarning, no pid file found - $NAME not running ?"
+	    exit 1
+	fi
+	kill -QUIT `cat $PIDFILE`
+	if WaitForPID rm $PIDFILE; then
+	    echo " done."
+	    exit 0
+	fi
+	echo " failed. Use force-quit"
+	exit 1
+	;;
+
+    force-quit)
+	echo -n "Terminating $NAME .."
+	if [ ! -r $PIDFILE ] ; then
+	    echo "\nwarning, no pid file found - $NAME not running ?"
+	    exit 1
+	fi
+	kill -TERM `cat $PIDFILE`
+	if WaitForPID rm $PIDFILE; then
+	    echo " done."
+	    exit 0
+	fi
+	echo " failed."
+	exit 1
+	;;
+
+    status)
+	if [ ! -r $PIDFILE ] ; then
+	    echo "$NAME is stopped"
+	    exit 0
+	fi
+	PID=`cat $PIDFILE`
+	if ps -p $PID | grep -q $PID; then
+	    echo "$NAME (PID $PID) is running..."
+	else
+	    echo "$NAME dead but PID file exists"
+	fi
+        ;;
+
+    restart)
+	$0 stop
+	$0 start
+	;;
+
+    reopen-logs)
+	echo -n "Reopening service $NAME logs .."
+	if [ ! -r $PIDFILE ] ; then
+	    echo "\nwarning, no pid file found - $NAME not running ?"
+	    exit 1
+	fi
+	kill -USR1 `cat $PIDFILE`
+	echo " done."
+	;;
+
+    reload|force-reload)
+	echo -n "Reload service $NAME .."
+	if [ ! -r $PIDFILE ] ; then
+	    echo "\nwarning, no pid file found - $NAME not running ?"
+	    exit 1
+	fi
+	kill -USR2 `cat $PIDFILE`
+	echo " done."
+	;;
+
+    configtest)
+	$BIN -t
+	;;
+
+    *)
+	echo "Usage: $0 {start|stop|force-quit|status|restart|reopen-logs|reload|force-reload|configtest}" >&2
+	exit 1
+	;;
+esac
+:

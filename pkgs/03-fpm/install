@@ -17,6 +17,7 @@ find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
 sed -i 's|src="http://www.w3.org/Icons/valid-xhtml10"|src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="|' $Top/$DataDir/fpm/status.html
 
 sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" -e "s/%MMS%/ $MM/" $Top/lib/systemd/system/php-fpm.service 
+sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" $Top/etc/init.d/php-fpm
 sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" $Top/etc/php/php-fpm.conf
 sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" $Top/etc/php/fpm.d/www.conf
 sed -i -e "s/%MM%/$MM/" -e "s/%MAJ%/$Maj/" $Top/etc/apache2/conf-available/php-fpm.conf
@@ -24,6 +25,7 @@ if [ "$MM" ]; then
     mv $Top/usr/sbin/php-fpm $Top/usr/sbin/php$MM-fpm
     mv $Top/$ManDir/man8/php-fpm.8.gz $Top/$ManDir/man8/php$MM-fpm.8.gz
     mv $Top/lib/systemd/system/php-fpm.service $Top/lib/systemd/system/php$MM-fpm.service
+    mv $Top/etc/init.d/php-fpm $Top/etc/init.d/php$MM-fpm
     mv $Top/etc/php/php-fpm.conf $Top/etc/php$MMD
     mv $Top/etc/php/fpm.d $Top/etc/php$MMD
     mv $Top/etc/apache2/conf-available/php-fpm.conf $Top/etc/apache2/conf-available/php$MM-fpm.conf
