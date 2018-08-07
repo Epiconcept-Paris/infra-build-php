@@ -1,0 +1,20 @@
+FROM debian:$DEBVER
+MAINTAINER Epiconcept
+
+ENV LANG=C
+ENV TZ=Europe/Paris
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
+RUN echo "export TERM=xterm\nalias l='ls -al'\necho \"Use: $MULTI_TOP/start\\nto start Apache\"" >>/root/.bashrc
+
+# Update/upgrade
+RUN apt-get update
+RUN apt-get upgrade -y
+
+# Tools and tests deps
+RUN apt-get install -y --no-install-recommends $MULTI_REQ
+
+RUN mkdir -p $MULTI_TOP/work
+COPY php/start $MULTI_TOP
+COPY php/info.php $MULTI_TOP
+
+CMD $MULTI_TOP/start

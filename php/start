@@ -1,0 +1,77 @@
+#!/bin/sh
+#
+#	start - Install multiple PHP versions in virtual hosts and start Apache
+#
+Prg=`basename $0`
+Dir=`dirname $0`
+Work="$Dir/work"
+Mult="$Work/multi"
+Base='epi-php'
+Arch='amd64'
+Domain="epiconcept.tld"
+IpSite="http://ipaddr.free.fr"
+DebNum=`expr \`cat /etc/debian_version\` : '\([0-9]*\)'`
+
+Dists=$Mult/.dists
+if [ ! -s $Dists ]; then
+    echo "$Prg: $Dists file is missing or empty" >&2
+    exit 1
+fi
+set -e
+
+sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf
+a2enmod proxy_fcgi >$Mult/a2.out
+
+>$Mult/fpm-init.out
+mkdir /run/php
+for dist in `cat $Dists`
+do
+    if [ ! -d $Work/$dist ]; then
+	echo "$Prg: \"$Work/$dist\" is not a directory" >&2
+	continue
+    fi
+    split="`echo "$dist" | sed -nr 's/^([5-9])\.([0-9]+)\.([0-9]+)-([0-9]+)$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`"
+    if [ -z "$split" ]; then
+	echo "$Prg: Invalid PHP-dist-dir \"$dist\"" >&2
+	continue
+    fi
+    eval "$split"
+    if [ -s $Work/$dist/epi-php-$Maj.$Min-cli_${dist}_$Arch.deb -a -s $Work/$dist/epi-php-$Maj.$Min-fpm_${dist}_$Arch.deb ]; then
+	dpkg -i $Work/$dist/epi-php-$Maj.$Min-cli_${dist}_$Arch.deb $Work/$dist/epi-php-$Maj.$Min-fpm_${dist}_$Arch.deb >>$Mult/dpkg-i.out
+    else
+	echo "$Prg: cannot find cli and fpm packages in \"$Work/$dist\""
+	continue
+    fi
+    fpm=php$Maj.$Min-fpm
+    www=$Work/$dist/www
+    site=php$Maj$Min.$Domain
+    service $fpm start >>$Mult/fpm-init.out
+    test -d $www || mkdir $www
+    test -f $www/index.php || echo "<?php header('Location: info.php'); ?>" >$www/index.php
+    cp -p $Dir/info.php $www
+    echo "<VirtualHost *:80>
+    ServerName $site
+    DocumentRoot $www
+    <FilesMatch \".+\.ph(ar|p|tml)$\">
+        SetHandler \"proxy:unix:/run/php/$fpm.sock|fcgi://localhost\"
+    </FilesMatch>
+    <Directory $www>
+	AllowOverride all
+	Require all granted
+    </Directory>
+</VirtualHost>" >/etc/apache2/sites-available/$site.conf
+    a2ensite $site.conf >>$Mult/a2.out
+    echo "Added site http://$site for host-dir debian/$DebNum/dist/$dist/www"
+    ok=y
+done
+IPAddr="`curl -sSL "$IpSite" 2>/dev/null | awk 'NR == 1 {print "IP=" $0} NR==2 { print "NS=" $0}'`"
+if [ "$IPAddr" ]; then
+    eval "$IPAddr"
+    echo "Our IP address is $IP ($NS)"
+fi
+if [ "$ok" ]; then
+    service apache2 start
+else
+    echo "$Prg: no valid site to start" >&2
+    exit 1
+fi
