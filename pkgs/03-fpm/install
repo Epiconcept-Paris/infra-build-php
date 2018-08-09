@@ -20,15 +20,19 @@ sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" -e "s/%MMS%/ $MM/" $Top/lib/systemd/s
 sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" $Top/etc/init.d/php-fpm
 sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" $Top/etc/php/php-fpm.conf
 sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" $Top/etc/php/fpm.d/www.conf
-sed -i -e "s/%MM%/$MM/" -e "s/%MAJ%/$Maj/" $Top/etc/apache2/conf-available/php-fpm.conf
+sed -i -e "s/%MM%/$MM/" -e "s/%MAJ%/$Maj/" $Top/etc/apache2/conf-available/pkgname.conf
+sed -i "s/%MM%/$MM/" $Top/DEBIAN/postinst
+sed -i "s/%MM%/$MM/g" $Top/DEBIAN/prerm
+sed -i "s/%MM%/$MM/" $Top/DEBIAN/postrm
+mv $Top/etc/apache2/conf-available/pkgname.conf $Top/etc/apache2/conf-available/$Name.conf
 if [ "$MM" ]; then
     mv $Top/usr/sbin/php-fpm $Top/usr/sbin/php$MM-fpm
     mv $Top/$ManDir/man8/php-fpm.8.gz $Top/$ManDir/man8/php$MM-fpm.8.gz
     mv $Top/lib/systemd/system/php-fpm.service $Top/lib/systemd/system/php$MM-fpm.service
+    mv $Top/usr/lib/tmpfiles.d/php-fpm.conf $Top/usr/lib/tmpfiles.d/php$MM-fpm.conf
     mv $Top/etc/init.d/php-fpm $Top/etc/init.d/php$MM-fpm
     mv $Top/etc/php/php-fpm.conf $Top/etc/php$MMD
     mv $Top/etc/php/fpm.d $Top/etc/php$MMD
-    mv $Top/etc/apache2/conf-available/php-fpm.conf $Top/etc/apache2/conf-available/php$MM-fpm.conf
 fi
 test -f $Top/etc/php$MMD/php-fpm.d/www.conf.default && mv $Top/etc/php$MMD/php-fpm.d/www.conf.default $Top/etc/php$MMD/fpm.d
 

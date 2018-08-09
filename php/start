@@ -23,7 +23,7 @@ sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf
 a2enmod proxy_fcgi >$Mult/a2.out
 
 >$Mult/fpm-init.out
-mkdir /run/php
+#mkdir /run/php
 for dist in `cat $Dists`
 do
     if [ ! -d $Work/$dist ]; then
@@ -45,7 +45,7 @@ do
     fpm=php$Maj.$Min-fpm
     www=$Work/$dist/www
     site=php$Maj$Min.$Domain
-    service $fpm start >>$Mult/fpm-init.out
+    #service $fpm start >>$Mult/fpm-init.out
     test -d $www || mkdir $www
     test -f $www/index.php || echo "<?php header('Location: info.php'); ?>" >$www/index.php
     cp -p $Dir/info.php $www

@@ -42,6 +42,9 @@ test -x "$BIN" || exit 0
 # Read configuration variable file if it is present
 test -r /etc/default/$NAME && . /etc/default/$NAME
 
+# Define LSB log_* functions (only to please lintian)
+. /lib/lsb/init-functions
+
 case "$1" in
     start)
 	echo -n "Starting $NAME .."

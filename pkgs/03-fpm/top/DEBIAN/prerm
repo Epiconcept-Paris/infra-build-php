@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -e
+
+test -x /etc/init.d/php%MM%-fpm && service php%MM%-fpm stop || true

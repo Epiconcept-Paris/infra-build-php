@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ]; then
+    if [ -d /run/systemd/system ]; then
+	systemd-tmpfiles --create php%MM%-fpm.conf >/dev/null
+    else
+	while read type path mode uid gid age arg
+	do
+	    case $type in
+		#.*)	;;
+		d)	if [ ! -d $path ]; then
+			    rm -f $path
+			    mkdir -p $path
+			    chmod $mode $path
+			    chown $uid:$gid $path
+			fi
+			;;
+	    esac
+	done </usr/lib/tmpfiles.d/php%MM%-fpm.conf
+    fi
+    if [ -x /etc/init.d/php%MM%-fpm ]; then
+	update-rc.d php%MM%-fpm defaults >/dev/null
+	test "$2" && cmd='restart' || cmd='start'
+	service php%MM%-fpm $cmd
+    fi
+fi
