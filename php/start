@@ -11,6 +11,7 @@ Arch='amd64'
 Domain="epiconcept.tld"
 IpSite="http://ipaddr.free.fr"
 DebNum=`expr \`cat /etc/debian_version\` : '\([0-9]*\)'`
+test $$ -eq 1 && exec >$Mult/docker-run.out 2>&1
 
 Dists=$Mult/.dists
 if [ ! -s $Dists ]; then
@@ -22,8 +23,6 @@ set -e
 sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf
 a2enmod proxy_fcgi >$Mult/a2.out
 
->$Mult/fpm-init.out
-#mkdir /run/php
 for dist in `cat $Dists`
 do
     if [ ! -d $Work/$dist ]; then
@@ -45,7 +44,6 @@ do
     fpm=php$Maj.$Min-fpm
     www=$Work/$dist/www
     site=php$Maj$Min.$Domain
-    #service $fpm start >>$Mult/fpm-init.out
     test -d $www || mkdir $www
     test -f $www/index.php || echo "<?php header('Location: info.php'); ?>" >$www/index.php
     cp -p $Dir/info.php $www
@@ -71,6 +69,13 @@ if [ "$IPAddr" ]; then
 fi
 if [ "$ok" ]; then
     service apache2 start
+    if [ $$ -eq 1 ]; then
+	echo "Waiting for container stop..."
+	while :
+	do
+	    sleep 600
+	done
+    fi
 else
     echo "$Prg: no valid site to start" >&2
     exit 1

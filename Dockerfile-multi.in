@@ -17,4 +17,4 @@ RUN mkdir -p $MULTI_TOP/work
 COPY php/start $MULTI_TOP
 COPY php/info.php $MULTI_TOP
 
-CMD $MULTI_TOP/start
+ENTRYPOINT [ "$MULTI_TOP/start" ]
