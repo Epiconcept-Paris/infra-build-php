@@ -202,7 +202,7 @@ echo "Building the '$BUILD_IMG' image..."
 User=`id -un`
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 #   Variables come in order of their appearance in Dockerfile-build.in
-CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" DEBVER="$DebVer" USER="$User" PHPVER="$PhpVer" ADDUSER="$AddUser" BUILD_REQ="$BUILD_REQ" BUILD_TOP="$BUILD_TOP" PHPSRC="$PhpDir/$PhpSrc" BLDCOPY="$BLDCOPY" envsubst '$CLI_DEPS $BUILD_NUM $DEBVER $USER $PHPVER $ADDUSER $BUILD_REQ $BUILD_TOP $PHPSRC $BLDCOPY' <Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
+DEBVER="$DebVer" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" ADDUSER="$AddUser" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpDir/$PhpSrc" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $CLI_DEPS $BUILD_NUM $USER $BUILD_TOP $PHPVER $ADDUSER $BUILD_REQ $PHPSRC $BLDCOPY' <Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
 
 echo "Running the '$BUILD_NAME' container..."
 Cmd="docker run -ti -v `pwd`/$Dist:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"

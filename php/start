@@ -44,9 +44,9 @@ do
     fpm=php$Maj.$Min-fpm
     www=$Work/$dist/www
     site=php$Maj$Min.$Domain
-    test -d $www || mkdir $www
-    test -f $www/index.php || echo "<?php header('Location: info.php'); ?>" >$www/index.php
-    cp -p $Dir/info.php $www
+    test -d $www || su -c "mkdir $www" $USER
+    test -f $www/index.php || su -c "echo \"<?php header('Location: info.php'); ?>\" >$www/index.php" $USER
+    su -c "cp -p $Dir/info.php $www" $USER
     echo "<VirtualHost *:80>
     ServerName $site
     DocumentRoot $www
@@ -73,7 +73,7 @@ if [ "$ok" ]; then
 	echo "Waiting for container stop..."
 	while :
 	do
-	    sleep 600
+	    sleep 15
 	done
     fi
 else

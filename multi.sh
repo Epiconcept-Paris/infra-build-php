@@ -76,6 +76,7 @@ DistOK()
     return 0
 }
 
+nd=1
 if [ "$ds" ]; then
     Sep=''
     for d in $ds
@@ -83,6 +84,7 @@ if [ "$ds" ]; then
 	if DistOK $DistDir/$d; then
 	    Dists="$Dists$Sep$d"
 	    Sep="$LF"
+	    nd=`expr $nd + 1`
 	else
 	    echo "$Prg: $d does not contain any valid $Base package" >&2
 	    exit 1
@@ -132,11 +134,28 @@ if docker images | grep "$MULTI_BASE *$DebVer" >/dev/null; then
 fi
 
 echo "Building the '$MULTI_IMG' image..."
-DEBVER="$DebVer" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" envsubst '$DEBVER $MULTI_TOP $MULTI_REQ' <Dockerfile-multi.in | tee $MultDir/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$MultDir/docker-multi.out 2>&1
+User=`id -un`
+AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
+#   Variables come in order of their appearance in Dockerfile-multi.in
+DEBVER="$DebVer" USER="$User" MULTI_TOP="$MULTI_TOP" ADDUSER="$AddUser" MULTI_REQ="$MULTI_REQ" envsubst '$DEBVER $USER $MULTI_TOP $ADDUSER $MULTI_REQ' <Dockerfile-multi.in | tee $MultDir/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$MultDir/docker-multi.out 2>&1
 #
 #   Run container
 #
-echo "Running the '$MULTI_NAME' container..."
-test -f .norun && Opt='-ti' || Opt='-d'
-Cmd="docker run $Opt -p 80:80 -v `pwd`/$DistDir:$MULTI_TOP/work --name $MULTI_NAME --rm $MULTI_IMG"
-test -f .norun && echo "$Cmd bash" || $Cmd
+RunCmd()
+{
+    echo "docker run $1 -p 80:80 -v `pwd`/$DistDir:$MULTI_TOP/work --name $MULTI_NAME --rm $MULTI_IMG"
+}
+if [ -f .norun ]; then
+    echo "Use:\n    `RunCmd -ti` bash\nto run the container"
+else
+    echo "Running the '$MULTI_NAME' container in background mode."
+    `RunCmd -d` >/dev/null
+    while :
+    do
+	sleep 1
+	grep '^Waiting for container stop' $MultDir/docker-run.out >/dev/null && break
+    done
+    sed -n "1,${nd}p" $MultDir/docker-run.out
+    echo "Use:\n    docker stop $MULTI_NAME\nto stop the container, and use:"
+    echo "    `RunCmd -ti` bash\nto run the container in the foreground"
+fi
