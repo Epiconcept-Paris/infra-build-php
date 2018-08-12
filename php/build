@@ -251,6 +251,7 @@ do
 	echo "Checking   package '$Pkg': `basename $deb`..."
 	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
 	echo "`basename $deb`" >>$Pkgs
+	chown $USER:$USER $deb
     else
 	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""
     fi

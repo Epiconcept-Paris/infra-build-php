@@ -5,48 +5,42 @@
 Prg=`basename $0`
 Dir=`dirname $0`
 Work="$Dir/work"
-Mult="$Work/multi"
+Logs="$Work/logs"
+Pkgs="$Work/pkgs"
 Base='epi-php'
 Arch='amd64'
 Domain="epiconcept.tld"
 IpSite="http://ipaddr.free.fr"
 DebNum=`expr \`cat /etc/debian_version\` : '\([0-9]*\)'`
-test $$ -eq 1 && exec >$Mult/docker-run.out 2>&1
+test $$ -eq 1 && exec >$Logs/docker-run.out 2>&1
 
-Dists=$Mult/.dists
-if [ ! -s $Dists ]; then
-    echo "$Prg: $Dists file is missing or empty" >&2
+if [ ! -d $Pkgs ]; then
+    echo "$Prg: directory $Pkgs is missing" >&2
     exit 1
 fi
 set -e
+Dists="`ls $Pkgs | sed -nr "s/$Base-[5-9]\.[0-9]-(cli|fpm)_([5-9]\.[0-9]\.[0-9]+-[0-9]+)_$Arch.deb/\2/p" | sort -u`"
+if [ -z "$Dists" ]; then
+    echo "$Prg: no valid package name in $Pkgs" >&2
+    exit 1
+fi
 
 sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf
-a2enmod proxy_fcgi >$Mult/a2.out
+a2enmod proxy_fcgi >$Logs/a2.out
 
-for dist in `cat $Dists`
+>$Logs/dpkg-i.out
+for dist in $Dists
 do
-    if [ ! -d $Work/$dist ]; then
-	echo "$Prg: \"$Work/$dist\" is not a directory" >&2
-	continue
-    fi
-    split="`echo "$dist" | sed -nr 's/^([5-9])\.([0-9]+)\.([0-9]+)-([0-9]+)$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`"
-    if [ -z "$split" ]; then
-	echo "$Prg: Invalid PHP-dist-dir \"$dist\"" >&2
-	continue
-    fi
-    eval "$split"
-    if [ -s $Work/$dist/epi-php-$Maj.$Min-cli_${dist}_$Arch.deb -a -s $Work/$dist/epi-php-$Maj.$Min-fpm_${dist}_$Arch.deb ]; then
-	dpkg -i $Work/$dist/epi-php-$Maj.$Min-cli_${dist}_$Arch.deb $Work/$dist/epi-php-$Maj.$Min-fpm_${dist}_$Arch.deb >>$Mult/dpkg-i.out
+    eval `echo "$dist" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]+)-([0-9]+)$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
+    if [ -s $Pkgs/$Base-$Maj.$Min-cli_${dist}_$Arch.deb -a -s $Pkgs/$Base-$Maj.$Min-fpm_${dist}_$Arch.deb ]; then
+	dpkg -i $Pkgs/$Base-$Maj.$Min-cli_${dist}_$Arch.deb $Pkgs/$Base-$Maj.$Min-fpm_${dist}_$Arch.deb >>$Logs/dpkg-i.out
     else
-	echo "$Prg: cannot find cli and fpm packages in \"$Work/$dist\""
+	echo "$Prg: cannot find both cli and fpm packages for $dist"
 	continue
     fi
     fpm=php$Maj.$Min-fpm
-    www=$Work/$dist/www
+    www=$Work/www/php$Maj$Min
     site=php$Maj$Min.$Domain
-    test -d $www || su -c "mkdir $www" $USER
-    test -f $www/index.php || su -c "echo \"<?php header('Location: info.php'); ?>\" >$www/index.php" $USER
-    su -c "cp -p $Dir/info.php $www" $USER
     echo "<VirtualHost *:80>
     ServerName $site
     DocumentRoot $www
@@ -58,8 +52,8 @@ do
 	Require all granted
     </Directory>
 </VirtualHost>" >/etc/apache2/sites-available/$site.conf
-    a2ensite $site.conf >>$Mult/a2.out
-    echo "Added site http://$site for host-dir debian/$DebNum/dist/$dist/www"
+    a2ensite $site.conf >>$Logs/a2.out
+    echo "Added site http://$site for host-dir debian/$DebNum/multi/www/php$Maj$Min"
     ok=y
 done
 IPAddr="`curl -sSL "$IpSite" 2>/dev/null | awk 'NR == 1 {print "IP=" $0} NR==2 { print "NS=" $0}'`"
@@ -69,13 +63,7 @@ if [ "$IPAddr" ]; then
 fi
 if [ "$ok" ]; then
     service apache2 start
-    if [ $$ -eq 1 ]; then
-	echo "Waiting for container stop..."
-	while :
-	do
-	    sleep 15
-	done
-    fi
+    test $$ -eq 1 && exec waitpid
 else
     echo "$Prg: no valid site to start" >&2
     exit 1

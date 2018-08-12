@@ -72,7 +72,7 @@ fi
 #
 #   Check PHP version
 #
-split="`echo "$1" | sed -nr 's/^([57])\.([0-9]+)\.([0-9]+)$/Maj=\1 Min=\2 Rel=\3/p'`"
+split="`echo "$1" | sed -nr 's/^([57])\.([0-9])\.([0-9]+)$/Maj=\1 Min=\2 Rel=\3/p'`"
 if [ -z "$split" ]; then
     echo "$Prg: invalid PHP version \"$1\" ([57].x.y)" >&2
     exit 1

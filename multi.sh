@@ -20,8 +20,8 @@ DefDeb=`ls debian | sort -n | tail -1`	# Default = latest
 #
 for arg in "$@"
 do
-    d=`expr "$arg" : '\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-[0-9][0-9]*\)$'`
-    v=`expr "$arg" : '\([0-9][0-9]\)$'`
+    d=`expr "$arg" : '\([5-9]\.[0-9]\.[0-9][0-9]*-[0-9][0-9]*\)$'`
+    v=`expr "$arg" : '\([0-9][0-9]*\)$'`
     if [ "$d" ]; then
 	ds="$ds $d"
     elif [ "$v" ]; then
@@ -52,54 +52,58 @@ DebDir=debian/$DebNum
 
 if [ -f $DebDir/Dockervars.sh ]; then
     eval `sed -n 's/^TESTS_REQ=/MULTI_REQ=/p' $DebDir/Dockervars.sh`
+    MULTI_REQ="$MULTI_REQ gcc libc-dev"
 else
     echo "$Prg: missing $DebDir/Dockervars.sh" >&2
     exit 1
 fi
 DistDir=$DebDir/dist
-MultDir=$DistDir/multi
-test -d $MultDir || mkdir $MultDir
+MultDir=$DebDir/multi
+Logs=$MultDir/logs
+Pkgs=$MultDir/pkgs
 #
 #   Check PHP-dists
 #
 DistOK()
 {
     # global Base Arch
-    local path dist mm
+    local path dist
     path="$1"
     test -d "$path" || return 1
     dist=`basename $path`
-    mm=`expr "$dist" : '\([0-9][0-9]*\.[0-9][0-9]*\)\.[0-9][0-9]*-[0-9][0-9]*$'`
-    test "$mm" || return 1
-    test -f $path/$Base-$mm-cli_${dist}_$Arch.deb || return 1
-    test -f $path/$Base-$mm-fpm_${dist}_$Arch.deb || return 1
+    test -f $path/$Base-$2.$3-cli_${dist}_$Arch.deb || return 1
+    test -f $path/$Base-$2.$3-fpm_${dist}_$Arch.deb || return 1
     return 0
 }
 
-nd=1
+nd=0
+test -d $Pkgs && rm -f $Pkgs/*.deb || mkdir -p $Pkgs
 if [ "$ds" ]; then
-    Sep=''
     for d in $ds
     do
-	if DistOK $DistDir/$d; then
-	    Dists="$Dists$Sep$d"
-	    Sep="$LF"
+	eval `echo "$d" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]+)-([0-9]+)$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
+	if DistOK $DistDir/$d $Maj $Min; then
+	    ln $DistDir/$d/$Base-$Maj.$Min-cli_${d}_$Arch.deb $Pkgs
+	    ln $DistDir/$d/$Base-$Maj.$Min-fpm_${d}_$Arch.deb $Pkgs
+	    w=$MultDir/www/php$Maj$Min
+	    test -d $w || mkdir -p $w
+	    test -f $w/index.php || echo "<?php header('Location: info.php'); ?>" >$w/index.php
+	    cp -p php/info.php $w
 	    nd=`expr $nd + 1`
 	else
-	    echo "$Prg: $d does not contain any valid $Base package" >&2
+	    echo "$Prg: $d does not contain the necessary $Base cli and fpm packages" >&2
 	    exit 1
 	fi
     done
 fi
-if [ "$Dists" ]; then
-    echo "$Dists" >$MultDir/.dists
-else
+if [ $nd -eq 0 ]; then
     echo "Usage: $Dir/$Prg <PHP-dist-dir> [<PHP-dist-dir> ...] [<Debian-version>]" >&2
     echo "Available dists for Debian version $DebNum ($DebVer):" >&2
     Sep=''
-    for dir in $DistDir/[5-9].[0-9]*.[0-9]*-[0-9]*
+    for dir in $DistDir/[5-9].[0-9].[0-9]*-[0-9]*
     do
-	if DistOK $dir; then
+	eval `basename $dir | sed -nr 's/^([5-9])\.([0-9])\.([0-9]+)-([0-9]+)$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
+	if DistOK $dir $Maj $Min; then
 	    Dists="$Dists$Sep`basename $dir`"
 	    Sep="$LF"
 	fi
@@ -133,17 +137,16 @@ if docker images | grep "$MULTI_BASE *$DebVer" >/dev/null; then
     docker rmi $MULTI_IMG >/dev/null
 fi
 
+test -d $Logs || mkdir -p $Logs
 echo "Building the '$MULTI_IMG' image..."
-User=`id -un`
-AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 #   Variables come in order of their appearance in Dockerfile-multi.in
-DEBVER="$DebVer" USER="$User" MULTI_TOP="$MULTI_TOP" ADDUSER="$AddUser" MULTI_REQ="$MULTI_REQ" envsubst '$DEBVER $USER $MULTI_TOP $ADDUSER $MULTI_REQ' <Dockerfile-multi.in | tee $MultDir/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$MultDir/docker-multi.out 2>&1
+DEBVER="$DebVer" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" envsubst '$DEBVER $MULTI_TOP $MULTI_REQ' <Dockerfile-multi.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
 #
 #   Run container
 #
 RunCmd()
 {
-    echo "docker run $1 -p 80:80 -v `pwd`/$DistDir:$MULTI_TOP/work --name $MULTI_NAME --rm $MULTI_IMG"
+    echo "docker run $1 -p 80:80 -v `pwd`/$MultDir:$MULTI_TOP/work --name $MULTI_NAME --rm $MULTI_IMG"
 }
 if [ -f .norun ]; then
     echo "Use:\n    `RunCmd -ti` bash\nto run the container"
@@ -153,9 +156,10 @@ else
     while :
     do
 	sleep 1
-	grep '^Waiting for container stop' $MultDir/docker-run.out >/dev/null && break
+	grep '^Waiting for container stop' $Logs/docker-run.out >/dev/null && break
     done
-    sed -n "1,${nd}p" $MultDir/docker-run.out
+    nd=`expr $nd + 1`
+    sed -n "1,${nd}p" $Logs/docker-run.out
     echo "Use:\n    docker stop $MULTI_NAME\nto stop the container, and use:"
     echo "    `RunCmd -ti` bash\nto run the container in the foreground"
 fi
