@@ -52,7 +52,7 @@ DebDir=debian/$DebNum
 
 if [ -f $DebDir/Dockervars.sh ]; then
     eval `sed -n 's/^TESTS_REQ=/MULTI_REQ=/p' $DebDir/Dockervars.sh`
-    MULTI_REQ="$MULTI_REQ gcc libc-dev"
+    MULTI_REQ="$MULTI_REQ gcc libc-dev"		# For dev man, add: manpages-dev man-db
 else
     echo "$Prg: missing $DebDir/Dockervars.sh" >&2
     exit 1
@@ -71,8 +71,8 @@ DistOK()
     path="$1"
     test -d "$path" || return 1
     dist=`basename $path`
-    test -f $path/$Base-$2.$3-cli_${dist}_$Arch.deb || return 1
-    test -f $path/$Base-$2.$3-fpm_${dist}_$Arch.deb || return 1
+    test -s $path/$Base-$2.$3-cli_${dist}_$Arch.deb || return 1
+    test -s $path/$Base-$2.$3-fpm_${dist}_$Arch.deb || return 1
     return 0
 }
 
@@ -85,7 +85,9 @@ if [ "$ds" ]; then
 	if DistOK $DistDir/$d $Maj $Min; then
 	    ln $DistDir/$d/$Base-$Maj.$Min-cli_${d}_$Arch.deb $Pkgs
 	    ln $DistDir/$d/$Base-$Maj.$Min-fpm_${d}_$Arch.deb $Pkgs
-	    w=$MultDir/www/php$Maj$Min
+	    test -s $DistDir/$d/$Base-$Maj.$Min-mysql_${d}_$Arch.deb && ln $DistDir/$d/$Base-$Maj.$Min-mysql_${d}_$Arch.deb $Pkgs
+	    test "$HOSTFMT" && h=`echo "$HOSTFMT" | awk -F. '{print $1}' | sed -e "s/%M/$Maj/" -e "s/%m/$Min/"` || h=php$Maj$Min
+	    w=$MultDir/www/$h
 	    test -d $w || mkdir -p $w
 	    test -f $w/index.php || echo "<?php header('Location: info.php'); ?>" >$w/index.php
 	    cp -p php/info.php $w
@@ -132,21 +134,22 @@ if docker ps -a | grep $MULTI_NAME >/dev/null; then
     echo "Deleting the existing '$MULTI_NAME' container..."
     docker rm $MULTI_NAME >/dev/null
 fi
-if docker images | grep "$MULTI_BASE *$DebVer" >/dev/null; then
-    echo "Deleting the existing '$MULTI_IMG' image..."
-    docker rmi $MULTI_IMG >/dev/null
-fi
 
 test -d $Logs || mkdir -p $Logs
-echo "Building the '$MULTI_IMG' image..."
-#   Variables come in order of their appearance in Dockerfile-multi.in
-DEBVER="$DebVer" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" envsubst '$DEBVER $MULTI_TOP $MULTI_REQ' <Dockerfile-multi.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
+if docker images | grep "$MULTI_BASE *$DebVer" >/dev/null; then
+    echo "Re-using the existing '$MULTI_IMG' image. Use:\n    docker rmi $MULTI_IMG\nto force a rebuild."
+else
+    echo "Building the '$MULTI_IMG' image..."
+    #   Variables come in order of their appearance in Dockerfile-multi.in
+    DEBVER="$DebVer" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" envsubst '$DEBVER $MULTI_TOP $MULTI_REQ' <Dockerfile-multi.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
+fi
 #
 #   Run container
 #
+test "$HOSTFMT" && RunEnv=' -e HOSTFMT'
 RunCmd()
 {
-    echo "docker run $1 -p 80:80 -v `pwd`/$MultDir:$MULTI_TOP/work --name $MULTI_NAME --rm $MULTI_IMG"
+    echo "docker run $1$RunEnv -p 80:80 -v `pwd`/$MultDir:$MULTI_TOP/work --name $MULTI_NAME --rm $MULTI_IMG"
 }
 if [ -f .norun ]; then
     echo "Use:\n    `RunCmd -ti` bash\nto run the container"

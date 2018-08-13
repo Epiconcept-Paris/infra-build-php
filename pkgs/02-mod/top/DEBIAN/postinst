@@ -4,11 +4,7 @@ set -e
 
 if [ -r /usr/share/apache2/apache2-maintscript-helper ]; then
     . /usr/share/apache2/apache2-maintscript-helper
-    # Normally, apache2_invoke includes a call to apache2_reload
-    # But that calls invoke-rc.d which fails in Docker containers,
-    # hence the extra call to service apache2 restart
     apache2_invoke enmod php%MMJ%
-    service apache2 status >/dev/null || service apache2 restart
 fi
 
 exit 0

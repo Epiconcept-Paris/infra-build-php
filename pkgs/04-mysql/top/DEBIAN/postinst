@@ -6,5 +6,10 @@ ini=/etc/php%MMD%/php.ini
 mod=mysql.so
 
 grep "^extension *= *$mod *$" $ini >/dev/null || echo "extension = $mod" >>$ini
-test -x /etc/init.d/apache2 -o -f /lib/systemd/system/apache2.service && service apache2 restart
+if [ -x /etc/init.d/apache2 -o -f /lib/systemd/system/apache2.service ]; then
+    service apache2 status >/dev/null && service apache2 restart
+fi
+if [ -x /etc/init.d/php%MM%-fpm -o -f /lib/systemd/system/php%MM%-fpm.service ]; then
+    service php%MM%-fpm status >/dev/null && service php%MM%-fpm restart
+fi
 exit 0

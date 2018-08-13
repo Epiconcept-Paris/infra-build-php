@@ -89,18 +89,19 @@ case "$1" in
     status)
 	if [ ! -r $PIDFILE ] ; then
 	    echo "$NAME is stopped"
-	    exit 0
+	    exit 1
 	fi
 	PID=`cat $PIDFILE`
 	if ps -p $PID | grep -q $PID; then
 	    echo "$NAME (PID $PID) is running..."
 	else
 	    echo "$NAME dead but PID file exists"
+	    exit 2
 	fi
         ;;
 
     restart)
-	$0 stop
+	$0 status >/dev/null && $0 stop
 	$0 start
 	;;
 
