@@ -67,6 +67,9 @@ Enfin, le script ````multi.sh````, comme le script ````mk.sh````, reconnait dans
 ## Notes
 
 * Serveur AWS de build : cdt@34.243.220.28
+* voir s'il faut gérer le rotate/reopen des logs de PHP-FPM
+* voir les FAILED tests des make test ?
+* correction des warnings du make install de PEAR 1.10 ?
 * voir si on peut optimiser la phase de build en fonction du nombre de cores CPU
 * voir s'il faut builder pour autre chose que amd64 (arm par ex)
 * déployer sur prephp7a1 et tester
