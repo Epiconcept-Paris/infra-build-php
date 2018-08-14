@@ -78,6 +78,6 @@ Cmd="docker run -ti -v `realpath $PWD/$Tools`:$TOOLS_TOP/dist --name $TOOLS_NAME
 if [ -f ../.norun ]; then
     echo "Use:\n    $Cmd bash\nto run the tools container"
 else
-    echo "Running the '$TOOLS_NAME' container..."
+    echo "Running the '$TOOLS_NAME' container:\n    $Cmd"
     $Cmd
 fi

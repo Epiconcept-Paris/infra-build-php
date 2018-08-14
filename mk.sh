@@ -43,7 +43,7 @@ SupPhp()
     # global Latest
     local sup flt
     test "$1" && sup=" supported" || sup=
-    test "$1" && flt="| egrep -v '^(5\.[01345]|7\.0)\.'" || flt=
+    test "$1" && flt="| grep -v '^5\.[01345]\.'" || flt=
     echo "Latest$sup PHP 5/7 versions:" >&2
     eval "echo \"$Latest\" $flt | sed 's/^/    /'" >&2
 }
@@ -176,8 +176,6 @@ BUILD_NAME=epi_build_php	# Only one build container at a time
 
 test -f .debug && BLDCOPY="$BLDCOPY
 COPY .debug $BUILD_TOP"
-test -f .norun && BLDCOPY="$BLDCOPY
-COPY .norun $BUILD_TOP"
 test -f php/.notest && BLDCOPY="$BLDCOPY
 COPY php/.notest $BUILD_TOP"
 
@@ -204,10 +202,13 @@ AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 #   Variables come in order of their appearance in Dockerfile-build.in
 DEBVER="$DebVer" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" ADDUSER="$AddUser" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpDir/$PhpSrc" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $CLI_DEPS $BUILD_NUM $USER $BUILD_TOP $PHPVER $ADDUSER $BUILD_REQ $PHPSRC $BLDCOPY' <Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
 
-echo "Running the '$BUILD_NAME' container..."
-Cmd="docker run -ti -v `pwd`/$Dist:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
-$Cmd
-test -f .norun && echo "Use:\n    $Cmd bash\nto run the build container"
+Cmd="docker run -ti -v $PWD/$Dist:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
+if [ -f .norun ]; then
+    echo "Use:\n    $Cmd bash\nto run the build container"
+else
+    echo "Running the '$BUILD_NAME' container:\n    $Cmd"
+    $Cmd
+fi
 echo "------------------------------------------------"
 
 #
@@ -216,9 +217,6 @@ echo "------------------------------------------------"
 TESTS_BASE=epi-tests-php
 TESTS_IMG=$TESTS_BASE:$Tag	# Keep all tests images separate
 TESTS_NAME=epi_tests_php	# Only one tests container at a time
-
-test -f .norun && TSTCOPY="$TSTCOPY
-COPY .norun $TESTS_TOP"
 
 if docker ps | grep $TESTS_NAME >/dev/null; then
     echo "Stopping the running '$TESTS_NAME' container..."
@@ -241,10 +239,13 @@ echo "Building the '$TESTS_IMG' image..."
 #   Variables come in order of their appearance in Dockerfile-tests.in
 DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $TSTCOPY' <Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
 
-echo "Running the '$TESTS_NAME' container..."
-Cmd="docker run -ti -p 80:80 -v `pwd`/$Dist:$TESTS_TOP/dist --name $TESTS_NAME --rm $TESTS_IMG"
-$Cmd
-echo "Use:\n    $Cmd bash\nto run the tests container again"
+Cmd="docker run -ti -v $PWD/$Dist:$TESTS_TOP/dist --name $TESTS_NAME --rm $TESTS_IMG"
+if [ -f .norun ]; then
+    echo "Use:\n    $Cmd bash\nto run the tests container"
+else
+    echo "Running the '$TESTS_NAME' container:\n    $Cmd"
+    $Cmd
+fi
 
 #
 #   End
