@@ -1,0 +1,10 @@
+Package: %NAME%
+Version: 1.0-1
+Architecture: amd64
+Maintainer: Christophe de Traversay <devel@traversay.com>
+Depends: libc6
+Section: admin
+Priority: optional
+Description: waitpid docker helper
+ This package provides the waitpid tool
+ for use mostly in docker containers

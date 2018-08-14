@@ -1,0 +1,4 @@
+%NAME% (%VERSION%) %DEBVER%; urgency=low
+  * The waitpid binary
+    Specific version for docker containers
+ -- Christophe de Traversay <devel@traversay.com>  %DATE%

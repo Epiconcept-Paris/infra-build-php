@@ -52,7 +52,6 @@ DebDir=debian/$DebNum
 
 if [ -f $DebDir/Dockervars.sh ]; then
     eval `sed -n 's/^TESTS_REQ=/MULTI_REQ=/p' $DebDir/Dockervars.sh`
-    MULTI_REQ="$MULTI_REQ gcc libc-dev"		# For dev man, add: manpages-dev man-db
 else
     echo "$Prg: missing $DebDir/Dockervars.sh" >&2
     exit 1
@@ -140,8 +139,20 @@ if docker images | grep "$MULTI_BASE *$DebVer" >/dev/null; then
     echo "Re-using the existing '$MULTI_IMG' image. Use:\n    docker rmi $MULTI_IMG\nto force a rebuild."
 else
     echo "Building the '$MULTI_IMG' image..."
+    #
+    #   Find the waitpid package
+    #
+    WaitPkg=`ls $DistDir/tools/epi-tools-waitpid_*_amd64.deb 2>/dev/null`
+    if [ -z "$WaitPkg" ]; then
+	tools/mk.sh
+	WaitPkg=`ls $DistDir/tools/epi-tools-waitpid_*_amd64.deb 2>/dev/null`
+	if [ -z "$WaitPkg" ]; then
+	    echo "Cannot build the waitpid package, needed to build the '$MULTI_IMG' image" >&2
+	    exit 1
+	fi
+    fi
     #   Variables come in order of their appearance in Dockerfile-multi.in
-    DEBVER="$DebVer" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" envsubst '$DEBVER $MULTI_TOP $MULTI_REQ' <Dockerfile-multi.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
+    DEBVER="$DebVer" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" WAITPKG="$WaitPkg" envsubst '$DEBVER $MULTI_TOP $MULTI_REQ $WAITPKG' <Dockerfile-multi.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
 fi
 #
 #   Run container

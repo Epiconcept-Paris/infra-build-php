@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+#	build - Compile and build all packages in pkgs
+#
+Prg=`basename $0`
+Bld=`dirname $0`
+Logs="$Bld/dist/.logs"				# Directory for log files
+test -f $Bld/.debug -o "$1" = 'debug' && Dbg=y
+
+set -e	# Stop on errors
+
+Base='epi-tools'
+for dir in $Bld/pkgs/*
+do
+    PkgDir=`basename $dir`
+    Pkg=`expr "$PkgDir" : '[0-9][0-9]-\(.*\)'`
+    Top=$dir/top
+    Name="$Base-$Pkg"
+    PkgVer=`sed -nr 's/Version: *([^-]+)-[0-9]+/\1/p' $Top/DEBIAN/control`
+
+    echo "Compiling package '$Pkg'..."
+    (cd $dir/src; make -k) >$Logs/make_$Pkg.out 2>&1
+
+    echo "Installing package '$Pkg'..."
+    # doc directory
+    sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
+    sed -i -e "s/%NAME%/$Name/g" -e "s/%VERSION%/$PkgVer/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Top/DEBIAN/control`/" $Top/usr/share/doc/pkgname/changelog.Debian
+    gzip -n9 $Top/usr/share/doc/pkgname/changelog*
+    mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name
+
+    # lintian overrides
+    if [ -f $Top/usr/share/lintian/overrides/pkgname ]; then
+	sed -i -e "s/%NAME%/$Name/g" $Top/usr/share/lintian/overrides/pkgname
+	mv $Top/usr/share/lintian/overrides/pkgname $Top/usr/share/lintian/overrides/$Name
+    fi
+
+    # DEBIAN directory
+    sed -i "s/%NAME%/$Name/" $Top/DEBIAN/control
+
+    echo "Assembling package '$Pkg'..."
+    out=$(fakeroot dpkg-deb -Zgzip --build $Top $Bld/dist)
+    deb=$(echo $out | sed "s/^.*building package ['\`][^']*' in ['\`]\([^']*\)'\.$/\1/")
+
+    if [ -f "$deb" ]; then
+	echo "Checking   package '$Pkg': `basename $deb`..."
+	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
+    else
+	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""
+    fi
+    if [ "$Dbg" ]; then
+	(cd $Top;
+	 find . -type f | sed 's/^..//' | sort >$Logs/files_$Pkg
+	 find . -type l | sed 's/^..//' | sort >$Logs/links_$Pkg)
+	test -s $Logs/links_$Pkg || rm $Logs/links_$Pkg
+    fi
+done

@@ -1,0 +1,9 @@
+.TH WAITPID 8
+.SH NAME
+waitpid \- wait for child processes
+.SH SYNOPSIS
+.B waitpid
+.SH DESCRIPTION
+.B waitpid
+waits for all processes that have a PPID equal to waitpid's PID.
+It is intended to be used as a crude replacement of init(8) in docker containers.
