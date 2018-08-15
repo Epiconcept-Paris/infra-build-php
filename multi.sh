@@ -165,7 +165,7 @@ RunCmd()
 if [ -f .norun ]; then
     echo "Use:\n    `RunCmd -ti` bash\nto run the container"
 else
-    echo "Running the '$MULTI_NAME' container in background mode."
+    echo "Running the '$MULTI_NAME' container in background mode:\n    `RunCmd -d`"
     `RunCmd -d` >/dev/null
     while :
     do

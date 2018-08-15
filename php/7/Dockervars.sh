@@ -30,6 +30,16 @@ AddExtra()
 {
     local Tgz
 
+    #	ereg legacy PHP extension
+    Tgz=ereg.tgz
+    if [ ! -f $Dir/files/$Tgz ]; then
+	echo "Fetching ereg legacy extension..."
+	curl -sSL "http://git.php.net/?p=pecl/text/ereg.git;a=snapshot;h=ee45d78c6bec127c60c687b4dd6dd62d369d172a;sf=tgz" -o $Dir/files/$Tgz
+    fi
+    BLDCOPY="$BLDCOPY
+COPY $Dir/files/$Tgz $BUILD_TOP/files
+COPY $Dir/hooks/ereg.sh $BUILD_TOP/hooks"
+
     #	MySQL legacy PHP extension
     Tgz=mysql.tgz
     if [ ! -f $Dir/files/$Tgz ]; then

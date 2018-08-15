@@ -1,93 +1,74 @@
 <?php
 $html = (PHP_SAPI != 'cli');
-if ($html) {?>
-<!DOCTYPE html>
-<html>
-<body>
-<style type="text/css">.tbl{width:auto}</style>
-<?php
-}
 
-echo 'PHP_OS = "'.PHP_OS.'"'.($html?'<br>':'')."\n";
-echo $html ? '<div class="center">' : '';
+ob_start();
+phpinfo();
+$info = ob_get_contents();
+ob_clean();
+
+$out = $html ? "<div class=\"center\">" : '';
 
 if (function_exists('apache_get_modules'))
 {
     $hdr = 'Apache modules';
-    echo $html ? "<h2>$hdr</h2><table class=\"tbl\"><tr>" : "$hdr:\n";
+    $out .= $html ? "<h2>$hdr</h2>\n<table class=\"tbl\">\n<tr>" : "$hdr:\n";
     $mods = apache_get_modules();
     asort($mods);
     $i = 0;
     foreach ($mods as $mod)
     {
-        echo $html ? "<td>$mod</td>" : "  $mod\n";
+        $out .= $html ? "<td>$mod</td>" : "  $mod\n";
 	if ($html)
 	{
 	    $i++;
 	    if ($i > 7)
 	    {
-		echo '</tr><tr>';
+		$out .= "</tr>\n<tr>";
 		$i = 0;
 	    }
 	}
     }
-    echo $html ? '</tr></table><br>' : "\n";
+    $out .= $html ? "</tr>\n</table><br>\n" : "\n";
 }
 
 if (function_exists('get_loaded_extensions'))
 {
     $hdr = 'Loaded extensions';
-    echo $html ? "<h2>$hdr</h2><table class=\"tbl\"><tr>" : "$hdr:\n";
+    $out .= $html ? "<h2>$hdr</h2>\n<table class=\"tbl\">\n<tr>" : "$hdr:\n";
     $exts = get_loaded_extensions();
+    if (!in_array('ereg', $exts) && function_exists('ereg_replace'))
+	$exts[] = 'ereg [Core]';
+    if (!in_array('mhash', $exts) && function_exists('mhash'))
+	$exts[] = 'mhash [hash]';
     asort($exts);
     $i = 0;
     foreach ($exts as $ext)
     {
-        echo $html ? "<td>$ext</td>" : "  $ext\n";
+        $out .= $html ? "<td>$ext</td>" : "  $ext\n";
         $i++;
 	if ($html)
 	{
 	    if ($i > 15)
 	    {
-		echo '</tr><tr>';
+		$out .= "</tr>\n<tr>";
 		$i = 0;
 	    }
 	}
     }
-    echo $html ? '</tr></table><br>' : "\n";
+    $out .= $html ? "</tr>\n</table><br>\n" : "\n";
 }
 
-if (method_exists('PDO','getAvailableDrivers'))
+$out .= $html ? "</div>\n" : "--------------------\n";
+
+if ($html)
 {
-    $hdr = 'PDO drivers';
-    echo $html ? "<h2>$hdr</h2><table class=\"tbl\"><tr>" : "$hdr:\n";
-    $drvs = PDO::getAvailableDrivers();
-    asort($drvs);
-    $i = 0;
-    foreach ($drvs as $drv)
-    {
-        echo $html ? "<td>$drv</td>" : "  $drv\n";
-        $i++;
-	if ($html)
-	{
-	    if ($i > 15)
-	    {
-		echo '</tr><tr>';
-		$i = 0;
-	    }
-	}
-    }
-    echo $html ? '</tr></table><br>' : "\n";
+    $ver = PHP_VERSION;
+    $sys = PHP_OS;
+    $info = str_replace('</style>', ".tbl{width:auto}\n</style>", $info);
+    $info = str_replace('phpinfo()', "PHP $ver / $sys info", $info);	# in <title>
+    $info = str_replace('<body>', "<body>\n$out", $info);
+    echo "$info";
 }
-
-echo $html ? '</div>' : "\n";
-
-phpinfo();
-
-if ($html) {
-?>
-</body>
-</html>
-<?php
-}
+else
+    echo "$out$info";
 ?>

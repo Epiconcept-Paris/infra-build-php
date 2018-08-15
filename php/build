@@ -76,6 +76,9 @@ if [ -d $Bld/hooks ]; then
 	./configure --help >$ConfigHelp
     fi
 fi
+if grep -- "--enable-apc-bc " $ConfigHelp >/dev/null; then
+    HookOpts="$HookOpts--disable-apc-bc "
+fi
 echo "Configuring php-$Ver$HookShow..."
 test "$Dbg" && echo "ExtOpts=\"$ExtOpts\" HookOpts=\"$HookOpts\""
 

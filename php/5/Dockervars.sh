@@ -8,7 +8,7 @@ Dir=php/5
 #
 PECLGET="http://pecl.php.net/get"
 
-#   AddPECL <URL-file> <Src-base> <Hook-name> <Hook-file> <Version>
+#   AddPECL <URL-file> <Src-base> <Hook-name> <Hook-file> [<Version>]
 AddPECL()
 {
     local Tgz File
@@ -86,4 +86,11 @@ if grep '/ext/opcache/' $PhpDir/$PhpLst >/dev/null; then
 else
     AddPECL APC APC APC apc
 fi
+if ! grep '/ext/fileinfo/' $PhpDir/$PhpLst >/dev/null; then
+    AddPECL Fileinfo Fileinfo FileInfo fileinfo
+    BUILD_REQ="$BUILD_REQ libmagic-dev"
+    TESTS_REQ="$TESTS_REQ libmagic1"
+    CLI_DEPS="$CLI_DEPS, libmagic1"
+fi
+AddPECL oauth oauth OAuth oauth 1.2.3	# Last version to support PHP5
 AddExtra
