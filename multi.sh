@@ -13,6 +13,7 @@ LF='
 
 test "$Dir" = '.' || cd "$Dir"
 test -d debian || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
+test -d docker || { echo "$Prg: missing 'docker' directory." >&2; exit 1; }
 DefDeb=`ls debian | sort -n | tail -1`	# Default = latest
 
 #
@@ -152,7 +153,7 @@ else
 	fi
     fi
     #   Variables come in order of their appearance in Dockerfile-multi.in
-    DEBVER="$DebVer" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" WAITPKG="$WaitPkg" envsubst '$DEBVER $MULTI_TOP $MULTI_REQ $WAITPKG' <Dockerfile-multi.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
+    DEBVER="$DebVer" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" WAITPKG="$WaitPkg" envsubst '$DEBVER $MULTI_TOP $MULTI_REQ $WAITPKG' <docker/Dockerfile-multi.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
 fi
 #
 #   Run container

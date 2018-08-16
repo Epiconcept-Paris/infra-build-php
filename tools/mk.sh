@@ -2,11 +2,13 @@
 #
 #	Build packages for tools
 #
-#	Usage:	./tools.sh [<Debian-version>]
+#	Usage:	./mk.sh [<Debian-version>]
+#		tools/mk.sh [<Debian-version>]
 #
 Prg=`basename $0`
 Dir=`dirname $0`
 DebTop=../debian
+Docker=../docker
 
 SupDeb()
 {
@@ -20,7 +22,8 @@ SupDeb()
 #   Check usage
 #
 test "$Dir" = '.' || cd "$Dir"
-test -d $DebTop || { echo "$Prg: missing '$DebTop' directory." >&2; exit 1; }
+test -d $DebTop || { echo "$Dir/$Prg: missing '$DebTop' directory." >&2; exit 1; }
+test -d $Docker || { echo "$Dir/$Prg: missing '$Docker' directory." >&2; exit 1; }
 DebNum=`ls $DebTop | sort -n | tail -1`	# Default = latest
 if [ $# -gt 1 ]; then
     echo "Usage: $Dir/$Prg [ <Debian-version> ]" >&2
@@ -69,8 +72,8 @@ fi
 
 test -d $Logs || mkdir -p $Logs
 echo "Building the '$TOOLS_IMG' image..."
-#   Variables come in order of their appearance in Dockerfile-multi.in
-DEBVER="$DebVer" TOOLS_TOP="$TOOLS_TOP" envsubst '$DEBVER $TOOLS_TOP' <Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG . >$Logs/docker.out 2>&1
+#   Variables come in order of their appearance in Dockerfile-tools.in
+DEBVER="$DebVer" TOOLS_TOP="$TOOLS_TOP" envsubst '$DEBVER $TOOLS_TOP' <../docker/Dockerfile-tools.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG . >$Logs/docker.out 2>&1
 #
 #   Run the container
 #
