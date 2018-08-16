@@ -52,7 +52,7 @@ do
 	    fi
 	    echo "Building $v for $n in $Dir"
 	    mkdir -p $Dir
-	    ./mk.sh $v $d | sed -u 's/$//' | tee $Dir/mk.out
+	    ./mk.sh $v $d | sed -u 's/$//' | tee $Dir/mk.out | sed -u 's/$//'
 	    eval "MUL$d=\"\$MUL$d\$v-\$Bld \""
 	fi
     done
@@ -68,7 +68,7 @@ do
 	else
 	    echo "Building tools for $n"
 	    mkdir -p $Dir
-	    tools/mk.sh $d | sed -u 's/$//' | tee $Dir/mk.out
+	    tools/mk.sh $d | sed -u 's/$//' | tee $Dir/mk.out | sed -u 's/$//'
 	fi
     fi
 done
