@@ -1,26 +1,36 @@
 #
 #	php/7/Dockervars.sh - Define extra Dockerfile vars depending on PHP version
 #
-Dir=php/7
+Php=php/7
 
 #
-#    Add hooks for PECL PHP extensions
+#   Add hooks for PECL PHP extensions
 #
-PECLGET="http://pecl.php.net/get"
-
 #   AddPECL <URL-file> <Src-base> <Hook-name> <Hook-file>
+#
 AddPECL()
 {
-    local Tgz
-    Tgz=`curl -sISL "$PECLGET/$1" | sed -n 's/^Content-Disposition:.*filename=\(.*\)$/\1/p'`
-    if [ ! -f $Dir/files/$Tgz ]; then
-	rm -f $Dir/files/$2-*.tgz
+    # global PECLGET Php Dir Prg BLDCOPY BUILD_TOP
+    local Tgz Old
+
+    Tgz=`curl -sISL "http://$PECLGET/$1" | sed -n 's/^Content-Disposition:.*filename=\(.*\)$/\1/p'`
+    if [ -z "$Tgz" ]; then
+	Old=`ls $Php/files/$2-*.tgz 2>/dev/null`
+	test "$Old" && Tgz=`basename $Old`
+	if [ -z "$Tgz" ]; then
+	    echo "Failed to download $1 extension from $PECLGET/$1" >&2
+	    echo "Put it manually as $Php/files/$2-<version>.tgz and run $Dir/$Prg again" >&2
+	    exit 1
+	fi
+    fi
+    if [ ! -f $Php/files/$Tgz ]; then
+	rm -vf $Php/files/$2-*.tgz | sed 's/^r/R/'	# sed for cosmetics
 	echo "Fetching $3 `expr $Tgz : "$2-\(.*\).tgz"` extension..."
-	curl -sSL "$PECLGET/$1" -o $Dir/files/$Tgz
+	curl -sSL "http://$PECLGET/$1" -o $Php/files/$Tgz
     fi
     BLDCOPY="$BLDCOPY
-COPY $Dir/files/$Tgz $BUILD_TOP/files
-COPY $Dir/hooks/$4.sh $BUILD_TOP/hooks"
+COPY $Php/files/$Tgz $BUILD_TOP/files
+COPY $Php/hooks/$4.sh $BUILD_TOP/hooks"
 }
 
 #
@@ -28,42 +38,34 @@ COPY $Dir/hooks/$4.sh $BUILD_TOP/hooks"
 #
 AddExtra()
 {
-    local Tgz
+    # global Php BLDCOPY BUILD_TOP
 
     #	ereg legacy PHP extension
-    Tgz=ereg.tgz
-    if [ ! -f $Dir/files/$Tgz ]; then
-	echo "Fetching ereg legacy extension..."
-	curl -sSL "http://git.php.net/?p=pecl/text/ereg.git;a=snapshot;h=ee45d78c6bec127c60c687b4dd6dd62d369d172a;sf=tgz" -o $Dir/files/$Tgz
-    fi
+    #	From https://github.com/php/pecl-text-ereg
+    #	Latest: https://github.com/php/pecl-text-ereg/archive/master.tar.gz
     BLDCOPY="$BLDCOPY
-COPY $Dir/files/$Tgz $BUILD_TOP/files
-COPY $Dir/hooks/ereg.sh $BUILD_TOP/hooks"
+COPY $Php/files/ereg.tar.gz $BUILD_TOP/files
+COPY $Php/hooks/ereg.sh $BUILD_TOP/hooks"
 
     #	MySQL legacy PHP extension
-    Tgz=mysql.tgz
-    if [ ! -f $Dir/files/$Tgz ]; then
-	echo "Fetching MySQL legacy extension..."
-	curl -sSL "https://github.com/php/pecl-database-mysql/archive/master.tar.gz" -o $Dir/files/$Tgz
-    fi
+    #	From https://github.com/php/pecl-database-mysql
+    #	Latest: https://github.com/php/pecl-database-mysql/archive/master.tar.gz
     BLDCOPY="$BLDCOPY
-COPY $Dir/files/$Tgz $BUILD_TOP/files
-COPY $Dir/files/mysql.patch $BUILD_TOP/files
-COPY $Dir/hooks/mysql.sh $BUILD_TOP/hooks"
+COPY $Php/files/mysql.tar.gz $BUILD_TOP/files
+COPY $Php/files/mysql.patch $BUILD_TOP/files
+COPY $Php/hooks/mysql.sh $BUILD_TOP/hooks"
 
     #	PEAR man pages
-    Tgz="PEAR_Manpages-1.10.0.tgz"
-    if [ ! -f $Dir/files/$Tgz ]; then
-	echo "Fetching PEAR manpages..."
-	curl -sSL "http://download.pear.php.net/package/$Tgz" -o $Dir/files/$Tgz
-    fi
+    #	From http://pear.php.net/package/PEAR_Manpages/download (see Download link)
+    #	Latest: http://download.pear.php.net/package/PEAR_Manpages-1.10.0.tgz
     BLDCOPY="$BLDCOPY
-COPY $Dir/files/$Tgz $BUILD_TOP/files
-COPY $Dir/hooks/pearman.sh $BUILD_TOP/hooks"
+COPY php/files/PEAR_Manpages-1.10.0.tgz $BUILD_TOP/files
+COPY php/hooks/pearman.sh $BUILD_TOP/hooks"
 }
 
 #
 #   Main
+#   global Php BLDCOPY BUILD_TOP
 #
 BLDCOPY="RUN mkdir $BUILD_TOP/hooks"
 

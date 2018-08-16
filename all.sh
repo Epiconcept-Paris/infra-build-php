@@ -52,31 +52,41 @@ do
 	    fi
 	    echo "Building $v for $n in $Dir"
 	    mkdir -p $Dir
-	    ./mk.sh $v $d >$Dir/mk.out
+	    ./mk.sh $v $d | sed -u 's/$//' | tee $Dir/mk.out
 	    eval "MUL$d=\"\$MUL$d\$v-\$Bld \""
 	fi
     done
+    Dir=debian/$d/dist/tools
+    if [ "$rm" ]; then
+	test -d $Dir && echo "Removing tools for $n"
+	rm -rf $Dir
+	docker images | grep "epi-tools  *$n" >/dev/null && docker rmi epi-tools:$n >/dev/null
+    fi
+    if [ "$mk" ]; then
+	if [ -d $Dir ]; then
+	    echo "tools are already built for $n"
+	else
+	    echo "Building tools for $n"
+	    mkdir -p $Dir
+	    tools/mk.sh $d | sed -u 's/$//' | tee $Dir/mk.out
+	fi
+    fi
 done
 #echo "d=$d n=$n"
 
 #eval "echo MUL$d=\\\"\$MUL$d\\\""
+Dir=debian/$d/multi
 if [ "$rm" ]; then
+    test -d $Dir && echo "Removing multi for $n"
     docker ps | grep epi_multi_php >/dev/null && docker stop epi_multi_php
-    rm -rf debian/$d/dist/tools debian/$d/multi
-    for p in tools multi-php
-    do
-	docker images | grep "epi-$p  *$n" >/dev/null && docker rmi epi-$p:$n >/dev/null
-    done
+    rm -rf $Dir
+    docker images | grep "epi-multi-php  *$n" >/dev/null && docker rmi epi-multi-php:$n >/dev/null
 fi
 if [ "$mk" ]; then
-    if [ -d debian/$d/dist/tools ]; then
-	echo "tools are already built for $n"
-    else
-	tools/mk.sh
-    fi
     if docker images | grep "epi-multi-php  *$n" >/dev/null; then
 	echo "multi is already built for $n"
     else
+	eval "echo \"Building and running multi for $n with \$MUL$d\""
 	eval ./multi.sh \$MUL$d
     fi
 fi

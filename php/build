@@ -6,7 +6,7 @@
 Prg=`basename $0`
 Bld=`dirname $0`
 Ver="$1"
-SupVer="5.2 5.6 7.1 7.2"			# UPDATE THIS on new version
+SupVer="5.2 5.6 7.0 7.1 7.2"			# UPDATE THIS on new version
 Logs="$Bld/dist/.logs"				# Directory for log files
 Pkgs="$Bld/dist/.pkgs"				# List of packages built
 Debug="$Bld/dist/.debug"			# Directory for debug files

@@ -30,11 +30,12 @@ if [ $# -gt 1 ]; then
     SupDeb
     exit 1
 fi
+
 #
 #   Check Debian version
 #
 if [ "$1" ]; then
-    if [ -f $DebTop/$2/name ]; then
+    if [ -f $DebTop/$1/name ]; then
 	DebNum="$1"
     else
 	echo "$Prg: unsupported Debian version \"$1\"" >&2
@@ -45,6 +46,7 @@ fi
 DebVer="`cat $DebTop/$DebNum/name`"
 Tools=$DebTop/$DebNum/dist/tools
 Logs=$Tools/.logs
+
 #
 #   Build the image
 #
@@ -52,6 +54,8 @@ TOOLS_TOP=/opt/tools
 TOOLS_BASE=epi-tools
 TOOLS_IMG=$TOOLS_BASE:$DebVer
 TOOLS_NAME=epi_tools
+date '+===== %Y-%m-%d %H:%M:%S %Z =================='
+Now=`date '+%s'`
 
 if docker ps | grep $TOOLS_NAME >/dev/null; then
     echo "Stopping the running '$TOOLS_NAME' container..."
@@ -74,6 +78,7 @@ test -d $Logs || mkdir -p $Logs
 echo "Building the '$TOOLS_IMG' image..."
 #   Variables come in order of their appearance in Dockerfile-tools.in
 DEBVER="$DebVer" TOOLS_TOP="$TOOLS_TOP" envsubst '$DEBVER $TOOLS_TOP' <../docker/Dockerfile-tools.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG . >$Logs/docker.out 2>&1
+
 #
 #   Run the container
 #
@@ -84,3 +89,13 @@ else
     echo "Running the '$TOOLS_NAME' container:\n    $Cmd"
     $Cmd
 fi
+
+#
+#   End
+#
+date '+===== %Y-%m-%d %H:%M:%S %Z =================='
+End=`date '+%s'`
+Len=`expr $End - $Now`
+Min=`expr $Len / 60`
+Sec=`expr $Len - '(' $Min '*' 60 ')'`
+printf "Duration: %d:%02d\n" $Min $Sec

@@ -9,7 +9,9 @@
 #	Debian-version is checked to be supported and defaults to latest version
 #
 PHPSITE='fr.php.net'
-PHP5URL="museum.php.net/php5"
+PHPARCH="museum.php.net/php5"
+PECLGET="pecl.php.net/get"
+
 #
 Prg=`basename $0`
 Dir=`dirname $0`
@@ -17,36 +19,43 @@ Dir=`dirname $0`
 # Get existing PHP 5.x and 7.x versions
 #
 Versions="`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -n 's/^.*<h[1-4]>Version \([^ ]*\) *<\/h[1-4]>/\1/p' | sort -nr -t. -k 1,1 -k 2,2 -k 3,3`"
-if [ -z "$Versions" ]; then
-    echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"" >&2
-    exit 1
-fi
-#
-# From $Versions isolate latest rel for each Maj.min
-#
-Latest="`echo "$Versions" | awk -F. '{
-    Mm = $1 "." $2
-    if (Mm in v) {
-	if (v[Mm] < $3)
+if [ "$Versions" ]; then
+    #
+    # From $Versions isolate latest rel for each Maj.min
+    #
+    Latest="`echo "$Versions" | awk -F. '{
+	Mm = $1 "." $2
+	if (Mm in v) {
+	    if (v[Mm] < $3)
+		v[Mm] = $3
+	}
+	else
 	    v[Mm] = $3
     }
-    else
-	v[Mm] = $3
-}
-END {
-    for (Mm in v)
-	printf("%s.%s\n", Mm, v[Mm]);
-}'`"
-
-SupPhp()
-{
-    # global Latest
-    local sup flt
-    test "$1" && sup=" supported" || sup=
-    test "$1" && flt="| grep -v '^5\.[01345]\.'" || flt=
-    echo "Latest$sup PHP 5/7 versions:" >&2
-    eval "echo \"$Latest\" $flt | sed 's/^/    /'" >&2
-}
+    END {
+	for (Mm in v)
+	    printf("%s.%s\n", Mm, v[Mm]);
+    }'`"
+    #
+    # Display latest versions, all or supported only ($1)
+    #
+    SupPhp()
+    {
+	# global Latest
+	local sup flt
+	if [ "$Latest" ]; then
+	    test "$1" && sup=" supported" || sup=
+	    test "$1" && flt="| grep -v '^5\.[01345]\.'" || flt=
+	    echo "Latest$sup PHP 5/7 versions:" >&2
+	    eval "echo \"$Latest\" $flt | sed 's/^/    /'" >&2
+	else
+	    echo "The list of latest PHP versions could not be fetched."
+	fi
+    }
+else
+    echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"" >&2
+    echo "$Prg: checking of the PHP version will be minimal" >&2
+fi
 
 SupDeb()
 {
@@ -73,19 +82,20 @@ fi
 #
 #   Check PHP version
 #
-split="`echo "$1" | sed -nr 's/^([57])\.([0-9])\.([0-9]+)$/Maj=\1 Min=\2 Rel=\3/p'`"
+split="`echo "$1" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})$/Maj=\1 Min=\2 Rel=\3/p'`"
 if [ -z "$split" ]; then
-    echo "$Prg: invalid PHP version \"$1\" ([57].x.y)" >&2
+    echo "$Prg: invalid PHP version \"$1\" ([5-9].[0-9].[0-9]{,2})" >&2
     exit 1
 fi
 eval "$split"
-if echo "$Versions" | grep "^$Maj\.$Min\.$Rel$" >/dev/null; then
-    PhpVer="$1"
-    PhpDir=php/$Maj/$PhpVer
-else
-    echo "$Prg: unknown PHP version \"$1\"" >&2
-    SupPhp
-    exit 1
+PhpVer="$1"
+PhpDir=php/$Maj/$PhpVer
+if [ "$Versions" ]; then
+    if ! echo "$Versions" | grep "^$Maj\.$Min\.$Rel$" >/dev/null; then
+	echo "$Prg: unknown PHP version \"$PhpVer\"" >&2
+	SupPhp
+	exit 1
+    fi
 fi
 #
 #   Check Debian version
@@ -101,7 +111,6 @@ if [ "$2" ]; then
 fi
 DebVer="`cat debian/$DebNum/name`"
 DebDir=debian/$DebNum
-Tag=$DebVer-$PhpVer
 #echo "DebVer=$DebVer PhpVer=$PhpVer Maj=$Maj Min=$Min Rel=$Rel"
 
 #
@@ -109,20 +118,45 @@ Tag=$DebVer-$PhpVer
 #
 date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 Now=`date '+%s'`
-test -d $PhpDir || mkdir $PhpDir
-PhpSrc=php-$PhpVer.tar.bz2
-PhpLst=php-$PhpVer.files
-if [ ! -f $PhpDir/$PhpSrc ]; then
-    echo "Fetching $PhpSrc..."
-    test $Maj -le 5 && PhpUrl="http://$PHP5URL/$PhpSrc" || PhpUrl="http://$PHPSITE/get/$PhpSrc/from/this/mirror"
-    curl -sSL $PhpUrl -o $PhpDir/$PhpSrc
+if [ ! -d $PhpDir ]; then
+    mkdir -p $PhpDir
+    mk=y
 fi
-if [ ! -f $PhpDir/$PhpLst ]; then
-    if ! tar tf $PhpDir/$PhpSrc >$PhpDir/$PhpLst 2>/dev/null; then
-	echo "$Prg: cannot fetch $PhpUrl" >&2
-	rm -f $PhpDir/$PhpSrc $PhpDir/$PhpLst
+Tbz=php-$PhpVer.tar.bz2
+PhpSrc=$PhpDir/$Tbz
+PhpLst=$PhpDir/php-$PhpVer.files
+if [ ! -s $PhpSrc ]; then
+    echo "Fetching $Tbz..."
+    Url1="http://$PHPSITE/get/$Tbz/from/this/mirror"
+    Url2="http://$PHPARCH/$Tbz"
+    for Url in "$Url1" "$Url2"
+    do
+	echo "Trying from \"$Url\"..."
+	curl -sSL "$Url" -o $PhpSrc 2>/dev/null
+	test $? -eq 0 -a -s $PhpSrc && break
+    done
+    if [ -s $PhpSrc ]; then
+	dl=y
+    else
+	echo "Failed to download $Tbz from known URLs" >&2
+	echo "Put it manually as $PhpSrc and run $Dir/$Prg again" >&2
+	rm -f $PhpSrc
+	test "$mk" && find $PhpDir -type d -empty -delete
 	exit 1
     fi
+fi
+if [ ! -s $PhpLst ]; then
+    if ! tar tf $PhpSrc >$PhpLst 2>/dev/null; then
+	echo "$Prg: $PhpSrc is not recognized as a tar archive" >&2
+	rm -f $PhpLst
+	test "$dl" && rm $PhpSrc
+	exit 1
+    fi
+fi
+if ! grep "^php-$PhpVer/" $PhpLst >/dev/null; then
+    echo "$Prg: $PhpSrc is not recognized as a PHP $PhpVer source archive" >&2
+    test "$dl" && rm $PhpSrc $PhpLst
+    exit 1
 fi
 
 #
@@ -171,6 +205,7 @@ test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir $Dist/.logs
 #
 #   Make build image and start container
 #
+Tag=$DebVer-$PhpVer
 BUILD_BASE=epi-build-php
 BUILD_IMG=$BUILD_BASE:$Tag	# Keep all build images separate
 BUILD_NAME=epi_build_php	# Only one build container at a time
@@ -201,7 +236,7 @@ echo "Building the '$BUILD_IMG' image..."
 User=`id -un`
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 #   Variables come in order of their appearance in Dockerfile-build.in
-DEBVER="$DebVer" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" ADDUSER="$AddUser" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpDir/$PhpSrc" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $CLI_DEPS $BUILD_NUM $USER $BUILD_TOP $PHPVER $ADDUSER $BUILD_REQ $PHPSRC $BLDCOPY' <docker/Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
+DEBVER="$DebVer" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" ADDUSER="$AddUser" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpSrc" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $CLI_DEPS $BUILD_NUM $USER $BUILD_TOP $PHPVER $ADDUSER $BUILD_REQ $PHPSRC $BLDCOPY' <docker/Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
 
 Cmd="docker run -ti -v $PWD/$Dist:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
 if [ -f .norun ]; then
