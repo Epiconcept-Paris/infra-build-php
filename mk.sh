@@ -19,48 +19,48 @@ Dir=`dirname $0`
 # Get existing PHP 5.x and 7.x versions
 #
 Versions="`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -n 's/^.*<h[1-4]>Version \([^ ]*\) *<\/h[1-4]>/\1/p' | sort -nr -t. -k 1,1 -k 2,2 -k 3,3`"
-if [ "$Versions" ]; then
-    #
-    # From $Versions isolate latest rel for each Maj.min
-    #
-    Latest="`echo "$Versions" | awk -F. '{
-	Mm = $1 "." $2
-	if (Mm in v) {
-	    if (v[Mm] < $3)
-		v[Mm] = $3
-	}
-	else
+if [ -z "$Versions" ]; then
+    echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"" >&2
+    echo "$Prg: using instead the list of versions already known" >&2
+    Versions="`ls -d php/[5-9]/[5-9].* | sed 's;^php/./;;' | sort -nr -t. -k 1,1 -k 2,2 -k 3,3`"
+    if [ -z "$Versions" ]; then
+	echo "$Prg: empty list of known PHP versions ??" >&2
+	exit 1
+    fi
+fi
+#
+# From $Versions isolate latest rel for each Maj.min
+#
+Latest="`echo "$Versions" | awk -F. '{
+    Mm = $1 "." $2
+    if (Mm in v) {
+	if (v[Mm] < $3)
 	    v[Mm] = $3
     }
-    END {
-	for (Mm in v)
-	    printf("%s.%s\n", Mm, v[Mm]);
-    }'`"
-    #
-    # Display latest versions, all or supported only ($1)
-    #
-    SupPhp()
-    {
-	# global Latest
-	local sup flt
-	if [ "$Latest" ]; then
-	    test "$1" && sup=" supported" || sup=
-	    test "$1" && flt="| grep -v '^5\.[01345]\.'" || flt=
-	    echo "Latest$sup PHP 5/7 versions:" >&2
-	    eval "echo \"$Latest\" $flt | sed 's/^/    /'" >&2
-	else
-	    echo "The list of latest PHP versions could not be fetched."
-	fi
-    }
-else
-    echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"" >&2
-    echo "$Prg: checking of the PHP version will be minimal" >&2
-fi
+    else
+	v[Mm] = $3
+}
+END {
+    for (Mm in v)
+	printf("%s.%s\n", Mm, v[Mm]);
+}'`"
+
+SupPhp()
+{
+    # global Latest
+    local sup flt
+
+    test "$1" && sup=" $1" || sup=
+    test "$1" && flt="| grep -v '^5\.[01345]\.'" || flt=
+    echo "Latest$sup PHP 5/7 versions:" >&2
+    eval "echo \"$Latest\" $flt | sed 's/^/    /'" >&2
+}
 
 SupDeb()
 {
     # global DebNum
     local v
+
     echo "Supported Debian versions (default $DebNum):" >&2
     ls debian | sort -n | while read v; do test -f debian/$v/name && printf "    %2d (`cat debian/$v/name`)\n" $v; done >&2
 }
@@ -74,7 +74,7 @@ test -d docker || { echo "$Prg: missing 'docker' directory." >&2; exit 1; }
 DebNum=`ls debian | sort -n | tail -1`	# Default = latest
 if [ $# -ne 1 -a $# -ne 2 ]; then
     echo "Usage: $Dir/$Prg <PHP-version> [ <Debian-version> ]" >&2
-    SupPhp -
+    SupPhp supported
     SupDeb
     exit 1
 fi
@@ -88,15 +88,15 @@ if [ -z "$split" ]; then
     exit 1
 fi
 eval "$split"
-PhpVer="$1"
-PhpDir=php/$Maj/$PhpVer
-if [ "$Versions" ]; then
-    if ! echo "$Versions" | grep "^$Maj\.$Min\.$Rel$" >/dev/null; then
-	echo "$Prg: unknown PHP version \"$PhpVer\"" >&2
-	SupPhp
-	exit 1
-    fi
+if echo "$Versions" | grep "^$Maj\.$Min\.$Rel$" >/dev/null; then
+    PhpVer="$1"
+    PhpDir=php/$Maj/$PhpVer
+else
+    echo "$Prg: unknown PHP version \"$1\"" >&2
+    SupPhp
+    exit 1
 fi
+
 #
 #   Check Debian version
 #
