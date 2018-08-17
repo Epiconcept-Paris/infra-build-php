@@ -4,7 +4,7 @@
 TOPDIR=../top
 BINDIR=$(TOPDIR)/usr/sbin
 MANDIR=$(TOPDIR)/usr/share/man
-CFLAGS=-O -Wall -fPIE -fstack-protector-strong -Wall
+CFLAGS=-O -fPIE -fstack-protector-strong -Wall
 LDFLAGS=-Wl,-z,relro -Wl,-z,now -pie
 
 all: bin man
