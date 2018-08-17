@@ -4,12 +4,14 @@
 TOPDIR=../top
 BINDIR=$(TOPDIR)/usr/sbin
 MANDIR=$(TOPDIR)/usr/share/man
+CFLAGS=-O -Wall -fPIE -fstack-protector-strong -Wall
+LDFLAGS=-Wl,-z,relro -Wl,-z,now -pie
 
 all: bin man
 
 bin: waitpid.c
 	test -d $(BINDIR) || mkdir -p $(BINDIR)
-	cc -O -Wall -s -o $(BINDIR)/waitpid waitpid.c
+	cc $(CFLAGS) $(LDFLAGS) -s -o $(BINDIR)/waitpid waitpid.c
 
 man: waitpid.8
 	test -d $(MANDIR)/man8 || mkdir -p $(MANDIR)/man8
