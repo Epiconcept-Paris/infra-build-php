@@ -10,6 +10,9 @@ mkdir -p $Pear
 INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear make install-pear >$Logs/make-install_$Pkg.out 2>&1
 
 if [ -d pear/man ]; then
+    Man1=pear/man/man1
+    #	Correct wrong man macro .PS
+    grep '^\.PS$' $Man1/pear.1 >/dev/null && sed -i -e 's/^\.PS/.RS/' -e '/^pear help /a.RE' $Man1/pear.1
     cp -rp pear/man $Top/usr/share
     find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
 else
