@@ -193,7 +193,7 @@ else
 	sleep 1
 	grep '^Waiting for container stop' $Logs/docker-run.out >/dev/null && break
     done
-    nd=`expr $nd + 1`
+    nd=`expr '(' $nd '*' 3 ')' + 1`
     sed -n "1,${nd}p" $Logs/docker-run.out
     echo "Use:\n    docker stop $MULTI_NAME\nto stop the container, and use:"
     echo "    `RunCmd -ti` bash\nto run the container in the foreground"

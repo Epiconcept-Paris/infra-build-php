@@ -63,7 +63,9 @@ do
     </Directory>
 </VirtualHost>" >/etc/apache2/sites-available/$site.conf
     a2ensite $site.conf >>$Logs/a2.out
-    echo "Added site http://$site with DocumentRoot $Work/$www"
+    echo "Added site http://$site"
+    echo "    with DocumentRoot $Work/$www"
+    echo "    and  SetHandler   \"proxy:unix:/run/php/$fpm.sock|fcgi://localhost\""
     ok=y
 done
 IPAddr="`curl -sSL "$IpSite" 2>/dev/null | awk 'NR == 1 {print "IP=" $0} NR==2 { print "NS=" $0}'`"
