@@ -153,7 +153,7 @@ Img="`docker images | sed -nr "s/^(epi-multi-php)  *($n) .*$/\1:\2/p"`"
 if [ "$rm" ]; then
     if [ "$Img" -o -d $Dir ]; then
 	echo -n "Removing multi for $n: "
-	docker ps | grep epi_multi_php >/dev/null && docker stop epi_multi_php
+	docker ps | grep epi_multi_php >/dev/null && docker stop epi_multi_php >/dev/null
 	test "$Img" && { echo -n "docker image"; $Do docker rmi $Img >/dev/null; }
 	test -d $Dir && { test "$Img" && echo -n ", "; echo -n $Dir; $Do rm -rf $Dir; }
 	echo
