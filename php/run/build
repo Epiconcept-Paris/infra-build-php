@@ -5,17 +5,27 @@
 #
 Prg=`basename $0`
 Bld=`dirname $0`
-Ver="$1"
-SupVer="5.2 5.6 7.0 7.1 7.2"			# UPDATE THIS on new version
+test -d $Bld/files -a -d $Bld/pkgs -a -d $Bld/dist || { "$0: cannot find 'files', 'pkgs' and 'dist' directories"; exit 1; }
+# Get version of latest PHP source
+Ver=`expr "\`ls $Bld/files/php-*.tar.bz2 2>/dev/null\`" : '.*/php-\([0-9\.]*\).tar.bz2'`
+if [ "$Ver" ]; then
+    echo "Found source of PHP $Ver in $Bld/files/"
+else
+    echo "$0: cannot find $Bld/files/php-<PHP-version>.tar.bz2"
+    exit 1
+fi
+SupVer="5.2 5.6 7.0 7.1 7.2"			# UPDATE THIS on new PHP version
+
 Logs="$Bld/dist/.logs"				# Directory for log files
 Pkgs="$Bld/dist/.pkgs"				# List of packages built
 Debug="$Bld/dist/.debug"			# Directory for debug files
-Maj=`echo $Ver | awk -F. '{print $1}'`
-MajMin=`echo $Ver | awk -F. '{print $1 "." $2}'`
 if [ -f $Bld/.debug -o "$2" = 'debug' ]; then
     Dbg=y					# Debug option
     test -d $Debug || su -c "mkdir $Debug" $USER
 fi
+Maj=`echo $Ver | awk -F. '{print $1}'`
+MajMin=`echo $Ver | awk -F. '{print $1 "." $2}'`
+echo " $SupVer " | grep " $MajMin " >/dev/null || echo "NOTICE: PHP version $MajMin is unsupported. Update SupVer= in $0 ?"
 
 set -e	# Stop on errors
 
@@ -31,12 +41,15 @@ mkdir /usr/src/php-$Ver; chown $USER:`id -gn $USER` /usr/src/php-$Ver
 su -c "tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src" $USER
 mv /usr/src/php-$Ver /usr/src/php
 
-cd /usr/src/php
+cd /usr/src/php		# All relative paths are to here: do NOT change it!
 PhpAPI=`sed -n 's/ *#define ZEND_MODULE_API_NO //p' Zend/zend_modules.h`
 
 ConfigHelp=$Logs/config-help.out
 ./configure --help >$ConfigHelp
-for Opt in '--with-mysql' '--with-mcrypt' '--with-ttf' '--enable-gd-native-ttf' '--enable-fpm'
+#
+#   Handle options not present in every PHP version
+#
+for Opt in --with-mysql --with-mcrypt --with-ttf --enable-gd-native-ttf --enable-fpm
 do
     case "$Opt" in
 	--with-*)   Sep='[ =[]';;
@@ -54,7 +67,9 @@ fi
 echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`ls -d $Bld/pkgs/*-fpm`/skip
 # Skip *-mysql package generation if --with-mysql known
 echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`ls -d $Bld/pkgs/*-mysql`/skip
-
+#
+#   Handle build-time hooks (mostly for PHP extensions)
+#
 if [ -d $Bld/hooks ]; then
     for hook in $Bld/hooks/*
     do
@@ -202,7 +217,7 @@ Phar='install-pear-nozlib.phar'
 for dir in $Bld/pkgs/*
 do
     PkgDir=`basename $dir`
-    Pkg=`expr "$PkgDir" : '[0-9][0-9]-\(.*\)'`
+    Pkg=`expr "$PkgDir" : '[0-9]\{2\}-\(.*\)'`
     Top=$dir/top
     if [ "$Pkg" = 'pear' ]; then
 	Name="$Base-$Pkg"

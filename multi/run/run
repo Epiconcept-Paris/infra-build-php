@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+#	multi/run - Run docker container from anywhere
+#
+Prg=`basename $0`
+Dir=`dirname $0`
+IniPwd=$PWD
+
+Path() { realpath --relative-to=$IniPwd $1; }
+test "$Dir" || Dir=`dirname \`realpath $0\``
+expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
+test "$Dir" = '.' || cd "$Dir"
+test -d logs || { echo "$Prg: missing '`Path pkgs`' directory." >&2; exit 1; }
+test -d pkgs || { echo "$Prg: missing '`Path logs`' directory." >&2; exit 1; }
+test -d www  || { echo "$Prg: missing '`Path www`' directory."  >&2; exit 1; }
+
+docker ps | grep epi_multi_php >/dev/null && docker stop epi_multi_php
+exec docker run -d -e HOSTFMT -p 80:80 -v $PWD:/opt/multi/work --name epi_multi_php --rm epi-multi-php:stretch

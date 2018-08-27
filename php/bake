@@ -2,19 +2,31 @@
 #
 #	Make PHP packages for a given set of PHP and Debian versions
 #
-#	Usage:	./mk.sh <PHP-version> [<Debian-version>]
+#	Usage:	[php|.]/bake <PHP-version> [<Debian-version>]
 #
 #	PHP-version is checked to be available in PHP sources on $PHPSITE
-#	Supported PHP versions are 5.2, 5.6, 7.1+ on jessie, 5.6 and 7.1+ on later Debian
+#	Supported PHP versions are defined in debian/<Debian-version>/mkre
 #	Debian-version is checked to be supported and defaults to latest version
 #
 PHPSITE='fr.php.net'
 PHPARCH="museum.php.net/php5"
 PECLGET="pecl.php.net/get"
 
-#
-Prg=`basename $0`
+Prg=php/`basename $0`
 Dir=`dirname $0`
+IniPwd=$PWD
+TopDir=../
+DebTop=${TopDir}debian
+PhpTop=
+PhpGit=php/
+
+Path() { realpath --relative-to=$IniPwd $1; }
+test "$Dir" || Dir=`dirname \`realpath $0\``
+expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
+test "$Dir" = '.' || cd "$Dir"
+#   Script's CWD is where it is located, but all messages assume PWD is top-level
+test -d $DebTop || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
+
 #
 # Get existing PHP 5.x and 7.x versions
 #
@@ -22,7 +34,7 @@ Versions="`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLo
 if [ -z "$Versions" ]; then
     echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"" >&2
     echo "$Prg: using instead the list of versions already known" >&2
-    Versions="`ls -d php/[5-9]/[5-9].* | sed 's;^php/./;;' | sort -nr -t. -k 1,1 -k 2,2 -k 3,3`"
+    Versions="`ls -d $PhpTop[5-9]/[5-9].* | sed "s;^$PhpTop./;;" | sort -nr -t. -k 1,1 -k 2,2 -k 3,3`"
     if [ -z "$Versions" ]; then
 	echo "$Prg: empty list of known PHP versions ??" >&2
 	exit 1
@@ -62,18 +74,15 @@ SupDeb()
     local v
 
     echo "Supported Debian versions (default $DebNum):" >&2
-    ls debian | sort -n | while read v; do test -f debian/$v/name && printf "    %2d (`cat debian/$v/name`)\n" $v; done >&2
+    ls $DebTop | sort -n | while read v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
 }
 
 #
 #   Check usage
 #
-test "$Dir" = '.' || cd "$Dir"
-test -d debian || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
-test -d docker || { echo "$Prg: missing 'docker' directory." >&2; exit 1; }
-DebNum=`ls debian | sort -n | tail -1`	# Default = latest
+DebNum=`ls $DebTop | sort -n | tail -1`	# Default = latest
 if [ $# -ne 1 -a $# -ne 2 ]; then
-    echo "Usage: $Dir/$Prg <PHP-version> [ <Debian-version> ]" >&2
+    echo "Usage: $Prg <PHP-version> [ <Debian-version> ]" >&2
     SupPhp supported
     SupDeb
     exit 1
@@ -90,7 +99,7 @@ fi
 eval "$split"
 if echo "$Versions" | grep "^$Maj\.$Min\.$Rel$" >/dev/null; then
     PhpVer="$1"
-    PhpDir=php/$Maj/$PhpVer
+    PhpDir=$PhpTop$Maj/$PhpVer
 else
     echo "$Prg: unknown PHP version \"$1\"" >&2
     SupPhp
@@ -101,7 +110,7 @@ fi
 #   Check Debian version
 #
 if [ "$2" ]; then
-    if [ -f debian/$2/name ]; then
+    if [ -f $DebTop/$2/name ]; then
 	DebNum="$2"
     else
 	echo "$Prg: unsupported Debian version \"$2\"" >&2
@@ -109,8 +118,8 @@ if [ "$2" ]; then
 	exit 1
     fi
 fi
-DebVer="`cat debian/$DebNum/name`"
-DebDir=debian/$DebNum
+DebVer="`cat $DebTop/$DebNum/name`"
+DebDir=$DebTop/$DebNum
 #echo "DebVer=$DebVer PhpVer=$PhpVer Maj=$Maj Min=$Min Rel=$Rel"
 
 #
@@ -139,7 +148,7 @@ if [ ! -s $PhpSrc ]; then
 	dl=y
     else
 	echo "Failed to download $Tbz from known URLs" >&2
-	echo "Put it manually as $PhpSrc and run $Dir/$Prg again" >&2
+	echo "Put it manually as $PhpSrc and run $Prg again" >&2
 	rm -f $PhpSrc
 	test "$mk" && find $PhpDir -type d -empty -delete
 	exit 1
@@ -168,11 +177,11 @@ TESTS_TOP=/opt/php-mk
 if [ -f $DebDir/Dockervars.sh ]; then
     . $DebDir/Dockervars.sh
 else
-    echo "$Prg: missing $DebDir/Dockervars.sh" >&2
+    echo "$Prg: missing debian/$DebNum/Dockervars.sh" >&2
     exit 1
 fi
-if [ -f php/$Maj/Dockervars.sh ]; then
-    . php/$Maj/Dockervars.sh
+if [ -f $PhpTop$Maj/Dockervars.sh ]; then
+    . $PhpTop$Maj/Dockervars.sh	# NOTE: initializes BLDCOPY and possibly TSTCOPY
 else
     echo "$Prg: missing php/$Maj/Dockervars.sh" >&2
     exit 1
@@ -182,7 +191,7 @@ fi
 #   Determine build number and build date
 #
 Num=$PhpDir/BUILD_NUM
-Cmt="`git log -n1 --format=%H -- $Num 2>/dev/null`"
+Cmt="`git log -n1 --format=%H -- $PhpGit$Num 2>/dev/null`"
 if [ "$Cmt" ]; then
     Log=`git show $Cmt:$Num`
     if [ -f $Num ]; then	# If $Num exists and is $Log, set it's mtime to $Cmt's
@@ -199,7 +208,7 @@ test -d $Dist || mkdir -p $Dist
 touch -r $Num $Dist/.date	# For package dates in changelog.Debian
 
 echo "Making PHP $PhpVer-$Bld packages for Debian $DebVer..."
-echo "Logs will be in $Dist/.logs/"
+echo "Logs will be in debian/$DebNum/dist/$PhpVer-$Bld/.logs/"
 test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir $Dist/.logs
 
 #
@@ -210,10 +219,14 @@ BUILD_BASE=epi-build-php
 BUILD_IMG=$BUILD_BASE:$Tag	# Keep all build images separate
 BUILD_NAME=epi_build_php	# Only one build container at a time
 
-test -f .debug && BLDCOPY="$BLDCOPY
-COPY .debug $BUILD_TOP"
-test -f php/.notest && BLDCOPY="$BLDCOPY
-COPY php/.notest $BUILD_TOP"
+BLDCOPY="$BLDCOPY
+COPY $PhpSrc $BUILD_TOP/files
+COPY ${PhpTop}pkgs $BUILD_TOP/pkgs
+COPY ${PhpTop}run/build $BUILD_TOP"
+test -f ${TopDir}.debug && BLDCOPY="$BLDCOPY
+RUN >$BUILD_TOP/.debug"
+test -f ${PhpTop}.notest && BLDCOPY="$BLDCOPY
+RUN >$BUILD_TOP/.notest"
 
 if docker ps | grep $BUILD_NAME >/dev/null; then
     echo "Stopping the running '$BUILD_NAME' container..."
@@ -236,10 +249,10 @@ echo "Building the '$BUILD_IMG' image..."
 User=`id -un`
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 #   Variables come in order of their appearance in Dockerfile-build.in
-DEBVER="$DebVer" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" BUILD_TOP="$BUILD_TOP" PHPVER="$PhpVer" ADDUSER="$AddUser" BUILD_REQ="$BUILD_REQ" PHPSRC="$PhpSrc" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $CLI_DEPS $BUILD_NUM $USER $BUILD_TOP $PHPVER $ADDUSER $BUILD_REQ $PHPSRC $BLDCOPY' <docker/Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
+DEBVER="$DebVer" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" BUILD_TOP="$BUILD_TOP" ADDUSER="$AddUser" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $CLI_DEPS $BUILD_NUM $USER $BUILD_TOP $ADDUSER $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
 
-Cmd="docker run -ti -v $PWD/$Dist:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
-if [ -f .norun ]; then
+Cmd="docker run -ti -v `realpath $PWD/$Dist`:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
+if [ -f ${TopDir}.norun ]; then
     echo "Use:\n    $Cmd bash\nto run the build container"
 else
     echo "Running the '$BUILD_NAME' container:\n    $Cmd"
@@ -253,6 +266,10 @@ echo "------------------------------------------------"
 TESTS_BASE=epi-tests-php
 TESTS_IMG=$TESTS_BASE:$Tag	# Keep all tests images separate
 TESTS_NAME=epi_tests_php	# Only one tests container at a time
+
+TSTCOPY="$TSTCOPY
+COPY ${PhpTop}run/info.php /var/www/html
+COPY ${PhpTop}run/tests $TESTS_TOP"
 
 if docker ps | grep $TESTS_NAME >/dev/null; then
     echo "Stopping the running '$TESTS_NAME' container..."
@@ -273,10 +290,10 @@ fi
 
 echo "Building the '$TESTS_IMG' image..."
 #   Variables come in order of their appearance in Dockerfile-tests.in
-DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $TSTCOPY' <docker/Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
+DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
 
-Cmd="docker run -ti -v $PWD/$Dist:$TESTS_TOP/dist --name $TESTS_NAME --rm $TESTS_IMG"
-if [ -f .norun ]; then
+Cmd="docker run -ti -v `realpath $PWD/$Dist`:$TESTS_TOP/dist --name $TESTS_NAME --rm $TESTS_IMG"
+if [ -f ${TopDir}.norun ]; then
     echo "Use:\n    $Cmd bash\nto run the tests container"
 else
     echo "Running the '$TESTS_NAME' container:\n    $Cmd"

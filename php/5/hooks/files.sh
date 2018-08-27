@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 #	files.sh - Install old .deb packages and patches for PHP 5.2/5.6
 #

@@ -2,13 +2,21 @@
 #
 #	Build packages for tools
 #
-#	Usage:	./mk.sh [<Debian-version>]
-#		tools/mk.sh [<Debian-version>]
+#	Usage:	[tools|.]/bake [<Debian-version>]
 #
-Prg=`basename $0`
+Prg=tools/`basename $0`
 Dir=`dirname $0`
-DebTop=../debian
-Docker=../docker
+IniPwd=$PWD
+TopDir=../
+DebTop=${TopDir}debian
+TlsTop=
+
+Path() { realpath --relative-to=$IniPwd $1; }
+test "$Dir" || Dir=`dirname \`realpath $0\``
+expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
+test "$Dir" = '.' || cd "$Dir"
+#   Script's CWD is where it is located, but all messages assume PWD is top-level
+test -d $DebTop || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
 
 SupDeb()
 {
@@ -21,12 +29,9 @@ SupDeb()
 #
 #   Check usage
 #
-test "$Dir" = '.' || cd "$Dir"
-test -d $DebTop || { echo "$Dir/$Prg: missing '$DebTop' directory." >&2; exit 1; }
-test -d $Docker || { echo "$Dir/$Prg: missing '$Docker' directory." >&2; exit 1; }
 DebNum=`ls $DebTop | sort -n | tail -1`	# Default = latest
 if [ $# -gt 1 ]; then
-    echo "Usage: $Dir/$Prg [ <Debian-version> ]" >&2
+    echo "Usage: $Prg [ <Debian-version> ]" >&2
     SupDeb
     exit 1
 fi
@@ -57,6 +62,11 @@ TOOLS_NAME=epi_tools
 date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 Now=`date '+%s'`
 
+TLSCOPY="COPY ${TlsTop}pkgs $TOOLS_TOP/pkgs
+COPY ${TlsTop}run/build $TOOLS_TOP/build"
+test -f ${TopDir}.debug && TLSCOPY="$TLSCOPY
+RUN >$TOOLS_TOP/.debug"
+
 if docker ps | grep $TOOLS_NAME >/dev/null; then
     echo "Stopping the running '$TOOLS_NAME' container..."
     docker stop -t 5 $TOOLS_NAME >/dev/null
@@ -76,14 +86,14 @@ fi
 
 test -d $Logs || mkdir -p $Logs
 echo "Building the '$TOOLS_IMG' image..."
-#   Variables come in order of their appearance in Dockerfile-tools.in
-DEBVER="$DebVer" TOOLS_TOP="$TOOLS_TOP" envsubst '$DEBVER $TOOLS_TOP' <../docker/Dockerfile-tools.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG . >$Logs/docker.out 2>&1
+#   Variables come in order of their appearance in Dockerfile.in
+DEBVER="$DebVer" TOOLS_TOP="$TOOLS_TOP" TLSCOPY="$TLSCOPY" envsubst '$DEBVER $TOOLS_TOP $TLSCOPY' <${TlsTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG . >$Logs/docker.out 2>&1
 
 #
 #   Run the container
 #
 Cmd="docker run -ti -v `realpath $PWD/$Tools`:$TOOLS_TOP/dist --name $TOOLS_NAME --rm $TOOLS_IMG"
-if [ -f ../.norun ]; then
+if [ -f ${TopDir}.norun ]; then
     echo "Use:\n    $Cmd bash\nto run the tools container"
 else
     echo "Running the '$TOOLS_NAME' container:\n    $Cmd"

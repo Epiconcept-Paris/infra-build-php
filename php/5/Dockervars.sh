@@ -1,7 +1,7 @@
 #
 #	php/5/Dockervars.sh - Define extra Dockerfile vars depending on PHP version
 #
-Php=php/5
+Php=${PhpTop}5
 
 #
 #   Add hooks for PECL PHP extensions
@@ -79,8 +79,8 @@ COPY $off $TESTS_TOP/pkgs"
     #	From http://pear.php.net/package/PEAR_Manpages/download (see Download link)
     #	Latest: http://download.pear.php.net/package/PEAR_Manpages-1.10.0.tgz
     BLDCOPY="$BLDCOPY
-COPY php/files/PEAR_Manpages-1.10.0.tgz $BUILD_TOP/files
-COPY php/hooks/pearman.sh $BUILD_TOP/hooks"
+COPY ${PhpTop}files/PEAR_Manpages-1.10.0.tgz $BUILD_TOP/files
+COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
 }
 
 #

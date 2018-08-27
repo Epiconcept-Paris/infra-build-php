@@ -11,7 +11,7 @@ Base='epi-php'
 Arch='amd64'
 HostFmt="${HOSTFMT:-php%M%m.epiconcept.tld}"
 IpSite="http://ipaddr.free.fr"
-DebNum=`expr \`cat /etc/debian_version\` : '\([0-9]*\)'`
+DebNum=`expr \`cat /etc/debian_version\` : '\([0-9]\{1,\}\)'`
 test $$ -eq 1 && exec >$Logs/docker-run.out 2>&1
 
 set -e	# Stop on errors
@@ -21,7 +21,7 @@ if [ ! -d $Pkgs ]; then
     exit 1
 fi
 
-Dists="`ls $Pkgs | sed -nr "s/$Base-[5-9]\.[0-9]-(cli|fpm|mysql)_([5-9]\.[0-9]\.[0-9]+-[0-9]+)_$Arch.deb/\2/p" | sort -u`"
+Dists="`ls $Pkgs | sed -nr "s/$Base-[5-9]\.[0-9]-(cli|fpm|mysql)_([5-9]\.[0-9]\.[0-9]{,2}-[0-9]{,2})_$Arch.deb/\2/p" | sort -u`"
 if [ -z "$Dists" ]; then
     echo "$Prg: no valid package name in $Pkgs" >&2
     exit 1
@@ -39,7 +39,7 @@ a2enmod proxy_fcgi >$Logs/a2.out
 >$Logs/dpkg-i.out
 for dist in $Dists
 do
-    eval `echo "$dist" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]+)-([0-9]+)$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
+    eval `echo "$dist" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})-([0-9]{,2})$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
     if [ -s $Pkgs/$Base-$Maj.$Min-cli_${dist}_$Arch.deb -a -s $Pkgs/$Base-$Maj.$Min-fpm_${dist}_$Arch.deb ]; then
 	dpkg -i $Pkgs/$Base-$Maj.$Min-cli_${dist}_$Arch.deb $Pkgs/$Base-$Maj.$Min-fpm_${dist}_$Arch.deb >>$Logs/dpkg-i.out
 	test -s $Pkgs/$Base-$Maj.$Min-mysql_${dist}_$Arch.deb && dpkg -i $Pkgs/$Base-$Maj.$Min-mysql_${dist}_$Arch.deb >>$Logs/dpkg-i.out

@@ -4,7 +4,7 @@ MAINTAINER Epiconcept
 ENV LANG=C
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
-RUN echo "export TERM=xterm\nalias l='ls -al'\necho \"Use:\n    $TESTS_TOP/tests\\nto start the tests\"" >>/root/.bashrc
+RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    $TESTS_TOP/tests\\nto start the tests\"" >>/root/.bashrc
 
 # Update/upgrade
 RUN apt-get update
@@ -14,8 +14,6 @@ RUN apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends $TESTS_REQ
 
 RUN mkdir -p $TESTS_TOP/dist
-COPY php/info.php /var/www/html
-COPY php/tests $TESTS_TOP
 $TSTCOPY
 
-CMD $TESTS_TOP/tests
+CMD [ "$TESTS_TOP/tests" ]

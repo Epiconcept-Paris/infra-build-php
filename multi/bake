@@ -2,27 +2,38 @@
 #
 #	Test the use of multiple PHP versions
 #
-#	Usage:	./multi.sh <PHP-dist-dir> [<PHP-dist-dir> ...] [<Debian-version>]
+#	Usage:	[multi|.]/bake <PHP-dist-dir> [<PHP-dist-dir> ...] [<Debian-version>]
 #
-Prg=`basename $0`
+Prg=multi/`basename $0`
 Dir=`dirname $0`
+IniPwd=$PWD
+TopDir=../
+DebTop=${TopDir}debian
+PhpTop=${TopDir}php
+TlsTop=${TopDir}tools
+MulTop=
+
+Path() { realpath --relative-to=$IniPwd $1; }
+test "$Dir" || Dir=`dirname \`realpath $0\``
+expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
+test "$Dir" = '.' || cd "$Dir"
+#   Script's CWD is where it is located, but all messages assume PWD is top-level
+test -d $DebTop || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
+test -d $PhpTop || { echo "$Prg: missing 'php' directory." >&2;  exit 1; }
+test -d $TlsTop || { echo "$Prg: missing 'tools' directory." >&2;  exit 1; }
+
+DefDeb=`ls $DebTop | sort -n | tail -1`	# Default = latest
 Base='epi-php'
 Arch='amd64'
 LF='
 '
-
-test "$Dir" = '.' || cd "$Dir"
-test -d debian || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
-test -d docker || { echo "$Prg: missing 'docker' directory." >&2; exit 1; }
-DefDeb=`ls debian | sort -n | tail -1`	# Default = latest
-
 #
 #    Parse args
 #
 for arg in "$@"
 do
-    d=`expr "$arg" : '\([5-9]\.[0-9]\.[0-9][0-9]*-[0-9][0-9]*\)$'`
-    v=`expr "$arg" : '\([0-9][0-9]*\)$'`
+    d=`expr "$arg" : '\([5-9]\.[0-9]\.[0-9]\{,2\}-[0-9]\{,2\}*\)$'`
+    v=`expr "$arg" : '\([0-9]\{1,\}\)$'`
     if [ "$d" ]; then
 	ds="$ds $d"
     elif [ "$v" ]; then
@@ -32,35 +43,37 @@ do
 	exit 1
     fi
 done
+
 #
 #   Check Debian version
 #
 for v in $vs
 do
-    if [ $v != 8 -a -f debian/$v/name ]; then
-	test "$DebNum" && echo "$Prg: discarding previously given Debian-version $DebNum (`cat debian/$DebNum/name`)" >&2
+    if [ $v != 8 -a -f $DebTop/$v/name ]; then
+	test "$DebNum" && echo "$Prg: discarding previously given Debian-version $DebNum (`cat $DebTop/$DebNum/name`)" >&2
 	DebNum="$v"
     else
 	echo "$Prg: unsupported Debian version \"$v\"" >&2
 	echo "Supported Debian versions (default $DefDeb):" >&2
-	ls debian | sort -n | grep -v '^8$' | while read v; do test -f debian/$v/name && printf "    %2d (`cat debian/$v/name`)\n" $v; done >&2
+	ls $DebTop | sort -n | grep -v '^8$' | while read v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
 	exit 1
     fi
 done
 test "$DebNum" || DebNum=$DefDeb
-DebVer="`cat debian/$DebNum/name`"
-DebDir=debian/$DebNum
+DebVer="`cat $DebTop/$DebNum/name`"
+DebDir=$DebTop/$DebNum
 
 if [ -f $DebDir/Dockervars.sh ]; then
     eval `sed -n 's/^TESTS_REQ=/MULTI_REQ=/p' $DebDir/Dockervars.sh`
 else
-    echo "$Prg: missing $DebDir/Dockervars.sh" >&2
+    echo "$Prg: missing debian/$DebNum/Dockervars.sh" >&2
     exit 1
 fi
 DistDir=$DebDir/dist
 MultDir=$DebDir/multi
 Logs=$MultDir/logs
 Pkgs=$MultDir/pkgs
+
 #
 #   Check PHP-dists
 #
@@ -81,7 +94,7 @@ test -d $Pkgs && rm -f $Pkgs/*.deb || mkdir -p $Pkgs
 if [ "$ds" ]; then
     for d in $ds
     do
-	eval `echo "$d" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]+)-([0-9]+)$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
+	eval `echo "$d" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})-([0-9]{,2})$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
 	if DistOK $DistDir/$d $Maj $Min; then
 	    ln $DistDir/$d/$Base-$Maj.$Min-cli_${d}_$Arch.deb $Pkgs
 	    ln $DistDir/$d/$Base-$Maj.$Min-fpm_${d}_$Arch.deb $Pkgs
@@ -90,21 +103,22 @@ if [ "$ds" ]; then
 	    w=$MultDir/www/$h
 	    test -d $w || mkdir -p $w
 	    test -f $w/index.php || echo "<?php header('Location: info.php'); ?>" >$w/index.php
-	    cp -p php/info.php $w
+	    cp -p $PhpTop/run/info.php $w
+	    cp -p ${MulTop}run/run $MultDir
 	    nd=`expr $nd + 1`
 	else
-	    echo "$Prg: $d does not contain the necessary $Base cli and fpm packages" >&2
+	    echo "$Prg: debian/$DebNum/dist/$d does not contain the necessary $Base cli and fpm packages" >&2
 	    exit 1
 	fi
     done
 fi
 if [ $nd -eq 0 ]; then
-    echo "Usage: $Dir/$Prg <PHP-dist-dir> [<PHP-dist-dir> ...] [<Debian-version>]" >&2
+    echo "Usage: $Prg <PHP-dist-dir> [<PHP-dist-dir> ...] [<Debian-version>]" >&2
     echo "Available dists for Debian version $DebNum ($DebVer):" >&2
     Sep=''
     for dir in $DistDir/[5-9].[0-9].[0-9]*-[0-9]*
     do
-	eval `basename $dir | sed -nr 's/^([5-9])\.([0-9])\.([0-9]+)-([0-9]+)$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
+	eval `basename $dir | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})-([0-9]{,2})$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
 	if DistOK $dir $Maj $Min; then
 	    Dists="$Dists$Sep`basename $dir`"
 	    Sep="$LF"
@@ -145,15 +159,21 @@ else
     #
     WaitPkg=`ls $DistDir/tools/epi-tools-waitpid_*_amd64.deb 2>/dev/null`
     if [ -z "$WaitPkg" ]; then
-	tools/mk.sh
+	$TlsTop/bake $DebNum
 	WaitPkg=`ls $DistDir/tools/epi-tools-waitpid_*_amd64.deb 2>/dev/null`
 	if [ -z "$WaitPkg" ]; then
-	    echo "Cannot build the waitpid package, needed to build the '$MULTI_IMG' image" >&2
+	    echo "$Prg: cannot build the waitpid package, needed to build the '$MULTI_IMG' image" >&2
 	    exit 1
 	fi
     fi
+    cp -p $WaitPkg ${MulTop}run
+    Pkg=`basename $WaitPkg`
+    MULCOPY="COPY ${MulTop}run/start $MULTI_TOP/start
+COPY ${MulTop}run/$Pkg /tmp
+RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
     #   Variables come in order of their appearance in Dockerfile-multi.in
-    DEBVER="$DebVer" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" WAITPKG="$WaitPkg" envsubst '$DEBVER $MULTI_TOP $MULTI_REQ $WAITPKG' <docker/Dockerfile-multi.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
+    DEBVER="$DebVer" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
+    rm -f ${MulTop}run/epi-tools-waitpid_*.deb
 fi
 #
 #   Run container
@@ -161,9 +181,9 @@ fi
 test "$HOSTFMT" && RunEnv=' -e HOSTFMT'
 RunCmd()
 {
-    echo "docker run $1$RunEnv -p 80:80 -v `pwd`/$MultDir:$MULTI_TOP/work --name $MULTI_NAME --rm $MULTI_IMG"
+    echo "docker run $1$RunEnv -p 80:80 -v `realpath $PWD/$MultDir`:$MULTI_TOP/work --name $MULTI_NAME --rm $MULTI_IMG"
 }
-if [ -f .norun ]; then
+if [ -f ${TopDir}.norun ]; then
     echo "Use:\n    `RunCmd -ti` bash\nto run the container"
 else
     echo "Running the '$MULTI_NAME' container in background mode:\n    `RunCmd -d`"

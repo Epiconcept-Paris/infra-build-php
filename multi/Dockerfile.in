@@ -4,7 +4,7 @@ MAINTAINER Epiconcept
 ENV LANG=C
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
-RUN echo "export TERM=xterm\nalias l='ls -al'\necho \"Use:\n    $MULTI_TOP/start\\nto start Apache\"" >>/root/.bashrc
+RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    $MULTI_TOP/start\\nto start Apache\"" >>/root/.bashrc
 
 # Update/upgrade
 RUN apt-get update
@@ -14,8 +14,6 @@ RUN apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends $MULTI_REQ
 
 RUN mkdir -p $MULTI_TOP/work
-COPY php/start $MULTI_TOP
-COPY $WAITPKG /tmp
-RUN cd /tmp; dpkg -i *.deb; rm -v *.deb
+$MULCOPY
 
 CMD [ "$MULTI_TOP/start" ]

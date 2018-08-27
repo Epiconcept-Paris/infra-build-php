@@ -1,19 +1,23 @@
 #!/bin/sh
 #
-#	all.sh - Build all latest PHP distribs, tools and multi
+#	bake - Bake all latest PHP distribs, tools and multi
 #
 PHPSITE='fr.php.net'
 
 Prg=`basename $0`
 Dir=`dirname $0`
+IniPwd=$PWD
 #Do=:	# Remove comment to not actually execute commands (for debug)
 
 LF='
 '
 
+Path() { realpath --relative-to=$IniPwd $1; }
+test "$Dir" || Dir=`dirname \`realpath $0\``
+expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
 test "$Dir" = '.' || cd "$Dir"
 test -d debian || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
-test -d docker || { echo "$Prg: missing 'docker' directory." >&2; exit 1; }
+test -d php    || { echo "$Prg: missing 'php' directory." >&2;    exit 1; }
 
 #
 #   Parse args (rm or mk so far)
@@ -117,6 +121,7 @@ do
 		echo 1 >php/$Maj/$v/BUILD_NUM
 	    fi
 	    Bld=`cat php/$Maj/$v/BUILD_NUM`
+	    eval "MUL$d=\"\$MUL$d\$v-\$Bld \""
 	    Dir=debian/$d/dist/$v-$Bld
 	    if [ -d $Dir ]; then
 		echo "$v is already built for $n"
@@ -124,8 +129,7 @@ do
 	    fi
 	    echo "Building $v for $n in $Dir"
 	    $Do mkdir -p $Dir
-	    $Do ./mk.sh $v $d | sed -u 's/$//' | $Do tee $Dir/mk.out | sed -u 's/$//'
-	    eval "MUL$d=\"\$MUL$d\$v-\$Bld \""
+	    $Do php/bake $v $d | sed -u 's/$//' | $Do tee $Dir/mk.out | sed -u 's/$//'
 	done
 
 	Dir=debian/$d/dist/tools
@@ -134,7 +138,7 @@ do
 	else
 	    echo "Building tools for $n"
 	    $Do mkdir -p $Dir
-	    $Do tools/mk.sh $d | sed -u 's/$//' | $Do tee $Dir/mk.out | sed -u 's/$//'
+	    $Do tools/bake $d | sed -u 's/$//' | $Do tee $Dir/mk.out | sed -u 's/$//'
 	fi
     fi
 done
@@ -161,6 +165,6 @@ if [ "$mk" ]; then
     elif [ "$Mul" ]; then
 	echo "Building and running multi for $n with $Mul"
 	test -d $Dir || $Do mkdir $Dir
-	$Do ./multi.sh $Mul | sed -u 's/$//' | $Do tee $Dir/mk.out | sed -u 's/$//'
+	$Do multi/bake $Mul | sed -u 's/$//' | $Do tee $Dir/mk.out | sed -u 's/$//'
     fi
 fi
