@@ -49,7 +49,7 @@ ConfigHelp=$Logs/config-help.out
 #
 #   Handle options not present in every PHP version
 #
-for Opt in --with-mysql --with-mcrypt --with-ttf --enable-gd-native-ttf --enable-fpm
+for Opt in --with-mysql --with-mcrypt --with-ttf --enable-gd-native-ttf --enable-fpm --with-fpm-systemd
 do
     case "$Opt" in
 	--with-*)   Sep='[ =[]';;
