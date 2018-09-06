@@ -6,15 +6,17 @@
 Prg=`basename $0`
 Bld=`dirname $0`
 test -d $Bld/files -a -d $Bld/pkgs -a -d $Bld/dist || { "$0: cannot find 'files', 'pkgs' and 'dist' directories"; exit 1; }
+Ext=.tar.bz2
 # Get version of latest PHP source
-Ver=`expr "\`ls $Bld/files/php-*.tar.bz2 2>/dev/null\`" : '.*/php-\([0-9\.]*\).tar.bz2'`
+Ver=`expr "\`ls $Bld/files/php-*$Ext 2>/dev/null\`" : ".*/php-\([0-9\.]*\)$Ext"`
 if [ "$Ver" ]; then
     echo "Found source of PHP $Ver in $Bld/files/"
 else
-    echo "$0: cannot find $Bld/files/php-<PHP-version>.tar.bz2"
+    echo "$0: cannot find $Bld/files/php-<PHP-version>$Ext"
     exit 1
 fi
 SupVer="5.2 5.6 7.0 7.1 7.2"			# UPDATE THIS on new PHP version
+umask 022					# Needed for lintian
 
 Logs="$Bld/dist/.logs"				# Directory for log files
 Pkgs="$Bld/dist/.pkgs"				# List of packages built
@@ -29,16 +31,10 @@ echo " $SupVer " | grep " $MajMin " >/dev/null || echo "NOTICE: PHP version $Maj
 
 set -e	# Stop on errors
 
-# In dir $1, if $2 doesn't exist, link it to $3/$2
-chkln()
-{
-   (test -d $1 || mkdir -p $1; cd $1; test -e $2 || ln -s $3/$2 $2)
-}
-
 echo "Extracting php-$Ver source..."
 test -d /usr/src/php && rm -rf /usr/src/php
 mkdir /usr/src/php-$Ver; chown $USER:`id -gn $USER` /usr/src/php-$Ver
-su -c "tar xf $Bld/files/php-$Ver.tar.bz2 -C /usr/src" $USER
+su -c "tar xf $Bld/files/php-$Ver$Ext -C /usr/src" $USER
 mv /usr/src/php-$Ver /usr/src/php
 
 cd /usr/src/php		# All relative paths are to here: do NOT change it!
@@ -97,7 +93,13 @@ fi
 echo "Configuring php-$Ver$HookShow..."
 test "$Dbg" && echo "ExtOpts=\"$ExtOpts\" HookOpts=\"$HookOpts\""
 
-chkln /usr/lib libjpeg.a  x86_64-linux-gnu		# For PHP5
+# In dir $1, if $2 doesn't exist, link it to $3/$2
+chkln()
+{
+   (test -d $1 || mkdir -p $1; cd $1; test -e $2 || ln -s $3/$2 $2)
+}
+
+chkln /usr/lib libjpeg.a  x86_64-linux-gnu	# For PHP5
 chkln /usr/lib libjpeg.so x86_64-linux-gnu
 chkln /usr/lib libpng.a   x86_64-linux-gnu
 chkln /usr/lib libpng.so  x86_64-linux-gnu

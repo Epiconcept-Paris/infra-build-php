@@ -11,6 +11,7 @@
 PHPSITE='fr.php.net'
 PHPARCH="museum.php.net/php5"
 PECLGET="pecl.php.net/get"
+Ext=.tar.bz2
 
 Prg=php/`basename $0`
 Dir=`dirname $0`
@@ -80,7 +81,7 @@ SupDeb()
 #
 #   Check usage
 #
-DebNum=`ls $DebTop | sort -n | tail -1`	# Default = latest
+DebNum=`ls $DebTop/*/name | sed "s;$DebTop/\([^/]*\)/name;\1;" | sort -n | tail -1`	# Default = latest
 if [ $# -ne 1 -a $# -ne 2 ]; then
     echo "Usage: $Prg <PHP-version> [ <Debian-version> ]" >&2
     SupPhp supported
@@ -127,47 +128,54 @@ DebDir=$DebTop/$DebNum
 #
 date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 Now=`date '+%s'`
+mk=
+dl=
 if [ ! -d $PhpDir ]; then
     mkdir -p $PhpDir
     mk=y
 fi
-Tbz=php-$PhpVer.tar.bz2
+#   ChkSrc SrcFile LstFile PhpVer - Check PHP source tarball
+ChkSrc()
+{
+    # global Prg
+    test -s $1 || return 1	# Safety check
+    if [ ! -s $2 ]; then
+	if ! tar tf $1 >$2 2>/dev/null; then
+	    echo "$Prg: $1 is not recognized as a tar archive" >&2
+	    rm -f $2
+	    return 1
+	fi
+    fi
+    grep "^php-$3/" $2 >/dev/null && return 0
+    echo "$Prg: $1 is not recognized as a PHP $3 source archive" >&2
+    return 1
+}
+Tbz=php-$PhpVer$Ext
 PhpSrc=$PhpDir/$Tbz
 PhpLst=$PhpDir/php-$PhpVer.files
-if [ ! -s $PhpSrc ]; then
+if [ -s $PhpSrc ]; then		# $PhpSrc exists: check it
+    ChkSrc $PhpSrc $PhpLst $PhpVer || exit 1
+else
     echo "Fetching $Tbz..."
-    Url1="http://$PHPSITE/get/$Tbz/from/this/mirror"
-    Url2="http://$PHPARCH/$Tbz"
-    for Url in "$Url1" "$Url2"
+    Urls="http://$PHPSITE/get/$Tbz/from/this/mirror http://$PHPARCH/$Tbz"
+    for Url in $Urls
     do
 	echo "Trying from \"$Url\"..."
-	curl -sSL "$Url" -o $PhpSrc 2>/dev/null
-	test $? -eq 0 -a -s $PhpSrc && break
+	if curl -sSL "$Url" -o $PhpSrc 2>/dev/null; then
+	    if ChkSrc $PhpSrc $PhpLst $PhpVer; then
+		dl=y
+		break
+	    fi
+	fi
     done
-    if [ -s $PhpSrc ]; then
-	dl=y
-    else
+    if [ -z "$dl" ]; then
 	echo "Failed to download $Tbz from known URLs" >&2
 	echo "Put it manually as $PhpSrc and run $Prg again" >&2
-	rm -f $PhpSrc
+	rm -f $PhpSrc $PhpLst
 	test "$mk" && find $PhpDir -type d -empty -delete
 	exit 1
     fi
 fi
-if [ ! -s $PhpLst ]; then
-    if ! tar tf $PhpSrc >$PhpLst 2>/dev/null; then
-	echo "$Prg: $PhpSrc is not recognized as a tar archive" >&2
-	rm -f $PhpLst
-	test "$dl" && rm $PhpSrc
-	exit 1
-    fi
-fi
-if ! grep "^php-$PhpVer/" $PhpLst >/dev/null; then
-    echo "$Prg: $PhpSrc is not recognized as a PHP $PhpVer source archive" >&2
-    test "$dl" && rm $PhpSrc $PhpLst
-    exit 1
-fi
-
 #
 #   Source debian and PHP hooks (in that order)
 #
