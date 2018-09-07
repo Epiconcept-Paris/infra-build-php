@@ -1,0 +1,84 @@
+#!/bin/sh
+#
+#	phpcache - List/check/save/remove gitignored files in php/
+#
+Prg=`basename $0`
+
+test -d php || { echo "$Prg: cannot find 'php/' in current directory '$PWD'" >&2; exit 1; }
+
+temp=`mktemp`
+cleanup()
+{
+    rm -f $temp
+}
+trap cleanup 0 1 2 15
+
+find php -type f | sort >$temp
+cache="`git ls-files php | sort | diff - $temp | sed -n 's/^> //p'`"
+test "$cache" || { echo "$Prg: no cached files in 'php/'"; exit 0; }
+case "$1" in
+    ls) test "$2" && echo "$cache" | grep "$2" || echo "$cache"
+	;;
+    chk)
+	echo "$cache" | while read f
+	do
+	    case "$f" in
+		*.tar.bz2|*.tgz)
+		    echo -n "Checking $f: "
+		    if tar tf $f >$temp 2>/dev/null; then
+			echo "OK"
+			b=`expr "$f" : '\(.*\).tar.bz2$'`
+			test "$b" || continue
+			test -f "$b.files" || continue
+			if cmp $b.files $temp >/dev/null; then
+			    echo "Checking $b.files: OK"
+			else
+			    echo "Correcting $b.files, previous is now $b.files.old"
+			    mv $b.files $b.files.old
+			    cp $temp $b.files
+			fi
+		    else
+			echo "BAD! Removed."
+			rm -f $f
+		    fi
+		    ;;
+	    esac
+	done
+	;;
+    save)
+	if [ "$2" ]; then
+	    case "$2" in
+		*.tbz|*.tar.bz2)
+		    tar=$2
+		    opt=j
+		    ;;
+		*.tgz|*.tar.gz)
+		    tar=$2
+		    opt=z
+		    ;;
+		*)  tar=$2.tbz
+		    opt=j
+		    ;;
+	    esac
+	    echo "Creating archive $tar..."
+	    echo "$cache" | tar cfT$opt $tar -
+	else
+	    echo "$Prg: missing <archive-name>" >&2
+	    exit 1
+	fi
+	;;
+    rm) if [ "$2" ]; then
+	    cache="`echo "$cache" | grep "$2"`"
+	else
+	    echo "The following files will be removed:"
+	    echo "$cache"
+	    echo -n "Proceed (y/N) ? "
+	    read a
+	    test "$a" = 'y' -o "$a" = 'yes' || exit 0
+	fi
+	rm -v $cache
+	;;
+    *)  echo "Usage: $Prg ls [<filter>] | chk | save <tbz-name> | rm [<filter>]" >&2
+	exit 1
+	;;
+esac
