@@ -58,34 +58,12 @@ END {
 	printf("%s.%s\n", Mm, v[Mm]);
 }'`"
 
-SupPhp()
-{
-    # global Latest
-    local sup flt
-
-    test "$1" && sup=" $1" || sup=
-    test "$1" && flt="| grep -v '^5\.[01345]\.'" || flt=
-    echo "Latest$sup PHP 5/7 versions:" >&2
-    eval "echo \"$Latest\" $flt | sed 's/^/    /'" >&2
-}
-
-SupDeb()
-{
-    # global DebNum
-    local v
-
-    echo "Supported Debian versions (default $DebNum):" >&2
-    ls $DebTop | sort -n | while read v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
-}
-
 #
 #   Check usage
 #
 DebNum=`ls $DebTop/*/name | sed "s;$DebTop/\([^/]*\)/name;\1;" | sort -n | tail -1`	# Default = latest
 if [ $# -ne 1 -a $# -ne 2 ]; then
     echo "Usage: $Prg <PHP-version> [ <Debian-version> ]" >&2
-    SupPhp supported
-    SupDeb
     exit 1
 fi
 
@@ -103,7 +81,8 @@ if echo "$Versions" | grep "^$Maj\.$Min\.$Rel$" >/dev/null; then
     PhpDir=$PhpTop$Maj/$PhpVer
 else
     echo "$Prg: unknown PHP version \"$1\"" >&2
-    SupPhp
+    echo "Latest PHP 5/7 versions:" >&2
+    echo "$Latest" | sed 's/^/    /' >&2
     exit 1
 fi
 
@@ -115,7 +94,8 @@ if [ "$2" ]; then
 	DebNum="$2"
     else
 	echo "$Prg: unsupported Debian version \"$2\"" >&2
-	SupDeb
+	echo "Supported Debian versions (default $DebNum):" >&2
+	ls $DebTop | sort -n | while read v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
 	exit 1
     fi
 fi

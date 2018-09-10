@@ -3,7 +3,9 @@
 #
 #	bake - Build or clean PHP distribs, tools and multi
 #
-#	Usage:	./bake [ls | mk | rm | Debian-version | PHP-maj-min | PHP-version | PHP-distrib | tools | multi]
+#	Usage:	./bake [mk | rm | <Debian-version> | <PHP-version> | tools | multi]
+#		./bake [ls | ver | help]
+#	<PHP-version> is <Maj>.<Min>, <Maj>.<Min>.<Rel> or <Maj>.<Min>.<Rel>-<Bld>
 #
 PHPSITE='fr.php.net'
 
@@ -34,39 +36,82 @@ do
     test -d $dir || { echo "$Prg: missing '$dir' directory." >&2; exit 2; }
 done
 
-Sep='{'
+DirSep='{'
+SupSep=''
 for f in $DebTop/*/name
 do
     dir=`dirname $f`
     test -f $dir/mkre || continue
     deb=`basename $dir`
-    DebVer="$DebVer$deb "
     name=`cat $f`
+    DebVer="$DebVer$deb "
+    DebDir="$DebDir$DirSep$deb"
+    DebSup="$DebSup$SupSep`cat $dir/mkre`"
+    DebLst="$DebLst`printf "%2d ($name)" $deb`$LF"
     SedArg="$SedArg -e 's/$name-/$deb:/' "
-    DebDir="$DebDir$Sep$deb"
-    Sep=','
+    DirSep=','
+    SupSep='|'
 done
 test "$DebVer" || { echo "$Prg: no valid Debian version in '$DebTop' ??" >&2; exit 3; }
 DebDir="$DebDir}"
+#echo "DebVer=\"$DebVer\" DebDir=\"$DebDir\" DebSup=\"$DebSup\" DebLst=\"$DebLst\" SedArg=\"$SedArg\""
 ReMajMin='[5-9]\.[0-9]$'
 ReVersion='[5-9]\.[0-9]\.[0-9]\{,2\}$'
 ReDistrib='\([5-9]\.[0-9]\.[0-9]\{,2\}\)-[0-9]\{,2\}$'
+
+#
+#   Get the latest versions
+#
+Vers()
+{
+    # global PHPSITE Prg DebSup PhpTop Versions Latest
+
+    Versions="`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`"
+    test "$Versions" || echo -e "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
+    Versions="$Versions$LF`ls -d $PhpTop/[5-9]/[5-9].* | sed "s;^$PhpTop/./;;"`"
+    Versions="`echo "$Versions" | sort -nru -t. -k 1,1 -k 2,2 -k 3,3`"
+    if [ -z "$Versions" ]; then
+	echo "$Prg: empty list of known PHP versions ??" >&2
+	exit 1
+    fi
+    Latest="`echo "$Versions" | egrep "^($DebSup)\.[0-9]{,2}$" | awk -F. '{
+	Mm = $1 "." $2
+	if (Mm in v) {
+	    if (v[Mm] < $3)
+		v[Mm] = $3
+	}
+	else
+	    v[Mm] = $3
+    }
+    END {
+	for (Mm in v)
+	    printf("%s.%s\n", Mm, v[Mm]);
+    }'`"
+}
 
 #
 #   Parse args -------------------------------------------------
 #
 Usage()
 {
-    echo "Usage: ./bake [ ls | mk | rm | <Debian-version> | <PHP-version> | tools | multi ...]" >&2
+    echo "Usage: ./bake [ mk | rm | <Debian-version> | <PHP-version> | tools | multi ...]" >&2
     echo -e "\t<Debian-version> is an integer or '-' for all versions" >&2
     echo -e "\t<PHP-version> is <Major>.<minor> or <Major>.<minor>.<release> or" >&2
     echo -e "\t\t\t <Major>.<minor>.<release>-<build>" >&2
     echo -e "\t\twhere <Major>, <minor> are single digit integers" >&2
     echo -e "\t\tand <release> & <build> are up to two digits integers" >&2
+    echo "       ./bake [ ls | ver | help ]" >&2
     exit ${1:-1}
 }
 
-if [ "$1" = 'ls' ]; then
+if [ "$1" = 'ver' ]; then
+    Vers
+    echo "Latest supported PHP versions:"
+    echo "$Latest" | sed 's/^/    /'
+    echo "Supported Debian versions:"
+    echo -n "$DebLst" | sed 's/^/    /'
+    exit 0
+elif [ "$1" = 'ls' ]; then
     Red='!'
     tty <&1 >/dev/null && { Red="`tput setaf 1`"; Grn="`tput setaf 2`"; Std="`tput setaf 7`"; }
     dirs="`eval ls -d $DebTop/$DebDir/{dist/{[5-9].*,tools},multi} 2>/dev/null`"
@@ -83,17 +128,18 @@ if [ "$1" = 'ls' ]; then
     done
     exit 0
 fi
-mode=Mk
+Mode=
 nbarg=$#
 while [ $# -gt 0 ]
 do
     case "$1" in
-	mk) mode=Mk
+	mk) Mode=Mk
+	    isMk=y
 	    if [ $# -eq 1 ]; then 	# last arg
 		test "$toMk" || toMk="$toRm"
 	    fi
 	    ;;
-	rm) mode=Rm
+	rm) Mode=Rm
 	    isRm=y
 	    ;;
 	# Debian version
@@ -109,6 +155,7 @@ do
 	    ;;
 	# PHP version or distrib, tools or multi
 	[5-9].[0-9]*|tools|multi)
+	    test "$Mode" || { Mode=Mk; isMk=y; }
 	    if [ "$1" = 'tools' -o "$1" = 'multi' ]; then
 		ok=y
 	    else
@@ -124,7 +171,7 @@ do
 	    test "$CurDeb" && Debs="$CurDeb" || Debs="$DebVer"
 	    for deb in $Debs
 	    do
-		eval echo "\" \$to$mode\"" | grep " $deb:$1 " >/dev/null || eval "to$mode=\"\${to$mode}$deb:$1 \""
+		eval echo "\" \$to$Mode\"" | grep " $deb:$1 " >/dev/null || eval "to$Mode=\"\${to$Mode}$deb:$1 \""
 	    done
 	    ;;
 	help)
@@ -136,8 +183,8 @@ do
     esac
     shift
 done
-test -z "$isMk" -a -z "$isRm" && isMk=y
-#echo "nbarg=$nbarg mode=$mode CurDeb=\"$CurDeb\" DebVer=\"$DebVer\" DebDir=\"$DebDir\" isMk=\"$isMk\" isRm=\"$isRm\" toMk=\"$toMk\" toRm=\"$toRm\""
+test "$isMk" -o "$isRm" || { echo "$Prg: no mode [mk|rm] specified" >&2; Usage; }
+#echo "nbarg=$nbarg Mode=$Mode CurDeb=\"$CurDeb\" DebVer=\"$DebVer\" DebDir=\"$DebDir\" isMk=\"$isMk\" isRm=\"$isRm\" toMk=\"$toMk\" toRm=\"$toRm\""
 #
 #   Remove -----------------------------------------------------
 #
@@ -241,7 +288,7 @@ if [ "$isRm" ]; then
 		    img="`expr "$img" : '\([^#]*\)'`"
 		fi
 		echo -n "Removing "
-		test "`basename "$dir"`" = 'multi' && docker ps | grep epi_multi_php >/dev/null && $Do eval "docker stop epi_multi_php >/dev/null"
+		test "`basename "$dir"`" = 'multi' && docker ps | grep epi_multi_php >/dev/null && $Do eval "echo \"Stopping the 'epi_multi_php' container...\"; docker stop epi_multi_php >/dev/null"
 		test "$dir" -a "$img" && sep='and ' || sep=
 		test "$dir" && { echo -n "$dir "; $Do rm -rf $dir; }
 		test "$img" && { echo -n "${sep}docker image$what"; $Do eval "docker rmi $img >/dev/null"; }
@@ -270,30 +317,7 @@ Inex()
     eval "inex$1$2$3=y"		# avoid duplicate messages
 }
 if [ "$isMk" ]; then
-    #
-    #   Get the latest versions
-    #
-    Versions="`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`"
-    test "$Versions" || echo -e "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
-    Versions="$Versions$LF`ls -d $PhpTop/[5-9]/[5-9].* | sed "s;^$PhpTop/./;;"`"
-    Versions="`echo "$Versions" | sort -nru -t. -k 1,1 -k 2,2 -k 3,3`"
-    if [ -z "$Versions" ]; then
-	echo "$Prg: empty list of known PHP versions ??" >&2
-	exit 1
-    fi
-    Latest="`echo "$Versions" | grep -v '^5\.[01345]\.' | awk -F. '{
-    Mm = $1 "." $2
-    if (Mm in v) {
-	if (v[Mm] < $3)
-	    v[Mm] = $3
-    }
-    else
-	v[Mm] = $3
-    }
-    END {
-    for (Mm in v)
-	printf("%s.%s\n", Mm, v[Mm]);
-    }'`"
+    Vers
     #
     #	Default make
     #
@@ -349,7 +373,7 @@ if [ "$isMk" ]; then
 	    test "$bld" && nbld=`expr $bld + 1` || nbld=1
 	    if [ "$wbld" ]; then
 		test "$bld" && opp="and previous was $bld" || opp="as first build-number"
-		test "$wbld" -eq "$bld" -o "$wbld" -eq "$nbld" || echo "NOTICE: build-number for PHP $ver on $name is $wbld $opp"
+		test "$wbld" -eq "$bld" -o "$wbld" -eq "$nbld" || echo "WARNING: build-number for PHP $ver on $name is $wbld $opp"
 		bld=$wbld
 	    fi
 	    test "$bld" || bld=1
@@ -379,7 +403,6 @@ if [ "$isMk" ]; then
 		    dir=$DebTop/$deb/multi
 		    echo "Building and running multi for $name with $mul"
 		    $Do mkdir -p $dir
-		    docker ps | grep epi_multi_php >/dev/null && $Do eval "docker stop epi_multi_php >/dev/null"
 		    $Do eval "$MulTop/bake $mul | sed -u 's/$//' | tee $dir/mk.out | sed -u 's/$//'"
 		else
 		    echo "$Prg: no PHP-distrib selected for 'multi'" >&2

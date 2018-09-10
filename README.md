@@ -3,6 +3,7 @@ Fournil à paquets PHP spécifiques Epiconcept sur Debian jessie/stretch
 
 ## Build et tests d'une nouvelle version
 
+Ils se font en exécutant le script ````bake```` situé dans le répertoire principal (au même niveau que les répertoires ````debian````, ````php````, ````tools```` et ````multi````) :
 ````
 ./bake [ <version-Debian> ] [ <version-PHP> ... ]
 ````
@@ -12,29 +13,64 @@ _\<version-PHP>_ est sous la forme _Maj_**.**_Min_, _Maj_**.**_Min_**.**_Rel_, o
 
 _\<version-Debian>_ est sous la forme numérique _n_, par défaut toutes les versions gérées.
 
-Exemples :
+#### Exemples :
 ````
 ./bake 8 5.2.17
 ````
-builde et teste la version 5.2.17 sous Debian jessie.
+builde et teste la version 5.2.17 pour Debian jessie.
 
 ````
 ./bake 7.2
 ````
-builde et teste la dernière version disponible de PHP 7.2 sous toutes les versions de Debian gérées.
+builde et teste la dernière version disponible de PHP 7.2 pour toutes les _\<version-Debian>_ gérées.
 ````
-./bake
+./bake mk
 ````
-builde et teste toutes les dernières versions disponibles de PHP sous toutes les versions de Debian gérées.
-
-````php/bake```` (sans arguments) affiche la liste des dernières versions disponibles de PHP et celle des versions gérées de Debian
+builde et teste toutes les dernières versions disponibles de PHP (ainsi que les cibles spéciales ````tools```` et ````multi````, voir ci-dessous) pour toutes les _\<version-Debian>_ gérées. Pour chaque build, le script de pilotage ````bake```` appelle le script ````php/bake````.
 
 Les packages résultants sont produits dans le répertoire ````debian/<version-Debian>/dist/<version-PHP>-<BUILD_NUM>````, qui est partagé avec le container docker. \
 Les logs du build et des tests sont dans le répertoire ````debian/<version-Debian>/dist/<version-PHP>-<BUILD_NUM>/.logs````
 
-Le nom des packages produits comporte un numéro de build après la _\<version-PHP>_. Ce numéro de build est contenu dans le fichier ````php/<version-majeure-PHP>/<version-PHP>/BUILD_NUM````. Après un ````git commit```` de ce fichier, on peut provoquer un incrément automatique de la valeur de ce dernier ````git commit```` en supprimant le fichier avec un simple :\
-````rm php/<version-majeure-PHP>/<version-PHP>/BUILD_NUM````\
-On peut aussi bien sur incrémenter manuellement le contenu du fichier.
+Le nom des packages produits comporte un numéro de build après la _\<version-PHP>_. Ce numéro de build est contenu dans le fichier ````php/<version-majeure-PHP>/<version-PHP>/BUILD_NUM````, qui peut être facilement modifié en passant un build complet à ````bake````:
+````
+./bake 7.2.9-2
+````
+````bake```` signale une différence inattendue (autre qu'un incrément de 1) entre le contenu de ````php/<version-majeure-PHP>/<version-PHP>/BUILD_NUM```` à son lancement et la nouveau numéro de build passé dans l'argument.
+
+## Le script ````bake````
+Le script bake admet un nombre quelconque d'arguments:
+- des cibles : des _\<version-PHP>_ ou les cibles spéciales ````tools```` ou ````multi````. Les _\<version-PHP>_ sont admises sous trois formes : _Maj_**.**_Min_, _Maj_**.**_Min_**.**_Rel_, ou _Maj_**.**_Min_**.**_Rel_**-**_Bld_, par exemple : ````7.2````, ````7.2.9```` ou ````7.2.9-2````. Pour la forme _Maj_**.**_Min_, ````bake```` recherche la dernière release connue (sur Internet ou en local). La forme _Maj_**.**_Min_**.**_Rel_**-**_Bld_ permet de préciser un numéro de build à créer (ce qui permet de changer aisément le numéro de build d'une release PHP) ou à supprimer (pour limiter la suppression à ce build précis)
+- un mode : ````mk```` ou ````rm````, par défaut ````mk```` si le mode n'est pas spécifié avant la première cible
+- un filtre : une _\<version-Debian>_ (sous forme numérique), par défaut toutes les versions gérées. Le filtre spécial ````-```` est également reconnu, pour revenir à toutes les _\<version-Debian>_ après en avoir précédemment sélectionné une
+
+Un mode ou un filtre restent actifs sur le reste de la ligne de commande jusqu'au prochain mode ou filtre (respectivement). Ainsi :
+````
+./bake 8 5.2 - 5.6 9 7.0 - 7.1 7.2
+````
+lance s'il y a lieu (````mk```` par défaut) le build des versions 5.2, 5.6, 7.1 et 7.2 pour ````jessie````(8) et des versions 5.6, 7.0, 7.1 et 7.2 pour ````stretch````(9). Autre exemple :
+````
+./bake rm 7.2.8 mk 7.2
+````
+supprime les distributions 7.2.8-* (de toutes les _\<version-Debian>_) et lance le build de la dernière version 7.2 pour toutes les _\<version-Debian>_.
+
+La cible spéciale ````tools```` gère le build ou la suppression des packages du répertoire ````tools/```` en appelant le script ````tools/bake````
+
+La cible spéciale ````multi```` gère le build, la suppression ou la reconfiguration de l'image docker de tests multiples (voir ci-dessous). Elle demande en arguments les _\<version-PHP>_ à utiliser (sous leurs 3 formes admises, voir ci-dessus), dont le build sera lancé si nécessaire. 
+
+Enfin, ````bake```` admet également des arguments uniques spéciaux :
+````
+./bake ls
+````
+affiche la liste des distributions (build) PHP existantes.
+````
+./bake ver
+````
+affiche les listes des dernières versions de PHP connues (sur Internet ou en local) et des versions de Debian Linux gérées.
+````
+./bake help
+````
+affiche l'aide résumée de ````bake````.
+
 
 
 ## Mise au point
@@ -50,15 +86,16 @@ Enfin, on peut également créer un fichier ````.debug```` (vide), qui active de
 ## Test de multiples versions
 Une fois qu'au moins deux versions de PHP ont été compilées, différant par leur versions Majeure et mineure, il est possible de les tester simultanément avec PHP FPM dans un container de test :
 ````
-multi/bake <distrib-PHP> [ <distrib-PHP> ...] [ <version-Debian> ]
+./bake [ <version-Debian> ] multi <version-PHP> [ <version-PHP> ...]
 ````
+_\<version-Debian>_ est sous la forme numérique _n_, par défaut la plus récente gérée (pour l'instant, la version 9 ````stretch```` est la seule).
 
-_\<distrib-PHP>_ est sous la forme _Maj_**.**_Min_**.**_Rel_**-**_Bld_, où _Bld_ est le numéro de build de la version PHP.\
-_\<version-Debian>_ est sous la forme numérique _n_, par défaut la plus récente gérée (pour l'instant, la version 9 [stretch] est la seule). Exemple :
+_\<version-PHP>_ est sous une des trois formes _Maj_**.**_Min_, _Maj_**.**_Min_**.**_Rel_ ou  _Maj_**.**_Min_**.**_Rel_**-**_Bld_, où _Bld_ est le numéro du build de la version PHP, qui sera lancé s'il n'existe pas.\
+Exemple :
 ````
-multi/bake 5.6.37-2 7.1.20-2 7.2.9-1
+./bake multi 5.6.37-2 7.1.20 7.2
 ````
-Le script ````multi/bake```` crée si nécessaire le répertoire ````debian/<version-Debian>/multi```` (partagé avec le container docker) avec 3 sous répertoires :
+Le script ````multi/bake````, appelé par ````./bake```` crée si nécessaire le répertoire ````debian/<version-Debian>/multi```` (partagé avec le container docker) avec 3 sous répertoires :
 * ````pkgs```` qui contient les packages Debian -cli et -fpm (et -mysql s'il existe) de chaque _\<distrib-PHP>_
 * ````www```` qui contient les ````DocumentRoot```` de test pour chaque version PHP, par défaut sous la forme ````php<version-majeure><version-mineure>````, dans notre exemple ````php56````, ````php71```` et ````php72````
 * ````logs```` qui contient les logs de build de l'image ````epi-multi-php:<version-Debian>```` (dans notre exemple ````epi-multi-php:stretch````) et de run du container ````epi_multi_php````
@@ -78,7 +115,6 @@ Enfin, le script ````multi/bake````, comme le script ````php/bake````, reconnait
 
 ## Notes
 
-* Serveur AWS de build : cdt@34.243.220.28
 * voir s'il faut gérer le rotate/reopen des logs de PHP-FPM
 * voir les FAILED tests des make test ?
 * correction des warnings du make install de PEAR 1.10 ?
