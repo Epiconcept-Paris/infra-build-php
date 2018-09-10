@@ -61,11 +61,17 @@ COPY $Php/hooks/mysql.sh $BUILD_TOP/hooks"
     BLDCOPY="$BLDCOPY
 COPY ${PhpTop}files/PEAR_Manpages-1.10.0.tgz $BUILD_TOP/files
 COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
+
+    if [ $Min -gt 2 ]; then
+	BUILD_REQ="$BUILD_REQ libzip-dev"
+	TESTS_REQ="$BUILD_REQ $LIBZIP"
+	CLI_DEPS="$CLI_DEPS, $LIBZIP"
+    fi
 }
 
 #
 #   Main
-#   global Php BLDCOPY BUILD_TOP
+#   global Php BLDCOPY BUILD_TOP BUILD_REQ TESTS_REQ CLI_DEPS LIBZIP
 #
 BLDCOPY="RUN mkdir $BUILD_TOP/hooks"
 

@@ -66,6 +66,7 @@ DebDir=$DebTop/$DebNum
 
 if [ -f $DebDir/Dockervars.sh ]; then
     eval `sed -n 's/^TESTS_REQ=/MULTI_REQ=/p' $DebDir/Dockervars.sh`
+    MULTI_REQ="$MULTI_REQ `sed -nr 's/LIBZIP="([^"]+)"/\1/p' $DebDir/Dockervars.sh`"
 else
     echo "$Prg: missing debian/$DebNum/Dockervars.sh" >&2
     exit 1

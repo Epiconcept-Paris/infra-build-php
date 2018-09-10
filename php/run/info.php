@@ -65,7 +65,7 @@ if ($html)
     $ver = PHP_VERSION;
     $sys = PHP_OS;
     $info = str_replace('</style>', ".tbl{width:auto}\n</style>", $info);
-    $info = str_replace('phpinfo()', "PHP $ver / $sys info", $info);	# in <title>
+    $info = preg_replace('/<title>.*phpinfo()/', "<title>PHP $ver / $sys info", $info);
     $info = str_replace('<body>', "<body>\n$out", $info);
     echo "$info";
 }

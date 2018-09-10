@@ -5,3 +5,5 @@ BUILD_REQ="vim apt-rdepends file curl build-essential autoconf pkg-config fakero
 CLI_DEPS="libjpeg62-turbo, libpng16-16, libxpm4, libmcrypt4, libxslt1.1, libcurl3, libfreetype6, libmariadbclient18, libxml2, libc6"
 
 TESTS_REQ="vim curl apache2 libjpeg62-turbo libpng16-16 libxpm4 libmcrypt4 libxslt1.1 libcurl3 libfreetype6 libmariadbclient18"
+
+LIBZIP="libzip4"
