@@ -58,11 +58,11 @@ ReDistrib='\([5-9]\.[0-9]\.[0-9]\{,2\}\)-[0-9]\{,2\}$'
 Usage()
 {
     echo "Usage: ./bake [ ls | mk | rm | <Debian-version> | <PHP-version> | tools | multi ...]" >&2
-    echo "\t<Debian-version> is an integer: 8, 9 or more" >&2
-    echo "\t<PHP-version> is <Major>.<minor> or <Major>.<minor>.<release> or" >&2
-    echo "\t\t\t <Major>.<minor>.<release>-<build>" >&2
-    echo "\t\twhere <Major>, <minor> are single digit integers" >&2
-    echo "\t\tand <release> & <build> are up to two digits integers" >&2
+    echo -e "\t<Debian-version> is an integer or '-' for all versions" >&2
+    echo -e "\t<PHP-version> is <Major>.<minor> or <Major>.<minor>.<release> or" >&2
+    echo -e "\t\t\t <Major>.<minor>.<release>-<build>" >&2
+    echo -e "\t\twhere <Major>, <minor> are single digit integers" >&2
+    echo -e "\t\tand <release> & <build> are up to two digits integers" >&2
     exit ${1:-1}
 }
 
@@ -97,8 +97,10 @@ do
 	    isRm=y
 	    ;;
 	# Debian version
-	[1-9]|1[0-9])
-	    if [ -f $DebTop/$1/name -a -f $DebTop/$1/mkre ]; then
+	[1-9]|1[0-9]|-)
+	    if [ "$1" = '-' ]; then
+		CurDeb=
+	    elif [ -f $DebTop/$1/name -a -f $DebTop/$1/mkre ]; then
 		CurDeb=$1
 	    else
 		echo "$Prg: invalid Debian version '$1'" >&2
@@ -264,7 +266,7 @@ Inex()
     test "`eval echo "\\$inex$1$2$3"`" && return
     ver=$1.$2
     expr "$3" : '[0-9][0-9]*' >/dev/null && { ver=$ver.$3; rel=$3; } || rel="<$3>"
-    echo "$Prg: version '$ver' is unknown. To handle it, create$LF	directory php/$1/$1.$2.$rel and put php-$1.$2.$rel.tar.bz2 in it." >&2
+    echo -e "$Prg: version '$ver' is unknown. To handle it, create\n\tdirectory php/$1/$1.$2.$rel and put php-$1.$2.$rel.tar.bz2 in it." >&2
     eval "inex$1$2$3=y"		# avoid duplicate messages
 }
 if [ "$isMk" ]; then
@@ -272,7 +274,7 @@ if [ "$isMk" ]; then
     #   Get the latest versions
     #
     Versions="`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`"
-    test "$Versions" || echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
+    test "$Versions" || echo -e "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
     Versions="$Versions$LF`ls -d $PhpTop/[5-9]/[5-9].* | sed "s;^$PhpTop/./;;"`"
     Versions="`echo "$Versions" | sort -nru -t. -k 1,1 -k 2,2 -k 3,3`"
     if [ -z "$Versions" ]; then
