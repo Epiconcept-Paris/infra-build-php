@@ -47,15 +47,16 @@ done
 #
 #   Check Debian version
 #
+re="`cat ${MulTop}mkre`"
 for v in $vs
 do
-    if [ $v != 8 -a -f $DebTop/$v/name ]; then
+    if echo $v | egrep "^($re)$" >/dev/null && [ -f $DebTop/$v/name ]; then
 	test "$DebNum" && echo "$Prg: discarding previously given Debian-version $DebNum (`cat $DebTop/$DebNum/name`)" >&2
 	DebNum="$v"
     else
 	echo "$Prg: unsupported Debian version \"$v\"" >&2
 	echo "Supported Debian versions (default $DefDeb):" >&2
-	ls $DebTop | sort -n | grep -v '^8$' | while read v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
+	ls $DebTop | sort -n | egrep "^($re)$" | while read v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
 	exit 1
     fi
 done
@@ -90,12 +91,13 @@ DistOK()
 }
 
 nd=0
-test -d $Pkgs && rm -f $Pkgs/*.deb || mkdir -p $Pkgs
+test -d $Pkgs && rm -f $Pkgs/*.deb
 if [ "$ds" ]; then
     for d in $ds
     do
 	eval `echo "$d" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})-([0-9]{,2})$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
 	if DistOK $DistDir/$d $Maj $Min; then
+	    mkdir -p $Pkgs
 	    ln $DistDir/$d/$Base-$Maj.$Min-cli_${d}_$Arch.deb $Pkgs
 	    ln $DistDir/$d/$Base-$Maj.$Min-fpm_${d}_$Arch.deb $Pkgs
 	    test -s $DistDir/$d/$Base-$Maj.$Min-mysql_${d}_$Arch.deb && ln $DistDir/$d/$Base-$Maj.$Min-mysql_${d}_$Arch.deb $Pkgs
@@ -114,7 +116,6 @@ if [ "$ds" ]; then
 fi
 if [ $nd -eq 0 ]; then
     echo "Usage: $Prg <PHP-dist-dir> [<PHP-dist-dir> ...] [<Debian-version>]" >&2
-    echo "Available dists for Debian version $DebNum ($DebVer):" >&2
     Sep=''
     for dir in $DistDir/[5-9].[0-9].[0-9]*-[0-9]*
     do
@@ -124,7 +125,10 @@ if [ $nd -eq 0 ]; then
 	    Sep="$LF"
 	fi
     done
-    echo "$Dists" | sed 's/^/    /' >&2
+    if [ "$Dists" ]; then
+	echo "Available dists for Debian version $DebNum ($DebVer):" >&2
+	echo "$Dists" | sed 's/^/    /' >&2
+    fi
     exit 1
 fi
 

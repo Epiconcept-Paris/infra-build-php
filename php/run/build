@@ -209,7 +209,7 @@ else
     echo "Testing php-$Ver..."
     echo "s" | su -c "make test >$Logs/make-test.out 2>&1" $USER
     sed -n '/^FAILED TEST /,'/^============/'p' $Logs/make-test.out
-    test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs
+    test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs/php_test_results.txt
 fi
 test "$Dbg" && find . ! -user $USER >$Debug/not-$USER
 

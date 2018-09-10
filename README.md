@@ -1,21 +1,31 @@
 # infra-build-php
 Fournil à paquets PHP spécifiques Epiconcept sur Debian jessie/stretch
 
-(Le nom un peu original de Fournil est lié au choix pour les scripts de pilotage d'un nom autre que « build » : __bake__, en remplacement de « mk.sh ».)
-
 ## Build et tests d'une nouvelle version
 
 ````
-php/bake <version-PHP> [ <version-Debian> ]
+./bake [ <version-Debian> ] [ <version-PHP> ... ]
 ````
 builde et teste la version _\<version-PHP>_ pour _\<version-Debian>_
 
-_\<version-PHP>_ est sous la forme _Maj_**.**_Min_**.**_Rel_, où _Maj_ = 5 ou 7 \
-_\<version-Debian>_ est sous la forme numérique _n_, par défaut la plus récente gérée. Exemple :
+_\<version-PHP>_ est sous la forme _Maj_**.**_Min_, _Maj_**.**_Min_**.**_Rel_, ou _Maj_**.**_Min_**.**_Rel_**-**_Bld_ (voir ci-dessous pour le numéro de build _Bld_), par défaut toutes les dernières versions _Maj_**.**_Min_ gérées pour _\<version-Debian>_. Actuellement, _Maj_ = 5 ou 7.
+
+_\<version-Debian>_ est sous la forme numérique _n_, par défaut toutes les versions gérées.
+
+Exemples :
 ````
-php/bake 5.2.17 8
+./bake 8 5.2.17
 ````
-builde et teste la version 5.2.17 sous Debian jessie
+builde et teste la version 5.2.17 sous Debian jessie.
+
+````
+./bake 7.2
+````
+builde et teste la dernière version disponible de PHP 7.2 sous toutes les versions de Debian gérées.
+````
+./bake
+````
+builde et teste toutes les dernières versions disponibles de PHP sous toutes les versions de Debian gérées.
 
 ````php/bake```` (sans arguments) affiche la liste des dernières versions disponibles de PHP et celle des versions gérées de Debian
 
