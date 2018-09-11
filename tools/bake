@@ -29,7 +29,7 @@ SupDeb()
 #
 #   Check usage
 #
-DebNum=`ls $DebTop | sort -n | tail -1`	# Default = latest
+DebNum=`ls $DebTop/*/name | sed "s;$DebTop/\([^/]*\)/name;\1;" | sort -n | tail -1`	# Default = latest
 if [ $# -gt 1 ]; then
     echo "Usage: $Prg [ <Debian-version> ]" >&2
     SupDeb

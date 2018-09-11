@@ -22,7 +22,7 @@ test -d $DebTop || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
 test -d $PhpTop || { echo "$Prg: missing 'php' directory." >&2;  exit 1; }
 test -d $TlsTop || { echo "$Prg: missing 'tools' directory." >&2;  exit 1; }
 
-DefDeb=`ls $DebTop | sort -n | tail -1`	# Default = latest
+DefDeb=`ls $DebTop/*/name | sed "s;$DebTop/\([^/]*\)/name;\1;" | sort -n | tail -1`	# Default = latest
 Base='epi-php'
 Arch='amd64'
 LF='
