@@ -58,6 +58,8 @@ file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs -r strip -v >
 find $Top -name '*.so' | xargs -r strip -v >>$Logs/striped_$Pkg.out
 find $Top -name '*.so' | xargs -r chmod -x
 
+test "$MM" && echo "extension_dir = /usr/lib/php/$MM" >>$Top/etc/php/php.ini
+test -d ext/opcache && echo "zend_extension = opcache.so" >>$Top/etc/php/php.ini
 if [ "$MM" ]; then
     mkdir $Top/etc/php/$MM
     mv $Top/etc/php/php.ini $Top/etc/php/$MM
@@ -73,6 +75,7 @@ if [ "$MM" ]; then
      mv phar.1.gz phar$MM.1.gz
      mv phar.phar.1.gz phar$MM.phar.1.gz
     )
+    (cd $Top/usr/lib/php; mv extensions $MM)
     sed -i -e "s/%MM%/$MM/g" -e "s/%PRI%/`echo $MM | tr -d .`/" $Top/DEBIAN/postinst
     sed -i "s/%MM%/$MM/g" $Top/DEBIAN/prerm
 else

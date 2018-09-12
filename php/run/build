@@ -128,7 +128,7 @@ PearDir='usr/share/php'
 ManDir='usr/share/man'
 DocDir='usr/share/doc'
 VarDir='var'
-su -c "EXTENSION_DIR=/usr/lib/php/$PhpAPI ./configure \
+su -c "EXTENSION_DIR=/usr/lib/php/extensions ./configure \
 	--prefix=/usr \
 	--sysconfdir=/$SysconfDir \
 	--with-config-file-path=/$SysconfDir \
@@ -228,10 +228,12 @@ do
 	Name="$Base-$Pkg"
 	PkgVer=`sed -n "s;^.*//$Phar/PEAR-\(.*\)\.tar.*$;\1;p" pear/$Phar`
 	PkgNum=`cat $dir/BUILD_NUM`
+	PkgDate="`date -Rr pear/$Phar`"
     else
 	Name="$Base-$MajMin-$Pkg"
 	PkgVer=$Ver
 	PkgNum=$BUILD_NUM
+	PkgDate="`date -Rr $Bld/dist/.date`"
 	test "$Pkg" = 'cli' && Cli="$Name"
     fi
     if [ -f $dir/skip ]; then
@@ -242,7 +244,7 @@ do
 
     # doc directory
     sed -i "s/%YEAR%/`date '+%Y'`/" $Top/usr/share/doc/pkgname/copyright
-    sed -i -e "s/%NAME%/$Name/g" -e "s/%VERSION%/$PkgVer/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/`date -Rr $Bld/dist/.date`/" $Top/usr/share/doc/pkgname/changelog.Debian
+    sed -i -e "s/%NAME%/$Name/g" -e "s/%VERSION%/$PkgVer/" -e "s/%DEBVER%/$DEBVER/" -e "s/%DATE%/$PkgDate/" $Top/usr/share/doc/pkgname/changelog.Debian
     gzip -n9 $Top/usr/share/doc/pkgname/changelog*
     mv $Top/usr/share/doc/pkgname $Top/usr/share/doc/$Name
 

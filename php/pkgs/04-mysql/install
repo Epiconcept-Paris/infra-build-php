@@ -10,5 +10,6 @@ if [ -d $Top/usr/lib ]; then
 else
     echo "\aERROR: no $Top/usr/lib directory. Package will be useless."
 fi
+test "$MM" && mv $Top/usr/lib/php/extensions $Top/usr/lib/php/$MM
 sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;" $Top/DEBIAN/postinst
 sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;" $Top/DEBIAN/postrm

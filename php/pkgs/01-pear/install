@@ -7,7 +7,10 @@ if grep metadata_dir pear/$Phar >/dev/null; then
 fi
 Pear=$Top/$PearDir
 mkdir -p $Pear
-INSTALL_ROOT=$Top PHP_PEAR_SYSCONF_DIR=etc/pear make install-pear >$Logs/make-install_$Pkg.out 2>&1
+# Let all _lastmodified in PEAR registry have a constant value
+Dif=`expr \`date '+%s'\` - \`date -r pear/$Phar '+%s'\``
+sed -i "/@\$(top_builddir)/s/@/@faketime -f -$Dif /" Makefile
+INSTALL_ROOT=$Top PHP_PEAR_SIG_BIN=/usr/bin/gpg PHP_PEAR_SYSCONF_DIR=etc/pear make install-pear >$Logs/make-install_$Pkg.out 2>&1
 
 if [ -d pear/man ]; then
     Man1=pear/man/man1
