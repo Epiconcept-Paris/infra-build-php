@@ -1,15 +1,15 @@
 FROM debian:$DEBVER
 MAINTAINER Epiconcept
 
+ENV DEBVER=$DEBVER
 ENV CLI_DEPS $CLI_DEPS
 ENV BUILD_NUM=$BUILD_NUM
-ENV DEBVER=$DEBVER
 ENV USER=$USER
 ENV LANG=C
 ENV TZ=Europe/Paris
+RUN $ADDUSER
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    $BUILD_TOP/build\\nto start the build\"" >>/root/.bashrc
-RUN $ADDUSER
 
 # Update/upgrade
 RUN apt-get update

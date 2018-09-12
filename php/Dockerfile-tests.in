@@ -1,8 +1,10 @@
 FROM debian:$DEBVER
 MAINTAINER Epiconcept
 
+ENV USER=$USER
 ENV LANG=C
 ENV TZ=Europe/Paris
+RUN $ADDUSER
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    $TESTS_TOP/tests\\nto start the tests\"" >>/root/.bashrc
 

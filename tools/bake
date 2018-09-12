@@ -51,6 +51,8 @@ fi
 DebVer="`cat $DebTop/$DebNum/name`"
 Tools=$DebTop/$DebNum/dist/tools
 Logs=$Tools/.logs
+User=`id -un`
+AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 
 #
 #   Build the image
@@ -87,7 +89,7 @@ fi
 test -d $Logs || mkdir -p $Logs
 echo "Building the '$TOOLS_IMG' image..."
 #   Variables come in order of their appearance in Dockerfile.in
-DEBVER="$DebVer" TOOLS_TOP="$TOOLS_TOP" TLSCOPY="$TLSCOPY" envsubst '$DEBVER $TOOLS_TOP $TLSCOPY' <${TlsTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG . >$Logs/docker.out 2>&1
+DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" TOOLS_TOP="$TOOLS_TOP" TLSCOPY="$TLSCOPY" envsubst '$DEBVER $USER $ADDUSER $TOOLS_TOP $TLSCOPY' <${TlsTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG . >$Logs/docker.out 2>&1
 
 #
 #   Run the container

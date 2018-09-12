@@ -6,6 +6,7 @@
 Prg=`basename $0`
 Bld=`dirname $0`
 test -d $Bld/files -a -d $Bld/pkgs -a -d $Bld/dist || { "$0: cannot find 'files', 'pkgs' and 'dist' directories"; exit 1; }
+
 Ext=.tar.bz2
 # Get version of latest PHP source
 Ver=`expr "\`ls $Bld/files/php-*$Ext 2>/dev/null\`" : ".*/php-\([0-9\.]*\)$Ext"`
@@ -16,6 +17,7 @@ else
     exit 1
 fi
 SupVer="5.2 5.6 7.0 7.1 7.2 7.3"		# UPDATE THIS on new PHP version
+Own="$USER:`id -gn $USER`"
 umask 022					# Needed for lintian
 
 Logs="$Bld/dist/.logs"				# Directory for log files
@@ -33,7 +35,7 @@ set -e	# Stop on errors
 
 echo "Extracting php-$Ver source..."
 test -d /usr/src/php && rm -rf /usr/src/php
-mkdir /usr/src/php-$Ver; chown $USER:`id -gn $USER` /usr/src/php-$Ver
+mkdir /usr/src/php-$Ver; chown $Own /usr/src/php-$Ver
 su -c "tar xf $Bld/files/php-$Ver$Ext -C /usr/src" $USER
 mv /usr/src/php-$Ver /usr/src/php
 
@@ -87,6 +89,7 @@ if [ -d $Bld/hooks ]; then
 	./configure --help >$ConfigHelp
     fi
 fi
+chown $Own $Logs/*-help.out
 if grep -- "--enable-apc-bc " $ConfigHelp >/dev/null; then
     HookOpts="$HookOpts--disable-apc-bc "
 fi
@@ -211,7 +214,7 @@ else
     sed -n '/^FAILED TEST /,'/^============/'p' $Logs/make-test.out
     test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs/php_test_results.txt
 fi
-test "$Dbg" && find . ! -user $USER >$Debug/not-$USER
+test "$Dbg" && { find . ! -user $USER >$Debug/not-$USER; chown $Own $Debug/not-$USER; }
 
 rm -f $Pkgs
 Base='epi-php'
@@ -271,7 +274,7 @@ do
 	echo "Checking   package '$Pkg': `basename $deb`..."
 	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
 	echo "`basename $deb`" >>$Pkgs
-	chown $USER:$USER $deb
+	chown $Own $deb
     else
 	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""
     fi
@@ -280,8 +283,11 @@ do
 	 find . -type f | sed 's/^..//' | sort >$Debug/files_$Pkg
 	 find . -type l | sed 's/^..//' | sort >$Debug/links_$Pkg)
 	test -s $Debug/links_$Pkg || rm $Debug/links_$Pkg
+	chown $Own $Debug/*_$Pkg
     fi
+    chown $Own $Logs/*_$Pkg.out
 done
+chown $Own $Pkgs
 test "$Dbg" && cp -p Makefile $Debug
 
 #make clean >$Logs/make-clean.out 2>&1

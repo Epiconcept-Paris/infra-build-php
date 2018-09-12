@@ -2,8 +2,10 @@ FROM debian:$DEBVER
 MAINTAINER Epiconcept
 
 ENV DEBVER=$DEBVER
+ENV USER=$USER
 ENV LANG=C
 ENV TZ=Europe/Paris
+RUN $ADDUSER
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use: $TOOLS_TOP/build\\nto build the packages\"" >>/root/.bashrc
 

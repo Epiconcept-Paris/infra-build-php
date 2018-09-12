@@ -1,8 +1,10 @@
 FROM debian:$DEBVER
 MAINTAINER Epiconcept
 
+ENV USER=$USER
 ENV LANG=C
 ENV TZ=Europe/Paris
+RUN $ADDUSER
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    $MULTI_TOP/start\\nto start Apache\"" >>/root/.bashrc
 

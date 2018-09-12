@@ -198,6 +198,8 @@ touch -r $Num $Dist/.date	# For package dates in changelog.Debian
 echo "Making PHP $PhpVer-$Bld packages for Debian $DebVer..."
 echo "Logs will be in debian/$DebNum/dist/$PhpVer-$Bld/.logs/"
 test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir $Dist/.logs
+User=`id -un`
+AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 
 #
 #   Make build image and start container
@@ -234,10 +236,8 @@ if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
 fi
 
 echo "Building the '$BUILD_IMG' image..."
-User=`id -un`
-AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 #   Variables come in order of their appearance in Dockerfile-build.in
-DEBVER="$DebVer" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" BUILD_TOP="$BUILD_TOP" ADDUSER="$AddUser" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $CLI_DEPS $BUILD_NUM $USER $BUILD_TOP $ADDUSER $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
+DEBVER="$DebVer" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" ADDUSER="$AddUser" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $CLI_DEPS $BUILD_NUM $USER $ADDUSER $BUILD_TOP $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >$Dist/.logs/docker-build.out 2>&1
 
 Cmd="docker run -ti -v `realpath $PWD/$Dist`:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
 if [ -f ${TopDir}.norun ]; then
@@ -278,7 +278,7 @@ fi
 
 echo "Building the '$TESTS_IMG' image..."
 #   Variables come in order of their appearance in Dockerfile-tests.in
-DEBVER="$DebVer" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
+DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
 
 Cmd="docker run -ti -v `realpath $PWD/$Dist`:$TESTS_TOP/dist --name $TESTS_NAME --rm $TESTS_IMG"
 if [ -f ${TopDir}.norun ]; then

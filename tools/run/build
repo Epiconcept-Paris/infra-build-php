@@ -6,6 +6,7 @@ Prg=`basename $0`
 Bld=`dirname $0`
 Logs="$Bld/dist/.logs"				# Directory for log files
 test -f $Bld/.debug -o "$1" = 'debug' && Dbg=y
+Own="$USER:`id -gn $USER`"
 
 set -e	# Stop on errors
 
@@ -44,6 +45,7 @@ do
     if [ -f "$deb" ]; then
 	echo "Checking   package '$Pkg': `basename $deb`..."
 	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
+	chown $Own $deb
     else
 	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""
     fi
@@ -52,5 +54,7 @@ do
 	 find . -type f | sed 's/^..//' | sort >$Logs/files_$Pkg
 	 find . -type l | sed 's/^..//' | sort >$Logs/links_$Pkg)
 	test -s $Logs/links_$Pkg || rm $Logs/links_$Pkg
+	chown $Own $Logs/*_$Pkg
     fi
+    chown $Own $Logs/*_$Pkg.out
 done

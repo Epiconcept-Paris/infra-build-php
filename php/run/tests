@@ -13,6 +13,8 @@ if [ ! -f $Pkgs ]; then
     echo "$Prg: cannot find $Pkgs file" >&2
     exit 1
 fi
+Own="$USER:`id -gn $USER`"
+umask 022
 
 if [ ! -x /sbin/runlevel ]; then	# Needed by invoke-rc.d
     echo "#!/bin/sh\necho \"${PREVLEVEL:-N} ${RUNLEVEL:-5}\"" >/sbin/runlevel
@@ -24,6 +26,7 @@ echo "Setting Apache 2 to prefork mode..."
 sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf
 a2dismod mpm_event >$Logs/a2mod.out 2>&1
 a2enmod mpm_prefork >>$Logs/a2mod.out 2>&1
+chown $Own $Logs/a2mod.out
 
 echo "Installing packages:"
 test -d $Tst/pkgs && dpkg -i $Tst/pkgs/*.deb >$Logs/dpkg-i.out 2>&1 || >$Logs/dpkg-i.out
@@ -38,9 +41,11 @@ do
 	echo "----------------------------------------" >>$Logs/dpkg-i.out
     fi
 done <$Pkgs
+chown $Own $Logs/dpkg-i.out
 
 echo "Testing PHP CLI..."
 php /var/www/html/info.php >$Logs/info_cli.out
 
 echo "Testing PHP apache module..."
 curl -sSL http://localhost/info.php >$Logs/info_mod.out
+chown $Own $Logs/info_*.out
