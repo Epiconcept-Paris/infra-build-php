@@ -11,13 +11,14 @@ Own="$USER:`id -gn $USER`"
 set -e	# Stop on errors
 
 Base='epi-tools'
+PkgDeb="+deb$DEBNUM"
 for dir in $Bld/pkgs/*
 do
     PkgDir=`basename $dir`
     Pkg=`expr "$PkgDir" : '[0-9]\{2\}-\(.*\)'`
     Top=$dir/top
     Name="$Base-$Pkg"
-    PkgVer=`sed -nr 's/Version: *([^-]+)-[0-9]{,2}/\1/p' $Top/DEBIAN/control`
+    PkgVer=`sed -nr 's/^Version: *([^-]+)-[0-9]{,2}%PKGDEB%$/\1/p' $Top/DEBIAN/control`
 
     echo "Compiling package '$Pkg'..."
     (cd $dir/src; make -k) >$Logs/make_$Pkg.out 2>&1
@@ -36,7 +37,7 @@ do
     fi
 
     # DEBIAN directory
-    sed -i "s/%NAME%/$Name/" $Top/DEBIAN/control
+    sed -i -e "s/%NAME%/$Name/" -e "s/%PKGDEB%/$PkgDeb/" $Top/DEBIAN/control
 
     echo "Assembling package '$Pkg'..."
     out=$(fakeroot dpkg-deb -Zgzip --build $Top $Bld/dist)

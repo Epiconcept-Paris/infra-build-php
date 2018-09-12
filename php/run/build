@@ -228,11 +228,13 @@ do
 	Name="$Base-$Pkg"
 	PkgVer=`sed -n "s;^.*//$Phar/PEAR-\(.*\)\.tar.*$;\1;p" pear/$Phar`
 	PkgNum=`cat $dir/BUILD_NUM`
+	PkgDeb=
 	PkgDate="`date -Rr pear/$Phar`"
     else
 	Name="$Base-$MajMin-$Pkg"
 	PkgVer=$Ver
 	PkgNum=$BUILD_NUM
+	PkgDeb="+deb$DEBNUM"
 	PkgDate="`date -Rr $Bld/dist/.date`"
 	test "$Pkg" = 'cli' && Cli="$Name"
     fi
@@ -258,7 +260,7 @@ do
     . $dir/install
 
     # DEBIAN directory
-    sed -i -e "s/%VERSION%/$PkgVer-$PkgNum/" -e "s/%NAME%/$Name/" -e "s/%DEPS%/$CLI_DEPS/" -e "s/%CLI%/$Cli/" -e "s/%PHPAPI%/$PhpAPI/" $Top/DEBIAN/control
+    sed -i -e "s/%VERSION%/$PkgVer-$PkgNum$PkgDeb/" -e "s/%NAME%/$Name/" -e "s/%DEPS%/$CLI_DEPS/" -e "s/%CLI%/$Cli/" -e "s/%PHPAPI%/$PhpAPI/" $Top/DEBIAN/control
 
     # Gather extra license files
     find $Top -type f -iname license | while read f

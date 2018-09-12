@@ -1,5 +1,5 @@
 Package: %NAME%
-Version: 1.0-1
+Version: 1.0-1%PKGDEB%
 Architecture: amd64
 Maintainer: Christophe de Traversay <devel@traversay.com>
 Depends: libc6
