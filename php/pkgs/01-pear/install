@@ -8,8 +8,7 @@ fi
 Pear=$Top/$PearDir
 mkdir -p $Pear
 # Let all _lastmodified in PEAR registry have a constant value
-Dif=`expr \`date '+%s'\` - \`date -r pear/$Phar '+%s'\``
-sed -i "/@\$(top_builddir)/s/@/@faketime -f -$Dif /" Makefile
+sed -i "/@\$(top_builddir)/s/@/@faketime -f '`date -r pear/$Phar '+%Y-%m-%d %H:%M:%S'`' /" Makefile
 INSTALL_ROOT=$Top PHP_PEAR_SIG_BIN=/usr/bin/gpg PHP_PEAR_SYSCONF_DIR=etc/pear make install-pear >$Logs/make-install_$Pkg.out 2>&1
 
 if [ -d pear/man ]; then
