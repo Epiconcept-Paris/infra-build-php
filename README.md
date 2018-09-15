@@ -55,7 +55,7 @@ supprime les distributions 7.2.8-* (de toutes les _\<version-Debian>_) et lance 
 
 La cible spéciale ````tools```` gère le build ou la suppression des packages du répertoire ````tools/```` en appelant le script ````tools/bake````
 
-La cible spéciale ````multi```` gère le build, la suppression ou la reconfiguration de l'image docker de tests multiples (voir ci-dessous). Elle demande en arguments les _\<version-PHP>_ à utiliser (sous leurs 3 formes admises, voir ci-dessus), dont le build sera lancé si nécessaire. 
+La cible spéciale ````multi```` gère le build, la suppression ou la reconfiguration de l'image docker de tests multiples (voir ci-dessous). Elle demande en arguments les _\<version-PHP>_ à utiliser (sous leurs 3 formes admises, voir ci-dessus), dont le build sera lancé si nécessaire.
 
 Enfin, ````bake```` admet également des arguments uniques spéciaux :
 ````
@@ -93,24 +93,25 @@ _\<version-Debian>_ est sous la forme numérique _n_, par défaut la plus récen
 _\<version-PHP>_ est sous une des trois formes _Maj_**.**_Min_, _Maj_**.**_Min_**.**_Rel_ ou  _Maj_**.**_Min_**.**_Rel_**-**_Bld_, où _Bld_ est le numéro du build de la version PHP, qui sera lancé s'il n'existe pas.\
 Exemple :
 ````
-./bake multi 5.6.37-2 7.1.20 7.2
+./bake multi 5.6.38-2 7.1.22 7.2
 ````
 Le script ````multi/bake````, appelé par ````./bake```` crée si nécessaire le répertoire ````debian/<version-Debian>/multi```` (partagé avec le container docker) avec 3 sous répertoires :
-* ````pkgs```` qui contient les packages Debian -cli et -fpm (et -mysql s'il existe) de chaque _\<distrib-PHP>_
-* ````www```` qui contient les ````DocumentRoot```` de test pour chaque version PHP, par défaut sous la forme ````php<version-majeure><version-mineure>````, dans notre exemple ````php56````, ````php71```` et ````php72````
-* ````logs```` qui contient les logs de build de l'image ````epi-multi-php:<version-Debian>```` (dans notre exemple ````epi-multi-php:stretch````) et de run du container ````epi_multi_php````
+* ````pkgs```` qui contient les packages Debian -cli et -fpm (et -mysql s'il existe) de chaque _\<version-PHP>_
+* ````www```` qui contient le ````DocumentRoot```` commun aux différentes _\<version-PHP>_ et qui est partagé avec le host comme un volume docker séparé. Coté host, le répertoire peut être un lien symbolique.
+* ````logs```` qui contient les logs de build de l'image ````epi-multi-php:<version-Debian>```` (dans notre exemple ````epi-multi-php:stretch````) et un script de run du container ````epi_multi_php````
 
-Puis le script ````multi/bake```` builde si nécessaire l'image docker et lance le container en mode background (sauf pour la mise au point). Depuis le script principal  ````/opt/multi/start```` du container, les packages de ````pkgs```` sont installés et un ````VirtualHost````est automatiquement configuré pour chacune des _\<distrib-PHP>_ de ces packages. Puis ````apache2```` est lancé sur le port 80, dans notre exemple pour 3 ````VirtualHost```` : ````php56.epiconcept.tld````,````php71.epiconcept.tld```` et ````php72.epiconcept.tld````, qu'il faudra déclarer dans le fichier ````hosts```` du client de test.
+Puis le script ````multi/bake```` builde si nécessaire l'image docker et lance le container en mode background (sauf pour la mise au point). Depuis le script principal  ````/opt/multi/start```` du container, les packages de ````pkgs```` sont installés et un ````VirtualHost````est automatiquement configuré pour chacune des _\<distrib-PHP>_ de ces packages. Puis ````apache2```` est lancé sur le port 80, dans notre exemple pour 3 ````VirtualHost```` : ````php56.epiconcept.tld````, ````php71.epiconcept.tld```` et ````php72.epiconcept.tld````, qu'il faudra déclarer dans le fichier ````hosts```` du client de test (ou dans un DNS).
 
-Il est possible de modifier le hostname fictif ````php%M%m.epiconcept.tld```` en définissant avant le ````docker run```` la variable d'environnement ````HOSTFMT````, dans laquelle les variables ````%M```` et ````%m```` seront automatiquement remplacées respectivement par les numéros de version majeure et mineure de chaque _\<distrib-PHP>_. Le script ````start```` utilisera automatiquement comme ````DocumentRoot```` des ````VirtualHost```` des sous-répertoires de ````www```` nommés comme la partie gauche finale du hostname, éventuellement modifiée par ````HOSTFMT````.
+Les ````VirtualHost```` sont créés à partir d'un fichier template ````siteconf.in```` (au même niveau que les 3 répertoire ````pkgs````, ````logs```` et ````www````). Dans ce fichier template, les macros ````%Maj%```` et ````%Min%```` seront automatiquement remplacées respectivement par les numéros de version majeure et mineure de chaque _\<distrib-PHP>_ placée dans ````pkgs````. Si le fichier template ````siteconf.in```` n'existe pas, une version par défaut sera créée, modifiable par la suite.
 
-Il faut noter que l'image docker (````epi-multi-php:stretch```` dans notre example) est indépendante des _\<distrib-PHP>_ testées et de son propre système de build : le script ````start```` du container déduit les _\<distrib-PHP>_ et par suite les ````VirtualHost````, du nom des packages ````.deb```` dans le répertoire ````pkgs````. Pour cette raison, l'image n'est pas recréée à chaque lancement de ````multi/bake````, il faut la supprimer explicitement, dans notre exemple par ````docker rmi epi-multi-php:stretch````.
+Il faut noter que l'image docker (````epi-multi-php:stretch```` dans notre example) est indépendante des _\<distrib-PHP>_ testées et de son propre système de build : le script ````start```` du container déduit les _\<distrib-PHP>_ et par suite les ````VirtualHost````, du nom des packages ````.deb```` dans le répertoire ````pkgs````. Pour cette raison, l'image n'est pas recréée à chaque lancement de ````multi/bake````, il faut la supprimer explicitement, dans notre exemple par ````./bake rm multi````.
 
-Pour utiliser l'image docker (````epi-multi-php:stretch```` toujours dans notre example) séparément de son système de build, il faut lui fournir un répertoire partagé de structure analogue à celle de ````debian/<version-Debian>/multi````, dans lequel les packages ````.deb```` de ````pkgs```` indiquent les _\<distrib-PHP>_ choisies et les sous-répertoires de ````www```` correspondent bien aux hostnames éventuellement modifiés par ````HOSTFMT````. Le sous-répertoire ````logs```` peut être vide mais doit être présent. Il suffit alors à un user ayand créé un répertoire ````$HOME/essai```` correctement peuplé de la façon décrite ci-dessus de lancer la commande (encore dans notre exemple) :
+Pour utiliser l'image docker (````epi-multi-php:stretch```` dans notre example) séparément de son système de build, il faut lui fournir un répertoire partagé (par exemple ````essai````) de structure approchant celle de ````debian/<version-Debian>/multi````, dans lequel les packages ````.deb```` d'un sous-répertoire ````pkgs```` indiquent les _\<distrib-PHP>_ choisies et où un sous-répertoire ````www```` existe, si l'on veut utiliser le script ````run```` fourni. Le sous-répertoire ````logs```` peut être absent et sera créé au besoin. Il suffit alors de lancer le script ````run```` placé avec les sous-répertoires :
 ````
-docker run -d -e HOSTFMT -p 80:80 -v ~/essai:/opt/multi/work --name epi_multi_php --rm epi-multi-php:stretch
+essai/multi
 ````
-\
+pour lancer le container. En modifiant le script run, on peut changer le point de montage du répertoire ````/opt/multi/www```` du container qui est utilisé par l'image comme ````DocumentRoot```` commun.
+
 Enfin, le script ````multi/bake````, comme le script ````php/bake````, reconnait dans le répertoire principal le fichier ````.norun```` pour permettre la mise au point.
 
 ## Notes

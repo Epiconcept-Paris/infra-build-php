@@ -10,9 +10,36 @@ Path() { realpath --relative-to=$IniPwd $1; }
 test "$Dir" || Dir=`dirname \`realpath $0\``
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
 test "$Dir" = '.' || cd "$Dir"
-test -d logs || { echo "$Prg: missing '`Path pkgs`' directory." >&2; exit 1; }
-test -d pkgs || { echo "$Prg: missing '`Path logs`' directory." >&2; exit 1; }
+test -d pkgs || { echo "$Prg: missing '`Path pkgs`' directory." >&2; exit 1; }
 test -d www  || { echo "$Prg: missing '`Path www`' directory."  >&2; exit 1; }
+test -d logs || mkdir logs
 
-docker ps | grep epi_multi_php >/dev/null && docker stop epi_multi_php
-exec docker run -d -e HOSTFMT -p 80:80 -v $PWD:/opt/multi/work --name epi_multi_php --rm epi-multi-php:stretch
+if docker ps | grep $MULTI_NAME >/dev/null; then
+    echo "Stopping the '$MULTI_NAME' container..."
+    docker stop $MULTI_NAME >/dev/null
+fi
+Cmd="docker run -d -p 80:80 -v $PWD:$MULTI_TOP/conf -v $PWD/www:$MULTI_TOP/www --name $MULTI_NAME --rm $MULTI_IMG"
+echo "Running the '$MULTI_NAME' container in background mode:\n    $Cmd"
+$Cmd >/dev/null
+Sec=0
+while [ $Sec -le 30 ]
+do
+    sleep 1
+    Sec=`expr $Sec + 1`
+    test -f logs/docker-run.out || continue
+    End="`grep -n '^Waiting for container stop' logs/docker-run.out`"
+    if [ "$End" ]; then
+	End=`expr "$End" : '\([0-9]*\):'`
+	sed -n "1,`expr $End - 1`p" logs/docker-run.out
+	break
+    fi
+    docker ps | grep $MULTI_NAME >/dev/null || { Abort=y; break; }
+done
+if [ $Sec -gt 30 ]; then
+    echo "Timed-out waiting for 'docker run ...' output" >&2
+elif [ "$Abort" ]; then
+    echo "The container stopped unexpectedly after $Sec seconds. Log contents:"
+    sed 's/^/    /' logs/docker-run.out
+else
+    echo "Use:\n    docker stop $MULTI_NAME\nto stop the container"
+fi

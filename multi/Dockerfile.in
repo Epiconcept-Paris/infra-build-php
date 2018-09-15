@@ -16,7 +16,7 @@ RUN apt-get upgrade -y
 # Tools and tests deps
 RUN apt-get install -y --no-install-recommends $MULTI_REQ
 
-RUN mkdir -p $MULTI_TOP/work
+RUN mkdir -p $MULTI_TOP/conf
 $MULCOPY
 
 CMD [ "$MULTI_TOP/start" ]

@@ -103,12 +103,6 @@ if [ "$ds" ]; then
 	    ln $DistDir/$d/$Base-$Maj.$Min-cli_$d${PkgDeb}_$Arch.deb $Pkgs
 	    ln $DistDir/$d/$Base-$Maj.$Min-fpm_$d${PkgDeb}_$Arch.deb $Pkgs
 	    test -s $DistDir/$d/$Base-$Maj.$Min-mysql_$d${PkgDeb}_$Arch.deb && ln $DistDir/$d/$Base-$Maj.$Min-mysql_$d${PkgDeb}_$Arch.deb $Pkgs
-	    test "$HOSTFMT" && h=`echo "$HOSTFMT" | awk -F. '{print $1}' | sed -e "s/%M/$Maj/" -e "s/%m/$Min/"` || h=php$Maj$Min
-	    w=$MultDir/www/$h
-	    test -d $w || mkdir -p $w
-	    test -f $w/index.php || echo "<?php header('Location: info.php'); ?>" >$w/index.php
-	    cp -p $PhpTop/run/info.php $w
-	    cp -p ${MulTop}run/run $MultDir
 	    nd=`expr $nd + 1`
 	else
 	    echo "$Prg: debian/$DebNum/dist/$d does not contain the necessary $Base cli and fpm packages" >&2
@@ -133,6 +127,10 @@ if [ $nd -eq 0 ]; then
     fi
     exit 1
 fi
+test -e $MultDir/www || mkdir -p $MultDir/www
+test -f $MultDir/www/index.php || echo "<?php header('Location: info.php'); ?>" >$MultDir/www/index.php
+test -f $MultDir/www/info.php || cp -p $PhpTop/run/info.php $MultDir/www
+
 User=`id -un`
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 
@@ -145,19 +143,22 @@ MULTI_IMG=$MULTI_BASE:$DebVer
 MULTI_NAME=epi_multi_php
 
 if docker ps | grep $MULTI_NAME >/dev/null; then
-    echo "Stopping the running '$MULTI_NAME' container..."
-    docker stop -t 5 $MULTI_NAME >/dev/null
-    while docker ps | grep $MULTI_NAME >/dev/null
-    do
-	sleep 1
-    done
+    if [ -f ${TopDir}.norun ]; then
+	Stop="docker stop $MULTI_NAME >/dev/null\n    "
+    else
+	echo "Stopping the running '$MULTI_NAME' container..."
+	docker stop -t 5 $MULTI_NAME >/dev/null
+	while docker ps | grep $MULTI_NAME >/dev/null
+	do
+	    sleep 1
+	done
+    fi
 fi
+#   Safety check, as we always call docker run with --rm
 if docker ps -a | grep $MULTI_NAME >/dev/null; then
-    echo "Deleting the existing '$MULTI_NAME' container..."
-    docker rm $MULTI_NAME >/dev/null
+    test -f ${TopDir}.norun || { echo "Deleting the existing '$MULTI_NAME' container..."; docker rm $MULTI_NAME >/dev/null; }
 fi
 
-test -d $Logs || mkdir -p $Logs
 if docker images | grep "$MULTI_BASE *$DebVer" >/dev/null; then
     echo "Re-using the existing '$MULTI_IMG' image. Use:\n    docker rmi $MULTI_IMG\nto force a rebuild."
 else
@@ -179,30 +180,17 @@ else
     MULCOPY="COPY ${MulTop}run/start $MULTI_TOP/start
 COPY ${MulTop}run/$Pkg /tmp
 RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
+    mkdir -p $Logs
     #   Variables come in order of their appearance in Dockerfile-multi.in
     DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
     rm -f ${MulTop}run/$Pkg
 fi
-#
-#   Run container
-#
-test "$HOSTFMT" && RunEnv=' -e HOSTFMT'
-RunCmd()
-{
-    echo "docker run $1$RunEnv -p 80:80 -v `realpath $PWD/$MultDir`:$MULTI_TOP/work --name $MULTI_NAME --rm $MULTI_IMG"
-}
+MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" envsubst '$MULTI_NAME $MULTI_TOP $MULTI_IMG' <${MulTop}run/run >$MultDir/run
+chmod +x $MultDir/run
+
 if [ -f ${TopDir}.norun ]; then
-    echo "Use:\n    `RunCmd -ti` bash\nto run the container"
-else
-    echo "Running the '$MULTI_NAME' container in background mode:\n    `RunCmd -d`"
-    `RunCmd -d` >/dev/null
-    while :
-    do
-	sleep 1
-	grep '^Waiting for container stop' $Logs/docker-run.out >/dev/null && break
-    done
-    nd=`expr '(' $nd '*' 3 ')' + 1`
-    sed -n "1,${nd}p" $Logs/docker-run.out
-    echo "Use:\n    docker stop $MULTI_NAME\nto stop the container, and use:"
-    echo "    `RunCmd -ti` bash\nto run the container in the foreground"
+    Top="`realpath $MultDir`"
+    echo "Use:\n    $Stop`sed -nr 's/^Cmd="([^"]+)"$/\1/p' $MultDir/run | sed "s;\\$PWD;$Top;g"` bash\nto run the container"
+    exit 0
 fi
+exec $MultDir/run
