@@ -5,22 +5,30 @@
 Prg=`basename $0`
 Dir=`dirname $0`
 IniPwd=$PWD
+DocRoot=`realpath "$1" 2>/dev/null`
 
 Path() { realpath --relative-to=$IniPwd $1; }
 test "$Dir" || Dir=`dirname \`realpath $0\``
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
 test "$Dir" = '.' || cd "$Dir"
+Prg=`Path "$Prg"`
 test -d pkgs || { echo "$Prg: missing '`Path pkgs`' directory." >&2; exit 1; }
-test -d www  || { echo "$Prg: missing '`Path www`' directory."  >&2; exit 1; }
+if [ "$1" ]; then
+    test -d "$DocRoot" || { echo "$Prg: '$1' is not a directory" >&2; exit 1; }
+else
+    test -d www && DocRoot="$PWD/www" || { echo "$Prg: missing '`Path www`' directory." >&2; exit 1; }
+fi
 test -d logs || mkdir logs
 
 if docker ps | grep $MULTI_NAME >/dev/null; then
     echo "Stopping the '$MULTI_NAME' container..."
     docker stop $MULTI_NAME >/dev/null
 fi
-Cmd="docker run -d -p 80:80 -v $PWD:$MULTI_TOP/conf -v $PWD/www:$MULTI_TOP/www --name $MULTI_NAME --rm $MULTI_IMG"
+Opt='-d'	# NOTE: multi/bake expects next line to start with Cmd="
+Cmd="docker run $Opt -p 80:80 -v $PWD:$MULTI_TOP/conf -v $DocRoot:$MULTI_TOP/www --name $MULTI_NAME --rm $MULTI_IMG"
 echo "Running the '$MULTI_NAME' container in background mode:\n    $Cmd"
 $Cmd >/dev/null
+
 Sec=0
 while [ $Sec -le 30 ]
 do

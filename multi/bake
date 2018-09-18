@@ -189,8 +189,8 @@ MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" envsubst 
 chmod +x $MultDir/run
 
 if [ -f ${TopDir}.norun ]; then
-    Top="`realpath $MultDir`"
-    echo "Use:\n    $Stop`sed -nr 's/^Cmd="([^"]+)"$/\1/p' $MultDir/run | sed "s;\\$PWD;$Top;g"` bash\nto run the container"
+    Opt='-ti' Top=`realpath $MultDir` DocRoot="$Top/www" eval "`sed -nr "/^Cmd=\\"/s;PWD;Top;p" $MultDir/run`"
+    echo "Use:\n    $Stop$Cmd bash\nto run the container"
     exit 0
 fi
 exec $MultDir/run
