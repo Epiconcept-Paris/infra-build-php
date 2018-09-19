@@ -47,7 +47,7 @@ done
 #
 #   Check Debian version
 #
-re="`cat ${MulTop}mkre`"
+re=`cat ${MulTop}mkre`
 for v in $vs
 do
     if echo $v | egrep "^($re)$" >/dev/null && [ -f $DebTop/$v/name ]; then
@@ -61,7 +61,7 @@ do
     fi
 done
 test "$DebNum" || DebNum=$DefDeb
-DebVer="`cat $DebTop/$DebNum/name`"
+DebVer=`cat $DebTop/$DebNum/name`
 DebDir=$DebTop/$DebNum
 PkgDeb="+deb$DebNum"
 
@@ -189,7 +189,7 @@ MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" envsubst 
 chmod +x $MultDir/run
 
 if [ -f ${TopDir}.norun ]; then
-    Opt='-ti' Top=`realpath $MultDir` DocRoot="$Top/www" eval "`sed -nr "/^Cmd=\\"/s;PWD;Top;p" $MultDir/run`"
+    Opt='-ti' Top=`realpath $MultDir` DocRoot="$Top/www" eval `sed -nr "/^Cmd=\\"/s;PWD;Top;p" $MultDir/run`
     echo "Use:\n    $Stop$Cmd bash\nto run the container"
     exit 0
 fi

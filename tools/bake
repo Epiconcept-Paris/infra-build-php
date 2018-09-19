@@ -48,7 +48,7 @@ if [ "$1" ]; then
 	exit 1
     fi
 fi
-DebVer="`cat $DebTop/$DebNum/name`"
+DebVer=`cat $DebTop/$DebNum/name`
 Tools=$DebTop/$DebNum/dist/tools
 Logs=$Tools/.logs
 User=`id -un`

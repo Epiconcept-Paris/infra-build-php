@@ -229,13 +229,13 @@ do
 	PkgVer=`sed -n "s;^.*//$Phar/PEAR-\(.*\)\.tar.*$;\1;p" pear/$Phar`
 	PkgNum=`cat $dir/BUILD_NUM`
 	PkgDeb=
-	PkgDate="`date -Rr pear/$Phar`"
+	PkgDate=`date -Rr pear/$Phar`
     else
 	Name="$Base-$MajMin-$Pkg"
 	PkgVer=$Ver
 	PkgNum=$BUILD_NUM
 	PkgDeb="+deb$DEBNUM"
-	PkgDate="`date -Rr $Bld/dist/.date`"
+	PkgDate=`date -Rr $Bld/dist/.date`
 	test "$Pkg" = 'cli' && Cli="$Name"
     fi
     if [ -f $dir/skip ]; then
@@ -277,7 +277,7 @@ do
     if [ -f "$deb" ]; then
 	echo "Checking   package '$Pkg': `basename $deb`..."
 	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
-	echo "`basename $deb`" >>$Pkgs
+	basename $deb >>$Pkgs
 	chown $Own $deb
     else
 	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""

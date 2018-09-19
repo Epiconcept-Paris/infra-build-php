@@ -66,15 +66,15 @@ Vers()
 {
     # global PHPSITE Prg DebSup PhpTop Versions Latest
 
-    Versions="`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`"
+    Versions=`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`
     test "$Versions" || echo -e "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
     Versions="$Versions$LF`ls -d $PhpTop/[5-9]/[5-9].* | sed "s;^$PhpTop/./;;"`"
-    Versions="`echo "$Versions" | sort -nru -t. -k 1,1 -k 2,2 -k 3,3`"
+    Versions=`echo "$Versions" | sort -nru -t. -k 1,1 -k 2,2 -k 3,3`
     if [ -z "$Versions" ]; then
 	echo "$Prg: empty list of known PHP versions ??" >&2
 	exit 1
     fi
-    Latest="`echo "$Versions" | egrep "^($DebSup)\.[0-9]{,2}$" | awk -F. '{
+    Latest=`echo "$Versions" | egrep "^($DebSup)\.[0-9]{,2}$" | awk -F. '{
 	Mm = $1 "." $2
 	if (Mm in v) {
 	    if (v[Mm] < $3)
@@ -86,7 +86,7 @@ Vers()
     END {
 	for (Mm in v)
 	    printf("%s.%s\n", Mm, v[Mm]);
-    }'`"
+    }'`
 }
 
 #
@@ -113,8 +113,8 @@ if [ "$1" = 'ver' ]; then
     exit 0
 elif [ "$1" = 'ls' ]; then
     Red='!'
-    tty <&1 >/dev/null && { Red="`tput setaf 1`"; Grn="`tput setaf 2`"; Std="`tput setaf 7`"; }
-    dirs="`eval ls -d $DebTop/$DebDir/{dist/{[5-9].*,tools},multi} 2>/dev/null`"
+    tty <&1 >/dev/null && { Red=`tput setaf 1`; Grn=`tput setaf 2`; Std=`tput setaf 7`; }
+    dirs=`eval ls -d $DebTop/$DebDir/{dist/{[5-9].*,tools},multi} 2>/dev/null`
     test "$dirs" && echo "Current distributions:"
     for dir in $dirs
     do
@@ -188,15 +188,15 @@ test "$isMk" -o "$isRm" || { echo "$Prg: no mode [mk|rm] specified" >&2; Usage; 
 #
 #   Remove -----------------------------------------------------
 #
-DockImgs="`docker images`"
+DockImgs=`docker images`
 if [ "$isRm" ]; then
     #
     #	Default remove
     #
     if [ -z "$toRm" ]; then
-	toRm="`eval ls -d $DebTop/$DebDir/dist/[5-9].* $DebTop/$DebDir/dist/tools $DebTop/$DebDir/multi 2>/dev/null | sed -nr -e "s;^$DebTop/([0-9]+)/dist/([5-9]\\.[0-9]\\.[0-9]{,2})-[0-9]{,2}$;\\1:\\2;p" -e "s;$DebTop/([0-9]+)/dist/tools$;\\1:tools;p" -e "s;$DebTop/([0-9]+)/multi$;\\1:~multi;p"`"
+	toRm=`eval ls -d $DebTop/$DebDir/dist/[5-9].* $DebTop/$DebDir/dist/tools $DebTop/$DebDir/multi 2>/dev/null | sed -nr -e "s;^$DebTop/([0-9]+)/dist/([5-9]\\.[0-9]\\.[0-9]{,2})-[0-9]{,2}$;\\1:\\2;p" -e "s;$DebTop/([0-9]+)/dist/tools$;\\1:tools;p" -e "s;$DebTop/([0-9]+)/multi$;\\1:~multi;p"`
 	toRm="$toRm$LF`echo "$DockImgs" | awk '/^epi-(build|tests)-php /{print $2}/^epi-tools /{print $2 "-tools"}/^epi-multi-php /{print $2 "-~multi"}' | eval sed $SedArg`"
-	toRm="`echo "$toRm" | LANG=C sort -ut: | tr -d '~'`"	# Remove '~' sort helper
+	toRm=`echo "$toRm" | LANG=C sort -ut: | tr -d '~'`	# Remove '~' sort helper
     fi
     #echo toRm: $toRm
     #
@@ -215,15 +215,15 @@ if [ "$isRm" ]; then
 	key=`expr "$tgt" : '[0-9]*:\(.*\)'`
 	# multi
 	if [ "$key" = 'multi' ]; then
-	    dir="`ls -d $DebTop/$deb/$key 2>/dev/null`"
-	    img="`echo "$DockImgs" | sed -nr "s/^(epi-multi-php)  *($name) .*$/\1:\2/p"`"
+	    dir=`ls -d $DebTop/$deb/$key 2>/dev/null`
+	    img=`echo "$DockImgs" | sed -nr "s/^(epi-multi-php)  *($name) .*$/\1:\2/p"`
 	    #echo "dir=$dir img=\"$img\""
 	    test "$img" && what="#_for_'multi'_on_$name" || what=
 	    test "$dir" -o "$img" && Objs="$Objs$dir+$img$what$LF"
 	# tools
 	elif [ "$key" = 'tools' ]; then
-	    dir="`ls -d $DebTop/$deb/dist/$key 2>/dev/null`"
-	    img="`echo "$DockImgs" | sed -nr "s/^(epi-tools)  *($name) .*$/\1:\2/p"`"
+	    dir=`ls -d $DebTop/$deb/dist/$key 2>/dev/null`
+	    img=`echo "$DockImgs" | sed -nr "s/^(epi-tools)  *($name) .*$/\1:\2/p"`
 	    #echo "dir=$dir img=\"$img\""
 	    test "$img" && what="#_for_'tools'_on_$name" || what=
 	    test "$dir" -o "$img" && Objs="$Objs$dir+$img$what$LF"
@@ -232,29 +232,29 @@ if [ "$isRm" ]; then
 	    ver=`expr "$key" : "$ReDistrib"`
 	    # distrib
 	    if [ "$ver" ]; then
-		dir="`ls -d $DebTop/$deb/dist/$key 2>/dev/null`"
-		imgs="`echo "$DockImgs" | sed -nr "s/^(epi-(build|tests)-php)  *($name-$ver) .*$/\1:\3/p" | sort`"
+		dir=`ls -d $DebTop/$deb/dist/$key 2>/dev/null`
+		imgs=`echo "$DockImgs" | sed -nr "s/^(epi-(build|tests)-php)  *($name-$ver) .*$/\1:\3/p" | sort`
 		expr "$imgs" : ".*$LF" >/dev/null && many=s || many=
 		echo "$imgs" | grep "epi-build-php" >/dev/null && bld=`docker run -ti --rm "epi-build-php:$name-$ver" sh -c "echo \\$BUILD_NUM" | tr -d ''`
 		#echo "key=$key ver=$ver bld=\"$bld\" dir=\"$dir\" imgs=\"$imgs\""
-		test "$key" = "$ver-$bld" && imgs="`echo -n "$imgs" | tr "$LF" ","`" || imgs=
+		test "$key" = "$ver-$bld" && imgs=`echo -n "$imgs" | tr "$LF" ","` || imgs=
 		test "$imgs" && what="#${many}_for_PHP_${ver}_on_$name" || what=
 		test "$dir" -o "$imgs" && Objs="$Objs$dir+$imgs$what$LF"
 	    # Maj.min or version
 	    else
-		vers="`(cd $DebTop/$deb/dist; ls -d $key* 2>/dev/null | sed -r "s/^([\.0-9]+)-[0-9]+$/\1/"; echo "$DockImgs" | sed -nr "s/^(epi-(build|tests)-php)  *$name-($key[\.0-9]*) .*$/\3/p") | sort -u`"
+		vers=`(cd $DebTop/$deb/dist; ls -d $key* 2>/dev/null | sed -r "s/^([\.0-9]+)-[0-9]+$/\1/"; echo "$DockImgs" | sed -nr "s/^(epi-(build|tests)-php)  *$name-($key[\.0-9]*) .*$/\3/p") | sort -u`
 		#echo "vers=\"$vers\""
 		for ver in $vers
 		do
-		    dirs="`ls -d $DebTop/$deb/dist/$ver-* 2>/dev/null`"
-		    imgs="`echo "$DockImgs" | sed -nr "s/^(epi-(build|tests)-php)  *($name-$ver) .*$/\1:\3/p" | sort`"
+		    dirs=`ls -d $DebTop/$deb/dist/$ver-* 2>/dev/null`
+		    imgs=`echo "$DockImgs" | sed -nr "s/^(epi-(build|tests)-php)  *($name-$ver) .*$/\1:\3/p" | sort`
 		    expr "$imgs" : ".*$LF" >/dev/null && many=s || many=
 		    echo "$imgs" | grep "epi-build-php" >/dev/null && bld=`docker run -ti --rm "epi-build-php:$name-$ver" sh -c "echo \\$BUILD_NUM" | tr -d ''`
 		    for dir in $dirs
 		    do
 			dist=`basename "$dir"`
 			#echo "dist=$dist ver=$ver bld=$bld"
-			test "$dist" = "$ver-$bld" && img="`echo -n "$imgs" | tr "$LF" ","`" || img=
+			test "$dist" = "$ver-$bld" && img=`echo -n "$imgs" | tr "$LF" ","` || img=
 			test "$img" && what="#${many}_for_PHP_${ver}_on_$name" || what=
 			test "$dir" -o "$img" && Objs="$Objs$dir+$img$what$LF"
 		    done
@@ -264,7 +264,7 @@ if [ "$isRm" ]; then
 	    fi
 	fi
     done
-    dockRm="`echo "$DockImgs" | awk '/^<none> +<none> +/{print $3}' | tr "$LF" ' '`"
+    dockRm=`echo "$DockImgs" | awk '/^<none> +<none> +/{print $3}' | tr "$LF" ' '`
     #echo "Objs=\"$Objs\""
     #
     #   If any objs, ask for confirm and proceed
@@ -281,11 +281,11 @@ if [ "$isRm" ]; then
 	    #
 	    for obj in $Objs
 	    do
-		dir="`expr "$obj" : '\([^+]*\)'`"
-		img="`expr "$obj" : '[^+]*+\(.*\)' | tr ',' ' '`"
+		dir=`expr "$obj" : '\([^+]*\)'`
+		img=`expr "$obj" : '[^+]*+\(.*\)' | tr ',' ' '`
 		if [ "$img" ]; then
-		    what="`expr "$img" : '[^#]*#\(.*\)' | tr '_' ' '`"
-		    img="`expr "$img" : '\([^#]*\)'`"
+		    what=`expr "$img" : '[^#]*#\(.*\)' | tr '_' ' '`
+		    img=`expr "$img" : '\([^#]*\)'`
 		fi
 		test "`basename "$dir"`" = 'multi' && docker ps | grep epi_multi_php >/dev/null && $Do eval "echo \"Stopping the 'epi_multi_php' container...\"; docker stop epi_multi_php >/dev/null"
 		echo -n "Removing "
@@ -324,7 +324,7 @@ if [ "$isMk" ]; then
     if [ -z "$toMk" ]; then
 	for deb in $DebVer
 	do
-	    re="`cat $DebTop/$deb/mkre`"
+	    re=`cat $DebTop/$deb/mkre`
 	    for ver in `echo "$Latest" | egrep "^($re)\."`
 	    do
 		toMk="$toMk$deb:$ver "
@@ -356,17 +356,17 @@ if [ "$isMk" ]; then
 		ver=$key
 	    else
 		expr "$key" : "$ReMajMin" >/dev/null || { echo "$Prg: cannot parse '$key'" >&2; continue; }
-		eval "`echo "$key" | sed -nr 's/^([5-9])\.([0-9])$/maj=\1 min=\2/p'`"
+		eval `echo "$key" | sed -nr 's/^([5-9])\.([0-9])$/maj=\1 min=\2/p'`
 		ver=`echo "$Latest" | grep "^$key\."` || { Inex $maj $min 'n'; continue; }
 	    fi
-	    eval "`echo "$ver" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})$/maj=\1 min=\2 rel=\3/p'`"
+	    eval `echo "$ver" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})$/maj=\1 min=\2 rel=\3/p'`
 	    echo "$Versions" | grep "^$ver$" >/dev/null || { Inex $maj $min $rel; continue; }
 	    echo $ver | egrep "^(`cat $DebTop/$deb/mkre`)\." >/dev/null || { echo "$Prg: build of PHP $ver is not supported on $name" >&2; continue; }
 	    # Find proper build
 	    phpdir=php/$maj/$ver
 	    bldf=$phpdir/BUILD_NUM
 	    test -f $bldf && bld=`cat $bldf` || bld=
-	    cmt="`git log -n1 --format=%H -- $bldf 2>/dev/null`"
+	    cmt=`git log -n1 --format=%H -- $bldf 2>/dev/null`
 	    test "$cmt" && git=`git show $cmt:$bldf` || git=
 	    #echo "deb=$deb ver=$ver wbld=$wbld bld=$bld git=$git"
 	    test "$bld" || bld="$git"
@@ -395,8 +395,6 @@ if [ "$isMk" ]; then
 	    name=`cat $DebTop/$deb/name`
 	    # multi
 	    if [ "$key" = 'multi' ]; then
-		# img="`docker images | sed -nr "s/^(epi-multi-php)  *($name) .*$/\1:\2/p"`"
-		# test "$img" && { echo "multi is already built for $name"; continue; }
 		eval "mul=\$MUL$deb"
 		#echo "deb=$deb mul=\"$mul\""
 		if [ "$mul" ]; then

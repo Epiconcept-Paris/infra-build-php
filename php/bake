@@ -33,10 +33,10 @@ test -d $DebTop || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
 #
 # Get existing PHP 5.x and 7.x versions
 #
-Versions="`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`"
+Versions=`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`
 test "$Versions" || echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
 Versions="$Versions$LF`ls -d $PhpTop[5-9]/[5-9].* | sed "s;^$PhpTop./;;"`"
-Versions="`echo "$Versions" | sort -nru -t. -k 1,1 -k 2,2 -k 3,3`"
+Versions=`echo "$Versions" | sort -nru -t. -k 1,1 -k 2,2 -k 3,3`
 if [ -z "$Versions" ]; then
     echo "$Prg: empty list of known PHP versions ??" >&2
     exit 1
@@ -44,7 +44,7 @@ fi
 #
 # From $Versions isolate latest rel for each Maj.min
 #
-Latest="`echo "$Versions" | awk -F. '{
+Latest=`echo "$Versions" | awk -F. '{
     Mm = $1 "." $2
     if (Mm in v) {
 	if (v[Mm] < $3)
@@ -56,7 +56,7 @@ Latest="`echo "$Versions" | awk -F. '{
 END {
     for (Mm in v)
 	printf("%s.%s\n", Mm, v[Mm]);
-}'`"
+}'`
 
 #
 #   Check usage
@@ -70,7 +70,7 @@ fi
 #
 #   Check PHP version
 #
-split="`echo "$1" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})$/Maj=\1 Min=\2 Rel=\3/p'`"
+split=`echo "$1" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})$/Maj=\1 Min=\2 Rel=\3/p'`
 if [ -z "$split" ]; then
     echo "$Prg: invalid PHP version \"$1\" ([5-9].[0-9].[0-9]{,2})" >&2
     exit 1
@@ -99,7 +99,7 @@ if [ "$2" ]; then
 	exit 1
     fi
 fi
-DebVer="`cat $DebTop/$DebNum/name`"
+DebVer=`cat $DebTop/$DebNum/name`
 DebDir=$DebTop/$DebNum
 #echo "DebVer=$DebVer PhpVer=$PhpVer Maj=$Maj Min=$Min Rel=$Rel"
 
@@ -179,7 +179,7 @@ fi
 #   Determine build number and build date
 #
 Num=$PhpDir/BUILD_NUM
-Cmt="`git log -n1 --format=%H -- $PhpGit$Num 2>/dev/null`"
+Cmt=`git log -n1 --format=%H -- $PhpGit$Num 2>/dev/null`
 if [ "$Cmt" ]; then
     Log=`git show $Cmt:$Num`
     if [ -f $Num ]; then	# If $Num exists and is $Log, set it's mtime to $Cmt's

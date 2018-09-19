@@ -14,7 +14,7 @@ cleanup()
 trap cleanup 0 1 2 15
 
 find php -type f | sort >$temp
-cache="`git ls-files php | sort | diff - $temp | sed -n 's/^> //p'`"
+cache=`git ls-files php | sort | diff - $temp | sed -n 's/^> //p'`
 test "$cache" || { echo "$Prg: no cached files in 'php/'"; exit 0; }
 case "$1" in
     ls) test "$2" && echo "$cache" | grep "$2" || echo "$cache"
@@ -68,7 +68,7 @@ case "$1" in
 	fi
 	;;
     rm) if [ "$2" ]; then
-	    cache="`echo "$cache" | grep "$2"`"
+	    cache=`echo "$cache" | grep "$2"`
 	else
 	    echo "The following files will be removed:"
 	    echo "$cache"

@@ -35,7 +35,7 @@ do
     sleep 1
     Sec=`expr $Sec + 1`
     test -f logs/docker-run.out || continue
-    End="`grep -n '^Waiting for container stop' logs/docker-run.out`"
+    End=`grep -n '^Waiting for container stop' logs/docker-run.out`
     if [ "$End" ]; then
 	End=`expr "$End" : '\([0-9]*\):'`
 	sed -n "1,`expr $End - 1`p" logs/docker-run.out
