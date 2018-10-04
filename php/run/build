@@ -183,7 +183,6 @@ su -c "EXTENSION_DIR=/usr/lib/php/extensions ./configure \
 	--enable-xmlreader \
 	--enable-xmlwriter \
 	--enable-zip \
-	--disable-debug \
 >$Logs/config.out 2>&1" $USER
 grep 'WARNING:' $Logs/config.out | egrep -v 'bison version|need re2c' || true	# true for set -e
 test "$Dbg" && cp -p Makefile $Debug/Makefile0
