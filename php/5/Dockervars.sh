@@ -1,69 +1,35 @@
 #
 #	php/5/Dockervars.sh - Define extra Dockerfile vars depending on PHP version
 #
-Php=${PhpTop}5
-
-#
-#   Add hooks for PECL PHP extensions
-#
-#   AddPECL <URL-file> <Src-base> <Hook-name> <Hook-file> [<Version>]
-#
-AddPECL()
-{
-    # global PECLGET Php Dir Prg BLDCOPY BUILD_TOP
-    local Tgz File Old
-
-    if [ "$5" ]; then
-	Tgz=$2-$5.tgz
-	File=$Tgz
-    else
-	Tgz=`curl -sISL "http://$PECLGET/$1" | sed -n 's/^Content-Disposition:.*filename=\(.*\)$/\1/p'`
-	if [ -z "$Tgz" ]; then
-	    Old=`ls $Php/files/$2-*.tgz 2>/dev/null`
-	    test "$Old" && Tgz=`basename $Old`
-	    if [ -z "$Tgz" ]; then
-		echo "Failed to download $1 extension from $PECLGET/$1" >&2
-		echo "Put it manually as $Php/files/$2-<version>.tgz and run $Dir/$Prg again" >&2
-		exit 1
-	    fi
-	fi
-	File=$1
-    fi
-    if [ ! -f $Php/files/$Tgz ]; then
-	rm -vf $Php/files/$2-*.tgz | sed 's/^r/R/'	# sed for cosmetics
-	echo "Fetching $3 `expr $Tgz : "$2-\(.*\).tgz"` extension..."
-	curl -sSL "http://$PECLGET/$File" -o $Php/files/$Tgz
-    fi
-    BLDCOPY="$BLDCOPY
-COPY $Php/files/$Tgz $BUILD_TOP/files
-COPY $Php/hooks/$4.sh $BUILD_TOP/hooks"
-}
+Php=$PhpTop$Maj
 
 #
 #   Add other files
 #
 AddExtra()
 {
-    # global Php Min BLDCOPY BUILD_TOP TSTCOPY TESTS_TOP BUILD_REQ TESTS_REQ CLI_DEPS
-    local file lib off cmn
+    # global Php Maj Min BLDCOPY BUILD_TOP TSTCOPY TESTS_TOP BUILD_REQ TESTS_REQ CLI_DEPS
+    local dir file lib off cmn
 
     #   Handle specific patch/package files
-    if [ -d $Php/files/5.$Min ]; then
-	for file in $Php/files/5.$Min/*
+    dir=$Php/files/$Maj.$Min
+    if [ -d $dir ]; then
+	for file in $dir/*
 	do
 	    # Packages (*.deb) are from http://archive.debian.org/debian/pool/main/m/mysql-dfsg-5.0
 	    case $file in
-		*.patch)	;;
-		*-dev_*.deb)	;;
-		*-common*.deb)	cmn=$file;;
-		*)		off=$file; lib=`basename "$file" | awk -F_ '{print $1}'`;;
+		*mysql*off_*.deb)	off=$file; lib=`basename "$file" | awk -F_ '{print $1}'`;;
+		*mysql-common_*.deb)	cmn=$file;;
+		*)			;;	# Other .deb or .patch
 	    esac
 	    BLDCOPY="$BLDCOPY
 COPY $file $BUILD_TOP/files"
 	done
+
 	BLDCOPY="$BLDCOPY
 COPY $Php/hooks/files.sh $BUILD_TOP/hooks"
 	if [ "$cmn" -a "$off" ]; then
+	    echo "Using MySQL `expr "$off" : '[^_]*_\([^-]*\)-'` packages found in $PhpGit$dir"
 	    TSTCOPY="RUN mkdir $BUILD_TOP/pkgs
 COPY $cmn $TESTS_TOP/pkgs
 COPY $off $TESTS_TOP/pkgs"
@@ -87,6 +53,8 @@ COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
 #   Main
 #   global Php BLDCOPY BUILD_TOP Tbz PhpLst BUILD_REQ TESTS_REQ CLI_DEPS
 #
+. ${PhpTop}lib/AddPECL.sh
+
 BLDCOPY="RUN mkdir $BUILD_TOP/hooks"
 
 echo "Checking $Tbz for OpCache..."

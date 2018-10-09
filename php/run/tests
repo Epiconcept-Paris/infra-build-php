@@ -36,9 +36,9 @@ do
     if dpkg -l `echo $pkg | awk -F_ '{print $1}'` >/dev/null 2>&1; then
 	echo "  . $pkg is already installed."
     else
+	echo "----------------------------------------" >>$Logs/dpkg-i.out
 	echo "  - $pkg"
 	dpkg -i $Tst/dist/$pkg >>$Logs/dpkg-i.out 2>&1
-	echo "----------------------------------------" >>$Logs/dpkg-i.out
     fi
 done <$Pkgs
 chown $Own $Logs/dpkg-i.out

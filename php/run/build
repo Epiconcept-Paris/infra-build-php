@@ -107,6 +107,8 @@ chkln /usr/lib libjpeg.so x86_64-linux-gnu
 chkln /usr/lib libpng.a   x86_64-linux-gnu
 chkln /usr/lib libpng.so  x86_64-linux-gnu
 chkln /usr/lib libXpm.a   x86_64-linux-gnu
+chkln /usr/lib libmysqlclient.so x86_64-linux-gnu
+chkln /usr/lib libmysqlclient_r.so x86_64-linux-gnu
 chkln /usr/include/freetype2/freetype freetype.h ..
 
 chkln /usr/include curl x86_64-linux-gnu	# For OAuth
