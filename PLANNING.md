@@ -1,6 +1,6 @@
 # Planning
 
-## Première partie
+## Première partie DONE
 
 * Phase 1 - Version quelconque PHP7 : 4j dont 1j preparation/évaluation
   * x Génération des paquets DEB (mod + CLI) pour toute version 7.[12].x de PHP passée en argument
@@ -27,7 +27,7 @@
   * x Ajout de l'extension OAuth en static
   * x Ajout de la géneration d'un prototype de paquet FPM
   
-## Seconde partie
+## Seconde partie DONE
 
 * x build des paquets PHP 5.6 et PHP 7.x
   * x avec le binaire FPM
@@ -44,3 +44,7 @@
   * x stockée par exemple dans /etc/php/7.1/php.ini et /etc/php/7.1/conf.d/*.ini
   * x si possible, modifier la conf pour mod_php pour qu'elle utilise le même fichier (et qu'on soit en cohérence)
 * x utilisation du container Docker de test pour tester le déploiement et les bascules, avec un POC (deux vhosts utilisant des versions différentes de PHP). Notre script de gestion des vhosts intégrera cela.
+
+## Remarques
+
+* nom unique pour le container de build, donc impossible de lancer des builds en parallèle
