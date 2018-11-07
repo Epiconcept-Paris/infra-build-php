@@ -47,4 +47,4 @@
 
 ## Remarques
 
-* nom unique pour le container de build, donc impossible de lancer des builds en parallèle
+* nom unique (epi_build_php) pour le container de build, donc impossible de lancer des builds en parallèle
