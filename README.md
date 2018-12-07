@@ -122,6 +122,9 @@ pour lancer le container. En modifiant le script run, on peut changer le point d
 
 Enfin, le script ````multi/bake````, comme le script ````php/bake````, reconnait dans le répertoire principal le fichier ````.norun```` pour permettre la mise au point.
 
+## Limitations
+
+* le container de build s'appelle epi_build_php
 ## Notes
 
 * voir s'il faut gérer le rotate/reopen des logs de PHP-FPM
