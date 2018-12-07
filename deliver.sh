@@ -1,1 +1,1 @@
-sudo -u epiconcept_build cp $(find -name '*.deb') /space/applisdata/php/
+sudo -u epiconcept_build cp $(find -name 'epi*.deb') /space/applisdata/php/
