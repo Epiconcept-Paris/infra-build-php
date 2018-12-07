@@ -1,6 +1,14 @@
 # infra-build-php
 Fournil à paquets PHP spécifiques Epiconcept sur Debian jessie/stretch
 
+## Installation
+
+* nécessite : docker fonctionnel
+* sudo apt install curl
+* cd gpg
+* ./genkey.sh
+* sortir master.gpg et le stocker ailleurs
+
 ## Build et tests d'une nouvelle version
 
 Ils se font en exécutant le script ````bake```` situé dans le répertoire principal (au même niveau que les répertoires ````debian````, ````php````, ````tools```` et ````multi````) :
