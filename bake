@@ -100,16 +100,20 @@ Usage()
     echo -e "\t\t\t <Major>.<minor>.<release>-<build>" >&2
     echo -e "\t\twhere <Major>, <minor> are single digit integers" >&2
     echo -e "\t\tand <release> & <build> are up to two digits integers" >&2
-    echo "       ./bake [ ls | ver | help ]" >&2
+    echo "       ./bake [ ls | ver | latest | help ]" >&2
     exit ${1:-1}
 }
 
-if [ "$1" = 'ver' ]; then
+if [ "$1" = 'ver' -o "$1" = 'latest' ]; then
     Vers
-    echo "Latest supported PHP versions:"
-    echo "$Latest" | sed 's/^/    /'
-    echo "Supported Debian versions:"
-    echo -n "$DebLst" | sed 's/^/    /'
+    if [ "$1" = 'ver' ]; then
+	echo "Latest supported PHP versions:"
+	echo "$Latest" | sed 's/^/    /'
+	echo "Supported Debian versions:"
+	echo -n "$DebLst" | sed 's/^/    /'
+    else
+	echo "$Latest"
+    fi
     exit 0
 elif [ "$1" = 'ls' ]; then
     Red='!'
