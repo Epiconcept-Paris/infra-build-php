@@ -44,7 +44,3 @@
   * x stockée par exemple dans /etc/php/7.1/php.ini et /etc/php/7.1/conf.d/*.ini
   * x si possible, modifier la conf pour mod_php pour qu'elle utilise le même fichier (et qu'on soit en cohérence)
 * x utilisation du container Docker de test pour tester le déploiement et les bascules, avec un POC (deux vhosts utilisant des versions différentes de PHP). Notre script de gestion des vhosts intégrera cela.
-
-## Remarques
-
-* nom unique (epi_build_php) pour le container de build, donc impossible de lancer des builds en parallèle
