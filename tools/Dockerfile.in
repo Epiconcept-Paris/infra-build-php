@@ -10,12 +10,8 @@ RUN $ADDUSER
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use: $TOOLS_TOP/build\\nto build the packages\"" >>/root/.bashrc
 
-# Update/upgrade
-RUN apt-get update
-RUN apt-get upgrade -y
-
-# Tools and build deps
-RUN apt-get install -y --no-install-recommends vim file gcc libc-dev make fakeroot lintian manpages-dev
+# Update/upgrade, install tools and tools deps
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends vim file gcc libc-dev make fakeroot lintian manpages-dev
 
 RUN mkdir -p $TOOLS_TOP/pkgs $TOOLS_TOP/dist
 $TLSCOPY

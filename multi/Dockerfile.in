@@ -9,12 +9,8 @@ RUN $ADDUSER
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    $MULTI_TOP/start\\nto start Apache\"" >>/root/.bashrc
 
-# Update/upgrade
-RUN apt-get update
-RUN apt-get upgrade -y
-
-# Tools and tests deps
-RUN apt-get install -y --no-install-recommends $MULTI_REQ
+# Update/upgrade, install tools and multi deps
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends $MULTI_REQ
 
 RUN mkdir -p $MULTI_TOP/conf
 $MULCOPY
