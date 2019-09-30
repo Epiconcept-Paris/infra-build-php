@@ -38,8 +38,9 @@ done
 
 DirSep='{'
 SupSep=''
-for f in $DebTop/*/name
+for f in `cd $DebTop; ls */name | sort -n`
 do
+    f="$DebTop/$f"
     dir=`dirname $f`
     test -f $dir/mkre || continue
     deb=`basename $dir`
