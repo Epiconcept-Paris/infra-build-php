@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+if [ -r /usr/share/apache2/apache2-maintscript-helper ]; then
+    . /usr/share/apache2/apache2-maintscript-helper
+    apache2_invoke dismod php%MMJ%
+fi
+
+exit 0

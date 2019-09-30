@@ -27,3 +27,4 @@ rmdir -v $EnaDir >>$Logs/rmed_$Pkg.out
 sed -i "s/%API%/`dpkg-query -W -f='${Provides}' apache2-bin`/" $Top/DEBIAN/control
 sed -i "s/%MMJ%/$MMJ/" $Top/DEBIAN/conffiles
 sed -i "s/%MMJ%/$MMJ/" $Top/DEBIAN/postinst
+sed -i "s/%MMJ%/$MMJ/" $Top/DEBIAN/prerm
