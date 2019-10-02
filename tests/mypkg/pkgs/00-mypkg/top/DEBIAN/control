@@ -1,0 +1,12 @@
+Package: %NAME%
+Version: %VERSION%
+Architecture: all
+Maintainer: Christophe de Traversay <devel@traversay.com>
+Section: admin
+Priority: optional
+Depends: %DEPENDS%
+Provides: %PROVIDES%
+Conflicts: %CONFLICTS%
+Description: Test package %NAME% by Epiconcept
+ This package provides the dummy %PKGBIN% script
+ used to test Depends/Provides/Conflicts control-file fields

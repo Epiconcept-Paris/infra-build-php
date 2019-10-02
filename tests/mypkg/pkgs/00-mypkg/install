@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+#	mypkg/install - Install package files in top/
+#
+SrcDir=$dir/src
+BinDir=$Top/usr/bin
+ManDir=$Top/usr/share/man
+ManSec=1
+
+PkgCap=`echo $PkgBin | tr '[a-z]' '[A-Z]'`
+
+mkdir -p $BinDir
+cp $SrcDir/mypkg $BinDir/$PkgBin
+
+mkdir -p $ManDir/man$ManSec
+sed -e "s/%PKGCAP%/$PkgCap/g" -e "s/%MANSEC%/$ManSec/g" -e "s/%PKGBIN%/$PkgBin/g" $SrcDir/mypkg.man >$ManDir/man$ManSec/$PkgBin.$ManSec
+gzip -n9 $ManDir/man$ManSec/$PkgBin.$ManSec

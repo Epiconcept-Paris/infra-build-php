@@ -1,0 +1,4 @@
+#!/bin/sh
+
+Prg=`basename $0`
+echo "Dummy script '$Prg' done"

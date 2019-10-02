@@ -1,0 +1,10 @@
+.TH %PKGCAP% %MANSEC%
+.SH NAME
+%PKGBIN% \- Display own's name and exit
+.SH SYNOPSIS
+.B %PKGBIN%
+.SH DESCRIPTION
+.B %PKGBIN%
+Only displays its name on stdout and exits.
+This script is just a placeholder to test
+Depends/Provides/Conflicts package control-file fields

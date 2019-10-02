@@ -1,0 +1,101 @@
+#!/bin/sh
+#
+#	Build packages for mypkg tests
+#
+#	Usage:	[mypkg|.]/bake <version>
+#
+Prg=tests/mypkg/`basename $0`
+Dir=`dirname $0`
+IniPwd=$PWD
+PkgTop=
+
+Path() { realpath --relative-to=$IniPwd $1; }
+test "$Dir" || Dir=`dirname \`realpath $0\``
+expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
+test "$Dir" = '.' || cd "$Dir"
+#   Script's CWD is where it is located, but all messages assume PWD is top-level
+
+Usage()
+{
+    local code
+
+    test "$1" && code=$1 || code=1
+    echo "Usage: $Prg <name_version:[depends]:[provides]:[conflicts]>" >&2
+    exit $code
+}
+
+#
+#   Check usage
+#
+test $# -eq 1 || Usage
+PkgData=`echo "$1" | sed -nr 's/([^_]+)_([^:]+):([^:]*):([^:]*):([^:]*)/PkgBin="\1" PkgVer="\2" PkgDep="\3" PkgPrv="\4" PkgCfl="\5"/p'`
+
+if [ -z "$PkgData" ]; then
+    echo "$Prg: package data \"$1\" is invalid" >&2
+    Usage 2
+fi
+#echo "PkgData='$PkgData'"; exit 0
+
+DebVer=jessie
+MyPkg=${PkgTop}dist
+Logs=$MyPkg/.logs
+User=`id -un`
+AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
+
+#
+#   Build the image
+#
+MYPKG_TOP=/opt/mypkg
+MYPKG_BASE=epi-mypkg
+MYPKG_IMG=$MYPKG_BASE:$DebVer
+MYPKG_NAME=epi_mypkg
+date '+===== %Y-%m-%d %H:%M:%S %Z =================='
+Now=`date '+%s'`
+
+PKGCOPY="COPY ${PkgTop}pkgs $MYPKG_TOP/pkgs
+COPY ${PkgTop}run/build $MYPKG_TOP/build"
+test -f ${PkgTop}.debug && PKGCOPY="$PKGCOPY
+RUN >$MYPKG_TOP/.debug"
+
+if docker ps | grep $MYPKG_NAME >/dev/null; then
+    echo "Stopping the running '$MYPKG_NAME' container..."
+    docker stop -t 5 $MYPKG_NAME >/dev/null
+    while docker ps | grep $MYPKG_NAME >/dev/null
+    do
+	sleep 1
+    done
+fi
+if docker ps -a | grep $MYPKG_NAME >/dev/null; then
+    echo "Deleting the existing '$MYPKG_NAME' container..."
+    docker rm $MYPKG_NAME >/dev/null
+fi
+if docker images | grep "$MYPKG_BASE *$DebVer" >/dev/null; then
+    echo "Deleting the existing '$MYPKG_IMG' image..."
+    docker rmi $MYPKG_IMG >/dev/null
+fi
+
+test -d $Logs || mkdir -p $Logs
+echo "Building the '$MYPKG_IMG' image..."
+#   Variables come in order of their appearance in Dockerfile.in
+DEBVER="$DebVer" PKGDATA="$PkgData" USER="$User" ADDUSER="$AddUser" MYPKG_TOP="$MYPKG_TOP" PKGCOPY="$PKGCOPY" envsubst '$DEBVER $PKGDATA $USER $ADDUSER $MYPKG_TOP $PKGCOPY' <${PkgTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $MYPKG_IMG . >$Logs/docker.out 2>&1
+
+#
+#   Run the container
+#
+Cmd="docker run -ti -v `realpath $PWD/$MyPkg`:$MYPKG_TOP/dist --name $MYPKG_NAME --rm $MYPKG_IMG"
+if [ -f ${PkgTop}.norun ]; then
+    echo "Use:\n    $Cmd bash\nto run the mypkg container"
+else
+    echo "Running the '$MYPKG_NAME' container:\n    $Cmd"
+    $Cmd
+fi
+
+#
+#   End
+#
+date '+===== %Y-%m-%d %H:%M:%S %Z =================='
+End=`date '+%s'`
+Len=`expr $End - $Now`
+Min=`expr $Len / 60`
+Sec=`expr $Len - '(' $Min '*' 60 ')'`
+printf "Duration: %d:%02d\n" $Min $Sec

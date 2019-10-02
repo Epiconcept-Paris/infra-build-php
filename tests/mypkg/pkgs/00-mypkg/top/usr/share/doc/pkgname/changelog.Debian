@@ -1,0 +1,4 @@
+%NAME% (%VERSION%) %DEBVER%; urgency=low
+  * The %PKGBIN% script
+    Specific version for package control-file fields tests
+ -- Christophe de Traversay <devel@traversay.com>  %DATE%
