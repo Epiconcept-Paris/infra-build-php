@@ -4,7 +4,7 @@ Architecture: amd64
 Maintainer: Cedric <c.girard@epiconcept.fr>
 Depends: %CLI%, lsb-base (>= 3.0-6), libc6
 Provides: php-fpm, phpapi-%PHPAPI%
-Conflicts: php5-fpm, php7.0-fpm, php7.1-fpm, php7.2-fpm
+Conflicts: php5-fpm, php7.0-fpm, php7.1-fpm, php7.2-fpm, php7.3-fpm
 Section: admin
 Priority: optional
 Description: PHP FastCGI Process Manager build by Epiconcept
