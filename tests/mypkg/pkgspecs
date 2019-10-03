@@ -1,0 +1,5 @@
+srv24_2.4::mysrv:
+mod11_1.1:mysrv:mymod:mymod, myfpm
+mod21_2.1:mysrv:mymod:mymod, myfpm
+fpm11_1.1:mysrv:myfpm:mymod
+fpm21_2.1:mysrv:myfpm:mymod

@@ -27,18 +27,11 @@ Usage()
 #
 #   Check usage
 #
-test $# -eq 1 || Usage
-PkgData=`echo "$1" | sed -nr 's/([^_]+)_([^:]+):([^:]*):([^:]*):([^:]*)/PkgBin="\1" PkgVer="\2" PkgDep="\3" PkgPrv="\4" PkgCfl="\5"/p'`
-
-if [ -z "$PkgData" ]; then
-    echo "$Prg: package data \"$1\" is invalid" >&2
-    Usage 2
-fi
-#echo "PkgData='$PkgData'"; exit 0
+test $# -gt 1 && echo "$Prg: ignoring arguments '$*'" >&2
 
 DebVer=jessie
-MyPkg=${PkgTop}dist
-Logs=$MyPkg/.logs
+Dist=${PkgTop}dist
+Logs=$Dist/.logs
 User=`id -un`
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 
@@ -52,39 +45,47 @@ MYPKG_NAME=epi_mypkg
 date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 Now=`date '+%s'`
 
-PKGCOPY="COPY ${PkgTop}pkgs $MYPKG_TOP/pkgs
-COPY ${PkgTop}run/build $MYPKG_TOP/build"
-test -f ${PkgTop}.debug && PKGCOPY="$PKGCOPY
-RUN >$MYPKG_TOP/.debug"
-
 if docker ps | grep $MYPKG_NAME >/dev/null; then
-    echo "Stopping the running '$MYPKG_NAME' container..."
-    docker stop -t 5 $MYPKG_NAME >/dev/null
-    while docker ps | grep $MYPKG_NAME >/dev/null
-    do
-	sleep 1
-    done
+    if [ -f ${PkgTop}.norun ]; then
+	Stop="docker stop $MYPKG_NAME >/dev/null\n    "
+    else
+	echo "Stopping the running '$MYPKG_NAME' container..."
+	docker stop -t 5 $MYPKG_NAME >/dev/null
+	while docker ps | grep $MYPKG_NAME >/dev/null
+	do
+	    sleep 1
+	done
+    fi
 fi
+#   Safety check, as we always call docker run with --rm
 if docker ps -a | grep $MYPKG_NAME >/dev/null; then
-    echo "Deleting the existing '$MYPKG_NAME' container..."
-    docker rm $MYPKG_NAME >/dev/null
-fi
-if docker images | grep "$MYPKG_BASE *$DebVer" >/dev/null; then
-    echo "Deleting the existing '$MYPKG_IMG' image..."
-    docker rmi $MYPKG_IMG >/dev/null
+    test -f ${PkgTop}.norun || { echo "Deleting the existing '$MYPKG_NAME' container..."; docker rm $MYPKG_NAME >/dev/null; }
 fi
 
-test -d $Logs || mkdir -p $Logs
-echo "Building the '$MYPKG_IMG' image..."
-#   Variables come in order of their appearance in Dockerfile.in
-DEBVER="$DebVer" PKGDATA="$PkgData" USER="$User" ADDUSER="$AddUser" MYPKG_TOP="$MYPKG_TOP" PKGCOPY="$PKGCOPY" envsubst '$DEBVER $PKGDATA $USER $ADDUSER $MYPKG_TOP $PKGCOPY' <${PkgTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $MYPKG_IMG . >$Logs/docker.out 2>&1
+if docker images | grep "$MYPKG_BASE *$DebVer" >/dev/null; then
+    echo "Re-using the existing '$MYPKG_IMG' image. Use:\n    docker rmi $MYPKG_IMG\nto force a rebuild."
+else
+    echo "Building the '$MYPKG_IMG' image..."
+    PKGCOPY="COPY ${PkgTop}src $MYPKG_TOP/src
+    COPY ${PkgTop}run/build $MYPKG_TOP"
+    mkdir -p $Logs
+
+    #   Variables come in order of their appearance in Dockerfile.in
+    DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" MYPKG_TOP="$MYPKG_TOP" PKGCOPY="$PKGCOPY" envsubst '$DEBVER $USER $ADDUSER $MYPKG_TOP $PKGCOPY' <${PkgTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $MYPKG_IMG . >$Logs/docker.out 2>&1
+fi
 
 #
 #   Run the container
 #
-Cmd="docker run -ti -v `realpath $PWD/$MyPkg`:$MYPKG_TOP/dist --name $MYPKG_NAME --rm $MYPKG_IMG"
+Cmd="docker run -ti -v `realpath $PWD/$Dist`:$MYPKG_TOP/dist --name $MYPKG_NAME --rm $MYPKG_IMG"
+Spec=$Dist/pkgspecs
+if [ ! -f $Spec ]; then
+    echo "No $Spec file: copying file ${PkgTop}pkgspecs to it."
+    mkdir -p $Dist
+    cp -p ${PkgTop}pkgspecs $Spec
+fi
 if [ -f ${PkgTop}.norun ]; then
-    echo "Use:\n    $Cmd bash\nto run the mypkg container"
+    echo "Use:\n    $Stop$Cmd bash\nto run the mypkg container"
 else
     echo "Running the '$MYPKG_NAME' container:\n    $Cmd"
     $Cmd

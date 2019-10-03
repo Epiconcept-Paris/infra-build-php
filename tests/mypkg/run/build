@@ -1,30 +1,51 @@
 #!/bin/sh
 #
-#	build - Compile and build all packages in pkgs
+#	build - Compile and build mypkg packages
 #
 Prg=`basename $0`
 Bld=`dirname $0`
-Logs="$Bld/dist/.logs"				# Directory for log files
-test -f $Bld/.debug -o "$1" = 'debug' && Dbg=y
 Own="$USER:`id -gn $USER`"
+Dist="$Bld/dist"
+Logs="$Dist/.logs"				# Directory for log files
+Spec="$Dist/pkgspecs"
+
+test -f $Dist/.debug -o "$1" = 'debug' && Dbg=y
+mkdir -p $Logs
+chown $Own $Dist $Logs
 
 set -e	# Stop on errors
 
 Base='epi-tests'
-for dir in $Bld/pkgs/*
+Top=$Bld/top
+if [ ! -s "$Spec" ]; then
+    echo "\aERROR: $Spec file is missing or empty" >&2
+    exit 1
+fi
+while read Line
 do
-    PkgDir=`basename $dir`
-    case $PkgDir in
-	00-*)	Pkg=`expr "$PkgDir" : '[0-9]\{2\}-\(.*\)'`;;
-	*)	echo "Ignoring the $PkgDir package directory" >&2;;
-    esac
-    test "$Pkg" || continue
-
-    Top=$dir/top
-    eval "$PKGDATA"
+    eval `echo "$Line" | sed -nr 's/([^_]+)_([^:]+):([^:]*):([^:]*):([^:]*)/PkgBin="\1" PkgVer="\2" PkgDep="\3" PkgPrv="\4" PkgCfl="\5"/p'`
+    if [ -z "$PkgBin" -o -z "$PkgVer" ]; then
+	echo "\aWARNING: skipping invalid pkgspecs line \"$Line\"" >&2
+	echo   " format: <name>_<version>:[<depends>]:[<provides>]:[<conflicts>]" >&2
+	continue
+    fi
     PkgName="$Base-$PkgBin"
 
-    echo "Installing package '$Pkg'..."
+    echo "Installing package '${PkgName}_$PkgVer'..."
+    rm -rf $Top
+    cp -rp $Bld/src $Top
+
+    # bin directory
+    BinDir=$Top/usr/bin
+    mv $BinDir/pkgname $BinDir/$PkgBin
+
+    # man directory
+    ManSec=1
+    ManDir=$Top/usr/share/man/man$ManSec
+    PkgCap=`echo $PkgBin | tr '[a-z]' '[A-Z]'`
+    sed -i -e "s/%PKGCAP%/$PkgCap/g" -e "s/%MANSEC%/$ManSec/g" -e "s/%PKGBIN%/$PkgBin/g" $ManDir/pkgname.$ManSec
+    mv $ManDir/pkgname.$ManSec $ManDir/$PkgBin.$ManSec
+    gzip -n9 $ManDir/$PkgBin.$ManSec
 
     # doc directory
     DocDir=$Top/usr/share/doc/pkgname
@@ -41,11 +62,7 @@ do
 	mv $LintDir/pkgname $LintDir/$PkgName
     fi
 
-    # specific package install
-    . $dir/install $PkgBin
-
     # DEBIAN directory
-echo "PkgName=$PkgName PkgVer=$PkgVer PkgBin=$PkgBin"
     sed -i -e "s/%NAME%/$PkgName/" -e "s/%VERSION%/$PkgVer/" -e "s/%PKGBIN%/$PkgBin/" $Top/DEBIAN/control
     for Fld in Depends Provides Conflicts
     do
@@ -56,30 +73,30 @@ echo "PkgName=$PkgName PkgVer=$PkgVer PkgBin=$PkgBin"
 	esac
 	if [ "$Val" ]; then
 	    Tag=`echo $Fld | tr '[a-z]' '[A-Z]'`
-	    echo Fld=$Fld sed -i "s/%$Tag%/$Val/" $Top/DEBIAN/control
+	    test "$Dbg" && echo "    Fld=$Fld Tag=$Tag Val=\"$Val\""
 	    sed -i "s/%$Tag%/$Val/" $Top/DEBIAN/control
 	else
+	    test "$Dbg" && echo "    Fld=$Fld deleted"
 	    sed -i "/^$Fld: /d" $Top/DEBIAN/control
 	fi
     done
 
-    echo "Assembling package '$Pkg'..."
-    out=$(fakeroot dpkg-deb -Zgzip --build $Top $Bld/dist)
+    echo "Assembling package '${PkgName}_$PkgVer'..."
+    out=$(fakeroot dpkg-deb -Zgzip --build $Top $Dist)
     deb=$(echo $out | sed "s/^.*building package ['\`][^']*' in ['\`]\([^']*\)'\.$/\1/")
 
     if [ -f "$deb" ]; then
-	echo "Checking   package '$Pkg': `basename $deb`..."
-	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
+	echo "Checking   package '$PkgName': `basename $deb`..."
+	lintian --allow-root $deb >$Logs/lintian_$PkgName.out
 	chown $Own $deb
     else
 	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""
     fi
     if [ "$Dbg" ]; then
 	(cd $Top;
-	 find . -type f | sed 's/^..//' | sort >$Logs/files_$Pkg
-	 find . -type l | sed 's/^..//' | sort >$Logs/links_$Pkg)
-	test -s $Logs/links_$Pkg || rm $Logs/links_$Pkg
-	chown $Own $Logs/*_$Pkg
+	 find . -type f | sed 's/^..//' | sort >$Logs/files_$PkgName
+	 find . -type l | sed 's/^..//' | sort >$Logs/links_$PkgName)
+	test -s $Logs/links_$PkgName || rm $Logs/links_$PkgName
     fi
-    chown $Own $Logs/*_$Pkg.out
-done
+    chown $Own $Logs/*_$PkgName*
+done <$Spec

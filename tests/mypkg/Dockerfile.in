@@ -1,8 +1,7 @@
 FROM debian:$DEBVER
-MAINTAINER Epiconcept
+LABEL maintainer Epiconcept
 
 ENV DEBVER=$DEBVER
-ENV PKGDATA=$PKGDATA
 ENV USER=$USER
 ENV LANG=C
 ENV TZ=Europe/Paris
@@ -13,7 +12,7 @@ RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use: $MYPKG_TOP/build\\nto
 # Update/upgrade, install tools and tools deps
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends vim file make fakeroot lintian manpages-dev
 
-RUN mkdir -p $MYPKG_TOP/pkgs $MYPKG_TOP/dist
+RUN mkdir -p $MYPKG_TOP/src $MYPKG_TOP/dist
 $PKGCOPY
 
 CMD [ "$MYPKG_TOP/build" ]

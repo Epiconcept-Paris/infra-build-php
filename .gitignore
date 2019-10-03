@@ -6,5 +6,4 @@ debian/*/multi
 php/[5-9]/files/*.tgz
 php/[5-9]/[5-9].*/php-*.tar.bz2
 php/[5-9]/[5-9].*/php-*.files
-tests/*/dist/.logs
-tests/*/dist/*.deb
+tests/*/dist
