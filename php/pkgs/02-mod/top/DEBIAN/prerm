@@ -6,5 +6,11 @@ if [ -r /usr/share/apache2/apache2-maintscript-helper ]; then
     . /usr/share/apache2/apache2-maintscript-helper
     apache2_invoke dismod php%MMJ%
 fi
+if [ -d /etc/epiconcept/php-mods-available -a -d /etc/php$MMD/conf.d ]; then
+    for f in /etc/epiconcept/php-mods-available/*.ini
+    do
+	rm -f /etc/php$MMD/conf.d/$f
+    done
+fi
 
 exit 0
