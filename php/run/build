@@ -24,8 +24,8 @@ Logs="$Bld/dist/.logs"				# Directory for log files
 Pkgs="$Bld/dist/.pkgs"				# List of packages built
 Debug="$Bld/dist/.debug"			# Directory for debug files
 if [ -f $Bld/.debug -o "$2" = 'debug' ]; then
+    su -c "mkdir -p $Debug" $USER
     Dbg=y					# Debug option
-    test -d $Debug || su -c "mkdir $Debug" $USER
 fi
 Maj=`echo $Ver | awk -F. '{print $1}'`
 MajMin=`echo $Ver | awk -F. '{print $1 "." $2}'`

@@ -6,6 +6,10 @@ Prg=`basename $0`
 Tst=`dirname $0`
 Logs="$Tst/dist/.logs"
 Pkgs="$Tst/dist/.pkgs"
+Dbg="$Tst/dist/.debug"
+test -d $Dbg || Dbg=
+LF='
+'
 
 set -e	# Stop on errors
 
@@ -20,32 +24,80 @@ if [ ! -x /sbin/runlevel ]; then	# Needed by invoke-rc.d
     echo "#!/bin/sh\necho \"${PREVLEVEL:-N} ${RUNLEVEL:-5}\"" >/sbin/runlevel
     chmod +x /sbin/runlevel
 fi
-test -x /usr/sbin/policy-rc.d && grep 'exit 101' /usr/sbin/policy-rc.d >/dev/null && sed -i 's/exit 101/exit 104/' /usr/sbin/policy-rc.d 
+test -x /usr/sbin/policy-rc.d && grep 'exit 101' /usr/sbin/policy-rc.d >/dev/null && sed -i 's/exit 101/exit 104/' /usr/sbin/policy-rc.d
 
 echo "Setting Apache 2 to prefork mode..."
 sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf
-a2dismod mpm_event >$Logs/a2mod.out 2>&1
-a2enmod mpm_prefork >>$Logs/a2mod.out 2>&1
-chown $Own $Logs/a2mod.out
+a2dismod mpm_event >$Logs/a2.out 2>&1
+a2enmod mpm_prefork >>$Logs/a2.out 2>&1
+echo "--- init-done -----" >>$Logs/a2.out
 
 echo "Installing packages:"
 test -d $Tst/pkgs && dpkg -i $Tst/pkgs/*.deb >$Logs/dpkg-i.out 2>&1 || >$Logs/dpkg-i.out
 
-while read pkg
+set +e
+#   We do not have a real /sbin/init running
+#   so process start/stop needs precautions
+ApaCtl='/usr/sbin/apache2ctl'
+test "$Dbg" && >$Dbg/ps-ef.out
+while read Deb
 do
-    if dpkg -l `echo $pkg | awk -F_ '{print $1}'` >/dev/null 2>&1; then
-	echo "  . $pkg is already installed."
-    else
-	echo "----------------------------------------" >>$Logs/dpkg-i.out
-	echo "  - $pkg"
-	dpkg -i $Tst/dist/$pkg >>$Logs/dpkg-i.out 2>&1
+    Pkg=`echo $Deb | awk -F_ '{print $1}'`
+    if dpkg -l $Pkg >/dev/null 2>&1; then
+	echo "  . $Deb is already installed."
+	continue
     fi
+    test "$Dbg" && (echo "--- pre-dpkg $Pkg -----"; ps -ef) >>$Dbg/ps-ef.out 2>&1
+    echo "----------------------------------------" >>$Logs/dpkg-i.out
+    Out="`dpkg -i $Tst/dist/$Deb 2>&1`"
+    xc=$?
+    if [ $xc -gt 0 ]; then
+	Cfl=`echo "$Out" | sed -nr 's/^ ([^ ]*) conflicts with.*$/\1/p'`
+	if [ "$Cfl" ]; then
+	    Out="$Out$LF    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	    Out="$Out$LF`dpkg -P $Cfl 2>&1`"
+	    echo "  ~ $Cfl removed as conflicting with $Pkg"
+	    Out="$Out$LF    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	    Out="$Out$LF`dpkg -i $Tst/dist/$Deb 2>&1`"
+	    xc=$?
+	fi
+    fi
+    echo "$Out" >>$Logs/dpkg-i.out
+    if [ $xc -eq 0 ]; then
+	echo "  - $Deb"
+	case "$Pkg" in
+	    *-cli)  echo -n "    Testing PHP CLI... "
+		    php /var/www/html/info.php >$Logs/info_cli.out
+		    echo "done."
+		    ;;
+	    *-mod)  echo -n "    Testing PHP Apache module... "
+		    echo "--- mod-inst-done -----" >>$Logs/a2.out
+		    test "$Dbg" && (echo --- post-install -----; ps -ef) >>$Dbg/ps-ef.out 2>&1
+		    curl -sSL http://localhost/info.php >$Logs/info_mod.out
+		    $ApaCtl stop >>$Logs/a2.out 2>&1
+		    echo "--- mod-stop-done -----" >>$Logs/a2.out
+		    sleep 1
+		    echo "done."
+		    ;;
+	    *-fpm)  echo -n "    Testing PHP Apache FPM... "
+		    echo "--- fpm-inst-done -----" >>$Logs/a2.out
+		    a2enmod proxy_fcgi >>$Logs/a2.out 2>&1
+		    a2enconf $Pkg >>$Logs/a2.out 2>&1
+		    $ApaCtl restart >>$Logs/a2.out 2>&1
+		    echo "--- fpm-restart-done -----" >>$Logs/a2.out
+		    sleep 1
+		    test "$Dbg" && (echo --- post-restart -----; ps -ef) >>$Dbg/ps-ef.out 2>&1
+		    curl -sSL http://localhost/info.php >$Logs/info_fpm.out
+		    rc=/etc/init.d/php*-fpm
+		    $rc stop >>$Logs/a2.out 2>&1
+		    $ApaCtl stop >>$Logs/a2.out 2>&1
+		    echo "--- fpm-stop-done -----" >>$Logs/a2.out
+		    sleep 1
+		    echo "done."
+		    ;;
+	esac
+    fi
+    test "$Dbg" && (echo "--- post-dpkg $Pkg -----"; ps -ef) >>$Dbg/ps-ef.out 2>&1
 done <$Pkgs
-chown $Own $Logs/dpkg-i.out
-
-echo "Testing PHP CLI..."
-php /var/www/html/info.php >$Logs/info_cli.out
-
-echo "Testing PHP apache module..."
-curl -sSL http://localhost/info.php >$Logs/info_mod.out
-chown $Own $Logs/info_*.out
+test "$Dbg" && chown $Own $Dbg/ps-ef.out
+chown $Own $Logs/a2.out $Logs/dpkg-i.out $Logs/info_*.out
