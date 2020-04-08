@@ -2,13 +2,10 @@
 
 set -e
 
-if [ -d /etc/epiconcept/php-mods-available ]; then
-    mkdir -p /etc/php$MMD/conf.d
-    for f in /etc/epiconcept/php-mods-available/*.ini
-    do
-	test -f $f && ln $f /etc/php$MMD/conf.d
-    done
-fi
+mkdir -p /var/lib/php/sessions
+chmod 733 /var/lib/php/sessions
+chmod o+t /var/lib/php/sessions
+
 if [ -r /usr/share/apache2/apache2-maintscript-helper ]; then
     . /usr/share/apache2/apache2-maintscript-helper
     apache2_invoke enmod php%MMJ%

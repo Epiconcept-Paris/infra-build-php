@@ -1,0 +1,5 @@
+MAILTO=infra@epiconcept.fr
+
+9,39 * * * *    /usr/local/bin/php_clean_sessions.sh
+
+# EOF
