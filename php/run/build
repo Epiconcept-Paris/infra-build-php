@@ -59,7 +59,7 @@ do
     fi
 done
 if grep -- "--enable-phpdbg " $ConfigHelp >/dev/null; then
-    ExtOpts="$ExtOpts--disable-phpdbg "
+    ExtOpts="$ExtOpts--enable-phpdbg "
 fi
 # Skip *-fpm package generation if --enable-fpm unknown
 echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`ls -d $Bld/pkgs/*-fpm`/skip
@@ -91,7 +91,7 @@ if [ -d $Bld/hooks ]; then
 fi
 chown $Own $Logs/*-help.out
 if grep -- "--enable-apc-bc " $ConfigHelp >/dev/null; then
-    HookOpts="$HookOpts--disable-apc-bc "
+    HookOpts="$HookOpts--enable-apc-bc "
 fi
 echo "Configuring php-$Ver$HookShow..."
 test "$Dbg" && echo "ExtOpts=\"$ExtOpts\" HookOpts=\"$HookOpts\""
