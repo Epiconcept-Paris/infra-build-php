@@ -4,4 +4,4 @@
 su -c "tar xf `echo $Bld/files/apcu-*.tgz` -C ext" $USER
 mv ext/package.xml ext/apcu-*
 Show="APCu"
-Opt="--enable-apcu --enable-apc"
+Opt="--enable-apcu"
