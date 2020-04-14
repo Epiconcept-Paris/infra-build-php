@@ -51,7 +51,7 @@ COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
 BLDCOPY="RUN mkdir $BUILD_TOP/hooks"
 
 AddPECL APCu apcu APCu apcu
-AddPECL APCu_bc apcu_bc APCu_bc apcu_bc
+#AddPECL APCu_bc apcu_bc APCu_bc apcu_bc
 AddPECL oauth oauth OAuth oauth
 AddPECL mcrypt mcrypt MCrypt mcrypt
 AddExtra
