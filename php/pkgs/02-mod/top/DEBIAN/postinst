@@ -3,8 +3,9 @@
 set -e
 
 mkdir -p /var/lib/php/sessions
-chmod 733 /var/lib/php/sessions
+chmod 0733 /var/lib/php/sessions
 chmod o+t /var/lib/php/sessions
+chmod 0755 /usr/local/bin/php_clean_sessions.sh
 
 if [ -r /usr/share/apache2/apache2-maintscript-helper ]; then
     . /usr/share/apache2/apache2-maintscript-helper
