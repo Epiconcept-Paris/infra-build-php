@@ -1,5 +1,5 @@
 # TODO
-* passage params auth APT
+* passage params auth APT (https://vsupalov.com/docker-build-pass-environment-variables/)
 * tester ce qui marche
 
 # DOCS
