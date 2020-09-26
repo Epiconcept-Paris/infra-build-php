@@ -1,0 +1,10 @@
+Package: %NAME%
+Version: 1.0-1%PKGDEB%
+Architecture: all
+Maintainer: Epiconcept's infra team <infra@epiconcept.com>
+Depends: php-cli
+Section: admin
+Priority: optional
+Description: Stale-PHP-sessions cleaner
+ This package provides the php_clean_sessions.sh script
+ to be run from the provided cron job

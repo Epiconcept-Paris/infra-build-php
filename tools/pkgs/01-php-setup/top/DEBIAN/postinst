@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+SessDir=/var/lib/php/sessions
+mkdir -p $SessDir
+chmod 0733 $SessDir
+chmod o+t $SessDir
+
+exit 0

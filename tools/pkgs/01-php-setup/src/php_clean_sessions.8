@@ -1,0 +1,10 @@
+.TH PHP_CLEAN_SESSIONS 8
+.SH NAME
+php_clean_sessions \- clean stale PHP sessions
+.SH SYNOPSIS
+.B php_clean_sessions
+.SH DESCRIPTION
+.B php_clean_sessions
+purges PHP's sessions directory from stale sessions, i.e. older than the
+age specified in the PHP config-parameter session.gc_maxlifetime
+It is intended to be run from the supplied cron.d job.

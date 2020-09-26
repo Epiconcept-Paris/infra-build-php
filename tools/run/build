@@ -10,7 +10,7 @@ Own="$USER:`id -gn $USER`"
 
 set -e	# Stop on errors
 
-Base='epi-tools'
+Base='epi'
 PkgDeb="+deb$DEBNUM"
 for dir in $Bld/pkgs/*
 do

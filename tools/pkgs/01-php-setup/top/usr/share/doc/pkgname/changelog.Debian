@@ -1,0 +1,4 @@
+%NAME% (%VERSION%) %DEBVER%; urgency=low
+  * The stale-PHP-sessions cleaner and related crond.d job
+    Maximum age of the sessions is taken from PHP's config
+ -- Epiconcept's infra team <infra@epiconcept.com>  %DATE%
