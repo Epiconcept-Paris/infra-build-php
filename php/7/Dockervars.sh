@@ -33,9 +33,9 @@ COPY ${PhpTop}files/PEAR_Manpages-1.10.0.tgz $BUILD_TOP/files
 COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
 
     #
-    #	Add libzip for 7.3+
+    #	Add libzip packages for 7.2+
     #
-    if [ $Min -gt 2 ]; then
+    if [ $Min -gt 1 ]; then
 	BUILD_REQ="$BUILD_REQ libzip-dev"
 	TESTS_REQ="$BUILD_REQ $LIBZIP"
 	CLI_DEPS="$CLI_DEPS, $LIBZIP"

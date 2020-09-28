@@ -66,6 +66,13 @@ do
     esac
     Pat=$(echo "$Opt" | sed 's/=.*$//')
     grep -- "$Pat$End" $ConfigHelp >/dev/null && Cfg="$Opt" || Cfg=
+    #   Handle special ZIP case
+    if [ "$Opt" = '--enable-zip' ]; then
+	grep 'bundled libzip is deprecated' configure >/dev/null && Dpr=y || Dpr=
+	grep -- '--with-libzip[ =[]' $ConfigHelp >/dev/null && Zip='--with-libzip=/usr' || Zip=
+	# if (no --enable-zip or deprecated) and --with-libzip, use it
+	test -z "$Cfg" -o "$Dpr" && test "$Zip" && Cfg="$Zip"
+    fi
     if [ "$Cfg" ]; then
 	echo "Using option found in 'configure --help': $Cfg"
 	ExtOpts="$ExtOpts$Sep$Opt"
