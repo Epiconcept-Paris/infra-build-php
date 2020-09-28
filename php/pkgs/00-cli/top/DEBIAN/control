@@ -4,7 +4,7 @@ Architecture: amd64
 Maintainer: Cedric <c.girard@epiconcept.fr>
 Depends: %DEPS%
 Provides: php-cli, phpapi-%PHPAPI%
-Conflicts: php5-cli, php7.0-cli, php7.1-cli, php7.2-cli, php7.3-cli%CFL%
+Conflicts: php5-cli, php7.0-cli, php7.1-cli, php7.2-cli, php7.3-cli, php7.4-cli%CFL%
 Section: admin
 Priority: optional
 Description: PHP CLI build by Epiconcept
