@@ -47,20 +47,32 @@ ConfigHelp=$Logs/config-help.out
 #
 #   Handle options not present in every PHP version
 #
-for Opt in --with-mysql --with-mcrypt --with-ttf --enable-gd-native-ttf --enable-fpm --with-fpm-systemd
+for Opt in  --with-mysql --with-mcrypt --with-ttf --enable-gd-native-ttf \
+	    --enable-phpdbg --enable-fpm --with-fpm-systemd \
+	    --with-gd --enable-gd \
+	    --with-freetype-dir=/usr --with-freetype \
+	    --with-jpeg-dir=/usr --with-jpeg \
+	    --with-xpm-dir=/usr,/usr/X11R6 --with-xpm \
+	    --with-png-dir=/usr \
+	    --with-pcre-regex \
+	    --enable-zip \
+	    --enable-hash \
+	    --enable-libxml \
+	    --enable-wddx
 do
     case "$Opt" in
-	--with-*)   Sep='[ =[]';;
-	*)	    Sep=' ';;
+	--with-*)   End='[ =[]';;
+	*)	    End=' ';;
     esac
-    if grep -- "$Opt$Sep" $ConfigHelp >/dev/null; then
-	echo "Using ${Opt} option found in 'configure --help'"
-	ExtOpts="$ExtOpts$Opt "
+    Pat=$(echo "$Opt" | sed 's/=.*$//')
+    grep -- "$Pat$End" $ConfigHelp >/dev/null && Cfg="$Opt" || Cfg=
+    if [ "$Cfg" ]; then
+	echo "Using option found in 'configure --help': $Cfg"
+	ExtOpts="$ExtOpts$Sep$Opt"
+	Sep=' '
     fi
 done
-if grep -- "--enable-phpdbg " $ConfigHelp >/dev/null; then
-    ExtOpts="$ExtOpts--enable-phpdbg "
-fi
+
 # Skip *-fpm package generation if --enable-fpm unknown
 echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`ls -d $Bld/pkgs/*-fpm`/skip
 # Skip *-mysql package generation if --with-mysql known
@@ -69,6 +81,7 @@ echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`ls -d $Bld/pkgs/*-mysq
 #   Handle build-time hooks (mostly for PHP extensions)
 #
 if [ -d $Bld/hooks ]; then
+    Sep=
     for hook in $Bld/hooks/*
     do
 	Show=
@@ -77,10 +90,11 @@ if [ -d $Bld/hooks ]; then
 	if [ "$Show" ]; then
 	    test "$HookShow" && HookShow="$HookShow + $Show" || HookShow=" with $Show"
 	fi
-	test "$Opt" && HookOpts="$HookOpts$Opt "
+	test "$Opt" && HookOpts="$HookOpts$Sep$Opt"
+	Sep=' '
     done
     if [ "$HookOpts" ]; then
-	grep ' need autoconf version 2.13 or' build/buildcheck.sh >/dev/null && export PHP_AUTOCONF='/usr/bin/autoconf2.13'
+	test -f build/buildcheck.sh && grep ' need autoconf version 2.13 or' build/buildcheck.sh >/dev/null && export PHP_AUTOCONF='/usr/bin/autoconf2.13'
 	mv configure configure0
 	test "$Dbg" && cp -p configure0 $Debug
 	su -c "./buildconf --force >$Logs/buildconf.out" $USER
@@ -90,11 +104,14 @@ if [ -d $Bld/hooks ]; then
     fi
 fi
 chown $Own $Logs/*-help.out
+
+#   Enable apc-bc if added by hook
 if grep -- "--enable-apc-bc " $ConfigHelp >/dev/null; then
-    HookOpts="$HookOpts--enable-apc-bc "
+    HookOpts="$HookOpts$Sep--enable-apc-bc"
 fi
+
 echo "Configuring php-$Ver$HookShow..."
-test "$Dbg" && echo "ExtOpts=\"$ExtOpts\" HookOpts=\"$HookOpts\""
+test "$Dbg" && echo "HookOpts=\"$HookOpts\""
 
 # In dir $1, if $2 doesn't exist, link it to $3/$2
 chkln()
@@ -144,20 +161,14 @@ su -c "EXTENSION_DIR=/usr/lib/php/extensions ./configure \
 	--with-pic \
 	--with-pear=/$PearDir \
 	--with-apxs2=/usr/bin/apxs \
-	--with-freetype-dir=/usr \
-	--with-jpeg-dir=/usr \
-	--with-png-dir=/usr \
-	--with-xpm-dir=/usr,/usr/X11R6 \
 	--with-zlib-dir=/usr \
 	--with-pdo-mysql=/usr \
 	--with-mysqli=/usr/bin/mysql_config \
 	--with-bz2 \
 	--with-curl \
-	--with-gd \
 	--with-gettext \
 	--with-iconv \
 	--with-mhash \
-	--with-pcre-regex \
 	--with-openssl \
 	--with-xsl \
 	--with-zlib \
@@ -167,9 +178,7 @@ su -c "EXTENSION_DIR=/usr/lib/php/extensions ./configure \
 	--enable-ctype \
 	--enable-dom \
 	--enable-ftp \
-	--enable-hash \
 	--enable-json \
-	--enable-libxml \
 	--enable-mbstring \
 	--enable-pdo \
 	--enable-posix \
@@ -180,11 +189,9 @@ su -c "EXTENSION_DIR=/usr/lib/php/extensions ./configure \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
-	--enable-wddx \
 	--enable-xml \
 	--enable-xmlreader \
 	--enable-xmlwriter \
-	--enable-zip \
 >$Logs/config.out 2>&1" $USER
 grep 'WARNING:' $Logs/config.out | egrep -v 'bison version|need re2c' || true	# true for set -e
 test "$Dbg" && cp -p Makefile $Debug/Makefile0
