@@ -4,15 +4,16 @@ set -e
 
 if [ "$1" = "configure" ]; then
     update-alternatives --install /usr/bin/php php /usr/bin/php%MM% %PRI% --slave /usr/share/man/man1/php.1.gz php.1.gz /usr/share/man/man1/php%MM%.1.gz
+    update-alternatives --install /usr/bin/phpdbg phpdbg /usr/bin/phpdbg%MM% %PRI% --slave /usr/share/man/man1/phpdbg.1.gz phpdbg.1.gz /usr/share/man/man1/phpdbg%MM%.1.gz
     update-alternatives --install /usr/bin/phar phar /usr/bin/phar%MM% %PRI% --slave /usr/share/man/man1/phar.1.gz phar.1.gz /usr/share/man/man1/phar%MM%.1.gz
     update-alternatives --install /usr/bin/phar.phar phar.phar /usr/bin/phar%MM%.phar %PRI% --slave /usr/share/man/man1/phar.phar.1.gz phar.phar.1.gz /usr/share/man/man1/phar%MM%.phar.1.gz
     update-alternatives --install /usr/lib/php/extensions extensions /usr/lib/php/%MM% %PRI%
 
-    mkdir -p /etc/php/$MMD/conf.d
+    mkdir -p /etc/php$MMD/conf.d
 fi
 
 if [ -d /etc/epiconcept/php-mods-available ]; then
     for f in /etc/epiconcept/php-mods-available/*.ini; do
-		test -f $f && ln $f /etc/php/$MMD/conf.d
+	test -f $f && ln $f /etc/php$MMD/conf.d
     done
 fi

@@ -65,6 +65,7 @@ if [ "$MM" ]; then
     mv $Top/etc/php/php.ini $Top/etc/php/$MM
     (cd $Top/usr/bin
      mv php php$MM
+     mv phpdbg phpdbg$MM
      if [ -e phar ]; then
 	mv phar.phar phar$MM.phar
     	ln -sf phar$MM.phar phar$MM
@@ -72,12 +73,19 @@ if [ "$MM" ]; then
      fi
      cd $Top/$ManDir/man1
      mv php.1.gz php$MM.1.gz
+     mv phpdbg.1.gz phpdbg$MM.1.gz
      mv phar.1.gz phar$MM.1.gz
      mv phar.phar.1.gz phar$MM.phar.1.gz
     )
     (cd $Top/usr/lib/php; mv extensions $MM)
     sed -i -e "s/%MM%/$MM/g" -e "s/%PRI%/`echo $MM | tr -d .`/" $Top/DEBIAN/postinst
     sed -i "s/%MM%/$MM/g" $Top/DEBIAN/prerm
+    mkdir -p $Top/usr/lib/epi-php$MMD
+    if [ $Maj -ge 7 ]; then
+	mv $Top/usr/lib/epi-php/prepend.d $Top/usr/lib/epi-php$MMD
+    else
+	rm -r $Top/usr/lib/epi-php
+    fi
 else
     #   Declare as Conflicts all other supported versions
     for v in $SupVer
