@@ -40,6 +40,17 @@ COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
 	TESTS_REQ="$BUILD_REQ $LIBZIP"
 	CLI_DEPS="$CLI_DEPS, $LIBZIP"
     fi
+
+    #	Add patches for Debian 10+
+    if [ $DebNum -gt 9 ]; then
+	BLDCOPY="$BLDCOPY
+COPY ${PhpTop}hooks/mysqli.sh $BUILD_TOP/hooks"
+	# 7.4 seems to not need this patch
+	if [ $Min -lt 4 ]; then
+	    BLDCOPY="$BLDCOPY
+COPY ${PhpTop}hooks/freetype.sh $BUILD_TOP/hooks"
+	fi
+    fi
 }
 
 #
