@@ -2,7 +2,7 @@ Package: %NAME%
 Version: %VERSION%
 Architecture: amd64
 Maintainer: Cedric <c.girard@epiconcept.fr>
-Depends: apache2, %API%, %CLI%, libc6, epiconcept-arborescence
+Depends: apache2, %API%, %CLI%, libc6
 Provides: libapache2-mod-php, phpapi-%PHPAPI%
 Conflicts: libapache2-mod-php, php-fpm
 Section: admin
