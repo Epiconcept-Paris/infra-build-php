@@ -32,6 +32,15 @@ COPY $Php/hooks/mysql.sh $BUILD_TOP/hooks"
 COPY ${PhpTop}files/PEAR_Manpages-1.10.0.tgz $BUILD_TOP/files
 COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
 
+    #	wddx legacy PHP extension for 7.4+
+    #	From https://github.com/php/pecl-text-wddx
+    #	Latest: https://github.com/php/pecl-text-wddx/archive/master.tar.gz
+    if [ $Min -gt 3 ]; then
+	BLDCOPY="$BLDCOPY
+COPY $Php/files/wddx.tar.gz $BUILD_TOP/files
+COPY $Php/hooks/wddx.sh $BUILD_TOP/hooks"
+    fi
+
     #
     #	Add libzip packages for 7.2+
     #
