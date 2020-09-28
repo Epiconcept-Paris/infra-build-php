@@ -14,6 +14,9 @@ PECLGET="pecl.php.net/get"
 Ext=.tar.bz2
 LF='
 '
+ColRed=`tput setaf 1`
+ColGrn=`tput setaf 2`
+ColStd=`tput setaf 7`
 
 Prg=php/`basename $0`
 Dir=`dirname $0`
@@ -149,7 +152,7 @@ else
 	fi
     done
     if [ -z "$dl" ]; then
-	echo "Failed to download $Tbz from known URLs" >&2
+	echo "$ColRed\aFAILED to download $Tbz from known URLs$ColStd" >&2
 	echo "Put it manually as $PhpSrc and run $Prg again" >&2
 	rm -f $PhpSrc $PhpLst
 	test "$mk" && find $PhpDir -type d -empty -delete
@@ -245,10 +248,15 @@ if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
 	echo "Use:\n    $Cmd bash\nto run the build container"
     else
 	echo "Running the '$BUILD_NAME' container:\n    $Cmd"
-	$Cmd
+	if $Cmd; then
+	    echo "Made PHP $PhpVer-$Bld packages for Debian $DebVer."
+	else
+	    echo "$ColRed\aFAILED to make PHP $PhpVer-$Bld packages for Debian $DebVer!$ColStd"
+	    exit 1
+	fi
     fi
 else
-    echo "FAILED to build the $BUILD_IMG image !"
+    echo "$ColRed\aFAILED to build the $BUILD_IMG image!$ColStd"
     echo "Examine $Dist/.logs/docker-build.out for details."
     exit 1
 fi
@@ -292,10 +300,15 @@ if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
 	echo "Use:\n    $Cmd bash\nto run the tests container"
     else
 	echo "Running the '$TESTS_NAME' container:\n    $Cmd"
-	$Cmd
+	if $Cmd; then
+	    echo "${ColGrn}All PHP $PhpVer-$Bld packages for Debian $DebVer built and tested.$ColStd"
+	else
+	    echo "$ColRed\aFAILED to test PHP $PhpVer-$Bld packages for Debian $DebVer!$ColStd"
+	    exit 1
+	fi
     fi
 else
-    echo "FAILED to build the $TESTS_IMG image !"
+    echo "$ColRed\aFAILED to build the $TESTS_IMG image!$ColStd"
     echo "Examine $Dist/.logs/docker-tests.out for details."
     exit 1
 fi
