@@ -87,7 +87,7 @@ Vers()
     END {
 	for (Mm in v)
 	    printf("%s.%s\n", Mm, v[Mm]);
-    }'`
+    }' | sort -n -t. -k 1,1 -k 2,2 -k 3,3`
 }
 
 #
