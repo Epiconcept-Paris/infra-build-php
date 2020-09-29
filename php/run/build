@@ -224,10 +224,63 @@ set +e	# Continue on errors
 if [ -f $Bld/.notest ]; then
     echo "Skiping php-$Ver tests."
 else
+    #
+    #	Make PHP tests with timeout, as 5.6.40 & 7.1.33 on buster hang
+    #	on the same curl test (test 2504 in 5.6.40, test 3325 in 7.1.33)
+    #	'ps -ef' shows a zombie shell, and killing its parent unhangs
+    #
     echo "Testing php-$Ver..."
-    echo "s" | su -c "make test >$Logs/make-test.out 2>&1" $USER
-    sed -n '/^FAILED TEST /,'/^============/'p' $Logs/make-test.out
-    test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs/php_test_results.txt
+    mkAlrm()
+    {
+	:
+    }
+    mkWake()
+    {
+	sleep $1
+	test $? -lt 128 && kill -s ALRM $2
+    }
+    mkOut="$Logs/make-test.out"
+    echo "s" | su -c "make test >$mkOut 2>&1" $USER &
+    mkPid=$!
+
+    mkMax=180	# 3 mn timeout with no change in $mkOut
+    mkOld=0	# Previous mkOut's size
+    mkRet=128	# mkPid's return code
+    trap mkAlrm ALRM
+    while :
+    do
+	mkWake $mkMax $$ &
+	wkPid=$!
+	wait $mkPid
+	mkRet=$?
+	if [ $mkRet -lt 128 ]; then
+	    # mkPid exited 'normally' (with or without error)
+	    kill $wkPid
+	    break
+	fi
+	# mkRet >= 128, so wait was interrupted by mkWake
+	wkPid=
+	mkSiz=`stat -c '%s' $mkOut`
+	if [ $mkSiz -eq $mkOld ]; then
+	    echo "Tests appear to be stalled - Aborting !"
+	    # TODO: we need something more efficient here !
+	    ps -ef >$Logs/mk-ps-ef.out
+	    zbPid=`ps -ef | grep '<defunct>' | awk '{print $3}'`
+	    test "$zbPid" && kill $zbPid 2>/dev/null
+	    kill $mkPid 2>/dev/null
+	    sleep 3
+	    echo "------------------------------------------------" >>$Logs/mk-ps-ef.out
+	    ps -ef >>$Logs/mk-ps-ef.out
+	    echo "ABORTED after ${mkMax}s inactivity !" >>$mkOut
+	    break
+	fi
+	mkOld=$mkSiz
+    done
+    trap ALRM
+    if [ $mkRet -lt 128 ]; then
+	sed -n '/^FAILED TEST /,'/^============/'p' $mkOut
+	test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs/php_test_results.txt
+    fi
 fi
 test "$Dbg" && { find . ! -user $USER >$Debug/not-$USER; chown $Own $Debug/not-$USER; }
 
