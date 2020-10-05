@@ -240,7 +240,7 @@ if [ "$isRm" ]; then
 		dir=`ls -d $DebTop/$deb/dist/$key 2>/dev/null`
 		imgs=`echo "$DockImgs" | sed -nr "s/^(epi-(build|tests)-php)  *($name-$ver) .*$/\1:\3/p" | sort`
 		expr "$imgs" : ".*$LF" >/dev/null && many=s || many=
-		echo "$imgs" | grep "epi-build-php" >/dev/null && bld=`docker run -ti --rm "epi-build-php:$name-$ver" sh -c "echo \\$BUILD_NUM" | tr -d ''`
+		echo "$imgs" | grep "epi-build-php" >/dev/null && bld=`docker run --rm "epi-build-php:$name-$ver" sh -c "echo \\$BUILD_NUM" | tr -d ''`
 		#echo "key=$key ver=$ver bld=\"$bld\" dir=\"$dir\" imgs=\"$imgs\""
 		test "$key" = "$ver-$bld" && imgs=`echo -n "$imgs" | tr "$LF" ","` || imgs=
 		test "$imgs" && what="#${many}_for_PHP_${ver}_on_$name" || what=
@@ -254,7 +254,7 @@ if [ "$isRm" ]; then
 		    dirs=`ls -d $DebTop/$deb/dist/$ver-* 2>/dev/null`
 		    imgs=`echo "$DockImgs" | sed -nr "s/^(epi-(build|tests)-php)  *($name-$ver) .*$/\1:\3/p" | sort`
 		    expr "$imgs" : ".*$LF" >/dev/null && many=s || many=
-		    echo "$imgs" | grep "epi-build-php" >/dev/null && bld=`docker run -ti --rm "epi-build-php:$name-$ver" sh -c "echo \\$BUILD_NUM" | tr -d ''`
+		    echo "$imgs" | grep "epi-build-php" >/dev/null && bld=`docker run --rm "epi-build-php:$name-$ver" sh -c "echo \\$BUILD_NUM" | tr -d ''`
 		    for dir in $dirs
 		    do
 			dist=`basename "$dir"`
