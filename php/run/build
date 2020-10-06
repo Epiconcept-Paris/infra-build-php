@@ -213,7 +213,7 @@ include /usr/share/dpkg/buildflags.mk\
 # Extra libs for PHP 5.2
 grep '^EXTRA_LIBS = .* -lssl -lcrypto' Makefile >/dev/null || sed -i 's/-lxml2 -lxml2 -lxml2/-lssl -lcrypto/' Makefile
 
-echo "Building php-$Ver..."
+date "+%Y-%m-%d %H:%M:%S Building php-$Ver..."
 if ! su -c "make -k >$Logs/make.out 2>&1" $USER; then
     echo "\aBuilding php-$Ver FAILED:"
     grep "error:" $Logs/make.out
@@ -227,59 +227,117 @@ else
     #
     #	Make PHP tests with timeout, as 5.6.40 & 7.1.33 on buster hang
     #	on the same curl test (test 2504 in 5.6.40, test 3325 in 7.1.33)
-    #	'ps -ef' shows a zombie shell, and killing its parent unhangs
+    #	if 'ps -ef' shows a zombie shell, killing its parent unhangs
     #
-    echo "Testing php-$Ver..."
-    mkAlrm()
-    {
-	:
-    }
+    #	We basically run "make test" in the background and set a watchdog
+    #	to check every $mkMax seconds that the output has been added to
+    #	If not, we assume some test is stuck and try to terminate it
+    #	If that fails, we terminate the whole make process group
+    #
+    #	Our watchdog function
     mkWake()
     {
 	sleep $1
 	test $? -lt 128 && kill -s ALRM $2
     }
+
+    date "+%Y-%m-%d %H:%M:%S Testing php-$Ver..."
     mkOut="$Logs/make-test.out"
+    mkLog="$Logs/mktest-ps.out"
+
+    mkErr="$Logs/make-test.err"
+    exec 3>&2
+    exec 2>>$mkErr	# Mostly to capture "Terminated" messages from shell
+    chown $Own $mkErr
+
     echo "s" | su -c "make test >$mkOut 2>&1" $USER &
     mkPid=$!
 
-    mkMax=180	# 3 mn timeout with no change in $mkOut
-    mkOld=0	# Previous mkOut's size
-    mkRet=128	# mkPid's return code
-    trap mkAlrm ALRM
+    mkOld=0		# Previous mkOut's size
+    mkMax=180		# 3 mn timeout with no change in $mkOut
+    trap : ALRM
     while :
     do
 	mkWake $mkMax $$ &
 	wkPid=$!
 	wait $mkPid
 	mkRet=$?
+	#date "+%Y-%m-%d %H:%M:%S mkRet=$mkRet"
 	if [ $mkRet -lt 128 ]; then
-	    # mkPid exited 'normally' (with or without error)
-	    kill $wkPid
+	    wkCld=$(ps -o ppid,pid | awk "\$1 == $wkPid { print \$2 }")
+	    echo "$Prg: mkRet=$mkRet wkPid=$wkPid wkCld=$wkCld" >>$mkOut
+	    kill $wkCld 2>/dev/null && echo "$Prg: stopped mkWake [$wkPid,$wkCld]" >>$mkOut
+	    wait
+	    test $mkRet -eq 2 -a "$mkPar" && mkCld=y	# make stopped after test-abort
 	    break
 	fi
-	# mkRet >= 128, so wait was interrupted by mkWake
+	# mkRet >= 128, so 'wait $mkPid' was interrupted at the end of mkWake
 	wkPid=
 	mkSiz=`stat -c '%s' $mkOut`
 	if [ $mkSiz -eq $mkOld ]; then
-	    echo "Tests appear to be stalled - Aborting !"
-	    # TODO: we need something more efficient here !
-	    ps -ef >$Logs/mk-ps-ef.out
-	    zbPid=`ps -ef | grep '<defunct>' | awk '{print $3}'`
-	    test "$zbPid" && kill $zbPid 2>/dev/null
-	    kill $mkPid 2>/dev/null
-	    sleep 3
-	    echo "------------------------------------------------" >>$Logs/mk-ps-ef.out
-	    ps -ef >>$Logs/mk-ps-ef.out
-	    echo "ABORTED after ${mkMax}s inactivity !" >>$mkOut
-	    break
+	    # Try to handle the known case of the hanged curl test
+	    # Our zombie shell appears as "[sh] <defunct>"
+	    mkPar=$(ps -u $USER -o ppid,cmd | awk '/ <defunct>/{print $1}')
+	    ps -Hu $USER -o pid,ppid,pgid,uid,cmd >$mkLog
+	    echo "----------------------------------------" >>$mkLog
+	    if [ "$mkPar" ]; then
+		# The dd trick is for removing the CR at the end of $mkOut
+		#	(this is needed for tail to return our last line)
+		mkTst=$( (dd count=1 bs=$(($mkSiz - 1)) <$mkOut 2>/dev/null; echo) | tail -1 -)
+		date "+%Y-%m-%d %H:%M:%S Aborting \"$mkTst\" after waiting ${mkMax}s"
+		echo "FAIL Test timed-out after $mkMax seconds of inactivity" >>$mkOut
+
+		# If there is also an orphan (PPID=1) php process,
+		# stop it, as this allows the tests to continue.
+		# Otherwise, kill the zombie's parent, but that aborts the make
+		mkOph=$(ps -u $USER -o pid,ppid | awk '$2 == 1 {print $1}')
+		if [ "$mkOph" ]; then
+		    kill $mkOph && echo "Terminated orphan mkOph=$mkOph" >>$mkLog
+		    wait $mkOph
+		    unset mkPar
+		else
+		    kill $mkPar && echo "Terminated zombie's parent mkPar=$mkPar" >>$mkLog
+		    wait $mkPar
+		fi
+	    else
+		date "+%Y-%m-%d %H:%M:%S Tests appear to be stalled - Aborting !"
+		# We want to kill the child of mkPid that is a process-group leader
+		mkCld=$(awk "\$2 == $mkPid && \$3 == \$1 { print \$1 }" $mkLog)
+		echo "mkPid=$mkPid mkCld=$mkCld" >>$mkLog
+		if [ "$mkCld" ]; then
+		    kill -- -$mkCld	# Abort process group
+		    wait $mkCld
+		    echo "wait mkCld=$mkCld -> ret=$?" >>$mkLog
+		    wait $mkPid
+		    echo "wait mkPid=$mkPid -> ret=$?" >>$mkLog
+		else
+		    echo "WARNING: No process to kill ?"
+		    mkCld=y
+		fi
+		break
+	    fi
 	fi
 	mkOld=$mkSiz
     done
     trap ALRM
-    if [ $mkRet -lt 128 ]; then
-	sed -n '/^FAILED TEST /,'/^============/'p' $mkOut
-	test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs/php_test_results.txt
+    if [ -f $mkLog ]; then
+	echo "========================================" >>$mkLog
+	ps -eHo pid,ppid,pgid,uid,cmd >>$mkLog
+	chown $Own $mkLog
+    fi
+
+    exec 2>&3
+    exec 3>&-
+    sed -i '/^Terminated$/d' $mkErr
+    test -s $mkErr && echo "Errors during tests:" && sed 's/^/  /' $mkErr >&2
+
+    sed -n '/^FAILED TEST SUMMARY/,'/^============/'p' $mkOut
+    test -f php_test_results_*.txt && cp -p php_test_results_*.txt $Logs/php_test_results.txt
+    if [ "$mkCld" ]; then
+	echo "$Prg: ABORTED after ${mkMax}s inactivity !" >>$mkOut
+	date "+%Y-%m-%d %H:%M:%S Tests of php-$Ver aborted."
+    else
+	date "+%Y-%m-%d %H:%M:%S Tests of php-$Ver completed."
     fi
 fi
 test "$Dbg" && { find . ! -user $USER >$Debug/not-$USER; chown $Own $Debug/not-$USER; }
@@ -360,6 +418,6 @@ do
     chown $Own $Logs/*_$Pkg.out
 done
 chown $Own $Pkgs
-test "$Dbg" && cp -p Makefile $Debug
+test "$Dbg" && cp -p Makefile $Debug || true
 
 #make clean >$Logs/make-clean.out 2>&1
