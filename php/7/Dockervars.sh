@@ -32,22 +32,29 @@ COPY $Php/hooks/mysql.sh $BUILD_TOP/hooks"
 COPY ${PhpTop}files/PEAR_Manpages-1.10.0.tgz $BUILD_TOP/files
 COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
 
-    #	wddx legacy PHP extension for 7.4+
-    #	From https://github.com/php/pecl-text-wddx
-    #	Latest: https://github.com/php/pecl-text-wddx/archive/master.tar.gz
-    if [ $Min -gt 3 ]; then
-	BLDCOPY="$BLDCOPY
-COPY $Php/files/wddx.tar.gz $BUILD_TOP/files
-COPY $Php/hooks/wddx.sh $BUILD_TOP/hooks"
+    #
+    #	For 7.2+, add specific dev and lib packages
+    #
+    if [ $Min -ge 2 ]; then
+	BUILD_REQ="$BUILD_REQ $DEV72_"
+	TESTS_REQ="$BUILD_REQ $LIB72_"
+	CLI_DEPS="$CLI_DEPS, $(echo "$LIB72_" | sed 's/ /, /g')"
     fi
 
     #
-    #	Add libzip packages for 7.2+
+    #	For 7.4+, add specific dev and lib packages..
     #
-    if [ $Min -gt 1 ]; then
-	BUILD_REQ="$BUILD_REQ libzip-dev"
-	TESTS_REQ="$BUILD_REQ $LIBZIP"
-	CLI_DEPS="$CLI_DEPS, $LIBZIP"
+    if [ $Min -ge 4 ]; then
+	BUILD_REQ="$BUILD_REQ $DEV74_"
+	TESTS_REQ="$BUILD_REQ $LIB74_"
+	CLI_DEPS="$CLI_DEPS, $(echo "$LIB74_" | sed 's/ /, /g')"
+
+	#   ..and the wddx legacy PHP extension
+	#   From https://github.com/php/pecl-text-wddx
+	#   Latest: https://github.com/php/pecl-text-wddx/archive/master.tar.gz
+	BLDCOPY="$BLDCOPY
+COPY $Php/files/wddx.tar.gz $BUILD_TOP/files
+COPY $Php/hooks/wddx.sh $BUILD_TOP/hooks"
     fi
 
     #	Add patches for Debian 10+
@@ -64,7 +71,7 @@ COPY ${PhpTop}hooks/freetype.sh $BUILD_TOP/hooks"
 
 #
 #   Main
-#   global Php BLDCOPY BUILD_TOP BUILD_REQ TESTS_REQ CLI_DEPS LIBZIP
+#   global Php BLDCOPY BUILD_TOP BUILD_REQ TESTS_REQ CLI_DEPS DEV7?_ LIB7?_
 #
 . ${PhpTop}lib/AddPECL.sh
 
