@@ -7,6 +7,7 @@
 #   E: Our phpdbg includes libgd/file on purpose
 %NAME%: embedded-library usr/bin/phpdbg%MM%: libgd
 %NAME%: embedded-library usr/bin/phpdbg%MM%: file
+%NAME%: embedded-library usr/bin/phpdbg%MM%: sqlite
 
 #   E: Pointless as phar is included in this cli package
 %NAME%: php-script-but-no-phpX-cli-dep usr/bin/phar.phar
