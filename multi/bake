@@ -182,10 +182,10 @@ COPY ${MulTop}run/$Pkg /tmp
 RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
     mkdir -p $Logs
     #   Variables come in order of their appearance in Dockerfile-multi.in
-    DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
+    DEBVER="$DebVer" DEBNUM="$DebNum" DOMAIN="${MultiDomain:-epiconcept.tld}" PORT="${MultiPort:-80}" USER="$User" ADDUSER="$AddUser" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $DOMAIN $PORT $USER $ADDUSER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
     rm -f ${MulTop}run/$Pkg
 fi
-MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" envsubst '$MULTI_NAME $MULTI_TOP $MULTI_IMG' <${MulTop}run/run >$MultDir/run
+MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" MULTI_PORT="${MultiPort:80}" envsubst '$MULTI_NAME $MULTI_TOP $MULTI_IMG $MULTI_PORT' <${MulTop}run/run >$MultDir/run
 chmod +x $MultDir/run
 
 if [ -f ${TopDir}.norun ]; then

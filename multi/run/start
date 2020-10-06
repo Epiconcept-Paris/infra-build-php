@@ -57,8 +57,8 @@ else
 #   DO NOT change DocumentRoot, it is needed by the container's start script
 #   DO NOT change SetHandler, it is in sync with the PHP-FPM configuration
 #
-<VirtualHost *:80>
-    ServerName php%Maj%%Min%.epiconcept.tld
+<VirtualHost *:$PORT>
+    ServerName php%Maj%%Min%.$DOMAIN
     DocumentRoot $WWW
     <FilesMatch \".+\.ph(ar|p|tml)$\">
         SetHandler \"proxy:unix:/run/php/php%Maj%.%Min%-fpm.sock|fcgi://localhost\"
@@ -95,7 +95,8 @@ do
     echo "$SiteConf" >/etc/apache2/sites-available/$Serv.conf
     su -c "cp -p /etc/apache2/sites-available/$Serv.conf $Logs" $USER
     a2ensite $Serv.conf >>$Logs/a2.out
-    echo "Added site http://$Serv"
+    test $PORT -eq 80 || Port=":$PORT"
+    echo "Added site http://$Serv$Port"
     echo "    with SetHandler   $Hand"
     Srvs="$Srvs$Serv "
     ns=`expr $ns + 1`
