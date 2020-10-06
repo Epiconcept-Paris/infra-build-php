@@ -4,7 +4,7 @@
 #	bake - Build or clean PHP distribs, tools and multi
 #
 #	Usage:	./bake [mk | rm | <Debian-version> | <PHP-version> | tools | multi]
-#		./bake [ls | ver | help]
+#		./bake [ls | ver | latest | help]
 #	<PHP-version> is <Maj>.<Min>, <Maj>.<Min>.<Rel> or <Maj>.<Min>.<Rel>-<Bld>
 #
 PHPSITE='fr.php.net'
@@ -16,16 +16,25 @@ DebTop=debian
 PhpTop=php
 TlsTop=tools
 MulTop=multi
-#Do=Do	# Remove comment to not actually execute commands (for debug)
+
+#
+#   Minimal do-not-run system: each effective command is prefixed with $Do
+#   If $Do is empty (normal use), commands are just executed
+#   If $Do is not-empty, it acts as a prefix command to which all effective
+#     commands are passed as arguments and collected for final (debug) display
+#   So just uncomment the next line to not actually execute commands
+#Do=Do
 LF='
 '
 Do()
 {
     # global DoCmds
+
     DoCmds="$DoCmds$*$LF"
 }
+
 #
-#   Check environment
+#   Check environment ------------------------------------------
 #
 Path() { realpath --relative-to=$IniPwd $1; }
 test "$Dir" || Dir=`dirname \`realpath $0\``
@@ -35,9 +44,23 @@ for dir in $DebTop $PhpTop $TlsTop $MulTop
 do
     test -d $dir || { echo "$Prg: missing '$dir' directory." >&2; exit 2; }
 done
+tty <&1 >/dev/null && trap '' HUP
 
-DirSep='{'
-SupSep=''
+DebDir()
+{
+    local ret v sep
+
+    test "$1" || return
+    test "$2" && ret='{' || ret=
+    for v in "$@"
+    do
+	ret="$ret$sep$v"
+	sep=','
+    done
+    test "$2" && echo "$ret}" || echo "$ret"
+}
+
+Sep=''
 for f in `cd $DebTop; ls */name | sort -n`
 do
     f="$DebTop/$f"
@@ -45,27 +68,30 @@ do
     test -f $dir/mkre || continue
     deb=`basename $dir`
     name=`cat $f`
-    DebVer="$DebVer$deb "
-    DebDir="$DebDir$DirSep$deb"
-    DebSup="$DebSup$SupSep`cat $dir/mkre`"
+    DebVer="$DebVer$Sep$deb"
     DebLst="$DebLst`printf "%2d ($name)" $deb`$LF"
-    SedArg="$SedArg -e 's/$name-/$deb:/' "
-    DirSep=','
-    SupSep='|'
+    SedArg="$SedArg$Sep-e 's/$name-/$deb:/'"
+    Sep=' '
 done
 test "$DebVer" || { echo "$Prg: no valid Debian version in '$DebTop' ??" >&2; exit 3; }
-DebDir="$DebDir}"
-#echo "DebVer=\"$DebVer\" DebDir=\"$DebDir\" DebSup=\"$DebSup\" DebLst=\"$DebLst\" SedArg=\"$SedArg\""
+#echo "DebVer=\"$DebVer\" DebDir=\"$(DebDir $DebVer)\" DebLst=\"$DebLst\" SedArg=\"$SedArg\""
 ReMajMin='[5-9]\.[0-9]$'
 ReVersion='[5-9]\.[0-9]\.[0-9]\{,2\}$'
 ReDistrib='\([5-9]\.[0-9]\.[0-9]\{,2\}\)-[0-9]\{,2\}$'
 
 #
-#   Get the latest versions
+#   General functions ------------------------------------------
+#
+#	Get the latest PHP versions
 #
 Vers()
 {
-    # global PHPSITE Prg DebSup PhpTop Versions Latest
+    # global PHPSITE Prg PhpTop Versions Latest
+    local Sup
+
+    # Build RE of all *Sup*ported PHP versions, trying to eliminate duplicates
+    Sup=$(eval cat $DebTop/$(DebDir $DebVer)/mkre | tr '|' '\n' | sort -u)
+    Sup=$(echo -n "$Sup" | tr '\n' '|')
 
     Versions=`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`
     test "$Versions" || echo -e "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
@@ -75,7 +101,7 @@ Vers()
 	echo "$Prg: empty list of known PHP versions ??" >&2
 	exit 1
     fi
-    Latest=`echo "$Versions" | egrep "^($DebSup)\.[0-9]{,2}$" | awk -F. '{
+    Latest=`echo "$Versions" | egrep "^($Sup)\.[0-9]{,2}$" | awk -F. '{
 	Mm = $1 "." $2
 	if (Mm in v) {
 	    if (v[Mm] < $3)
@@ -91,7 +117,7 @@ Vers()
 }
 
 #
-#   Parse args -------------------------------------------------
+#	Usage
 #
 Usage()
 {
@@ -105,6 +131,11 @@ Usage()
     exit ${1:-1}
 }
 
+#
+#   Parse args -------------------------------------------------
+#
+#	'ver' and 'latest' commands
+#
 if [ "$1" = 'ver' -o "$1" = 'latest' ]; then
     Vers
     if [ "$1" = 'ver' ]; then
@@ -116,10 +147,13 @@ if [ "$1" = 'ver' -o "$1" = 'latest' ]; then
 	echo "$Latest"
     fi
     exit 0
+#
+#	'ls' command
+#
 elif [ "$1" = 'ls' ]; then
     Red='!'
     tty <&1 >/dev/null && { Red=`tput setaf 1`; Grn=`tput setaf 2`; Std=`tput setaf 7`; }
-    dirs=`eval ls -d $DebTop/$DebDir/{dist/{[5-9].*,tools},multi} 2>/dev/null`
+    dirs=`eval ls -dv $DebTop/$(DebDir $DebVer)/{dist/{[5-9].*,tools},multi} 2>/dev/null`
     test "$dirs" && echo "Current distributions:"
     for dir in $dirs
     do
@@ -133,6 +167,9 @@ elif [ "$1" = 'ls' ]; then
     done
     exit 0
 fi
+#
+#	other args: mk | rm | <Debian-version> | <PHP-version> | tools | multi | help
+#
 Mode=
 nbarg=$#
 while [ $# -gt 0 ]
@@ -147,18 +184,19 @@ do
 	rm) Mode=Rm
 	    isRm=y
 	    ;;
-	# Debian version
+	# Debian-version
 	[1-9]|1[0-9]|-)
 	    if [ "$1" = '-' ]; then
 		CurDeb=
 	    elif [ -f $DebTop/$1/name -a -f $DebTop/$1/mkre ]; then
-		CurDeb=$1
+		CurDeb=$CurDeb$CurSep$1
+		CurSep=' '
 	    else
 		echo "$Prg: invalid Debian version '$1'" >&2
 		exit 3
 	    fi
 	    ;;
-	# PHP version or distrib, tools or multi
+	# PHP-version or distrib, tools or multi
 	[5-9].[0-9]*|tools|multi)
 	    test "$Mode" || { Mode=Mk; isMk=y; }
 	    if [ "$1" = 'tools' -o "$1" = 'multi' ]; then
@@ -182,6 +220,9 @@ do
 	help)
 	    Usage 0
 	    ;;
+	-n)
+	    Do=Do
+	    ;;
 	*)  echo "$Prg: invalid argument '$1'" >&2
 	    Usage
 	    ;;
@@ -189,7 +230,8 @@ do
     shift
 done
 test "$isMk" -o "$isRm" || { echo "$Prg: no mode [mk|rm] specified" >&2; Usage; }
-#echo "nbarg=$nbarg Mode=$Mode CurDeb=\"$CurDeb\" DebVer=\"$DebVer\" DebDir=\"$DebDir\" isMk=\"$isMk\" isRm=\"$isRm\" toMk=\"$toMk\" toRm=\"$toRm\""
+#echo "nbarg=$nbarg Do=\"$Do\" Mode=$Mode CurDeb=\"$CurDeb\" DebVer=\"$DebVer\" isMk=\"$isMk\" isRm=\"$isRm\" toMk=\"$toMk\" toRm=\"$toRm\""
+
 #
 #   Remove -----------------------------------------------------
 #
@@ -199,8 +241,10 @@ if [ "$isRm" ]; then
     #	Default remove
     #
     if [ -z "$toRm" ]; then
-	toRm=`eval ls -d $DebTop/$DebDir/dist/[5-9].* $DebTop/$DebDir/dist/tools $DebTop/$DebDir/multi 2>/dev/null | sed -nr -e "s;^$DebTop/([0-9]+)/dist/([5-9]\\.[0-9]\\.[0-9]{,2})-[0-9]{,2}$;\\1:\\2;p" -e "s;$DebTop/([0-9]+)/dist/tools$;\\1:tools;p" -e "s;$DebTop/([0-9]+)/multi$;\\1:~multi;p"`
-	toRm="$toRm$LF`echo "$DockImgs" | awk '/^epi-(build|tests)-php /{print $2}/^epi-tools /{print $2 "-tools"}/^epi-multi-php /{print $2 "-~multi"}' | eval sed $SedArg`"
+	test "$CurDeb" && Debs=$(DebDir $CurDeb) || Debs=$(DebDir $DebVer)
+	toRm=`eval ls -dv $DebTop/$Debs/dist/[5-9].* $DebTop/$Debs/dist/tools $DebTop/$Debs/multi 2>/dev/null | sed -nr -e "s;^$DebTop/([0-9]+)/dist/([5-9]\\.[0-9]\\.[0-9]{,2})-[0-9]{,2}$;\\1:\\2;p" -e "s;$DebTop/([0-9]+)/dist/tools$;\\1:tools;p" -e "s;$DebTop/([0-9]+)/multi$;\\1:~multi;p"`
+	test "$CurDeb" && SedFlt=" -nr -e '/^$(DebDir $CurDeb | tr '{,}' '(|)'):/p'"
+	toRm="$toRm$LF`echo "$DockImgs" | awk '/^epi-(build|tests)-php /{print $2} /^epi-tools /{print $2 "-tools"} /^epi-multi-php /{print $2 "-~multi"}' | eval sed $SedArg$SedFlt`"
 	toRm=`echo "$toRm" | LANG=C sort -ut: | tr -d '~'`	# Remove '~' sort helper
     fi
     #echo toRm: $toRm
@@ -327,7 +371,8 @@ if [ "$isMk" ]; then
     #	Default make
     #
     if [ -z "$toMk" ]; then
-	for deb in $DebVer
+	test "$CurDeb" && Debs="$CurDeb" || Debs="$DebVer"
+	for deb in $Debs
 	do
 	    re=`cat $DebTop/$deb/mkre`
 	    for ver in `echo "$Latest" | egrep "^($re)\."`
@@ -347,8 +392,12 @@ if [ "$isMk" ]; then
 	key=`expr "$tgt" : '[0-9]*:\(.*\)'`
 	#echo "deb=$deb key=$key"
 	if [ "$key" = 'multi' ]; then
-	    # Postpone multi until we know MulDeb and PHP dists
-	    test "$deb" -gt "0$MulDeb" && MulDeb="$deb"
+	    if [ "$CurDeb" ]; then
+		MulDeb="$CurDeb"
+	    else
+		# Postpone multi until we know MulDeb and PHP dists
+		test "$deb" -gt "0$MulDeb" && MulDeb="$deb"
+	    fi
 	elif [ "$key" = 'tools' ]; then
 	    Objs="$Objs$tgt "
 	else
@@ -406,7 +455,7 @@ if [ "$isMk" ]; then
 		    dir=$DebTop/$deb/multi
 		    echo "Building and running multi for $name with $mul"
 		    $Do mkdir -p $dir
-		    $Do eval "$MulTop/bake $mul | sed -u 's/$//' | tee $dir/mk.out | sed -u 's/$//'"
+		    $Do eval "$MulTop/bake $deb $mul | sed -u 's/$//' | tee $dir/mk.out | sed -u 's/$//'"
 		else
 		    echo "$Prg: no PHP-distrib selected for 'multi'" >&2
 		    continue

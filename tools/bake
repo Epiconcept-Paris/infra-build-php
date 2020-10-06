@@ -10,6 +10,7 @@ IniPwd=$PWD
 TopDir=../
 DebTop=${TopDir}debian
 TlsTop=
+tty <&1 >/dev/null && Opt='-ti '
 
 Path() { realpath --relative-to=$IniPwd $1; }
 test "$Dir" || Dir=`dirname \`realpath $0\``
@@ -94,7 +95,7 @@ DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" TOOLS_TOP="$TO
 #
 #   Run the container
 #
-Cmd="docker run -ti -v `realpath $PWD/$Tools`:$TOOLS_TOP/dist --name $TOOLS_NAME --rm $TOOLS_IMG"
+Cmd="docker run $Opt-v `realpath $PWD/$Tools`:$TOOLS_TOP/dist --name $TOOLS_NAME --rm $TOOLS_IMG"
 if [ -f ${TopDir}.norun ]; then
     echo "Use:\n    $Cmd bash\nto run the tools container"
 else
