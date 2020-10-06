@@ -4,5 +4,9 @@
 %NAME%: embedded-library usr/bin/php%MM%: pcre3
 %NAME%: embedded-library usr/bin/php%MM%: sqlite
 
+#   E: Our phpdbg includes libgd/file on purpose
+%NAME%: embedded-library usr/bin/phpdbg%MM%: libgd
+%NAME%: embedded-library usr/bin/phpdbg%MM%: file
+
 #   E: Pointless as phar is included in this cli package
 %NAME%: php-script-but-no-phpX-cli-dep usr/bin/phar.phar
