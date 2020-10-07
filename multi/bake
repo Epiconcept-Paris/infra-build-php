@@ -27,6 +27,10 @@ Base='epi-php'
 Arch='amd64'
 LF='
 '
+ColRed=`tput setaf 1`
+ColGrn=`tput setaf 2`
+ColStd=`tput setaf 7`
+
 #
 #    Parse args
 #
@@ -67,7 +71,9 @@ PkgDeb="+deb$DebNum"
 
 if [ -f $DebDir/Dockervars.sh ]; then
     eval `sed -n 's/^TESTS_REQ=/MULTI_REQ=/p' $DebDir/Dockervars.sh`
-    MULTI_REQ="$MULTI_REQ `sed -nr 's/LIB7[0-9]_="([^"]+)"/\1/p' $DebDir/Dockervars.sh`"
+    LIBS=`sed -nr 's/LIB7[0-9]_="([^"]+)"/\1/p' $DebDir/Dockervars.sh`
+    LIBS=`echo -n "$LIBS" | tr '\n' ' '`
+    MULTI_REQ="$MULTI_REQ $LIBS"
 else
     echo "$Prg: missing debian/$DebNum/Dockervars.sh" >&2
     exit 1
@@ -183,9 +189,10 @@ RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
     mkdir -p $Logs
     #   Variables come in order of their appearance in Dockerfile-multi.in
     DEBVER="$DebVer" DEBNUM="$DebNum" DOMAIN="${MultiDomain:-epiconcept.tld}" PORT="${MultiPort:-80}" USER="$User" ADDUSER="$AddUser" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $DOMAIN $PORT $USER $ADDUSER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
+    test $? -eq 0 || { echo "$ColRed\aFAILED to build the '$MULTI_IMG' docker image!$ColStd" >&2; exit 2; }
     rm -f ${MulTop}run/$Pkg
 fi
-MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" MULTI_PORT="${MultiPort:80}" envsubst '$MULTI_NAME $MULTI_TOP $MULTI_IMG $MULTI_PORT' <${MulTop}run/run >$MultDir/run
+MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" MULTI_PORT="${MultiPort:-80}" envsubst '$MULTI_NAME $MULTI_TOP $MULTI_IMG $MULTI_PORT' <${MulTop}run/run >$MultDir/run
 chmod +x $MultDir/run
 
 if [ -f ${TopDir}.norun ]; then
