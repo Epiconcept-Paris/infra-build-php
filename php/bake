@@ -253,13 +253,13 @@ if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
 	    echo "Made PHP $PhpVer-$Bld packages for Debian $DebVer."
 	else
 	    echo "$ColRed\aFAILED to make PHP $PhpVer-$Bld packages for Debian $DebVer!$ColStd"
-	    exit 1
+	    exit 3
 	fi
     fi
 else
     echo "$ColRed\aFAILED to build the $BUILD_IMG image!$ColStd"
     echo "Examine $Dist/.logs/docker-build.out for details."
-    exit 1
+    exit 2
 fi
 echo "------------------------------------------------"
 
@@ -305,13 +305,13 @@ if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
 	    echo "${ColGrn}All PHP $PhpVer-$Bld packages for Debian $DebVer built and tested.$ColStd"
 	else
 	    echo "$ColRed\aFAILED to test PHP $PhpVer-$Bld packages for Debian $DebVer!$ColStd"
-	    exit 1
+	    exit 3
 	fi
     fi
 else
     echo "$ColRed\aFAILED to build the $TESTS_IMG image!$ColStd"
     echo "Examine $Dist/.logs/docker-tests.out for details."
-    exit 1
+    exit 2
 fi
 
 #
