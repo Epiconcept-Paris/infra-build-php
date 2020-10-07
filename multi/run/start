@@ -95,7 +95,10 @@ do
     echo "$SiteConf" >/etc/apache2/sites-available/$Serv.conf
     su -c "cp -p /etc/apache2/sites-available/$Serv.conf $Logs" $USER
     a2ensite $Serv.conf >>$Logs/a2.out
-    test $PORT -eq 80 || Port=":$PORT"
+    if [ $PORT -ne 80 ]; then
+	sed -i "/^Listen 80$/s/80/$PORT/" /etc/apache2/ports.conf
+	Port=":$PORT"
+    fi
     echo "Added site http://$Serv$Port"
     echo "    with SetHandler   $Hand"
     Srvs="$Srvs$Serv "
