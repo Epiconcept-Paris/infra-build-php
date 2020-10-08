@@ -104,7 +104,12 @@ if [ -f ${TopDir}.norun ]; then
     echo "Use:\n    $Cmd bash\nto run the tools container"
 else
     echo "Running the '$TOOLS_NAME' container:\n    $Cmd"
-    $Cmd
+    if $Cmd; then
+	echo "${ColGrn}All tools packages for Debian $DebVer made.$ColStd"
+    else
+	echo "$ColRed\aFAILED to make tools packages for Debian $DebVer!$ColStd"
+	exit 3
+    fi
 fi
 
 #
