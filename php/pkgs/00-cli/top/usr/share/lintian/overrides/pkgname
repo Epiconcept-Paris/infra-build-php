@@ -1,13 +1,8 @@
-#   E: Our PHP cli includes libgd/file/pcre3/sqlite on purpose
-%NAME%: embedded-library usr/bin/php%MM%: libgd
-%NAME%: embedded-library usr/bin/php%MM%: file
-%NAME%: embedded-library usr/bin/php%MM%: pcre3
-%NAME%: embedded-library usr/bin/php%MM%: sqlite
+#   E: Our PHP cli may include libgd/file/pcre3/sqlite on purpose
+%NAME%: embedded-library usr/bin/php%MM%: *
 
-#   E: Our phpdbg includes libgd/file on purpose
-%NAME%: embedded-library usr/bin/phpdbg%MM%: libgd
-%NAME%: embedded-library usr/bin/phpdbg%MM%: file
-%NAME%: embedded-library usr/bin/phpdbg%MM%: sqlite
+#   E: Our phpdbg may include libgd/file/sqlite on purpose
+%NAME%: embedded-library usr/bin/phpdbg%MM%: *
 
 #   E: Pointless as phar is included in this cli package
-%NAME%: php-script-but-no-phpX-cli-dep usr/bin/phar.phar
+%NAME%: php-script-but-no-php-cli-dep usr/bin/phar.phar

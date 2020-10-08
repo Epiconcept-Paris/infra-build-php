@@ -1,0 +1,7 @@
+#   W: ignore national encoding in comments and strings
+%NAME%: national-encoding usr/share/doc/epi-php-pear/XML_Util/examples/example.php
+%NAME%: national-encoding usr/share/php/Structures/Graph/Manipulator/AcyclicTest.php
+%NAME%: national-encoding usr/share/php/Structures/Graph/Manipulator/TopologicalSorter.php
+%NAME%: national-encoding usr/share/php/Structures/Graph/Node.php
+%NAME%: national-encoding usr/share/php/Structures/Graph.php
+%NAME%: national-encoding usr/share/php/test/Structures_Graph/tests/BasicGraphTest.php

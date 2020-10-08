@@ -14,7 +14,9 @@ fi
 find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
 
 #   Replace link to w3.org icon with an embedded 26-byte GIF image
-sed -i 's|src="http://www.w3.org/Icons/valid-xhtml10"|src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="|' $Top/$DataDir/fpm/status.html
+#   Replace the remote php.gif with a local copy (all this to silence lintian on privacy)
+sed -i -e 's|src="http://www.w3.org/Icons/valid-xhtml10"|src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="|' -e 's|https://static.php.net/www.php.net/images/||' $Top/$DataDir/fpm/status.html
+mv $Top/php.gif $Top/$DataDir/fpm
 
 sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" -e "s/%MMS%/ $MM/" $Top/lib/systemd/system/php-fpm.service 
 sed -i -e "s/%MM%/$MM/" -e "s;%MMD%;$MMD;" $Top/etc/init.d/php-fpm

@@ -1,8 +1,5 @@
-#   E: Our PHP module includes libgd/file/pcre3/sqlite on purpose
-%NAME%: embedded-library usr/lib/apache2/modules/libphp%MMJ%.so: libgd
-%NAME%: embedded-library usr/lib/apache2/modules/libphp%MMJ%.so: file
-%NAME%: embedded-library usr/lib/apache2/modules/libphp%MMJ%.so: pcre3
-%NAME%: embedded-library usr/lib/apache2/modules/libphp%MMJ%.so: sqlite
+#   E: Our PHP module may include libgd/file/pcre3/sqlite on purpose
+%NAME%: embedded-library usr/lib/apache2/modules/libphp%MMJ%.so: *
 
 #   E: This is due to our custom module naming
 %NAME%: apache2-module-does-not-ship-load-file libphp%MMJ%
