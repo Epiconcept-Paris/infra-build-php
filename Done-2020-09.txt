@@ -1,0 +1,25 @@
+- Support de PHP 7.4:
+  . Mise à jour de l'utilisation des options inconstantes de 'configure'
+  . Gestion des packages dev/lib pour versions spécifiques de PHP (généralisation de 'LIBZIP')
+  . Ajout wddx
+
+- Support de Debian 10
+  . Résolution du problème de configuration freetype
+  . Résolution des problèmes de compilation mysqli (long)
+  . Contournement par timeout du hang sur les tests de PHP version 5.6 et 7.1 (long)
+
+- Support de Debian 11 / Ubuntu 20.04 LTS
+  . migration nécessaire de la chaine de build sur buster (Debian 8 -> 10)
+  . correction des erreurs lintian (conformité packages)
+  . tests avec Ubuntu focal (20.04 LTS): libjpeg62-turbo doit être ajouté hors apt
+
+- Ajout du binaire phpdbg (et lintian overrides)
+- Gestion spéciale de zip (libzip dès que 'deprecated)
+- Reorg des fichiers epiconcept (package epi-php-setup séparé et /usr/lib/epi-phpX.Y)
+- Les erreurs de configuration/compilation/preparation avortent le build/test
+- Les build (./bake mk) peuvent être lancés en background
+- Correction de l'exit non-0 de php/run/build si pas mode debug (.debug)
+
+- Ajout d'options (nom de domaine, port TCP) pour le test de PHP-FPM ('multi')
+- Amélioration du script de pilotage bake (en lien avec nouvelles versions Debian)
+- Nettoyage README.md
