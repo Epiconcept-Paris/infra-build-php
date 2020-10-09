@@ -5,4 +5,4 @@
 %NAME%: embedded-library usr/bin/phpdbg%MM%: *
 
 #   E: Pointless as phar is included in this cli package
-%NAME%: php-script-but-no-php-cli-dep usr/bin/phar.phar
+%NAME%: php-script-but-no-phpX-cli-dep usr/bin/phar.phar

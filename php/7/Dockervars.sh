@@ -59,6 +59,7 @@ COPY $Php/hooks/wddx.sh $BUILD_TOP/hooks"
 
     #	Add patches for Debian 10+
     if [ $DebNum -gt 9 ]; then
+	BUILD_REQ="ed $BUILD_REQ"
 	BLDCOPY="$BLDCOPY
 COPY ${PhpTop}hooks/mysqli.sh $BUILD_TOP/hooks"
 	# 7.4 seems to not need this patch

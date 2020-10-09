@@ -97,3 +97,10 @@ fi
 sed -i "s;%MMD%;$MMD;" $Top/DEBIAN/conffiles
 sed -i "s/%CFL%/$Cfl/" $Top/DEBIAN/control
 test "$Dbg" && cp $Top/DEBIAN/control $Debug/control_$Pkg
+
+#   Adapt lintian/overrides to lintian (i.e. Debian) version
+if [ $DEBNUM -gt 9 ]; then
+    echo "/phar is included/-1,/phpX-cli/d\nw" | ed - $Top/usr/share/lintian/overrides/$Name
+elif [ $DEBNUM -gt 8 ]; then
+    sed -i 's/phpX-cli/php-cli/' $Top/usr/share/lintian/overrides/$Name
+fi

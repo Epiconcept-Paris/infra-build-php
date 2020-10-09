@@ -50,6 +50,7 @@ COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
 
     #	Add patches for Debian 10+
     if [ $DebNum -gt 9 ]; then
+	BUILD_REQ="ed $BUILD_REQ"
 	BLDCOPY="$BLDCOPY
 COPY ${PhpTop}hooks/mysqli.sh $BUILD_TOP/hooks
 COPY ${PhpTop}hooks/freetype.sh $BUILD_TOP/hooks"
