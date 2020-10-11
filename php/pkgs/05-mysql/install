@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#	04-mysql/install - Install php-mysql files to $Top
+#	05-mysql/install - Install php-mysql files to $Top
 #
 # There is no 'make install-..': files were moved to $Top by 00-cli/install
 #
