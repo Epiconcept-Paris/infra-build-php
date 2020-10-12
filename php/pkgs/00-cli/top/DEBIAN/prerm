@@ -4,7 +4,6 @@ set -e
 
 if [ "$1" = "remove" -o "$1" = "deconfigure" ]; then
     update-alternatives --remove php /usr/bin/php%MM%
-    update-alternatives --remove phpdbg /usr/bin/phpdbg%MM%
     update-alternatives --remove phar /usr/bin/phar%MM%
     update-alternatives --remove phar.phar /usr/bin/phar%MM%.phar
 fi

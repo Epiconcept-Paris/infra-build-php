@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "configure" ]; then
+    update-alternatives --install /usr/bin/phpdbg phpdbg /usr/bin/phpdbg%MM% %PRI% --slave /usr/share/man/man1/phpdbg.1.gz phpdbg.1.gz /usr/share/man/man1/phpdbg%MM%.1.gz
+fi

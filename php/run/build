@@ -49,7 +49,8 @@ ConfigHelp=$Logs/config-help.out
 #
 PearDir='usr/share/php'
 for Opt in  --with-mysql --with-mcrypt --with-ttf --enable-gd-native-ttf \
-	    --enable-phpdbg --enable-fpm --with-fpm-systemd \
+	    --enable-phpdbg --enable-phpdbg-readline --enable-phpdbg-webhelper \
+	    --enable-fpm --with-fpm-systemd \
 	    --with-pear=/$PearDir \
 	    --with-gd --enable-gd \
 	    --with-freetype-dir=/usr --with-freetype \
@@ -69,7 +70,7 @@ do
 	*)	    End=' ';;
     esac
     Pat=$(echo "$Opt" | sed 's/=.*$//')
-    grep -- "$Pat$End" $ConfigHelp >/dev/null && Cfg="$Opt" || Cfg=
+    egrep -- "$Pat($End|$)" $ConfigHelp >/dev/null && Cfg="$Opt" || Cfg=
     #   Handle special ZIP case for PHP up to 7.3
     if [ "$Opt" = '--enable-zip' ]; then
 	grep 'bundled libzip is deprecated' configure >/dev/null && Dpr=y || Dpr=
@@ -86,6 +87,8 @@ done
 
 # Skip *-fpm package generation if --enable-fpm unknown
 echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`ls -d $Bld/pkgs/*-fpm`/skip
+# Skip *-phpdbg package generation if --enable-phpdbg unknown
+echo "$ExtOpts" | grep -- '--enable-phpdbg ' >/dev/null || >`ls -d $Bld/pkgs/*-phpdbg`/skip
 # Skip *-mysql package generation if --with-mysql known
 echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`ls -d $Bld/pkgs/*-mysql`/skip
 #
@@ -220,7 +223,7 @@ date "+%Y-%m-%d %H:%M:%S Building php-$Ver..."
 if ! su -c "make -k >$Logs/make.out 2>&1" $USER; then
     echo "\aBuilding php-$Ver FAILED:"
     grep "error:" $Logs/make.out
-    exit 1
+    exit 2
 fi
 
 set +e	# Continue on errors

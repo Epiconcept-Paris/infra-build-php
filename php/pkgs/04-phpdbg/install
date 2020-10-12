@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+#	04-phpdbg/install - Install phpdbg files to $Top
+#
+# There is no 'make install-..': files were moved to $Top by 00-cli/install
+#
+if [ -d $Top/usr/bin ]; then
+    file $Top/usr/bin/* | sed -n 's/^\([^:]*\): *ELF .*$/\1/p' | xargs -r strip -v >$Logs/striped_$Pkg.out
+else
+    echo "\aERROR: no $Top/usr/bin directory. Package will be useless."
+fi
+
+#   Compress our manual page(s)
+find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
+
+sed -i "s/%MM%/$MM/" $Top/DEBIAN/postinst
+sed -i "s/%MM%/$MM/g" $Top/DEBIAN/prerm
+if [ "$MM" ]; then
+    (cd $Top/usr/bin
+     mv phpdbg phpdbg$MM
+     cd $Top/$ManDir/man1
+     mv phpdbg.1.gz phpdbg$MM.1.gz
+    )
+    sed -i -e "s/%MM%/$MM/g" -e "s/%PRI%/`echo $MM | tr -d .`/" $Top/DEBIAN/postinst
+    sed -i "s/%MM%/$MM/g" $Top/DEBIAN/prerm
+fi
+test "$Dbg" && cp $Top/DEBIAN/control $Debug/control_$Pkg
