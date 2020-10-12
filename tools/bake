@@ -99,6 +99,7 @@ test $? -eq 0 || { echo "$ColRed\aFAILED to build the '$TOOLS_IMG' docker image!
 #
 #   Run the container
 #
+test -f ${TopDir}.norun && Opt='-ti '
 Cmd="docker run $Opt-v `realpath $PWD/$Tools`:$TOOLS_TOP/dist --name $TOOLS_NAME --rm $TOOLS_IMG"
 if [ -f ${TopDir}.norun ]; then
     echo "Use:\n    $Cmd bash\nto run the tools container"
