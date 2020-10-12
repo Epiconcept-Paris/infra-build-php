@@ -4,7 +4,7 @@ Architecture: amd64
 Maintainer: Cedric <c.girard@epiconcept.fr>
 Depends: %DEPS%
 Provides: php-phpdbg, phpapi-%PHPAPI%
-Conflicts: php7.0-phpdbg, php7.1-phpdbg, php7.2-phpdbg, php7.3-phpdbg, php7.4-phpdbg
+Conflicts: php5.6-phpdbg, php7.0-phpdbg, php7.1-phpdbg, php7.2-phpdbg, php7.3-phpdbg, php7.4-phpdbg
 Section: admin
 Priority: optional
 Description: PHP Debugger build by Epiconcept

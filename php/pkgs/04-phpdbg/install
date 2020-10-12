@@ -23,5 +23,7 @@ if [ "$MM" ]; then
     )
     sed -i -e "s/%MM%/$MM/g" -e "s/%PRI%/`echo $MM | tr -d .`/" $Top/DEBIAN/postinst
     sed -i "s/%MM%/$MM/g" $Top/DEBIAN/prerm
+else
+    rm -v $Top/DEBIAN/p* >>$Logs/rmed_$Pkg.out
 fi
 test "$Dbg" && cp $Top/DEBIAN/control $Debug/control_$Pkg
