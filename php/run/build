@@ -413,6 +413,7 @@ do
 	chown $Own $deb
     else
 	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""
+	test "$AsmPkg" && AsmPkg="$AsmPkg\n$Pkg" || AsmPkg="$Pkg"
     fi
     if [ "$Dbg" ]; then
 	(cd $Top;
@@ -424,6 +425,13 @@ do
     chown $Own $Logs/*_$Pkg.out
 done
 chown $Own $Pkgs
-test "$Dbg" && cp -p Makefile $Debug || true
+test "$Dbg" && cp -p Makefile $Debug
+
+if [ "$AsmPkg" ]; then
+    echo "FAILED to assemble the following package(s):"
+    echo "$AsmPkg" | sed 's/^/    /'
+    exit 3
+fi
 
 #make clean >$Logs/make-clean.out 2>&1
+exit 0

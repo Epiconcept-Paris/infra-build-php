@@ -11,6 +11,16 @@ test -d $Dbg || Dbg=
 LF='
 '
 
+#  AddVar var val [sep]
+AddVar()
+{
+   # global $1
+   local sep
+
+   sep=${3:-\\n}
+   eval "test \"\$$1\" && $1=\"\${$1}$sep$2\" || $1=\"$2\""
+}
+
 set -e	# Stop on errors
 
 if [ ! -f $Pkgs ]; then
@@ -68,12 +78,14 @@ do
 	case "$Pkg" in
 	    *-cli)  echo -n "    Testing PHP CLI... "
 		    php /var/www/html/info.php >$Logs/info_cli.out
+		    test -s $Logs/info_cli.out || AddVar TestPkg $Pkg
 		    echo "done."
 		    ;;
 	    *-mod)  echo -n "    Testing PHP Apache module... "
 		    echo "--- mod-inst-done -----" >>$Logs/a2.out
 		    test "$Dbg" && (echo --- post-install -----; ps -ef) >>$Dbg/ps-ef.out 2>&1
 		    curl -sSL http://localhost/info.php >$Logs/info_mod.out
+		    test -s $Logs/info_mod.out || AddVar TestPkg $Pkg
 		    $ApaCtl stop >>$Logs/a2.out 2>&1
 		    echo "--- mod-stop-done -----" >>$Logs/a2.out
 		    sleep 1
@@ -88,6 +100,7 @@ do
 		    sleep 1
 		    test "$Dbg" && (echo --- post-restart -----; ps -ef) >>$Dbg/ps-ef.out 2>&1
 		    curl -sSL http://localhost/info.php >$Logs/info_fpm.out
+		    test -s $Logs/info_fpm.out || AddVar TestPkg $Pkg
 		    rc=/etc/init.d/php*-fpm
 		    $rc stop >>$Logs/a2.out 2>&1
 		    $ApaCtl stop >>$Logs/a2.out 2>&1
@@ -96,8 +109,20 @@ do
 		    echo "done."
 		    ;;
 	esac
+    else
+	AddVar InstPkg $Pkg
     fi
     test "$Dbg" && (echo "--- post-dpkg $Pkg -----"; ps -ef) >>$Dbg/ps-ef.out 2>&1
 done <$Pkgs
 test "$Dbg" && chown $Own $Dbg/ps-ef.out
 chown $Own $Logs/a2.out $Logs/dpkg-i.out $Logs/info_*.out
+if [ "$InstPkg" ]; then
+    echo "FAILED to install the following package(s):"
+    echo "$InstPkg" | sed 's/^/    /'
+    exit 2
+elif [ "$TestPkg" ]; then
+    echo "FAILED to test the following package(s):"
+    echo "$TestPkg" | sed 's/^/    /'
+    exit 2
+fi
+exit 0
