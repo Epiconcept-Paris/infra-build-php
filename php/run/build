@@ -47,8 +47,10 @@ ConfigHelp=$Logs/config-help.out
 #
 #   Handle options not present in every PHP version
 #
+PearDir='usr/share/php'
 for Opt in  --with-mysql --with-mcrypt --with-ttf --enable-gd-native-ttf \
 	    --enable-phpdbg --enable-fpm --with-fpm-systemd \
+	    --with-pear=/$PearDir \
 	    --with-gd --enable-gd \
 	    --with-freetype-dir=/usr --with-freetype \
 	    --with-jpeg-dir=/usr --with-jpeg \
@@ -151,7 +153,7 @@ else
 fi
 SysconfDir="etc/php$MMD"
 DataDir="usr/share/php$MMD"
-PearDir='usr/share/php'
+# PearDir defined above before ExtOpts
 ManDir='usr/share/man'
 DocDir='usr/share/doc'
 VarDir='var'
@@ -167,7 +169,6 @@ su -c "EXTENSION_DIR=/usr/lib/php/extensions ./configure \
 	--disable-rpath \
 	--disable-cgi \
 	--with-pic \
-	--with-pear=/$PearDir \
 	--with-apxs2=/usr/bin/apxs \
 	--with-zlib-dir=/usr \
 	--with-pdo-mysql=/usr \
