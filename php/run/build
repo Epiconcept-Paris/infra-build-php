@@ -86,7 +86,7 @@ do
 done
 
 # Skip *-pear package generation if --with-pear unknown
-echo "$ExtOpts" | grep -- '--with-pear ' >/dev/null || >`ls -d $Bld/pkgs/*-pear`/skip
+echo "$ExtOpts" | grep -- '--with-pear=' >/dev/null || >`ls -d $Bld/pkgs/*-pear`/skip
 # Skip *-fpm package generation if --enable-fpm unknown
 echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`ls -d $Bld/pkgs/*-fpm`/skip
 # Skip *-phpdbg package generation if --enable-phpdbg unknown
