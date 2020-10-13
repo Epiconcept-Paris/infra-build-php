@@ -260,7 +260,7 @@ if [ "$isRm" ]; then
 	# Sort
 	toRm=`echo "$toRm" | LANG=C sort -ut: | tr -d '~'`	# Remove '~' sort helper
     fi
-    test "$Do" && echo "toRm=\"$toRm\""
+    test "$Do" && echo "toRm:" $toRm
 
     #
     #	Collect elements to remove in $Objs
@@ -274,6 +274,7 @@ if [ "$isRm" ]; then
     for tgt in $toRm
     do
 	deb=`expr "$tgt" : '\([0-9]*\):.*'`
+	test "$deb" || { echo "Ignoring invalid rm target '$tgt'" >&2; continue; }
 	name=`cat $DebTop/$deb/name`
 	key=`expr "$tgt" : '[0-9]*:\(.*\)'`
 	# multi
@@ -402,7 +403,7 @@ if [ "$isMk" ]; then
 	    echo $deb | egrep "^(`cat $MulTop/mkre`)$" >/dev/null && toMk="$toMk$deb:multi "
 	done
     fi
-    test "$Do" && echo "toMk=\"$toMk\""
+    test "$Do" && echo "toMk:" $toMk
 
     #
     #	Collect elements to build in $Objs
@@ -474,7 +475,9 @@ if [ "$isMk" ]; then
 		#echo "deb=$deb mul=\"$mul\""
 		if [ "$mul" ]; then
 		    dir=$DebTop/$deb/multi
-		    test $deb != $MulDebRun && { run=''; norun='-'; } || { run=' and running'; norun=; }
+		    # Only run multi for Debian $MulDebRun with $MultiRun set
+		    test $deb = $MulDebRun -a "$MultiRun" && run=' and running' || run=
+		    test "$run" && norun= || norun='-'
 		    echo "Building$run multi for $name with ${mul}on *.${MultiDomain:-$DefDom}:${MultiPort:-$DefTcp}"
 		    $Do mkdir -p $dir
 		    $Do eval "$MulTop/bake $deb $mul$norun | sed -u 's/$//' | tee $dir/mk.out | sed -u 's/$//'"
