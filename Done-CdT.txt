@@ -14,7 +14,8 @@ Modifications d'octobre 2020
 - Support de Debian 11 / Ubuntu 20.04 LTS
   . migration nécessaire de la chaine de build sur buster (Debian 8 -> 10)
   . analyse et correction des erreurs lintian (conformité packages) [assez long]
-  . tests avec Ubuntu focal (20.04 LTS): libjpeg62-turbo doit être ajouté hors apt
+  . tests avec Ubuntu focal (20.04 LTS): libjpeg62-turbo_2.0.5-1.1 doit être ajouté hors apt
+  . et libzip4_1.7.3 pour PHP 7.4
 
 - Ajout du binaire phpdbg (et lintian overrides) dans un package interne séparé 04-phpdbg
   le package interne 04-mysql devenant alors 05-mysql
