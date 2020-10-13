@@ -335,7 +335,7 @@ if [ "$isRm" ]; then
     #
     if [ "$Objs" ]; then
 	echo "The following directories and/or docker images:"
-	echo -n "$Objs" | tr '_' ' ' | sed -r -e 's/^([^+]+)\+?$/    \1/' -e 's/^([^+]+)\+[^#]+#(.*)$/    \1 and docker image\2/' -e 's/^\+[^#]+#(.*)$/    docker image\1/'
+	echo -n "$Objs" | tr '_' ' ' | sed -r -e 's/^([^+]+)\+?$/    \1/' -e 's/^([^+]+)\+[^#]+#(.*)$/    \1 and docker image\2/' -e 's/^\+[^#]+#(.*)$/    docker image\1/' | sort -n -t/ -k2,2
 	test "$dockRm" && echo "    and some unnamed docker image(s)"
 	echo -n "will be REMOVED. Proceed ? "
 	read a
