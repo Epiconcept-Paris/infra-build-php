@@ -21,7 +21,11 @@ do
     PkgVer=`sed -nr 's/^Version: *([^-]+)-[0-9]{,2}%PKGDEB%$/\1/p' $Top/DEBIAN/control`
 
     echo "Compiling package '$Pkg'..."
-    (cd $dir/src; make -k) >$Logs/make_$Pkg.out 2>&1
+    if ! (cd $dir/src; make -k) >$Logs/make_$Pkg.out 2>&1; then
+	echo "\aBuilding package '$Pkg' FAILED:"
+	grep "error:" $Logs/make_$Pkg.out
+	exit 2
+    fi
 
     echo "Installing package '$Pkg'..."
     # doc directory
@@ -49,6 +53,7 @@ do
 	chown $Own $deb
     else
 	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""
+	test "$AsmPkg" && AsmPkg="$AsmPkg\n$Pkg" || AsmPkg="$Pkg"
     fi
     if [ "$Dbg" ]; then
 	(cd $Top;
@@ -59,3 +64,9 @@ do
     fi
     chown $Own $Logs/*_$Pkg.out
 done
+if [ "$AsmPkg" ]; then
+    echo "FAILED to assemble the following package(s):"
+    echo "$AsmPkg" | sed 's/^/    /'
+    exit 3
+fi
+exit 0
