@@ -22,6 +22,7 @@ test -d $DebTop || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
 test -d $PhpTop || { echo "$Prg: missing 'php' directory." >&2;  exit 1; }
 test -d $TlsTop || { echo "$Prg: missing 'tools' directory." >&2;  exit 1; }
 
+eval $(egrep '^Def(Dom|Tcp)=' ${TopDir}bake)
 DefDeb=`ls $DebTop/*/name | sed "s;$DebTop/\([^/]*\)/name;\1;" | sort -n | tail -1`	# Default = latest
 Base='epi-php'
 Arch='amd64'
@@ -39,14 +40,17 @@ do
     d=`expr "$arg" : '\([5-9]\.[0-9]\.[0-9]\{,2\}-[0-9]\{,2\}*\)$'`
     v=`expr "$arg" : '\([0-9]\{1,\}\)$'`
     if [ "$d" ]; then
-	ds="$ds $d"
+	ds="$ds $d"	# PHP distribs
     elif [ "$v" ]; then
-	vs="$vs $v"
+	vs="$vs $v"	# Debian versions
+    elif [ "$arg" = '-' ]; then
+	NoRun=y
     else
 	echo "$Prg: invalid PHP-dist-dir or Debian-version \"$arg\"" >&2
 	exit 1
     fi
 done
+test -f ${TopDir}.norun && NoRun=y
 
 #
 #   Check Debian version
@@ -149,7 +153,7 @@ MULTI_IMG=$MULTI_BASE:$DebVer
 MULTI_NAME=epi_multi_php
 
 if docker ps | grep $MULTI_NAME >/dev/null; then
-    if [ -f ${TopDir}.norun ]; then
+    if [ "$NoRun" ]; then
 	Stop="docker stop $MULTI_NAME >/dev/null\n    "
     else
 	echo "Stopping the running '$MULTI_NAME' container..."
@@ -162,7 +166,7 @@ if docker ps | grep $MULTI_NAME >/dev/null; then
 fi
 #   Safety check, as we always call docker run with --rm
 if docker ps -a | grep $MULTI_NAME >/dev/null; then
-    test -f ${TopDir}.norun || { echo "Deleting the existing '$MULTI_NAME' container..."; docker rm $MULTI_NAME >/dev/null; }
+    test "$NoRun" || { echo "Deleting the existing '$MULTI_NAME' container..."; docker rm $MULTI_NAME >/dev/null; }
 fi
 
 if docker images | grep "$MULTI_BASE *$DebVer" >/dev/null; then
@@ -188,14 +192,14 @@ COPY ${MulTop}run/$Pkg /tmp
 RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
     mkdir -p $Logs
     #   Variables come in order of their appearance in Dockerfile-multi.in
-    DEBVER="$DebVer" DEBNUM="$DebNum" DOMAIN="${MultiDomain:-epiconcept.tld}" PORT="${MultiPort:-80}" USER="$User" ADDUSER="$AddUser" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $DOMAIN $PORT $USER $ADDUSER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
+    DEBVER="$DebVer" DEBNUM="$DebNum" DOMAIN="${MultiDomain:-$DefDom}" PORT="${MultiPort:-$DefTcp}" USER="$User" ADDUSER="$AddUser" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $DOMAIN $PORT $USER $ADDUSER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
     test $? -eq 0 || { echo "$ColRed\aFAILED to build the '$MULTI_IMG' docker image!$ColStd" >&2; exit 2; }
     rm -f ${MulTop}run/$Pkg
 fi
 MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" MULTI_PORT="${MultiPort:-80}" envsubst '$MULTI_NAME $MULTI_TOP $MULTI_IMG $MULTI_PORT' <${MulTop}run/run >$MultDir/run
 chmod +x $MultDir/run
 
-if [ -f ${TopDir}.norun ]; then
+if [ "$NoRun" ]; then
     Opt='-ti' Top=`realpath $MultDir` DocRoot="$Top/www" eval `sed -nr "/^Cmd=\\"/s;PWD;Top;p" $MultDir/run`
     echo "Use:\n    $Stop$Cmd bash\nto run the container"
     exit 0
