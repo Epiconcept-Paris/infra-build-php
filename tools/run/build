@@ -7,6 +7,7 @@ Bld=`dirname $0`
 Logs="$Bld/dist/.logs"				# Directory for log files
 test -f $Bld/.debug -o "$1" = 'debug' && Dbg=y
 Own="$USER:`id -gn $USER`"
+umask 022					# Needed for lintian
 
 set -e	# Stop on errors
 
