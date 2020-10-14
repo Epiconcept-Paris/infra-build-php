@@ -50,7 +50,9 @@ do
 
     if [ -f "$deb" ]; then
 	echo "Checking   package '$Pkg': `basename $deb`..."
-	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
+	if ! lintian --allow-root $deb >$Logs/lintian_$Pkg.out; then
+	    test "$ChkPkg" && ChkPkg="$ChkPkg\n$Pkg" || ChkPkg="$Pkg"
+	fi
 	chown $Own $deb
     else
 	test "$Dbg" && echo "out=\"$out\" deb=\"$deb\""
@@ -65,6 +67,11 @@ do
     fi
     chown $Own $Logs/*_$Pkg.out
 done
+if [ "$ChkPkg" ]; then
+    echo "FAILED to check the following package(s):"
+    echo "$ChkPkg" | sed 's/^/    /'
+    exit 3
+fi
 if [ "$AsmPkg" ]; then
     echo "FAILED to assemble the following package(s):"
     echo "$AsmPkg" | sed 's/^/    /'

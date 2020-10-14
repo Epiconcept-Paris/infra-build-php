@@ -410,7 +410,9 @@ do
 
     if [ -f "$deb" ]; then
 	echo "Checking   package '$Pkg': `basename $deb`..."
-	lintian --allow-root $deb >$Logs/lintian_$Pkg.out
+	if ! lintian --allow-root $deb >$Logs/lintian_$Pkg.out; then
+	    test "$ChkPkg" && ChkPkg="$ChkPkg\n$Pkg" || ChkPkg="$Pkg"
+	fi
 	basename $deb >>$Pkgs
 	chown $Own $deb
     else
@@ -429,6 +431,11 @@ done
 chown $Own $Pkgs
 test "$Dbg" && cp -p Makefile $Debug
 
+if [ "$ChkPkg" ]; then
+    echo "FAILED to check the following package(s):"
+    echo "$ChkPkg" | sed 's/^/    /'
+    exit 3
+fi
 if [ "$AsmPkg" ]; then
     echo "FAILED to assemble the following package(s):"
     echo "$AsmPkg" | sed 's/^/    /'
