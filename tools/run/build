@@ -8,7 +8,7 @@ Logs="$Bld/dist/.logs"				# Directory for log files
 test -f $Bld/.debug -o "$1" = 'debug' && Dbg=y
 Own="$USER:`id -gn $USER`"
 umask 022					# Needed for lintian
-find $Bld/pkgs | xargs chown go-w
+find $Bld/pkgs | xargs chmod go-w
 
 set -e	# Stop on errors
 
