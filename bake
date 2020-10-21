@@ -224,6 +224,9 @@ do
 	    test "$AllDeb" && Debs="$AllDeb" || Debs="$DebVer"
 	    for deb in $Debs
 	    do
+		if [ "$1" = 'multi' ]; then
+		    echo $deb | egrep "^(`cat $MulTop/mkre`)$" >/dev/null || continue
+		fi
 		eval echo "\" \$to$Mode\"" | grep " $deb:$1 " >/dev/null || eval "to$Mode=\"\${to$Mode}$deb:$1 \""
 	    done
 	    ;;
@@ -482,7 +485,7 @@ if [ "$isMk" ]; then
 		    $Do mkdir -p $dir
 		    $Do eval "$MulTop/bake $deb $mul$norun | sed -u 's/$//' | tee $dir/mk.out | sed -u 's/$//'"
 		else
-		    echo "$Prg: no PHP-distrib selected for 'multi'" >&2
+		    echo "$Prg: no PHP-distrib selected for 'multi' on $name" >&2
 		    exit 3
 		fi
 	    # tools
