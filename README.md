@@ -84,46 +84,138 @@ affiche l'aide résumée de `bake`.
 
 ## Mise au point
 
-Elle se fait en créant un fichier `.norun` (vide) dans le répertoire principal (où se trouve le répertoire « debian ») : `>.norun` ou `touch .norun`\
-Les scripts affichent alors les commandes `docker` à lancer au lieu de démarrer les containers. Les containers `docker` une fois démarrés, les  commandes bash à lancer pour le build et les tests sont affichées au lieu d'être exécutées.
+Elle se fait en créant un fichier `.norun` (vide) dans le répertoire principal (où se trouve le répertoire `debian`) : `>.norun` ou `touch .norun`\
+Les scripts affichent alors les commandes `docker` à lancer au lieu de démarrer les containers. Un containers `docker` une fois démarré, la  commande bash à lancer pour le build ou les tests est affichée au lieu d'être exécutée.
 
-Il est possible de sauter le "make test" du build en créant de même un fichier (vide) `php/.notest`.
+Il est possible de sauter le "make test" du build PHP en créant de même un fichier (vide) `php/.notest`.
 
 Enfin, on peut également créer un fichier `.debug` (vide), qui active des traces supplémentaires dans le container de build et des logs (et sauvegardes de fichiers) supplémentaires dans le répertoire `debian/<version-Debian>/dist/<version-PHP>-<BUILD_NUM>/.debug`
 
 ## Test de multiples versions
-Une fois qu'au moins deux versions de PHP ont été compilées, différant par leur versions Majeure et mineure, il est possible de les tester simultanément avec PHP FPM dans un container de test :
+
+### Préparation (build) d'une image `docker`
+
+Une fois qu'au moins deux versions de PHP (>= 5.6) ont été compilées, différant par leur versions Majeure et mineure, il est possible de préparer un container `docker` pour les tester simultanément avec PHP FPM :
 ```
 ./bake [ <version-Debian> ] multi <version-PHP> [ <version-PHP> ...]
 ```
-_\<version-Debian>_ est sous la forme numérique _n_, par défaut la plus récente gérée (pour l'instant, la version 11 `bullseye`).
+_\<version-Debian>_ est sous la forme numérique _n_, par défaut toutes les versions depuis `stretch` (Debian 9) jusqu'à la plus récente gérée (pour l'instant, la version 11 `bullseye`).
 
 _\<version-PHP>_ est sous une des trois formes _Maj_**.**_Min_, _Maj_**.**_Min_**.**_Rel_ ou  _Maj_**.**_Min_**.**_Rel_**-**_Bld_, où _Bld_ est le numéro du build de la version PHP, qui sera lancé s'il n'existe pas.\
 Exemple :
 ```
-./bake multi 5.6.38-2 7.1.22 7.2
+./bake 10 multi 5.6.38-2 7.1.22 7.2
 ```
 Le script `multi/bake`, appelé par `./bake` crée si nécessaire le répertoire `debian/<version-Debian>/multi` (partagé avec le container `docker`) avec 3 sous répertoires :
-* `pkgs` qui contient les packages Debian -cli et -fpm (et -mysql s'il existe) de chaque _\<version-PHP>_
+* `pkgs` qui contient les packages Debian `-cli` et `-fpm` (et `-mysql` s'il existe) de chaque _\<version-PHP>_
 * `www` qui contient le `DocumentRoot` commun aux différentes _\<version-PHP>_ et qui est partagé avec le host comme un volume `docker` séparé. Coté host, le répertoire peut être un lien symbolique.
-* `logs` qui contient les logs de build de l'image `epi-multi-php:<version-Debian>` (dans notre exemple `epi-multi-php:stretch`) et un script de run du container `epi_multi_php`
+* `logs` qui contiendra les logs de build de l'image `epi-multi-php:<version-Debian>` (dans notre exemple `epi-multi-php:buster`) et éventuellement les logs de run du container correspondant.
 
-Puis le script `multi/bake` builde si nécessaire l'image `docker` et lance le container en mode background (sauf pour la mise au point). Depuis le script principal  `/opt/multi/start` du container, les packages de `pkgs` sont installés et un `VirtualHost`est automatiquement configuré pour chacune des _\<distrib-PHP>_ de ces packages. Puis `apache2` est lancé sur le port 80, dans notre exemple pour 3 `VirtualHost` : `php56.epiconcept.tld`, `php71.epiconcept.tld` et `php72.epiconcept.tld`, qu'il faudra déclarer dans le fichier `hosts` du client de test (ou dans un DNS). Il est possible de changer le domaine par défaut `epiconcept.tld` de l'image `docker` en exportant la variable d'environnement `MultiDomain`. Il est également possible de modifier le port TCP par défaut (`80`) en exportant la variable d'environnement `MultiPort`. Exemple:
+Puis le script `multi/bake` builde si nécessaire l'image `docker` et affiche la commande pour lancer le container en mode background, sauf pour la mise au point (`.norun`, voir ci-dessous) pour laquelle la commande affichée lancera le container en mode interactif.
+Si la variable d'environnement `MultiRun` est assignée (par exemple : `MultiRun=y`), le lancement en mode background se fera automatiquement, pour la version la plus récente de Debian si plusieurs versions de `multi` sont buildées.
+
+### Exécution (run) du container
+
+Lorsque le container est lancé, depuis le script principal `/opt/multi/start` du container, les packages de `pkgs` sont installés et un `VirtualHost`est automatiquement configuré pour chacune des _\<distrib-PHP>_ de ces packages.
+Puis `apache2` est lancé, dans notre exemple sur le port 80 pour 3 `VirtualHost` : `php56.epiconcept.tld`, `php71.epiconcept.tld` et `php72.epiconcept.tld`, qu'il faudra déclarer dans un DNS ou dans le fichier `hosts` du client de test.  
+Il est possible de changer le domaine par défaut `epiconcept.tld` de l'image `docker` en exportant avant le build la variable d'environnement `MultiDomain` ou en modifiant avant le run la variable `Domain=` du fichier `srvconf` (au même niveau que le répertoire `pkgs`).
+De même, il est également possible de modifier le port TCP par défaut (`80`) en exportant la variable d'environnement `MultiPort` ou en modifiant la variable `Port=` du fichier `srvconf`.
+Exemple:
 ```
-export MultiDomain=voozanoo.net Multiport=81
+export MultiDomain=voozanoo.net Multiport=81 MultiRun=y
 ```
 
-Les `VirtualHost` sont créés à partir d'un fichier template `siteconf.in` (au même niveau que les 3 répertoire `pkgs`, `logs` et `www`). Dans ce fichier template, les macros `%Maj%` et `%Min%` seront automatiquement remplacées respectivement par les numéros de version majeure et mineure de chaque _\<distrib-PHP>_ placée dans `pkgs`. Si le fichier template `siteconf.in` n'existe pas, une version par défaut sera créée, modifiable par la suite et qui prend en compte les valeurs des variables `MultiDomain` et `MultiPort` si elles sont exportées.
+Les `VirtualHost` sont créés à partir d'un fichier template `siteconf.in` (au même niveau que les 3 répertoire `pkgs`, `logs` et `www`).
+Dans ce fichier template, les macros `%Maj%` et `%Min%` seront automatiquement remplacées respectivement par les numéros de version majeure et mineure de chaque _\<distrib-PHP>_ placée dans `pkgs`.
+Et les macros `%Port%` et `%Domain%` seront automatiquement remplacées par les valeurs de `Port=` et `Domain=` du fichier `srvconf`, qui prend en compte au build les valeurs éventuelles des variables d'environnement `MultiPort=` et `MultiDomain=`.
+Si le fichier `srvconf` n'existe pas, il sera créé au build et modifiable par la suite avant chaque `run`
+De même, si le fichier template `siteconf.in` n'existe pas, une version par défaut sera créée, modifiable par la suite.
 
-Il faut noter que l'image `docker` (`epi-multi-php:bullseye` dans notre exemple) est indépendante des _\<distrib-PHP>_ testées et de son propre système de build : le script `start` du container déduit les _\<distrib-PHP>_ et par suite les `VirtualHost`, du nom des packages `.deb` dans le répertoire `pkgs`. Pour cette raison, l'image n'est pas recréée à chaque lancement de `multi/bake`, il faut la supprimer explicitement, dans notre exemple par `./bake rm multi`.
+### Exécution autonome du container
 
-Pour utiliser l'image `docker` (`epi-multi-php:bullseye` dans notre exemple) séparément de son système de build, il faut lui fournir un répertoire partagé (par exemple `essai`) de structure approchant celle de `debian/<version-Debian>/multi`, dans lequel les packages `.deb` d'un sous-répertoire `pkgs` indiquent les _\<distrib-PHP>_ choisies et où un sous-répertoire `www` existe, si l'on veut utiliser le script `run` fourni. Le sous-répertoire `logs` peut être absent et sera créé au besoin. Il suffit alors de lancer le script `run` placé avec les sous-répertoires :
+Il faut noter que l'image `docker` (`epi-multi-php:buster` dans notre exemple) est indépendante des _\<distrib-PHP>_ testées et de son propre système de build : le script `start` du container déduit les _\<distrib-PHP>_ et par suite les `VirtualHost`, du nom des packages `.deb` dans le répertoire `pkgs`. Pour cette raison, l'image n'est pas recréée à chaque lancement de `multi/bake`, il faut la supprimer explicitement, dans notre exemple par `./bake rm multi`.
+
+Pour utiliser l'image `docker` (`epi-multi-php:buster` dans notre exemple) séparément de son système de build, il faut lui fournir un répertoire partagé (par exemple `fpm`) de structure :
 ```
-essai/multi
+fpm
+├── pkgs
+│   ├── epi-php-…_amd64.deb
+│   └── epi-php-…_amd64.deb
+├── srvconf
+└── go
 ```
-pour lancer le container. En modifiant le script run, on peut changer le point de montage du répertoire `/opt/multi/www` du container qui est utilisé par l'image comme `DocumentRoot` commun.
+dans laquelle seuls `pkgs` (et son contenu) et `srvconf` ont des noms imposés.
+Les packages `epi-php-…_amd64.deb` de `pkgs` indiquent les _\<distrib-PHP>_ choisies.
+Le sous-répertoire `logs` peut être absent et sera créé au besoin.
+Le fichier `srvconf` contient par exemple :
+```
+Port='81'
+Domain='epiconcept.tld'
+IpSite='http://ipaddr.free.fr'
+```
+La variable IpSite, requise, est l'URL (externe sur Internet !) d'une page PHP contenant:
+``` php
+<?php
+$Ip = $_SERVER['REMOTE_ADDR'];
+$Hn = gethostbyaddr($Ip);
+echo "$Ip\n$Hn\n";
+
+```
+qui renvoie par `curl -sSL $IpSite` deux lignes de texte:
+```
+<adresse-IP>
+<reverse-lookup-hostname>
+```
+Le script `go` est une copie de `debian/10/multi/run`.
+
+Si l'on suppose alors une arborescence web quelconque :
+```
+path
+└── to
+    └── web
+        └── site
+            ├── …
+            └── index.php
+```
+la commande
+```
+fpm/go path/to/web/site
+```
+lance l'image docker `epi-multi-php:buster` dans un container qui active Apache/FPM avec toutes les versions PHP définies par les paquets dans `fpm/pkgs`.
 
 Enfin, le script `multi/bake`, comme le script `php/bake`, reconnait dans le répertoire principal le fichier `.norun` pour permettre la mise au point.
+
+### Déploiement sur un serveur pour tests de FPM
+
+Pour déployer sur un serveur un container `docker` de test FPM, il faut :
+
+* sauvegarder l'image `docker` de `multi` pour la bonne version de Debian
+  Par exemple, pour une `stretch` :
+  ```
+  docker save epi-multi-php:stretch | bzip2 >epi-multi-php_stretch.tbz
+  ```
+* sauvegarder le répertoire `pkgs`, le script `run` et le fichier `srvconf` de `debian/9/multi` :
+  ```
+  tar cjCf debian/9/multi fpm-deb9.tbz pkgs srvconf run
+  ```
+* installer si nécessaire `docker-ce` sur le serveur cible
+
+* restaurer l'image docker :
+  ```
+  bunzip2 < epi-multi-php_stretch.tbz | docker load
+  ```
+* restaurer le répertoire `pkgs` et autres, par exemple dans /opt/fpm
+  ```
+  mkdir /opt/fpm
+  tar xCf /opt/fpm fpm-deb9.tbz
+  ```
+* modifier selon les besoins le contenu de `pkgs` (suppression) et `srvconf` (modification)
+
+* lancer le script run sur le `DocumentRoot` de son choix, par exemple `/var/www/html` :
+  ```
+  /opt/fpm/run /var/www/html
+  ```
+  C'est prêt ! Bon tests :-)
 
 ## Notes
 

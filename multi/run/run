@@ -6,19 +6,26 @@ Prg=`basename $0`
 Dir=`dirname $0`
 IniPwd=$PWD
 DocRoot=`realpath "$1" 2>/dev/null`
-Port='$MULTI_PORT'
 
 Path() { realpath --relative-to=$IniPwd $1; }
 test "$Dir" || Dir=`dirname \`realpath $0\``
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
 test "$Dir" = '.' || cd "$Dir"
 Prg=`Path "$Prg"`
+
 test -d pkgs || { echo "$Prg: missing '`Path pkgs`' directory." >&2; exit 1; }
+
+PATH="$PATH:"	# dash wants $PWD in the path for the '.' command
+SrvConf=`Path srvconf`
+test -f srvconf && . srvconf || { echo "$Prg: missing '$SrvConf'" >&2; exit 1; }
+test "$Port" || { echo "$Prg: missing 'Port=...' in $SrvConf"; exit 2; }
+
 if [ "$1" ]; then
     test -d "$DocRoot" || { echo "$Prg: '$1' is not a directory" >&2; exit 1; }
 else
     test -d www && DocRoot="$PWD/www" || { echo "$Prg: missing '`Path www`' directory." >&2; exit 1; }
 fi
+
 test -d logs || mkdir logs
 
 if docker ps | grep $MULTI_NAME >/dev/null; then
@@ -28,7 +35,7 @@ fi
 Opt='-d'	# NOTE: multi/bake expects next line to start with Cmd="
 Cmd="docker run $Opt -p $Port:$Port -v $PWD:$MULTI_TOP/conf -v $DocRoot:$MULTI_TOP/www --name $MULTI_NAME --rm $MULTI_IMG"
 echo "Running the '$MULTI_NAME' container in background mode:\n    $Cmd"
-$Cmd >/dev/null
+$Cmd >/dev/null || { echo "\aFAILED to run the '$MULTI_NAME' container!"; exit 1; }
 
 Sec=0
 while [ $Sec -le 30 ]

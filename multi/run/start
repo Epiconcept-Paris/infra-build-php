@@ -7,15 +7,21 @@ Dir=`dirname $0`
 Conf='conf'
 Logs="$Dir/$Conf/logs"
 Pkgs="$Dir/$Conf/pkgs"
+SrvConf="$Dir/$Conf/srvconf"
 WWW="$Dir/www"
 Base='epi-php'
 Arch='amd64'
 PkgDeb="+deb$DEBNUM"
-IpSite="http://ipaddr.free.fr"
+Out="$Logs/docker-run.out"
 Own="$USER:`id -gn $USER`"
+
 mkdir -p $Logs
-test $$ -eq 1 && exec >$Logs/docker-run.out 2>&1
-chown $Own $Logs/docker-run.out
+if [ $$ -eq 1 ]; then
+    exec >$Out 2>&1
+    chown $Own $Out
+else
+    rm -f $Out
+fi
 
 set -e	# Stop on errors
 
@@ -27,6 +33,16 @@ fi
 Dists=`ls $Pkgs | sed -nr "s/$Base-[5-9]\.[0-9]-(cli|fpm|mysql)_([5-9]\.[0-9]\.[0-9]{,2}-[0-9]{,2})\\\\${PkgDeb}_$Arch.deb/\2/p" | sort -u`
 if [ -z "$Dists" ]; then
     echo "$Prg: no valid package name in $Pkgs" >&2
+    exit 1
+fi
+
+if [ -s "$SrvConf" ]; then
+    . $SrvConf
+    test "$Port"   || { echo "$Prg: missing 'Port=...' in $SrvConf";   exit 2; }
+    test "$Domain" || { echo "$Prg: missing 'Domain=...' in $SrvConf"; exit 2; }
+    test "$IpSite" || { echo "$Prg: missing 'IpSite=...' in $SrvConf"; exit 2; }
+else
+    echo "$Prg: missing configuration file $SrvConf" >&2
     exit 1
 fi
 
@@ -51,14 +67,16 @@ else
     echo "#
 #   Template for multi-PHP site configuration
 #
-#	%Maj% will be replaced by the PHP major version
-#	%Min% will be replaced by the PHP minor version
+#	%Port% will be replaced by the Port from srvconf
+#	%Maj% will be replaced by the PHP major version from packages
+#	%Min% will be replaced by the PHP minor version from packages
+#	%Domain% will be replaced by the Domain from srvconf
 #
 #   DO NOT change DocumentRoot, it is needed by the container's start script
 #   DO NOT change SetHandler, it is in sync with the PHP-FPM configuration
 #
-<VirtualHost *:$PORT>
-    ServerName php%Maj%%Min%.$DOMAIN
+<VirtualHost *:%Port%>
+    ServerName php%Maj%%Min%.%Domain%
     DocumentRoot $WWW
     <FilesMatch \".+\.ph(ar|p|tml)$\">
         SetHandler \"proxy:unix:/run/php/php%Maj%.%Min%-fpm.sock|fcgi://localhost\"
@@ -84,7 +102,7 @@ do
 	echo "$Prg: cannot find both cli and fpm packages for $dist"
 	continue
     fi
-    SiteConf=`cat $InPath | sed -e "s/%Maj%/$Maj/g" -e "s/%Min%/$Min/g"`
+    SiteConf=`cat $InPath | sed -e "s/%Port%/$Port/g" -e "s/%Maj%/$Maj/g" -e "s/%Min%/$Min/g" -e "s/%Domain%/$Domain/g"`
     Serv=`echo "$SiteConf" | sed -nr 's/^ *ServerName +([^ ]+).*$/\1/p'`
     Hand=`echo "$SiteConf" | sed -nr 's/^ *SetHandler +([^ ]+).*$/\1/p'`
     if echo " $Srvs" | grep " $Serv " >/dev/null; then
@@ -95,11 +113,11 @@ do
     echo "$SiteConf" >/etc/apache2/sites-available/$Serv.conf
     su -c "cp -p /etc/apache2/sites-available/$Serv.conf $Logs" $USER
     a2ensite $Serv.conf >>$Logs/a2.out
-    if [ $PORT -ne 80 ]; then
-	sed -i "/^Listen 80$/s/80/$PORT/" /etc/apache2/ports.conf
-	Port=":$PORT"
+    if [ $Port -ne 80 ]; then
+	sed -i "/^Listen 80$/s/80/$Port/" /etc/apache2/ports.conf
+	Listen=":$Port"
     fi
-    echo "Added site http://$Serv$Port"
+    echo "Added site http://$Serv$Listen"
     echo "    with SetHandler   $Hand"
     Srvs="$Srvs$Serv "
     ns=`expr $ns + 1`

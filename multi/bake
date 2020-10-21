@@ -50,7 +50,7 @@ do
 	exit 1
     fi
 done
-test -f ${TopDir}.norun && NoRun=y
+test -f $TopDir.norun && NoRun=y
 
 #
 #   Check Debian version
@@ -137,7 +137,13 @@ if [ $nd -eq 0 ]; then
     fi
     exit 1
 fi
-test -e $MultDir/www || mkdir -p $MultDir/www
+SrvConf=$MultDir/srvconf
+if [ ! -f $SrvConf ]; then
+    echo "Port='${MultiPort:-$DefTcp}'" >$SrvConf
+    echo "Domain='${MultiDomain:-$DefDom}'" >>$SrvConf
+    echo "IpSite='http://ipaddr.free.fr'" >>$SrvConf
+fi
+mkdir -p $MultDir/www
 test -f $MultDir/www/index.php || echo "<?php header('Location: info.php'); ?>" >$MultDir/www/index.php
 test -f $MultDir/www/info.php || cp -p $PhpTop/run/info.php $MultDir/www
 
@@ -192,16 +198,23 @@ COPY ${MulTop}run/$Pkg /tmp
 RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
     mkdir -p $Logs
     #   Variables come in order of their appearance in Dockerfile-multi.in
-    DEBVER="$DebVer" DEBNUM="$DebNum" DOMAIN="${MultiDomain:-$DefDom}" PORT="${MultiPort:-$DefTcp}" USER="$User" ADDUSER="$AddUser" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $DOMAIN $PORT $USER $ADDUSER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
+    DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
     test $? -eq 0 || { echo "$ColRed\aFAILED to build the '$MULTI_IMG' docker image!$ColStd" >&2; exit 2; }
     rm -f ${MulTop}run/$Pkg
 fi
-MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" MULTI_PORT="${MultiPort:-80}" envsubst '$MULTI_NAME $MULTI_TOP $MULTI_IMG $MULTI_PORT' <${MulTop}run/run >$MultDir/run
+MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" envsubst '$MULTI_NAME $MULTI_TOP $MULTI_IMG' <${MulTop}run/run >$MultDir/run
 chmod +x $MultDir/run
 
 if [ "$NoRun" ]; then
-    Opt='-ti' Top=`realpath $MultDir` DocRoot="$Top/www" eval `sed -nr "/^Cmd=\\"/s;PWD;Top;p" $MultDir/run`
-    echo "Use:\n    $Stop$Cmd bash\nto run the container"
+    if [ -f $TopDir.norun ]; then
+	. $SrvConf
+	Opt='-ti' Port="$Port" Top=`realpath $MultDir` DocRoot="$Top/www" eval `sed -nr "/^Cmd=\\"/s;PWD;Top;p" $MultDir/run`
+	Cmd="$Cmd bash"
+    else
+	Stop=		# will be done by multi/run if needed
+	Cmd="debian/$DebNum/multi/run"
+    fi
+    echo "Use:\n    $Stop$Cmd\nto run the container"
     exit 0
 fi
 exec $MultDir/run
