@@ -1,1 +1,1 @@
-/etc/php%MMD%/php.ini
+/etc/php/%MMD%/php.ini
