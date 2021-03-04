@@ -16,7 +16,7 @@ else
     echo "$0: cannot find $Bld/files/php-<PHP-version>$Ext"
     exit 1
 fi
-SupVer="5.2 5.6 7.0 7.1 7.2 7.3 7.4"		# UPDATE THIS on new PHP version
+SupVer="5.2 5.6 7.1 7.4"		# UPDATE THIS on new PHP version
 Own="$USER:`id -gn $USER`"
 umask 022					# Needed for lintian
 find $Bld/pkgs | xargs chmod go-w
