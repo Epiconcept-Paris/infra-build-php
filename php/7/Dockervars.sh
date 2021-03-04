@@ -82,4 +82,5 @@ AddPECL APCu apcu APCu apcu
 #AddPECL APCu_bc apcu_bc APCu_bc apcu_bc
 AddPECL oauth oauth OAuth oauth
 AddPECL mcrypt mcrypt MCrypt mcrypt
+AddPECL ssh2 ssh2 SSH2 ssh2
 AddExtra
