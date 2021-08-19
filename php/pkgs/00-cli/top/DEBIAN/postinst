@@ -13,6 +13,6 @@ fi
 
 if [ -d /etc/epiconcept/php-mods-available ]; then
     for f in /etc/epiconcept/php-mods-available/*.ini; do
-	test -f $f && ln $f /etc/php/%MM%/conf.d
+	test -f $f && ln -s $f /etc/php/%MM%/conf.d
     done
 fi
