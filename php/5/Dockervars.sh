@@ -78,4 +78,5 @@ if ! grep '/ext/fileinfo/' $PhpLst >/dev/null; then
     CLI_DEPS="$CLI_DEPS, libmagic1"
 fi
 AddPECL oauth oauth OAuth oauth 1.2.3	# Last version to support PHP5
+AddPECL ssh2 ssh2 SSH2 ssh2 0.12 
 AddExtra
