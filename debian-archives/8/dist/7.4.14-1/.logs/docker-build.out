@@ -1,0 +1,39 @@
+Sending build context to Docker daemon  31.35MB
+Step 1/34 : FROM debian:jessie
+ ---> 4eb8376dc2a3
+Step 2/34 : MAINTAINER Epiconcept
+ ---> Using cache
+ ---> 48274d0780aa
+Step 3/34 : ENV DEBVER=jessie
+ ---> Using cache
+ ---> 40f0a4cfe853
+Step 4/34 : ENV DEBNUM=8
+ ---> Using cache
+ ---> 4145c3f1e19a
+Step 5/34 : ENV CLI_DEPS libjpeg62-turbo, libpng12-0, libxpm4, libmcrypt4, libxslt1.1, libcurl3, libfreetype6, libmysqlclient18, libxml2, libreadline6, libc6, libzip2, libonig2
+ ---> Using cache
+ ---> 7eb721c6bd1a
+Step 6/34 : ENV BUILD_NUM=1
+ ---> Using cache
+ ---> be4e581ed1d8
+Step 7/34 : ENV USER=cedric
+ ---> Using cache
+ ---> 61693ef03493
+Step 8/34 : ENV LANG=C
+ ---> Using cache
+ ---> 33892910475f
+Step 9/34 : ENV TZ=Europe/Paris
+ ---> Using cache
+ ---> ca235d435c02
+Step 10/34 : RUN groupadd -g 1000 cedric; useradd -u 1000 -g 1000 cedric
+ ---> Using cache
+ ---> 6f2a29e0aa46
+Step 11/34 : RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
+ ---> Using cache
+ ---> 52a9d18a36c4
+Step 12/34 : RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    /opt/php-mk/build\\nto start the build\"" >>/root/.bashrc
+ ---> Using cache
+ ---> c90f3225256d
+Step 13/34 : RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends vim apt-rdepends file curl build-essential autoconf pkg-config faketime fakeroot lintian apache2 apache2-dev libmcrypt-dev libmhash-dev libjpeg-dev libxpm-dev libxslt1-dev libbz2-dev libxft-dev libmysqlclient-dev libcurl4-openssl-dev libssl-dev libpcre3-dev libsystemd-dev libreadline-dev libzip-dev libonig-dev libsqlite3-dev
+ ---> Running in 327079d01f52
+Get:1 http://security.debian.org jessie/updates InRelease [44.9 kB]

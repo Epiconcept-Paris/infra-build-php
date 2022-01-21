@@ -1,0 +1,11 @@
+Installing PHP CLI binary:        /opt/php-mk/pkgs/00-cli/top/usr/bin/
+Installing PHP CLI man page:      /opt/php-mk/pkgs/00-cli/top/usr/share/man/man1/
+Installing PHP FPM binary:        /opt/php-mk/pkgs/00-cli/top/usr/sbin/
+Installing PHP FPM defconfig:     /opt/php-mk/pkgs/00-cli/top/etc/php/
+Installing PHP FPM man page:      /opt/php-mk/pkgs/00-cli/top/usr/share/man/man8/
+Installing PHP FPM status page:   /opt/php-mk/pkgs/00-cli/top/usr/share/php/fpm/
+Installing phpdbg binary:         /opt/php-mk/pkgs/00-cli/top/usr/bin/
+Installing phpdbg man page:       /opt/php-mk/pkgs/00-cli/top/usr/share/man/man1/
+Installing shared extensions:     /opt/php-mk/pkgs/00-cli/top/usr/lib/php/extensions/
+/usr/src/php/build/shtool install -c ext/phar/phar.phar /opt/php-mk/pkgs/00-cli/top/usr/bin/phar.phar
+ln -s -f phar.phar /opt/php-mk/pkgs/00-cli/top/usr/bin/phar

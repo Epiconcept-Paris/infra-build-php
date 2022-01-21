@@ -1,0 +1,39 @@
+FROM debian:jessie
+MAINTAINER Epiconcept
+
+ENV DEBVER=jessie
+ENV DEBNUM=8
+ENV CLI_DEPS libjpeg62-turbo, libpng12-0, libxpm4, libmcrypt4, libxslt1.1, libcurl3, libfreetype6, libmysqlclient15off, libxml2, libreadline6, libc6, libmagic1
+ENV BUILD_NUM=1
+ENV USER=cedric
+ENV LANG=C
+ENV TZ=Europe/Paris
+RUN groupadd -g 1000 cedric; useradd -u 1000 -g 1000 cedric
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
+RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    /opt/php-mk/build\\nto start the build\"" >>/root/.bashrc
+
+# Update/upgrade, install tools and build deps
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends vim apt-rdepends file curl build-essential autoconf2.13 pkg-config faketime fakeroot lintian apache2 apache2-dev libmcrypt-dev libmhash-dev libjpeg-dev libxpm-dev libxslt1-dev libbz2-dev libxft-dev libcurl4-openssl-dev libssl-dev libpcre3-dev libsystemd-dev libreadline-dev libssh2-1-dev libmagic-dev
+
+RUN mkdir -p /opt/php-mk/dist /opt/php-mk/files
+RUN mkdir /opt/php-mk/hooks
+COPY 5/files/APC-3.1.13.tgz /opt/php-mk/files
+COPY 5/hooks/apc.sh /opt/php-mk/hooks
+COPY 5/files/Fileinfo-1.0.4.tgz /opt/php-mk/files
+COPY 5/hooks/fileinfo.sh /opt/php-mk/hooks
+COPY 5/files/oauth-1.2.3.tgz /opt/php-mk/files
+COPY 5/hooks/oauth.sh /opt/php-mk/hooks
+COPY 5/files/5.2/apache2.patch /opt/php-mk/files
+COPY 5/files/5.2/libmysqlclient15-dev_5.0.51a-24+lenny5_amd64.deb /opt/php-mk/files
+COPY 5/files/5.2/libmysqlclient15off_5.0.51a-24+lenny5_amd64.deb /opt/php-mk/files
+COPY 5/files/5.2/libxml2.patch /opt/php-mk/files
+COPY 5/files/5.2/mysql-common_5.0.51a-24+lenny5_all.deb /opt/php-mk/files
+COPY 5/files/5.2/openssl.patch /opt/php-mk/files
+COPY 5/hooks/files.sh /opt/php-mk/hooks
+COPY files/PEAR_Manpages-1.10.0.tgz /opt/php-mk/files
+COPY hooks/pearman.sh /opt/php-mk/hooks
+COPY 5/5.2.17/php-5.2.17.tar.bz2 /opt/php-mk/files
+COPY pkgs /opt/php-mk/pkgs
+COPY run/build /opt/php-mk
+
+CMD [ "/opt/php-mk/build" ]

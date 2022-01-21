@@ -1,0 +1,8 @@
+----- openssl.patch -----
+patching file ext/openssl/openssl.c
+patching file ext/openssl/tests/bug41033.phpt
+patching file ext/openssl/tests/bug66501.phpt
+patching file ext/openssl/tests/openssl_error_string_basic.phpt
+patching file ext/openssl/tests/sni_server.phpt
+patching file ext/openssl/xp_ssl.c
+patching file ext/phar/util.c

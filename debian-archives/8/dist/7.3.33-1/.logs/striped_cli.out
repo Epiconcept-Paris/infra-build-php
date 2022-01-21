@@ -1,0 +1,2 @@
+copy from `/opt/php-mk/pkgs/00-cli/top/usr/bin/php' [elf64-x86-64] to `/opt/php-mk/pkgs/00-cli/top/usr/bin/stBsV6dc' [elf64-x86-64]
+copy from `/opt/php-mk/pkgs/00-cli/top/usr/lib/php/extensions/opcache.so' [elf64-x86-64] to `/opt/php-mk/pkgs/00-cli/top/usr/lib/php/extensions/ste8w4qe' [elf64-x86-64]

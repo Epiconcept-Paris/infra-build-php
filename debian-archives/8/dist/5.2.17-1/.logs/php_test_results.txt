@@ -1,0 +1,4216 @@
+
+=====================================================================
+FAILED TEST SUMMARY
+---------------------------------------------------------------------
+Bug #34712 (zend.ze1_compatibility_mode = on segfault) [Zend/tests/bug34712.phpt]
+Bug #62765 (apc_bin_dumpfile report Fatal error when there is "goto" in function) [ext/apc/tests/bug62765.phpt]
+curl_error() function - basic test for curl_error using a fake url [ext/curl/tests/curl_error_basic.phpt]
+Curl_multi_getcontent() basic test with different sources (local file/http) [ext/curl/tests/curl_multi_getcontent_basic3.phpt]
+curl_setopt() basic parameter test [ext/curl/tests/curl_setopt_error.phpt]
+timezone_abbreviations_list() tests [ext/date/tests/010.phpt]
+Test DateTimeZone::listAbbreviations() function : basic functionality [ext/date/tests/DateTimeZone_listAbbreviations_basic1.phpt]
+Test DateTime::modify() function : usage variation - Passing unexpected values to first argument $modify. [ext/date/tests/DateTime_modify_variation1.phpt]
+Test date_modify() function : usage variation - Passing unexpected values to second argument $format. [ext/date/tests/date_modify_variation2.phpt]
+Test timezone_abbreviations_list() function : basic functionality [ext/date/tests/timezone_abbreviations_list_basic1.phpt]
+DOMDocument::validate() should validate an external DTD declaration [ext/dom/tests/DOMDocument_validate_external_dtd.phpt]
+DOMDocument::$validateOnParse - effectual determination (dom_document_validate_on_parse_read/dom_document_validate_on_parse_write) [ext/dom/tests/DOMDocument_validate_on_parse_variation.phpt]
+Test 7: DTD tests [ext/dom/tests/dom007.phpt]
+Bug #43073 (TrueType bounding box is wrong for angle<>0) [ext/gd/tests/bug43073.phpt]
+Bug #48801 (Problem with imagettfbbox) [ext/gd/tests/bug48801.phpt]
+Test imagecolorallocate() function : usage variations  - passing different data types to fourth argument [ext/gd/tests/imagecolorallocate_variation4.phpt]
+mhash() test [ext/mhash/tests/001.phpt]
+mhash_keygen_s2k() test [ext/mhash/tests/003.phpt]
+Bug #28382 (openssl_x509_parse extensions support) [ext/openssl/tests/bug28382.phpt]
+Bug #47828 (segfaults when a UTF-8 conversion fails openssl_x509_parse()) [ext/openssl/tests/bug47828.phpt]
+Bug #41125 (PDO mysql + quote() + prepare() can result in seg fault) [ext/pdo_mysql/tests/bug41125.phpt]
+Bug #44327 (PDORow::queryString property & numeric offsets / Crash) [ext/pdo_mysql/tests/bug44327.phpt]
+Test session_encode() function : error functionality [ext/session/tests/session_encode_error2.phpt]
+SimpleXML: XPath [ext/simplexml/tests/008.phpt]
+Bug #44811 (Improve error messages when creating new SoapClient which contains invalid data) [ext/soap/tests/bugs/bug44811.phpt]
+ext/sockets - socket_strerror - basic test [ext/sockets/tests/socket_strerror.phpt]
+proc_open [ext/standard/tests/general_functions/proc_open02.phpt]
+Test uniqid() function : basic functionality [ext/standard/tests/general_functions/uniqid_basic.phpt]
+time_sleep_until() function - basic test for time_sleep_until() [ext/standard/tests/misc/time_sleep_until_basic.phpt]
+Test setlocale() function : basic functionality - setting system locale to a specific [ext/standard/tests/strings/setlocale_basic1.phpt]
+Test setlocale() function : basic functionality - set locale using an array [ext/standard/tests/strings/setlocale_basic2.phpt]
+Test setlocale() function : basic functionality - passing multiple locales as argument [ext/standard/tests/strings/setlocale_basic3.phpt]
+Test setlocale() function : usage variations - passing multiple valid/invlaid locales as argument [ext/standard/tests/strings/setlocale_variation1.phpt]
+Test setlocale() function : usage variations - setting system locale = 0 [ext/standard/tests/strings/setlocale_variation3.phpt]
+Test strptime() function : basic functionality [ext/standard/tests/time/strptime_basic.phpt]
+sysvmsg functions on non-existing queue [ext/sysvmsg/tests/005.phpt]
+msg_send() data types when not serializing [ext/sysvmsg/tests/006.phpt]
+Test 10: EXSLT Support [ext/xsl/tests/xslt010.phpt]
+Check xsltprocessor::registerPHPFunctions and a non-string function in xsl [ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcnostring.phpt]
+Check xsltprocessor::registerPHPFunctions and a undefined php function [ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcundef.phpt]
+Test function gzgetc() by calling it with its expected arguments [ext/zlib/tests/gzgetc_basic.phpt]
+=====================================================================
+
+=====================================================================
+EXPECTED FAILED TEST SUMMARY
+---------------------------------------------------------------------
+output buffering - fatalism [tests/output/ob_011.phpt]
+ob_start(): Ensure unerasable buffer cannot be flushed by ob_flush() [tests/output/ob_start_basic_unerasable_005.phpt]
+SPL: ArrayObject::exchangeArray() basic usage with object as underlying data store. [ext/spl/tests/arrayObject_exchangeArray_basic3.phpt]
+Bug #39863 (file_exists() silently truncates after a null byte) [ext/standard/tests/file/bug39863.phpt]
+=====================================================================
+
+
+=====================================================================
+TEST RESULT SUMMARY
+---------------------------------------------------------------------
+Exts skipped    :   34
+Exts tested     :   48
+---------------------------------------------------------------------
+
+Number of tests : 9087              7590
+Tests skipped   : 1497 ( 16.5%) --------
+Tests warned    :    0 (  0.0%) (  0.0%)
+Tests failed    :   41 (  0.5%) (  0.5%)
+Expected fail   :    4 (  0.0%) (  0.1%)
+Tests passed    : 7545 ( 83.0%) ( 99.4%)
+---------------------------------------------------------------------
+Time taken      : 14130 seconds
+=====================================================================
+
+=====================================================================
+FAILED TEST SUMMARY
+---------------------------------------------------------------------
+Bug #34712 (zend.ze1_compatibility_mode = on segfault) [Zend/tests/bug34712.phpt]
+Bug #62765 (apc_bin_dumpfile report Fatal error when there is "goto" in function) [ext/apc/tests/bug62765.phpt]
+curl_error() function - basic test for curl_error using a fake url [ext/curl/tests/curl_error_basic.phpt]
+Curl_multi_getcontent() basic test with different sources (local file/http) [ext/curl/tests/curl_multi_getcontent_basic3.phpt]
+curl_setopt() basic parameter test [ext/curl/tests/curl_setopt_error.phpt]
+timezone_abbreviations_list() tests [ext/date/tests/010.phpt]
+Test DateTimeZone::listAbbreviations() function : basic functionality [ext/date/tests/DateTimeZone_listAbbreviations_basic1.phpt]
+Test DateTime::modify() function : usage variation - Passing unexpected values to first argument $modify. [ext/date/tests/DateTime_modify_variation1.phpt]
+Test date_modify() function : usage variation - Passing unexpected values to second argument $format. [ext/date/tests/date_modify_variation2.phpt]
+Test timezone_abbreviations_list() function : basic functionality [ext/date/tests/timezone_abbreviations_list_basic1.phpt]
+DOMDocument::validate() should validate an external DTD declaration [ext/dom/tests/DOMDocument_validate_external_dtd.phpt]
+DOMDocument::$validateOnParse - effectual determination (dom_document_validate_on_parse_read/dom_document_validate_on_parse_write) [ext/dom/tests/DOMDocument_validate_on_parse_variation.phpt]
+Test 7: DTD tests [ext/dom/tests/dom007.phpt]
+Bug #43073 (TrueType bounding box is wrong for angle<>0) [ext/gd/tests/bug43073.phpt]
+Bug #48801 (Problem with imagettfbbox) [ext/gd/tests/bug48801.phpt]
+Test imagecolorallocate() function : usage variations  - passing different data types to fourth argument [ext/gd/tests/imagecolorallocate_variation4.phpt]
+mhash() test [ext/mhash/tests/001.phpt]
+mhash_keygen_s2k() test [ext/mhash/tests/003.phpt]
+Bug #28382 (openssl_x509_parse extensions support) [ext/openssl/tests/bug28382.phpt]
+Bug #47828 (segfaults when a UTF-8 conversion fails openssl_x509_parse()) [ext/openssl/tests/bug47828.phpt]
+Bug #41125 (PDO mysql + quote() + prepare() can result in seg fault) [ext/pdo_mysql/tests/bug41125.phpt]
+Bug #44327 (PDORow::queryString property & numeric offsets / Crash) [ext/pdo_mysql/tests/bug44327.phpt]
+Test session_encode() function : error functionality [ext/session/tests/session_encode_error2.phpt]
+SimpleXML: XPath [ext/simplexml/tests/008.phpt]
+Bug #44811 (Improve error messages when creating new SoapClient which contains invalid data) [ext/soap/tests/bugs/bug44811.phpt]
+ext/sockets - socket_strerror - basic test [ext/sockets/tests/socket_strerror.phpt]
+proc_open [ext/standard/tests/general_functions/proc_open02.phpt]
+Test uniqid() function : basic functionality [ext/standard/tests/general_functions/uniqid_basic.phpt]
+time_sleep_until() function - basic test for time_sleep_until() [ext/standard/tests/misc/time_sleep_until_basic.phpt]
+Test setlocale() function : basic functionality - setting system locale to a specific [ext/standard/tests/strings/setlocale_basic1.phpt]
+Test setlocale() function : basic functionality - set locale using an array [ext/standard/tests/strings/setlocale_basic2.phpt]
+Test setlocale() function : basic functionality - passing multiple locales as argument [ext/standard/tests/strings/setlocale_basic3.phpt]
+Test setlocale() function : usage variations - passing multiple valid/invlaid locales as argument [ext/standard/tests/strings/setlocale_variation1.phpt]
+Test setlocale() function : usage variations - setting system locale = 0 [ext/standard/tests/strings/setlocale_variation3.phpt]
+Test strptime() function : basic functionality [ext/standard/tests/time/strptime_basic.phpt]
+sysvmsg functions on non-existing queue [ext/sysvmsg/tests/005.phpt]
+msg_send() data types when not serializing [ext/sysvmsg/tests/006.phpt]
+Test 10: EXSLT Support [ext/xsl/tests/xslt010.phpt]
+Check xsltprocessor::registerPHPFunctions and a non-string function in xsl [ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcnostring.phpt]
+Check xsltprocessor::registerPHPFunctions and a undefined php function [ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcundef.phpt]
+Test function gzgetc() by calling it with its expected arguments [ext/zlib/tests/gzgetc_basic.phpt]
+=====================================================================
+
+=====================================================================
+EXPECTED FAILED TEST SUMMARY
+---------------------------------------------------------------------
+output buffering - fatalism [tests/output/ob_011.phpt]
+ob_start(): Ensure unerasable buffer cannot be flushed by ob_flush() [tests/output/ob_start_basic_unerasable_005.phpt]
+SPL: ArrayObject::exchangeArray() basic usage with object as underlying data store. [ext/spl/tests/arrayObject_exchangeArray_basic3.phpt]
+Bug #39863 (file_exists() silently truncates after a null byte) [ext/standard/tests/file/bug39863.phpt]
+=====================================================================
+
+
+================================================================================
+/usr/src/php/Zend/tests/bug34712.phpt
+================================================================================
+Strict Standards: Implicit cloning object of class 'foo' because of 'zend.ze1_compatibility_mode' in /usr/src/php/Zend/tests/bug34712.php on line 11
+
+Strict Standards: Implicit cloning object of class 'bar' because of 'zend.ze1_compatibility_mode' in /usr/src/php/Zend/tests/bug34712.php on line 15
+Segmentation fault (core dumped)
+================================================================================
+004+ Segmentation fault (core dumped)
+004- ok
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/apc/tests/bug62765.phpt
+================================================================================
+Parse error: syntax error, unexpected T_STRING in /usr/src/php/ext/apc/tests/bug62765_file.php on line 8
+
+Warning: apc_compile_file(): Error compiling /usr/src/php/ext/apc/tests/bug62765_file.php in apc_compile_file. in /usr/src/php/ext/apc/tests/bug62765.php on line 17
+
+Parse error: syntax error, unexpected T_STRING in /usr/src/php/ext/apc/tests/bug62765_file.php on line 8
+================================================================================
+001+ Parse error: syntax error, unexpected T_STRING in /usr/src/php/ext/apc/tests/bug62765_file.php on line 8
+002+ 
+001- 22
+002- okey
+003+ Warning: apc_compile_file(): Error compiling /usr/src/php/ext/apc/tests/bug62765_file.php in apc_compile_file. in /usr/src/php/ext/apc/tests/bug62765.php on line 17
+004+ 
+005+ Parse error: syntax error, unexpected T_STRING in /usr/src/php/ext/apc/tests/bug62765_file.php on line 8
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/curl/tests/curl_error_basic.phpt
+================================================================================
+== Testing curl_error with a fake URL ==
+Error: Could not resolve host: fakeURL
+================================================================================
+002+ Error: Could not resolve host: fakeURL
+002- Error: Couldn't resolve host 'fakeURL'
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/curl/tests/curl_multi_getcontent_basic3.phpt
+================================================================================
+<html>
+<head><title>301 Moved Permanently</title></head>
+<body>
+<center><h1>301 Moved Permanently</h1></center>
+<hr><center>Myra</center>
+</body>
+</html>
+CURL2
+================================================================================
+001+ <html>
+002+ <head><title>301 Moved Permanently</title></head>
+003+ <body>
+004+ <center><h1>301 Moved Permanently</h1></center>
+005+ <hr><center>Myra</center>
+006+ </body>
+007+ </html>
+001- User-agent: *
+002- Disallow: /backend/
+003- Disallow: /distributions/
+004- Disallow: /stats/
+005- Disallow: /source.php
+006- Disallow: /search.php
+007- Disallow: /mod.php
+008- Disallow: /manual/add-note.php
+009- 
+010- Disallow: /harming/humans
+011- Disallow: /ignoring/human/orders
+012- Disallow: /harm/to/self
+013- 
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/curl/tests/curl_setopt_error.phpt
+================================================================================
+*** curl_setopt() call with incorrect parameters
+
+Warning: Wrong parameter count for curl_setopt() in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 4
+
+Warning: Wrong parameter count for curl_setopt() in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 5
+
+Warning: Wrong parameter count for curl_setopt() in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 7
+
+Warning: Wrong parameter count for curl_setopt() in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 8
+
+Warning: Wrong parameter count for curl_setopt() in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 9
+
+Warning: Wrong parameter count for curl_setopt() in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 10
+
+Warning: curl_setopt(): supplied argument is not a valid cURL handle resource in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 13
+
+Warning: curl_setopt(): Invalid curl configuration option in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 14
+
+Warning: curl_setopt(): Invalid curl configuration option in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 16
+================================================================================
+016+ 
+017+ Warning: curl_setopt(): Invalid curl configuration option in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 14
+018+ 
+019+ Warning: curl_setopt(): Invalid curl configuration option in /usr/src/php/ext/curl/tests/curl_setopt_error.php on line 16
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/date/tests/010.phpt
+================================================================================
+array(76) {
+  [0]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(16) "America/New_York"
+  }
+  [1]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "America/Antigua"
+  }
+  [2]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(16) "America/Atikokan"
+  }
+  [3]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(21) "America/Cambridge_Bay"
+  }
+  [4]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(14) "America/Cancun"
+  }
+  [5]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(14) "America/Cayman"
+  }
+  [6]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "America/Chicago"
+  }
+  [7]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(21) "America/Coral_Harbour"
+  }
+  [8]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "America/Detroit"
+  }
+  [9]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(18) "America/Fort_Wayne"
+  }
+  [10]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(18) "America/Grand_Turk"
+  }
+  [11]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(28) "America/Indiana/Indianapolis"
+  }
+  [12]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(20) "America/Indiana/Knox"
+  }
+  [13]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(23) "America/Indiana/Marengo"
+  }
+  [14]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(26) "America/Indiana/Petersburg"
+  }
+  [15]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(25) "America/Indiana/Tell_City"
+  }
+  [16]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(21) "America/Indiana/Vevay"
+  }
+  [17]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(25) "America/Indiana/Vincennes"
+  }
+  [18]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(23) "America/Indiana/Winamac"
+  }
+  [19]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(20) "America/Indianapolis"
+  }
+  [20]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "America/Iqaluit"
+  }
+  [21]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "America/Jamaica"
+  }
+  [22]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(27) "America/Kentucky/Louisville"
+  }
+  [23]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(27) "America/Kentucky/Monticello"
+  }
+  [24]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "America/Knox_IN"
+  }
+  [25]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(18) "America/Louisville"
+  }
+  [26]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "America/Managua"
+  }
+  [27]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(17) "America/Menominee"
+  }
+  [28]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(14) "America/Merida"
+  }
+  [29]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "America/Moncton"
+  }
+  [30]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(16) "America/Montreal"
+  }
+  [31]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(14) "America/Nassau"
+  }
+  [32]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "America/Nipigon"
+  }
+  [33]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(14) "America/Panama"
+  }
+  [34]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(19) "America/Pangnirtung"
+  }
+  [35]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(22) "America/Port-au-Prince"
+  }
+  [36]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(20) "America/Rankin_Inlet"
+  }
+  [37]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(16) "America/Resolute"
+  }
+  [38]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(21) "America/Santo_Domingo"
+  }
+  [39]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(19) "America/Thunder_Bay"
+  }
+  [40]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "America/Toronto"
+  }
+  [41]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(14) "Canada/Eastern"
+  }
+  [42]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(3) "EST"
+  }
+  [43]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(7) "EST5EDT"
+  }
+  [44]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(7) "Jamaica"
+  }
+  [45]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(10) "US/Central"
+  }
+  [46]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(15) "US/East-Indiana"
+  }
+  [47]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(10) "US/Eastern"
+  }
+  [48]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(17) "US/Indiana-Starke"
+  }
+  [49]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(-18000)
+    ["timezone_id"]=>
+    string(11) "US/Michigan"
+  }
+  [50]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(13) "Australia/ACT"
+  }
+  [51]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(18) "Australia/Brisbane"
+  }
+  [52]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(18) "Australia/Canberra"
+  }
+  [53]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(16) "Australia/Currie"
+  }
+  [54]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(16) "Australia/Hobart"
+  }
+  [55]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(13) "Australia/LHI"
+  }
+  [56]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(18) "Australia/Lindeman"
+  }
+  [57]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(19) "Australia/Lord_Howe"
+  }
+  [58]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(19) "Australia/Melbourne"
+  }
+  [59]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(13) "Australia/NSW"
+  }
+  [60]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(20) "Australia/Queensland"
+  }
+  [61]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(16) "Australia/Sydney"
+  }
+  [62]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(18) "Australia/Tasmania"
+  }
+  [63]=>
+  array(3) {
+    ["dst"]=>
+    bool(false)
+    ["offset"]=>
+    int(36000)
+    ["timezone_id"]=>
+    string(18) "Australia/Victoria"
+  }
+  [64]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(19) "Australia/Melbourne"
+  }
+  [65]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(13) "Australia/ACT"
+  }
+  [66]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(18) "Australia/Brisbane"
+  }
+  [67]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(18) "Australia/Canberra"
+  }
+  [68]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(16) "Australia/Currie"
+  }
+  [69]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(16) "Australia/Hobart"
+  }
+  [70]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(18) "Australia/Lindeman"
+  }
+  [71]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(13) "Australia/NSW"
+  }
+  [72]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(20) "Australia/Queensland"
+  }
+  [73]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(16) "Australia/Sydney"
+  }
+  [74]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(18) "Australia/Tasmania"
+  }
+  [75]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(39600)
+    ["timezone_id"]=>
+    string(18) "Australia/Victoria"
+  }
+}
+Done
+================================================================================
+001+ array(76) {
+001- array(71) {
+144+     string(25) "America/Indiana/Tell_City"
+144-     string(21) "America/Indiana/Vevay"
+153+     string(21) "America/Indiana/Vevay"
+153-     string(25) "America/Indiana/Vincennes"
+162+     string(25) "America/Indiana/Vincennes"
+162-     string(23) "America/Indiana/Winamac"
+171+     string(23) "America/Indiana/Winamac"
+171-     string(20) "America/Indianapolis"
+180+     string(20) "America/Indianapolis"
+180-     string(15) "America/Iqaluit"
+189+     string(15) "America/Iqaluit"
+189-     string(15) "America/Jamaica"
+198+     string(15) "America/Jamaica"
+198-     string(27) "America/Kentucky/Louisville"
+207+     string(27) "America/Kentucky/Louisville"
+207-     string(27) "America/Kentucky/Monticello"
+216+     string(27) "America/Kentucky/Monticello"
+216-     string(15) "America/Knox_IN"
+225+     string(15) "America/Knox_IN"
+225-     string(18) "America/Louisville"
+234+     string(18) "America/Louisville"
+234-     string(15) "America/Managua"
+243+     string(15) "America/Managua"
+243-     string(17) "America/Menominee"
+252+     string(17) "America/Menominee"
+252-     string(14) "America/Merida"
+261+     string(14) "America/Merida"
+261-     string(16) "America/Montreal"
+270+     string(15) "America/Moncton"
+270-     string(14) "America/Nassau"
+279+     string(16) "America/Montreal"
+279-     string(15) "America/Nipigon"
+288+     string(14) "America/Nassau"
+288-     string(14) "America/Panama"
+297+     string(15) "America/Nipigon"
+297-     string(19) "America/Pangnirtung"
+306+     string(14) "America/Panama"
+306-     string(22) "America/Port-au-Prince"
+315+     string(19) "America/Pangnirtung"
+315-     string(20) "America/Rankin_Inlet"
+324+     string(22) "America/Port-au-Prince"
+324-     string(21) "America/Santo_Domingo"
+333+     string(20) "America/Rankin_Inlet"
+333-     string(19) "America/Thunder_Bay"
+342+     string(16) "America/Resolute"
+342-     string(15) "America/Toronto"
+351+     string(21) "America/Santo_Domingo"
+351-     string(14) "Canada/Eastern"
+360+     string(19) "America/Thunder_Bay"
+360-     string(3) "EST"
+369+     string(15) "America/Toronto"
+369-     string(7) "EST5EDT"
+378+     string(14) "Canada/Eastern"
+378-     string(7) "Jamaica"
+387+     string(3) "EST"
+387-     string(10) "US/Central"
+396+     string(7) "EST5EDT"
+396-     string(15) "US/East-Indiana"
+405+     string(7) "Jamaica"
+405-     string(10) "US/Eastern"
+414+     string(10) "US/Central"
+414-     string(17) "US/Indiana-Starke"
+423+     string(15) "US/East-Indiana"
+423-     string(11) "US/Michigan"
+430+     int(-18000)
+430-     int(36000)
+432+     string(10) "US/Eastern"
+432-     string(13) "Australia/ACT"
+439+     int(-18000)
+439-     int(36000)
+441+     string(17) "US/Indiana-Starke"
+441-     string(18) "Australia/Brisbane"
+448+     int(-18000)
+448-     int(36000)
+450+     string(11) "US/Michigan"
+450-     string(18) "Australia/Canberra"
+459+     string(13) "Australia/ACT"
+459-     string(16) "Australia/Currie"
+468+     string(18) "Australia/Brisbane"
+468-     string(16) "Australia/Hobart"
+477+     string(18) "Australia/Canberra"
+477-     string(18) "Australia/Lindeman"
+486+     string(16) "Australia/Currie"
+486-     string(19) "Australia/Melbourne"
+495+     string(16) "Australia/Hobart"
+495-     string(13) "Australia/NSW"
+504+     string(13) "Australia/LHI"
+504-     string(20) "Australia/Queensland"
+513+     string(18) "Australia/Lindeman"
+513-     string(16) "Australia/Sydney"
+522+     string(19) "Australia/Lord_Howe"
+522-     string(18) "Australia/Tasmania"
+531+     string(19) "Australia/Melbourne"
+531-     string(18) "Australia/Victoria"
+536+     bool(false)
+536-     bool(true)
+538+     int(36000)
+538-     int(39600)
+540+     string(13) "Australia/NSW"
+540-     string(19) "Australia/Melbourne"
+545+     bool(false)
+545-     bool(true)
+547+     int(36000)
+547-     int(39600)
+549+     string(20) "Australia/Queensland"
+549-     string(13) "Australia/ACT"
+554+     bool(false)
+554-     bool(true)
+556+     int(36000)
+556-     int(39600)
+558+     string(16) "Australia/Sydney"
+558-     string(18) "Australia/Brisbane"
+563+     bool(false)
+563-     bool(true)
+565+     int(36000)
+565-     int(39600)
+567+     string(18) "Australia/Tasmania"
+567-     string(18) "Australia/Canberra"
+572+     bool(false)
+573+     ["offset"]=>
+574+     int(36000)
+575+     ["timezone_id"]=>
+576+     string(18) "Australia/Victoria"
+572-     bool(true)
+573-     ["offset"]=>
+574-     int(39600)
+575-     ["timezone_id"]=>
+576-     string(16) "Australia/Currie"
+585+     string(19) "Australia/Melbourne"
+585-     string(16) "Australia/Hobart"
+594+     string(13) "Australia/ACT"
+594-     string(18) "Australia/Lindeman"
+603+     string(18) "Australia/Brisbane"
+603-     string(13) "Australia/NSW"
+612+     string(18) "Australia/Canberra"
+612-     string(20) "Australia/Queensland"
+621+     string(16) "Australia/Currie"
+621-     string(16) "Australia/Sydney"
+630+     string(16) "Australia/Hobart"
+630-     string(18) "Australia/Tasmania"
+639+     string(18) "Australia/Lindeman"
+639-     string(18) "Australia/Victoria"
+641+   [71]=>
+642+   array(3) {
+641- }
+642- Done
+643+     ["dst"]=>
+644+     bool(true)
+645+     ["offset"]=>
+646+     int(39600)
+647+     ["timezone_id"]=>
+648+     string(13) "Australia/NSW"
+649+   }
+650+   [72]=>
+651+   array(3) {
+652+     ["dst"]=>
+653+     bool(true)
+654+     ["offset"]=>
+655+     int(39600)
+656+     ["timezone_id"]=>
+657+     string(20) "Australia/Queensland"
+658+   }
+659+   [73]=>
+660+   array(3) {
+661+     ["dst"]=>
+662+     bool(true)
+663+     ["offset"]=>
+664+     int(39600)
+665+     ["timezone_id"]=>
+666+     string(16) "Australia/Sydney"
+667+   }
+668+   [74]=>
+669+   array(3) {
+670+     ["dst"]=>
+671+     bool(true)
+672+     ["offset"]=>
+673+     int(39600)
+674+     ["timezone_id"]=>
+675+     string(18) "Australia/Tasmania"
+676+   }
+677+   [75]=>
+678+   array(3) {
+679+     ["dst"]=>
+680+     bool(true)
+681+     ["offset"]=>
+682+     int(39600)
+683+     ["timezone_id"]=>
+684+     string(18) "Australia/Victoria"
+685+   }
+686+ }
+687+ Done
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/date/tests/DateTimeZone_listAbbreviations_basic1.phpt
+================================================================================
+*** Testing DateTimeZone::listAbbreviations() : basic functionality ***
+string(5) "array"
+int(399)
+
+-- Format a sample entry --
+array(4) {
+  [0]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(-14400)
+    ["timezone_id"]=>
+    string(18) "America/Porto_Acre"
+  }
+  [1]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(-14400)
+    ["timezone_id"]=>
+    string(16) "America/Eirunepe"
+  }
+  [2]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(-14400)
+    ["timezone_id"]=>
+    string(18) "America/Rio_Branco"
+  }
+  [3]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(-14400)
+    ["timezone_id"]=>
+    string(11) "Brazil/Acre"
+  }
+}
+===DONE===
+================================================================================
+003+ int(399)
+003- int(338)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/date/tests/DateTime_modify_variation1.phpt
+================================================================================
+*** Testing DateTime::modify() : usage variation -  unexpected values to first argument $modify***
+
+-- int 0 --
+
+Warning: DateTime::modify(): Failed to parse time string (0) at position 0 (0): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- int 1 --
+
+Warning: DateTime::modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- int 12345 --
+
+Warning: DateTime::modify(): Failed to parse time string (12345) at position 4 (5): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- int -12345 --
+
+Warning: DateTime::modify(): Failed to parse time string (-12345) at position 5 (5): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- float 10.5 --
+NULL
+
+-- float -10.5 --
+
+Warning: DateTime::modify(): Failed to parse time string (-10.5) at position 4 (5): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- float .5 --
+NULL
+
+-- empty array --
+
+Warning: DateTime::modify() expects parameter 1 to be string, array given in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- int indexed array --
+
+Warning: DateTime::modify() expects parameter 1 to be string, array given in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- associative array --
+
+Warning: DateTime::modify() expects parameter 1 to be string, array given in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- nested arrays --
+
+Warning: DateTime::modify() expects parameter 1 to be string, array given in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- uppercase NULL --
+
+Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- lowercase null --
+
+Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- lowercase true --
+
+Warning: DateTime::modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- lowercase false --
+
+Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- uppercase TRUE --
+
+Warning: DateTime::modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- uppercase FALSE --
+
+Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- empty string DQ --
+
+Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- empty string SQ --
+
+Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- string DQ --
+
+Warning: DateTime::modify(): Failed to parse time string (string) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- string SQ --
+
+Warning: DateTime::modify(): Failed to parse time string (string) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- mixed case string --
+
+Warning: DateTime::modify(): Failed to parse time string (sTrInG) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- heredoc --
+
+Warning: DateTime::modify(): Failed to parse time string (hello world) at position 0 (h): The timezone could not be found in the database in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- instance of classWithToString --
+
+Warning: DateTime::modify(): Failed to parse time string (Class A object) at position 0 (C): The timezone could not be found in the database in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- instance of classWithoutToString --
+
+Warning: DateTime::modify() expects parameter 1 to be string, object given in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- undefined var --
+
+Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- unset var --
+
+Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+
+-- resource --
+
+Warning: DateTime::modify() expects parameter 1 to be string, resource given in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+bool(false)
+===DONE===
+================================================================================
+004- NULL
+005+ Warning: DateTime::modify(): Failed to parse time string (0) at position 0 (0): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+006+ bool(false)
+007+ 
+007- NULL
+010+ Warning: DateTime::modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+011+ bool(false)
+012+ 
+010- NULL
+013- NULL
+015+ Warning: DateTime::modify(): Failed to parse time string (12345) at position 4 (5): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+016+ bool(false)
+017+ 
+019+ 
+020+ Warning: DateTime::modify(): Failed to parse time string (-12345) at position 5 (5): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+021+ bool(false)
+019- NULL
+027+ 
+028+ Warning: DateTime::modify(): Failed to parse time string (-10.5) at position 4 (5): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+029+ bool(false)
+045- NULL
+048- NULL
+051- NULL
+054- NULL
+056+ Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+057+ bool(false)
+058+ 
+057- NULL
+060- NULL
+061+ Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+062+ bool(false)
+063+ 
+063- NULL
+066+ Warning: DateTime::modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+067+ bool(false)
+068+ 
+066- NULL
+069- NULL
+071+ Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+072+ bool(false)
+073+ 
+072- NULL
+075- NULL
+076+ Warning: DateTime::modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+077+ bool(false)
+078+ 
+078- NULL
+081+ Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+082+ bool(false)
+083+ 
+081- NULL
+086+ Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+087+ bool(false)
+088+ 
+089- NULL
+091+ Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+092+ bool(false)
+093+ 
+092- NULL
+096+ Warning: DateTime::modify(): Failed to parse time string (string) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+097+ bool(false)
+098+ 
+101+ Warning: DateTime::modify(): Failed to parse time string (string) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+102+ bool(false)
+103+ 
+106+ Warning: DateTime::modify(): Failed to parse time string (sTrInG) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+107+ bool(false)
+108+ 
+111+ Warning: DateTime::modify(): Failed to parse time string (hello world) at position 0 (h): The timezone could not be found in the database in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+112+ bool(false)
+113+ 
+115+ 
+116+ Warning: DateTime::modify(): Failed to parse time string (Class A object) at position 0 (C): The timezone could not be found in the database in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+117+ bool(false)
+126+ Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+127+ bool(false)
+128+ 
+130+ 
+131+ Warning: DateTime::modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/DateTime_modify_variation1.php on line 99
+132+ bool(false)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/date/tests/date_modify_variation2.phpt
+================================================================================
+*** Testing date_modify() : usage variation -  unexpected values to second argument $format***
+
+-- int 0 --
+
+Warning: date_modify(): Failed to parse time string (0) at position 0 (0): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- int 1 --
+
+Warning: date_modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- int 12345 --
+
+Warning: date_modify(): Failed to parse time string (12345) at position 4 (5): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- int -12345 --
+
+Warning: date_modify(): Failed to parse time string (-12345) at position 5 (5): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- float 10.5 --
+NULL
+
+-- float -10.5 --
+
+Warning: date_modify(): Failed to parse time string (-10.5) at position 4 (5): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- float .5 --
+NULL
+
+-- empty array --
+
+Warning: date_modify() expects parameter 2 to be string, array given in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- int indexed array --
+
+Warning: date_modify() expects parameter 2 to be string, array given in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- associative array --
+
+Warning: date_modify() expects parameter 2 to be string, array given in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- nested arrays --
+
+Warning: date_modify() expects parameter 2 to be string, array given in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- uppercase NULL --
+
+Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- lowercase null --
+
+Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- lowercase true --
+
+Warning: date_modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- lowercase false --
+
+Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- uppercase TRUE --
+
+Warning: date_modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- uppercase FALSE --
+
+Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- empty string DQ --
+
+Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- empty string SQ --
+
+Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- string DQ --
+
+Warning: date_modify(): Failed to parse time string (string) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- string SQ --
+
+Warning: date_modify(): Failed to parse time string (string) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- mixed case string --
+
+Warning: date_modify(): Failed to parse time string (sTrInG) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- heredoc --
+
+Warning: date_modify(): Failed to parse time string (hello world) at position 0 (h): The timezone could not be found in the database in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- instance of classWithToString --
+
+Warning: date_modify(): Failed to parse time string (Class A object) at position 0 (C): The timezone could not be found in the database in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- instance of classWithoutToString --
+
+Warning: date_modify() expects parameter 2 to be string, object given in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- undefined var --
+
+Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- unset var --
+
+Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+
+-- resource --
+
+Warning: date_modify() expects parameter 2 to be string, resource given in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+bool(false)
+===DONE===
+================================================================================
+004- NULL
+005+ Warning: date_modify(): Failed to parse time string (0) at position 0 (0): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+006+ bool(false)
+007+ 
+007- NULL
+010+ Warning: date_modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+011+ bool(false)
+012+ 
+010- NULL
+013- NULL
+015+ Warning: date_modify(): Failed to parse time string (12345) at position 4 (5): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+016+ bool(false)
+017+ 
+019+ 
+020+ Warning: date_modify(): Failed to parse time string (-12345) at position 5 (5): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+021+ bool(false)
+019- NULL
+027+ 
+028+ Warning: date_modify(): Failed to parse time string (-10.5) at position 4 (5): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+029+ bool(false)
+045- NULL
+048- NULL
+051- NULL
+054- NULL
+056+ Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+057+ bool(false)
+058+ 
+057- NULL
+060- NULL
+061+ Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+062+ bool(false)
+063+ 
+063- NULL
+066+ Warning: date_modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+067+ bool(false)
+068+ 
+066- NULL
+069- NULL
+071+ Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+072+ bool(false)
+073+ 
+072- NULL
+075- NULL
+076+ Warning: date_modify(): Failed to parse time string (1) at position 0 (1): Unexpected character in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+077+ bool(false)
+078+ 
+078- NULL
+081+ Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+082+ bool(false)
+083+ 
+081- NULL
+086+ Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+087+ bool(false)
+088+ 
+089- NULL
+091+ Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+092+ bool(false)
+093+ 
+092- NULL
+096+ Warning: date_modify(): Failed to parse time string (string) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+097+ bool(false)
+098+ 
+101+ Warning: date_modify(): Failed to parse time string (string) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+102+ bool(false)
+103+ 
+106+ Warning: date_modify(): Failed to parse time string (sTrInG) at position 0 (s): The timezone could not be found in the database in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+107+ bool(false)
+108+ 
+111+ Warning: date_modify(): Failed to parse time string (hello world) at position 0 (h): The timezone could not be found in the database in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+112+ bool(false)
+113+ 
+115+ 
+116+ Warning: date_modify(): Failed to parse time string (Class A object) at position 0 (C): The timezone could not be found in the database in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+117+ bool(false)
+126+ Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+127+ bool(false)
+128+ 
+130+ 
+131+ Warning: date_modify(): Failed to parse time string () at position 0 ( in /usr/src/php/ext/date/tests/date_modify_variation2.php on line 99
+132+ bool(false)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/date/tests/timezone_abbreviations_list_basic1.phpt
+================================================================================
+*** Testing timezone_abbreviations_list() : basic functionality ***
+string(5) "array"
+int(399)
+
+-- Format a sample entry --
+array(4) {
+  [0]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(-14400)
+    ["timezone_id"]=>
+    string(18) "America/Porto_Acre"
+  }
+  [1]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(-14400)
+    ["timezone_id"]=>
+    string(16) "America/Eirunepe"
+  }
+  [2]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(-14400)
+    ["timezone_id"]=>
+    string(18) "America/Rio_Branco"
+  }
+  [3]=>
+  array(3) {
+    ["dst"]=>
+    bool(true)
+    ["offset"]=>
+    int(-14400)
+    ["timezone_id"]=>
+    string(11) "Brazil/Acre"
+  }
+}
+===DONE===
+================================================================================
+003+ int(399)
+003- int(338)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/dom/tests/DOMDocument_validate_external_dtd.phpt
+================================================================================
+Warning: DOMDocument::validate(): No declaration for element root in /usr/src/php/ext/dom/tests/DOMDocument_validate_external_dtd.php on line 6
+
+Warning: DOMDocument::validate(): No declaration for element foo in /usr/src/php/ext/dom/tests/DOMDocument_validate_external_dtd.php on line 6
+
+Warning: DOMDocument::validate(): No declaration for attribute bar of element foo in /usr/src/php/ext/dom/tests/DOMDocument_validate_external_dtd.php on line 6
+bool(false)
+================================================================================
+001+ Warning: DOMDocument::validate(): No declaration for element root in /usr/src/php/ext/dom/tests/DOMDocument_validate_external_dtd.php on line 6
+001- bool(true)
+002+ 
+003+ Warning: DOMDocument::validate(): No declaration for element foo in /usr/src/php/ext/dom/tests/DOMDocument_validate_external_dtd.php on line 6
+004+ 
+005+ Warning: DOMDocument::validate(): No declaration for attribute bar of element foo in /usr/src/php/ext/dom/tests/DOMDocument_validate_external_dtd.php on line 6
+006+ bool(false)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.phpt
+================================================================================
+validateOnParse set to FALSE: 
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: base line 45 and head in Entity, line: 48 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: img line 53 and a in Entity, line: 53 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: img line 63 and a in Entity, line: 64 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: a line 62 and li in Entity, line: 65 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: li line 61 and ul in Entity, line: 66 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: input line 69 and form in Entity, line: 70 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: input line 68 and div in Entity, line: 71 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: form line 67 and nav in Entity, line: 73 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: br line 173 and dd in Entity, line: 173 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: dd line 173 and dl in Entity, line: 176 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: dl line 155 and div in Entity, line: 176 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: div line 74 and nav in Entity, line: 176 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 196 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 196 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 198 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 198 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 200 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 200 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Entity 'copy' not defined in Entity, line: 887 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): AttValue: " or ' expected in Entity, line: 897 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): attributes construct error in Entity, line: 897 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Couldn't find end of Start Tag div line 897 in Entity, line: 897 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: nav line 74 and div in Entity, line: 897 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: img line 907 and a in Entity, line: 907 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: a line 907 and body in Entity, line: 909 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: ul line 56 and html in Entity, line: 910 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag input line 55 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag a line 53 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag div line 52 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag nav line 51 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag body line 49 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 25 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 24 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 23 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 22 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 21 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 17 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 16 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 15 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 13 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 12 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 11 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag link line 10 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag meta line 6 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag meta line 5 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag head line 3 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+
+Warning: DOMDocument::loadXML(): Premature end of data in tag html line 2 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+No Error Report Above
+
+Fatal error: Call to a member function appendChild() on a non-object in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 17
+================================================================================
+002+ 
+003+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: base line 45 and head in Entity, line: 48 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+004+ 
+005+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: img line 53 and a in Entity, line: 53 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+006+ 
+007+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: img line 63 and a in Entity, line: 64 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+008+ 
+009+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: a line 62 and li in Entity, line: 65 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+010+ 
+011+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: li line 61 and ul in Entity, line: 66 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+012+ 
+013+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: input line 69 and form in Entity, line: 70 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+014+ 
+015+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: input line 68 and div in Entity, line: 71 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+016+ 
+017+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: form line 67 and nav in Entity, line: 73 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+018+ 
+019+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: br line 173 and dd in Entity, line: 173 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+020+ 
+021+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: dd line 173 and dl in Entity, line: 176 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+022+ 
+023+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: dl line 155 and div in Entity, line: 176 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+024+ 
+025+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: div line 74 and nav in Entity, line: 176 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+026+ 
+027+ Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 196 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+028+ 
+029+ Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 196 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+030+ 
+031+ Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 198 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+032+ 
+033+ Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 198 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+034+ 
+035+ Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 200 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+036+ 
+037+ Warning: DOMDocument::loadXML(): Entity 'middot' not defined in Entity, line: 200 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+038+ 
+039+ Warning: DOMDocument::loadXML(): Entity 'copy' not defined in Entity, line: 887 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+040+ 
+041+ Warning: DOMDocument::loadXML(): AttValue: " or ' expected in Entity, line: 897 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+042+ 
+043+ Warning: DOMDocument::loadXML(): attributes construct error in Entity, line: 897 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+044+ 
+045+ Warning: DOMDocument::loadXML(): Couldn't find end of Start Tag div line 897 in Entity, line: 897 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+046+ 
+047+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: nav line 74 and div in Entity, line: 897 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+048+ 
+049+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: img line 907 and a in Entity, line: 907 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+050+ 
+051+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: a line 907 and body in Entity, line: 909 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+052+ 
+053+ Warning: DOMDocument::loadXML(): Opening and ending tag mismatch: ul line 56 and html in Entity, line: 910 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+054+ 
+055+ Warning: DOMDocument::loadXML(): Premature end of data in tag input line 55 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+056+ 
+057+ Warning: DOMDocument::loadXML(): Premature end of data in tag a line 53 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+058+ 
+059+ Warning: DOMDocument::loadXML(): Premature end of data in tag div line 52 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+060+ 
+061+ Warning: DOMDocument::loadXML(): Premature end of data in tag nav line 51 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+062+ 
+063+ Warning: DOMDocument::loadXML(): Premature end of data in tag body line 49 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+064+ 
+065+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 25 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+066+ 
+067+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 24 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+068+ 
+069+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 23 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+070+ 
+071+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 22 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+072+ 
+073+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 21 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+074+ 
+075+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 17 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+076+ 
+077+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 16 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+078+ 
+079+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 15 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+080+ 
+081+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 13 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+082+ 
+083+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 12 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+084+ 
+085+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 11 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+086+ 
+087+ Warning: DOMDocument::loadXML(): Premature end of data in tag link line 10 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+088+ 
+089+ Warning: DOMDocument::loadXML(): Premature end of data in tag meta line 6 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+090+ 
+091+ Warning: DOMDocument::loadXML(): Premature end of data in tag meta line 5 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+092+ 
+093+ Warning: DOMDocument::loadXML(): Premature end of data in tag head line 3 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+094+ 
+095+ Warning: DOMDocument::loadXML(): Premature end of data in tag html line 2 in Entity, line: 911 in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 12
+003- validateOnParse set to TRUE: 
+005- Warning: DOMDocument::loadXML(): No declaration for element NYPHP in Entity, line: %d in %s on line %d
+098+ Fatal error: Call to a member function appendChild() on a non-object in /usr/src/php/ext/dom/tests/DOMDocument_validate_on_parse_variation.php on line 17
+006- 
+007- Warning: DOMDocument::loadXML(): Element body content does not follow the DTD, expecting (p | h1 | h2 | h3 | h4 | h5 | h6 | div | ul | ol | dl | pre | hr | blockquote | address | fieldset | table | form | noscript | ins | del | script)*, got (div div div div div NYPHP) in Entity, line: %d in %s on line %d
+008- Error Report Above
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/dom/tests/dom007.phpt
+================================================================================
+Length: 1
+Key GIF: GIF (image/gif) (-)
+
+Index 0: GIF (image/gif) (-)
+
+NULL
+
+Length: 3
+Key: myimage Name: myimage
+Key: test Name: test
+Key: rdf Name: rdf
+
+Index 0: myimage
+Index 1: test
+Index 2: rdf
+
+NULL
+NULL
+================================================================================
+009+ Key: myimage Name: myimage
+011- Key: myimage Name: myimage
+012+ 
+013+ Index 0: myimage
+014+ Index 1: test
+015+ Index 2: rdf
+013- Index 0: test
+014- Index 1: rdf
+015- Index 2: myimage
+016- 
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/gd/tests/bug43073.phpt
+================================================================================
+(500, 400), (610, 400), (610, 376), (500, 376)
+(492, 363), (591, 322), (580, 295), (480, 336)
+(470, 331), (548, 254), (527, 233), (449, 310)
+(439, 309), (483, 202), (461, 193), (416, 299)
+(400, 300), (400, 183), (380, 183), (380, 300)
+(362, 307), (316, 195), (291, 205), (337, 318)
+(330, 329), (246, 244), (224, 265), (308, 350)
+(308, 360), (202, 316), (190, 344), (296, 388)
+(300, 400), (187, 400), (187, 425), (300, 425)
+(306, 437), (195, 483), (206, 510), (318, 464)
+(328, 469), (240, 557), (260, 578), (349, 491)
+(359, 491), (312, 607), (334, 616), (382, 501)
+(400, 500), (400, 618), (419, 618), (419, 500)
+(436, 493), (483, 607), (507, 597), (461, 482)
+(468, 471), (555, 558), (577, 538), (490, 450)
+(490, 440), (600, 485), (611, 457), (502, 412)
+================================================================================
+001+ (500, 400), (610, 400), (610, 376), (500, 376)
+001- (500, 402), (610, 402), (610, 376), (500, 376)
+005+ (400, 300), (400, 183), (380, 183), (380, 300)
+005- (401, 300), (401, 183), (381, 183), (381, 300)
+009+ (300, 400), (187, 400), (187, 425), (300, 425)
+009- (300, 399), (186, 399), (186, 425), (300, 425)
+013+ (400, 500), (400, 618), (419, 618), (419, 500)
+013- (398, 500), (398, 618), (418, 618), (418, 500)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/gd/tests/bug48801.phpt
+================================================================================
+(-1, 15)
+(156, 15)
+(156, -48)
+(-1, -48)
+================================================================================
+002+ (156, 15)
+003+ (156, -48)
+002- (155, 15)
+003- (155, -48)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/gd/tests/imagecolorallocate_variation4.phpt
+================================================================================
+*** Testing imagecolorallocate() : usage variations ***
+
+--float 10.5--
+int(657930)
+
+--float -10.5--
+int(657910)
+
+--float 10.1234567e10--
+bool(false)
+
+--float 10.7654321E-10--
+int(657920)
+
+--float .5--
+int(657920)
+
+--empty array--
+int(657920)
+
+--int indexed array--
+int(657921)
+
+--associative array--
+int(657921)
+
+--nested arrays--
+int(657921)
+
+--uppercase NULL--
+int(657920)
+
+--lowercase null--
+int(657920)
+
+--lowercase true--
+int(657921)
+
+--lowercase false--
+int(657920)
+
+--uppercase TRUE--
+int(657921)
+
+--uppercase FALSE--
+int(657920)
+
+--empty string DQ--
+int(657920)
+
+--empty string SQ--
+int(657920)
+
+--string DQ--
+int(657920)
+
+--string SQ--
+int(657920)
+
+--mixed case string--
+int(657920)
+
+--heredoc--
+int(657920)
+
+--instance of classWithToString--
+
+Notice: Object of class classWithToString could not be converted to int in /usr/src/php/ext/gd/tests/imagecolorallocate_variation4.php on line 91
+int(657921)
+
+--instance of classWithoutToString--
+
+Notice: Object of class classWithoutToString could not be converted to int in /usr/src/php/ext/gd/tests/imagecolorallocate_variation4.php on line 91
+int(657921)
+
+--undefined var--
+int(657920)
+
+--unset var--
+int(657920)
+
+--file resource--
+int(657925)
+===DONE===
+================================================================================
+010+ bool(false)
+010- int(657919)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/mhash/tests/001.phpt
+================================================================================
+MHASH_MD5
+ok
+
+MHASH_SHA1
+ok
+
+MHASH_HAVAL256
+ok
+
+MHASH_HAVAL192
+ok
+
+MHASH_HAVAL224
+ok
+
+MHASH_HAVAL160
+ok
+
+MHASH_RIPEMD160
+ok
+
+MHASH_GOST
+ok
+
+MHASH_TIGER: string(24) "ý¹šyÃ:•g~ —«®‘ë
+à0T»\9"
+MHASH_TIGER: string(24) "ý¹šyÃ:•g~ —«®‘ëà0T»\9"
+
+MHASH_CRC32
+ok
+
+MHASH_CRC32B
+ok
+================================================================================
+025+ MHASH_TIGER: string(24) "ý¹šyÃ:•g~ —«®‘ë
+026+ à0T»\9"
+027+ MHASH_TIGER: string(24) "ý¹šyÃ:•g~ —«®‘ëà0T»\9"
+025- MHASH_TIGER
+026- ok
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/mhash/tests/003.phpt
+================================================================================
+MHASH_MD5
+ok
+
+MHASH_SHA1
+ok
+
+MHASH_HAVAL256
+ok
+
+MHASH_HAVAL224: string(200) "5c4aff3d825ad608f608c8eae779ee3868610bc60a98f3d770b311a6677c797fc2dadcab71dde0c0191e068397ab297f0ae5cbbc6cbcd0c78ca8470c42401f6b77e81dc2ba8d51930ff982760335324fb850ac2d30b73514004c096d60472d320e0ec349"
+MHASH_HAVAL224: string(200) "5c4aff3d825ad608f608c8eae779ee3868610bc60a98f3d770b311a6677c797fc2dadcab71dde0c0191e068397ab297f0de5cbbc6cbcd0c78ca8470c42401f6b77e81dc2ba8d51930ff982760335324fb850ac2d30b73514004c096d60472d320e0ec349"
+
+MHASH_HAVAL192
+ok
+
+MHASH_HAVAL160
+ok
+
+MHASH_RIPEMD160
+ok
+
+MHASH_GOST
+ok
+
+MHASH_TIGER
+ok
+
+MHASH_CRC32: string(200) "481c40148c26185f9a59ef18e86f51c5d2d0315b46711d22ae08c1ccdd669fe956c817380815e3a545f6ee453c9da48d1d994dbc3ac8ba85a572108412f06b2a16b1489cda75b118e82f7d9bdfdb68336957bbf19e4a3f76750a6985a53dd557229dfcf3"
+MHASH_CRC32: string(200) "481c40148c26185f9a59ef18e86f51c5d2d0315b46711d22ae08c1ccdd669fe956c817380815e3a545f6ee453c9da48d1d994dbc3ac8ba85a572108412f06b2a16b1489cda75b118e82f7d9bdfdb68336957bbf19e4a3f76750d6985a53dd557229dfcf3"
+
+MHASH_CRC32B
+ok
+================================================================================
+010+ MHASH_HAVAL224: string(200) "5c4aff3d825ad608f608c8eae779ee3868610bc60a98f3d770b311a6677c797fc2dadcab71dde0c0191e068397ab297f0ae5cbbc6cbcd0c78ca8470c42401f6b77e81dc2ba8d51930ff982760335324fb850ac2d30b73514004c096d60472d320e0ec349"
+011+ MHASH_HAVAL224: string(200) "5c4aff3d825ad608f608c8eae779ee3868610bc60a98f3d770b311a6677c797fc2dadcab71dde0c0191e068397ab297f0de5cbbc6cbcd0c78ca8470c42401f6b77e81dc2ba8d51930ff982760335324fb850ac2d30b73514004c096d60472d320e0ec349"
+010- MHASH_HAVAL224
+011- ok
+028+ MHASH_CRC32: string(200) "481c40148c26185f9a59ef18e86f51c5d2d0315b46711d22ae08c1ccdd669fe956c817380815e3a545f6ee453c9da48d1d994dbc3ac8ba85a572108412f06b2a16b1489cda75b118e82f7d9bdfdb68336957bbf19e4a3f76750a6985a53dd557229dfcf3"
+029+ MHASH_CRC32: string(200) "481c40148c26185f9a59ef18e86f51c5d2d0315b46711d22ae08c1ccdd669fe956c817380815e3a545f6ee453c9da48d1d994dbc3ac8ba85a572108412f06b2a16b1489cda75b118e82f7d9bdfdb68336957bbf19e4a3f76750d6985a53dd557229dfcf3"
+028- MHASH_CRC32
+029- ok
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/openssl/tests/bug28382.phpt
+================================================================================
+array(11) {
+  ["basicConstraints"]=>
+  string(8) "CA:FALSE"
+  ["nsComment"]=>
+  string(38) "For Grid use only; request tag userTag"
+  ["nsCertType"]=>
+  string(30) "SSL Client, SSL Server, S/MIME"
+  ["crlDistributionPoints"]=>
+  string(65) "
+Full Name:
+  URI:http://mobile.blue-software.ro:90/ca/crl.shtml
+"
+  ["nsCaPolicyUrl"]=>
+  string(38) "http://mobile.blue-software.ro:90/pub/"
+  ["subjectAltName"]=>
+  string(28) "email:sergiu@bluesoftware.ro"
+  ["subjectKeyIdentifier"]=>
+  string(59) "B0:A7:FF:F9:41:15:DE:23:39:BD:DD:31:0F:97:A0:B2:A2:74:E0:FC"
+  ["authorityKeyIdentifier"]=>
+  string(115) "DirName:/C=RO/ST=Romania/L=Craiova/O=Sergiu/OU=Sergiu SRL/CN=Sergiu CA/emailAddress=n_sergiu@hotmail.com
+serial:00
+"
+  ["keyUsage"]=>
+  string(71) "Digital Signature, Non Repudiation, Key Encipherment, Data Encipherment"
+  ["nsBaseUrl"]=>
+  string(20) "http://62.231.98.52/"
+  ["1.2.3.4"]=>
+  string(4) ">çb4"
+}
+================================================================================
+009+   string(65) "
+010+ Full Name:
+011+   URI:http://mobile.blue-software.ro:90/ca/crl.shtml
+009-   string(51) "URI:http://mobile.blue-software.ro:90/ca/crl.shtml
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/openssl/tests/bug47828.phpt
+================================================================================
+string(8) "263efe3e"
+Done
+================================================================================
+001+ string(8) "263efe3e"
+001- string(8) "9337ed77"
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/pdo_mysql/tests/bug41125.phpt
+================================================================================
+Fatal error: Uncaught exception 'PDOException' with message 'SQLSTATE[HY000] [2002] Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)' in /usr/src/php/ext/pdo/tests/pdo_test.inc:36
+Stack trace:
+#0 /usr/src/php/ext/pdo/tests/pdo_test.inc(36): PDO->__construct('mysql:host=loca...', 'root', '', NULL)
+#1 /usr/src/php/ext/pdo/tests/pdo_test.inc(83): PDOTest::factory()
+#2 /usr/src/php/ext/pdo_mysql/tests/bug41125.php(5): PDOTest::test_factory('/usr/src/php/ex...')
+#3 {main}
+  thrown in /usr/src/php/ext/pdo/tests/pdo_test.inc on line 36
+================================================================================
+001+ Fatal error: Uncaught exception 'PDOException' with message 'SQLSTATE[HY000] [2002] Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)' in /usr/src/php/ext/pdo/tests/pdo_test.inc:36
+002+ Stack trace:
+003+ #0 /usr/src/php/ext/pdo/tests/pdo_test.inc(36): PDO->__construct('mysql:host=loca...', 'root', '', NULL)
+004+ #1 /usr/src/php/ext/pdo/tests/pdo_test.inc(83): PDOTest::factory()
+005+ #2 /usr/src/php/ext/pdo_mysql/tests/bug41125.php(5): PDOTest::test_factory('/usr/src/php/ex...')
+006+ #3 {main}
+007+   thrown in /usr/src/php/ext/pdo/tests/pdo_test.inc on line 36
+001- 1
+002- 00000
+003- -------------------------------------------------------
+004- [1] Query: [[SELECT 1 FROM DUAL WHERE 1 = '?\'\'']]
+005- 
+006- 00000
+007- --------
+008- [2] Query: [[SELECT 'a\'0' FROM DUAL WHERE 1 = ?]]
+009- a'0
+010- 00000
+011- --------
+012- [3] Query: [[SELECT 'a', 'b\'' FROM DUAL WHERE '''' LIKE '\'' AND ?]]
+013- a - b'
+014- 00000
+015- --------
+016- [4] Query: [[SELECT 'foo?bar', '', '''' FROM DUAL WHERE ?]]
+017- foo?bar -  - '
+018- 00000
+019- --------
+020- Query: [[SELECT upper(:id) FROM DUAL WHERE '1']]
+021- O'\0
+022- 00000
+023- -------------------------------------------------------
+024- [1] Query: [[SELECT 1, 'foo' FROM DUAL WHERE 1 = :id AND '\0' IS NULL AND  2 <> :id]]
+025- 
+026- 00000
+027- --------
+028- [2] Query: [[SELECT 1 FROM DUAL WHERE 1 = :id AND '' AND  2 <> :id]]
+029- 
+030- 00000
+031- --------
+032- [3] Query: [[SELECT 1 FROM DUAL WHERE 1 = :id AND '\'\'' = '''' AND  2 <> :id]]
+033- 
+034- 00000
+035- --------
+036- [4] Query: [[SELECT 1 FROM DUAL WHERE 1 = :id AND '\'' = '''' AND  2 <> :id]]
+037- 1
+038- 00000
+039- --------
+040- [5] Query: [[SELECT 'a', 'b\'' FROM DUAL WHERE '''' LIKE '\'' AND 1]]
+041- a - b'
+042- 00000
+043- --------
+044- [6] Query: [[SELECT 'a''', '\'b\'' FROM DUAL WHERE '''' LIKE '\'' AND 1]]
+045- a' - 'b'
+046- 00000
+047- --------
+048- [7] Query: [[SELECT UPPER(:id) FROM DUAL WHERE '1']]
+049- 1
+050- 00000
+051- --------
+052- [8] Query: [[SELECT 1 FROM DUAL WHERE '\'']]
+053- 
+054- 00000
+055- --------
+056- [9] Query: [[SELECT 1 FROM DUAL WHERE :id AND '\0' OR :id]]
+057- 1
+058- 00000
+059- --------
+060- [10] Query: [[SELECT 1 FROM DUAL WHERE 'a\f\n\0' AND 1 >= :id]]
+061- 
+062- 00000
+063- --------
+064- [11] Query: [[SELECT 1 FROM DUAL WHERE '\'' = '''']]
+065- 1
+066- 00000
+067- --------
+068- [12] Query: [[SELECT '\n' '1 FROM DUAL WHERE '''' and :id']]
+069- 
+070- 1 FROM DUAL WHERE '' and :id
+071- 00000
+072- --------
+073- [13] Query: [[SELECT 1 'FROM DUAL WHERE :id AND '''' = '''' OR 1 = 1 AND ':id]]
+074- 1
+075- 00000
+076- --------
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/pdo_mysql/tests/bug44327.phpt
+================================================================================
+Fatal error: Uncaught exception 'PDOException' with message 'SQLSTATE[HY000] [2002] Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)' in /usr/src/php/ext/pdo/tests/pdo_test.inc:36
+Stack trace:
+#0 /usr/src/php/ext/pdo/tests/pdo_test.inc(36): PDO->__construct('mysql:host=loca...', 'root', '', NULL)
+#1 /usr/src/php/ext/pdo/tests/pdo_test.inc(83): PDOTest::factory()
+#2 /usr/src/php/ext/pdo_mysql/tests/bug44327.php(4): PDOTest::test_factory('/usr/src/php/ex...')
+#3 {main}
+  thrown in /usr/src/php/ext/pdo/tests/pdo_test.inc on line 36
+================================================================================
+001+ Fatal error: Uncaught exception 'PDOException' with message 'SQLSTATE[HY000] [2002] Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)' in /usr/src/php/ext/pdo/tests/pdo_test.inc:36
+002+ Stack trace:
+003+ #0 /usr/src/php/ext/pdo/tests/pdo_test.inc(36): PDO->__construct('mysql:host=loca...', 'root', '', NULL)
+004+ #1 /usr/src/php/ext/pdo/tests/pdo_test.inc(83): PDOTest::factory()
+005+ #2 /usr/src/php/ext/pdo_mysql/tests/bug44327.php(4): PDOTest::test_factory('/usr/src/php/ex...')
+006+ #3 {main}
+007+   thrown in /usr/src/php/ext/pdo/tests/pdo_test.inc on line 36
+001- object(PDORow)#%d (2) {
+002-   ["queryString"]=>
+003-   string(17) "SELECT 1 AS "one""
+004-   ["one"]=>
+005-   string(1) "1"
+006- }
+007- string(1) "1"
+008- string(1) "1"
+009- string(17) "SELECT 1 AS "one""
+010- ----------------------------------
+011- object(PDORow)#%d (2) {
+012-   ["queryString"]=>
+013-   string(19) "SELECT id FROM test"
+014-   ["id"]=>
+015-   string(1) "1"
+016- }
+017- string(19) "SELECT id FROM test"
+018- ----------------------------------
+019- 
+020- Notice: Trying to get property of non-object in %s on line %d
+021- NULL
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/session/tests/session_encode_error2.phpt
+================================================================================
+*** Testing session_encode() : error functionality ***
+
+-- Iteration 1 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 0 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 2 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 1 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 3 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 12345 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 4 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key -2345 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 5 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 10 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 6 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key -10 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 7 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 123456789000 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 8 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 0 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 9 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 0 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 10 --
+bool(true)
+string(21) "|s:12:"Hello World!";"
+bool(true)
+
+-- Iteration 11 --
+bool(true)
+string(21) "|s:12:"Hello World!";"
+bool(true)
+
+-- Iteration 12 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 1 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 13 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 0 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 14 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 1 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 15 --
+bool(true)
+
+Notice: session_encode(): Skipping numeric key 0 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+
+-- Iteration 16 --
+bool(true)
+string(21) "|s:12:"Hello World!";"
+bool(true)
+
+-- Iteration 17 --
+bool(true)
+string(21) "|s:12:"Hello World!";"
+bool(true)
+
+-- Iteration 18 --
+bool(true)
+string(28) "Nothing|s:12:"Hello World!";"
+bool(true)
+
+-- Iteration 19 --
+bool(true)
+string(28) "Nothing|s:12:"Hello World!";"
+bool(true)
+
+-- Iteration 20 --
+bool(true)
+bool(false)
+bool(true)
+
+-- Iteration 21 --
+bool(true)
+
+Warning: Illegal offset type in /usr/src/php/ext/session/tests/session_encode_error2.php on line 82
+bool(false)
+bool(true)
+
+-- Iteration 22 --
+bool(true)
+string(21) "|s:12:"Hello World!";"
+bool(true)
+
+-- Iteration 23 --
+bool(true)
+string(21) "|s:12:"Hello World!";"
+bool(true)
+
+-- Iteration 24 --
+bool(true)
+
+Strict Standards: Resource ID#5 used as offset, casting to integer (5) in /usr/src/php/ext/session/tests/session_encode_error2.php on line 82
+
+Notice: session_encode(): Skipping numeric key 5 in /usr/src/php/ext/session/tests/session_encode_error2.php on line 83
+bool(false)
+bool(true)
+Done
+================================================================================
+126+ bool(false)
+126- string(33) "Hello World!|s:12:"Hello World!";"
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/simplexml/tests/008.phpt
+================================================================================
+array(1) {
+  [0]=>
+  object(SimpleXMLElement)#2 (1) {
+    ["test"]=>
+    object(SimpleXMLElement)#3 (0) {
+    }
+  }
+}
+array(0) {
+}
+================================================================================
+009+ array(0) {
+009- bool(false)
+010+ }
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/soap/tests/bugs/bug44811.phpt
+================================================================================
+SOAP-ERROR: Parsing WSDL: Couldn't load from 'http://slashdot.org' : Premature end of data in tag html line 6
+
+ok
+================================================================================
+001+ SOAP-ERROR: Parsing WSDL: Couldn't load from 'http://slashdot.org' : Premature end of data in tag html line 6
+001- SOAP-ERROR: Parsing WSDL: Couldn't load from 'http://slashdot.org' : Premature end of data in tag html line 3
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/sockets/tests/socket_strerror.phpt
+================================================================================
+Warning: socket_strerror() expects exactly 1 parameter, 0 given in /usr/src/php/ext/sockets/tests/socket_strerror.php on line 2
+string(7) "Success"
+string(23) "Operation not permitted"
+string(25) "No such file or directory"
+string(15) "No such process"
+string(23) "Interrupted system call"
+string(18) "Input/output error"
+string(25) "No such device or address"
+string(22) "Argument list too long"
+string(17) "Exec format error"
+string(19) "Bad file descriptor"
+string(18) "No child processes"
+string(32) "Resource temporarily unavailable"
+string(22) "Cannot allocate memory"
+string(17) "Permission denied"
+string(11) "Bad address"
+string(21) "Block device required"
+string(23) "Device or resource busy"
+string(11) "File exists"
+string(25) "Invalid cross-device link"
+string(14) "No such device"
+string(15) "Not a directory"
+string(14) "Is a directory"
+string(16) "Invalid argument"
+string(29) "Too many open files in system"
+string(19) "Too many open files"
+string(30) "Inappropriate ioctl for device"
+string(14) "Text file busy"
+string(14) "File too large"
+string(23) "No space left on device"
+string(12) "Illegal seek"
+string(21) "Read-only file system"
+string(14) "Too many links"
+string(11) "Broken pipe"
+string(32) "Numerical argument out of domain"
+string(29) "Numerical result out of range"
+string(25) "Resource deadlock avoided"
+string(18) "File name too long"
+string(18) "No locks available"
+string(24) "Function not implemented"
+string(19) "Directory not empty"
+string(33) "Too many levels of symbolic links"
+string(16) "Unknown error 41"
+string(26) "No message of desired type"
+string(18) "Identifier removed"
+string(27) "Channel number out of range"
+string(24) "Level 2 not synchronized"
+string(14) "Level 3 halted"
+string(13) "Level 3 reset"
+string(24) "Link number out of range"
+string(28) "Protocol driver not attached"
+string(26) "No CSI structure available"
+string(14) "Level 2 halted"
+string(16) "Invalid exchange"
+string(26) "Invalid request descriptor"
+string(13) "Exchange full"
+string(8) "No anode"
+string(20) "Invalid request code"
+string(12) "Invalid slot"
+string(16) "Unknown error 58"
+string(20) "Bad font file format"
+string(19) "Device not a stream"
+string(17) "No data available"
+string(13) "Timer expired"
+string(24) "Out of streams resources"
+string(29) "Machine is not on the network"
+string(21) "Package not installed"
+string(16) "Object is remote"
+string(21) "Link has been severed"
+string(15) "Advertise error"
+string(13) "Srmount error"
+string(27) "Communication error on send"
+string(14) "Protocol error"
+string(18) "Multihop attempted"
+string(18) "RFS specific error"
+string(11) "Bad message"
+string(37) "Value too large for defined data type"
+string(26) "Name not unique on network"
+string(28) "File descriptor in bad state"
+string(22) "Remote address changed"
+string(38) "Can not access a needed shared library"
+string(36) "Accessing a corrupted shared library"
+string(31) ".lib section in a.out corrupted"
+string(47) "Attempting to link in too many shared libraries"
+string(37) "Cannot exec a shared library directly"
+string(49) "Invalid or incomplete multibyte or wide character"
+string(43) "Interrupted system call should be restarted"
+string(18) "Streams pipe error"
+string(14) "Too many users"
+string(30) "Socket operation on non-socket"
+string(28) "Destination address required"
+string(16) "Message too long"
+string(30) "Protocol wrong type for socket"
+string(22) "Protocol not available"
+string(22) "Protocol not supported"
+string(25) "Socket type not supported"
+string(23) "Operation not supported"
+string(29) "Protocol family not supported"
+string(40) "Address family not supported by protocol"
+string(22) "Address already in use"
+string(31) "Cannot assign requested address"
+string(15) "Network is down"
+string(22) "Network is unreachable"
+string(35) "Network dropped connection on reset"
+string(32) "Software caused connection abort"
+string(24) "Connection reset by peer"
+string(25) "No buffer space available"
+string(39) "Transport endpoint is already connected"
+string(35) "Transport endpoint is not connected"
+string(45) "Cannot send after transport endpoint shutdown"
+string(34) "Too many references: cannot splice"
+string(20) "Connection timed out"
+string(18) "Connection refused"
+string(12) "Host is down"
+string(16) "No route to host"
+string(29) "Operation already in progress"
+string(25) "Operation now in progress"
+string(17) "Stale file handle"
+string(24) "Structure needs cleaning"
+string(27) "Not a XENIX named type file"
+string(29) "No XENIX semaphores available"
+string(20) "Is a named type file"
+string(16) "Remote I/O error"
+string(19) "Disk quota exceeded"
+string(15) "No medium found"
+string(17) "Wrong medium type"
+string(18) "Operation canceled"
+string(26) "Required key not available"
+string(15) "Key has expired"
+string(20) "Key has been revoked"
+string(27) "Key was rejected by service"
+string(10) "Owner died"
+string(21) "State not recoverable"
+string(37) "Operation not possible due to RF-kill"
+================================================================================
+118+ string(17) "Stale file handle"
+118- string(21) "Stale NFS file handle"
+134+ string(37) "Operation not possible due to RF-kill"
+134- string(17) "Unknown error 132"
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/standard/tests/general_functions/proc_open02.phpt
+================================================================================
+bool(true)
+array(8) {
+  ["command"]=>
+  string(28) "/usr/bin/nohup /bin/sleep 50"
+  ["pid"]=>
+  int(22514)
+  ["running"]=>
+  bool(false)
+  ["signaled"]=>
+  bool(true)
+  ["stopped"]=>
+  bool(false)
+  ["exitcode"]=>
+  int(-1)
+  ["termsig"]=>
+  int(1)
+  ["stopsig"]=>
+  int(0)
+}
+bool(false)
+array(8) {
+  ["command"]=>
+  string(28) "/usr/bin/nohup /bin/sleep 50"
+  ["pid"]=>
+  int(22514)
+  ["running"]=>
+  bool(false)
+  ["signaled"]=>
+  bool(false)
+  ["stopped"]=>
+  bool(false)
+  ["exitcode"]=>
+  int(-1)
+  ["termsig"]=>
+  int(0)
+  ["stopsig"]=>
+  int(0)
+}
+Done!
+================================================================================
+008+   bool(false)
+009+   ["signaled"]=>
+009-   ["signaled"]=>
+010-   bool(false)
+016+   int(1)
+016-   int(0)
+020+ bool(false)
+020- bool(true)
+029+   bool(false)
+029-   bool(true)
+035+   int(0)
+035-   int(15)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/standard/tests/general_functions/uniqid_basic.phpt
+================================================================================
+*** Testing uniqid() : basic functionality ***
+
+uniqid() without a prefix
+string(13) "6041525bef25d"
+string(23) "6041525bef2678.69871673"
+string(13) "6041525bef2a6"
+
+
+uniqid() with a prefix
+string(18) "999996041525bef2ef"
+string(28) "999996041525bef2f55.19536601"
+string(18) "999996041525bef331"
+
+string(18) "999996041525bef37a"
+string(28) "999996041525bef3839.21085442"
+string(18) "999996041525bef3b0"
+
+string(17) "10506041525bef3f2"
+string(27) "10506041525bef3f76.86121739"
+string(17) "10506041525bef431"
+
+string(13) "6041525bef46c"
+string(23) "6041525bef4700.81093115"
+string(13) "6041525bef4a9"
+
+string(14) "16041525bef4eb"
+string(24) "16041525bef4ef3.21356012"
+string(14) "16041525bef528"
+
+string(13) "6041525bef562"
+string(23) "6041525bef5664.65516522"
+string(13) "6041525bef59f"
+
+===DONE===
+================================================================================
+014+ string(18) "999996041525bef37a"
+015+ string(28) "999996041525bef3839.21085442"
+016+ string(18) "999996041525bef3b0"
+014- string(18) "999994%s"
+015- string(28) "999994%s.%s"
+016- string(18) "999994%s"
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/standard/tests/misc/time_sleep_until_basic.phpt
+================================================================================
+bool(false)
+===DONE===
+================================================================================
+001+ bool(false)
+001- bool(true)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/standard/tests/strings/setlocale_basic1.phpt
+================================================================================
+*** Testing setlocale() : basic functionality - set to a specific locale ***
+Setting system locale(LC_ALL) to Checking currency settings in the new locale, expected: EUR, Found: 
+Test FAILED.
+Done
+================================================================================
+003+ Test FAILED.
+003- string(%d) %s
+004- Checking currency settings in the new locale, expected: %s, Found: %s
+005- Test PASSED.
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/standard/tests/strings/setlocale_basic2.phpt
+================================================================================
+*** Testing setlocale() with an array containing list of locales ***
+-- Testing setlocale() : 'category' argument as LC_ALL & 'locale' argument as an array --
+Test FAILED.
+Done
+================================================================================
+003+ Test FAILED.
+003- string(%d) "%s"
+004- Checking currency settings in the new locale, expected: %s, Found: %s
+005- Test PASSED.
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/standard/tests/strings/setlocale_basic3.phpt
+================================================================================
+*** Testing setlocale() by passing multiple locales as argument ***
+Done
+================================================================================
+002- -- Testing setlocale() by giving 'category' as LC_ALL & multiple locales(en_US.utf8, Ko_KR.utf8, zh_CN.utf8) --
+003- string(%d) "%s"
+004- Checking currency settings in the new locale, expected: %s, Found: %s
+005- Test PASSED.
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/standard/tests/strings/setlocale_variation1.phpt
+================================================================================
+*** Testing setlocale() by passing multiple valid/invalid locales as argument ***
+Done
+================================================================================
+002- -- Testing setlocale() by giving 'category' as LC_ALL & multiple locales(en_US.invalid, en_US.utf8, Ko_KR.utf8, KO_KR.invalid, zh_CN.utf8) --
+003- string(%d) "%s"
+004- Checking currency settings in the new locale, expected: %s, Found: %s
+005- Test PASSED.
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/standard/tests/strings/setlocale_variation3.phpt
+================================================================================
+*** Testing setlocale() : usage variations - setting system locale = 0 ***
+Locale info, before setting the locale
+array(18) {
+  ["decimal_point"]=>
+  string(1) "."
+  ["thousands_sep"]=>
+  string(0) ""
+  ["int_curr_symbol"]=>
+  string(0) ""
+  ["currency_symbol"]=>
+  string(0) ""
+  ["mon_decimal_point"]=>
+  string(0) ""
+  ["mon_thousands_sep"]=>
+  string(0) ""
+  ["positive_sign"]=>
+  string(0) ""
+  ["negative_sign"]=>
+  string(0) ""
+  ["int_frac_digits"]=>
+  int(127)
+  ["frac_digits"]=>
+  int(127)
+  ["p_cs_precedes"]=>
+  int(127)
+  ["p_sep_by_space"]=>
+  int(127)
+  ["n_cs_precedes"]=>
+  int(127)
+  ["n_sep_by_space"]=>
+  int(127)
+  ["p_sign_posn"]=>
+  int(127)
+  ["n_sign_posn"]=>
+  int(127)
+  ["grouping"]=>
+  array(0) {
+  }
+  ["mon_grouping"]=>
+  array(0) {
+  }
+}
+Setting system locale, category = LC_ALL and locale = 0
+Locale info, after setting the locale
+array(18) {
+  ["decimal_point"]=>
+  string(1) "."
+  ["thousands_sep"]=>
+  string(0) ""
+  ["int_curr_symbol"]=>
+  string(0) ""
+  ["currency_symbol"]=>
+  string(0) ""
+  ["mon_decimal_point"]=>
+  string(0) ""
+  ["mon_thousands_sep"]=>
+  string(0) ""
+  ["positive_sign"]=>
+  string(0) ""
+  ["negative_sign"]=>
+  string(0) ""
+  ["int_frac_digits"]=>
+  int(127)
+  ["frac_digits"]=>
+  int(127)
+  ["p_cs_precedes"]=>
+  int(127)
+  ["p_sep_by_space"]=>
+  int(127)
+  ["n_cs_precedes"]=>
+  int(127)
+  ["n_sep_by_space"]=>
+  int(127)
+  ["p_sign_posn"]=>
+  int(127)
+  ["n_sign_posn"]=>
+  int(127)
+  ["grouping"]=>
+  array(0) {
+  }
+  ["mon_grouping"]=>
+  array(0) {
+  }
+}
+Checking locale in the system, Expected : no change in the existing locale
+Test PASSED.
+Done
+================================================================================
+007+   string(0) ""
+007-   string(1) ","
+009+   string(0) ""
+009-   string(4) "USD "
+011+   string(0) ""
+011-   string(1) "$"
+013+   string(0) ""
+013-   string(1) "."
+015+   string(0) ""
+015-   string(1) ","
+019+   string(0) ""
+019-   string(1) "-"
+021+   int(127)
+021-   int(2)
+023+   int(127)
+023-   int(2)
+025+   int(127)
+025-   int(1)
+027+   int(127)
+027-   int(0)
+029+   int(127)
+029-   int(1)
+031+   int(127)
+031-   int(0)
+033+   int(127)
+033-   int(1)
+035+   int(127)
+035-   int(1)
+037+   array(0) {
+037-   array(2) {
+038-     [0]=>
+039-     int(3)
+040-     [1]=>
+041-     int(3)
+040+   array(0) {
+044-   array(2) {
+045-     [0]=>
+046-     int(3)
+047-     [1]=>
+048-     int(3)
+049+   string(0) ""
+051+   string(0) ""
+053+   string(0) ""
+055+   string(0) ""
+057+   string(0) ""
+057-   string(1) ","
+059-   string(4) "USD "
+061+   string(0) ""
+061-   string(1) "$"
+063+   int(127)
+063-   string(1) "."
+065+   int(127)
+065-   string(1) ","
+067+   int(127)
+069+   int(127)
+069-   string(1) "-"
+071+   int(127)
+071-   int(2)
+073+   int(127)
+073-   int(2)
+075+   int(127)
+075-   int(1)
+077+   int(127)
+077-   int(0)
+079+   array(0) {
+079-   int(1)
+081-   int(0)
+082+   array(0) {
+083-   int(1)
+085-   int(1)
+087-   array(2) {
+088-     [0]=>
+089-     int(3)
+090-     [1]=>
+091-     int(3)
+094-   array(2) {
+095-     [0]=>
+096-     int(3)
+097-     [1]=>
+098-     int(3)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/standard/tests/time/strptime_basic.phpt
+================================================================================
+*** Testing strptime() : basic functionality ***
+array(9) {
+  ["tm_sec"]=>
+  int(0)
+  ["tm_min"]=>
+  int(0)
+  ["tm_hour"]=>
+  int(10)
+  ["tm_mday"]=>
+  int(2)
+  ["tm_mon"]=>
+  int(6)
+  ["tm_year"]=>
+  int(63)
+  ["tm_wday"]=>
+  int(2)
+  ["tm_yday"]=>
+  int(182)
+  ["unparsed"]=>
+  string(0) ""
+}
+array(9) {
+  ["tm_sec"]=>
+  int(0)
+  ["tm_min"]=>
+  int(0)
+  ["tm_hour"]=>
+  int(10)
+  ["tm_mday"]=>
+  int(2)
+  ["tm_mon"]=>
+  int(6)
+  ["tm_year"]=>
+  int(163)
+  ["tm_wday"]=>
+  int(1)
+  ["tm_yday"]=>
+  int(182)
+  ["unparsed"]=>
+  string(0) ""
+}
+array(9) {
+  ["tm_sec"]=>
+  int(0)
+  ["tm_min"]=>
+  int(0)
+  ["tm_hour"]=>
+  int(10)
+  ["tm_mday"]=>
+  int(2)
+  ["tm_mon"]=>
+  int(6)
+  ["tm_year"]=>
+  int(0)
+  ["tm_wday"]=>
+  int(2)
+  ["tm_yday"]=>
+  int(182)
+  ["unparsed"]=>
+  string(0) ""
+}
+===DONE===
+================================================================================
+020+   string(0) ""
+020-   string(3) "GMT"
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/sysvmsg/tests/005.phpt
+================================================================================
+Fatal error: Call to undefined function msg_queue_exists() in /usr/src/php/ext/sysvmsg/tests/005.php on line 10
+================================================================================
+001+ Fatal error: Call to undefined function msg_queue_exists() in /usr/src/php/ext/sysvmsg/tests/005.php on line 10
+001- Using 'Resource id #4' as queue resource:
+002- bool(false)
+003- bool(false)
+004- bool(false)
+005- bool(true)
+006- 
+007- Warning: msg_receive(): maximum size of the message has to be greater than zero in %s on line %d
+008- bool(false)
+009- 
+010- Warning: msg_send(): msgsnd failed: Invalid argument in %s on line %d
+011- bool(false)
+012- bool(true)
+013- Using 'foo' as queue resource:
+014- 
+015- Warning: msg_set_queue() expects parameter 1 to be resource, string given in %s on line %d
+016- bool(false)
+017- 
+018- Warning: msg_stat_queue() expects parameter 1 to be resource, string given in %s on line %d
+019- bool(false)
+020- 
+021- Warning: msg_receive() expects parameter 1 to be resource, string given in %s on line %d
+022- bool(false)
+023- bool(false)
+024- 
+025- Warning: msg_receive() expects parameter 1 to be resource, string given in %s on line %d
+026- bool(false)
+027- 
+028- Warning: msg_send() expects parameter 1 to be resource, string given in %s on line %d
+029- bool(false)
+030- bool(false)
+031- Done
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/sysvmsg/tests/006.phpt
+================================================================================
+Sending/receiving 'foo':
+bool(true)
+bool(true)
+bool(true)
+bool(true)
+Sending/receiving '123':
+bool(true)
+bool(true)
+bool(true)
+bool(false)
+Sending/receiving '9.2233720368548E+18':
+bool(true)
+bool(true)
+bool(true)
+bool(false)
+Sending/receiving '1':
+bool(true)
+bool(true)
+bool(true)
+bool(false)
+Sending/receiving '1.01':
+bool(true)
+bool(true)
+bool(true)
+bool(false)
+Sending/receiving '':
+
+Warning: msg_send(): Message parameter must be either a string or a number. in /usr/src/php/ext/sysvmsg/tests/006.php on line 9
+bool(false)
+bool(false)
+bool(true)
+bool(false)
+Sending/receiving 'Array':
+
+Warning: msg_send(): Message parameter must be either a string or a number. in /usr/src/php/ext/sysvmsg/tests/006.php on line 9
+bool(false)
+bool(false)
+bool(false)
+bool(false)
+Done
+================================================================================
+011+ Sending/receiving '9.2233720368548E+18':
+011- Sending/receiving '%d':
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/xsl/tests/xslt010.phpt
+================================================================================
+Test 10: EXSLT Support
+  
+  
+  Test Date : 0001-12-31Z
+    year                 : 1
+    leap-year            : false
+    month-in-year        : 12
+    month-name           : December
+    month-abbreviation   : Dec
+    week-in-year         : 1
+    day-in-year          : 365
+    day-in-month         : 31
+    day-of-week-in-month : 5
+    day-in-week          : 2
+    day-name             : Monday
+    day-abbreviation     : Mon
+    time                 : 
+    hour-in-day          : NaN
+    minute-in-hour       : NaN
+    second-in-minute     : NaN
+  
+  Test Date : 3000-01-31
+    year                 : 3000
+    leap-year            : false
+    month-in-year        : 1
+    month-name           : January
+    month-abbreviation   : Jan
+    week-in-year         : 5
+    day-in-year          : 31
+    day-in-month         : 31
+    day-of-week-in-month : 5
+    day-in-week          : 6
+    day-name             : Friday
+    day-abbreviation     : Fri
+    time                 : 
+    hour-in-day          : NaN
+    minute-in-hour       : NaN
+    second-in-minute     : NaN
+  
+  Test Date : 2000-02-29
+    year                 : 2000
+    leap-year            : true
+    month-in-year        : 2
+    month-name           : February
+    month-abbreviation   : Feb
+    week-in-year         : 9
+    day-in-year          : 60
+    day-in-month         : 29
+    day-of-week-in-month : 5
+    day-in-week          : 3
+    day-name             : Tuesday
+    day-abbreviation     : Tue
+    time                 : 
+    hour-in-day          : NaN
+    minute-in-hour       : NaN
+    second-in-minute     : NaN
+  
+  Test Date : 9990001-12-31Z
+    year                 : 9990001
+    leap-year            : false
+    month-in-year        : 12
+    month-name           : December
+    month-abbreviation   : Dec
+    week-in-year         : 1
+    day-in-year          : 365
+    day-in-month         : 31
+    day-of-week-in-month : 5
+    day-in-week          : 2
+    day-name             : Monday
+    day-abbreviation     : Mon
+    time                 : 
+    hour-in-day          : NaN
+    minute-in-hour       : NaN
+    second-in-minute     : NaN
+  
+  Test Date : -0004-02-29
+    year                 : -4
+    leap-year            : true
+    month-in-year        : 2
+    month-name           : February
+    month-abbreviation   : Feb
+    week-in-year         : 9
+    day-in-year          : 60
+    day-in-month         : 29
+    day-of-week-in-month : 5
+    day-in-week          : 1
+    day-name             : Sunday
+    day-abbreviation     : Sun
+    time                 : 
+    hour-in-day          : NaN
+    minute-in-hour       : NaN
+    second-in-minute     : NaN
+================================================================================
+010+     week-in-year         : 1
+010-     week-in-year         : 53
+064+     week-in-year         : 1
+064-     week-in-year         : 53
+082+     week-in-year         : 9
+082-     week-in-year         : 10
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcnostring.phpt
+================================================================================
+NULL
+
+Warning: XSLTProcessor::transformToXml(): Handler name must be a string in /usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcnostring.php on line 11
+
+Warning: XSLTProcessor::transformToXml(): xmlXPathCompiledEval: evaluation failed in /usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcnostring.php on line 11
+
+Warning: XSLTProcessor::transformToXml(): runtime error: file /usr/src/php/ext/xsl/tests/phpfunc-nostring.xsl line 8 element value-of in /usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcnostring.php on line 11
+
+Warning: XSLTProcessor::transformToXml(): XPath evaluation returned no result. in /usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcnostring.php on line 11
+NULL
+================================================================================
+009+ Warning: XSLTProcessor::transformToXml(): XPath evaluation returned no result. in /usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcnostring.php on line 11
+010+ NULL
+009- Warning: XSLTProcessor::transformToXml(): xsltValueOf: text copy failed in %s on line %d
+010- bool(false)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcundef.phpt
+================================================================================
+NULL
+
+Warning: XSLTProcessor::transformToXml(): Unable to call handler undefinedfunc() in /usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcundef.php on line 11
+
+Warning: XSLTProcessor::transformToXml(): xmlXPathCompiledEval: evaluation failed in /usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcundef.php on line 11
+
+Warning: XSLTProcessor::transformToXml(): runtime error: file /usr/src/php/ext/xsl/tests/phpfunc-undef.xsl line 8 element value-of in /usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcundef.php on line 11
+
+Warning: XSLTProcessor::transformToXml(): XPath evaluation returned no result. in /usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcundef.php on line 11
+NULL
+================================================================================
+009+ Warning: XSLTProcessor::transformToXml(): XPath evaluation returned no result. in /usr/src/php/ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcundef.php on line 11
+010+ NULL
+009- Warning: XSLTProcessor::transformToXml(): xsltValueOf: text copy failed in %s on line %d
+010- bool(false)
+================================================================================
+
+
+
+================================================================================
+/usr/src/php/ext/zlib/tests/gzgetc_basic.phpt
+================================================================================
+When you're taught through feelings
+Destiny flying high above
+all I know is that you can realize it
+Destiny who cares
+as it turns around
+and I know that it descends down on me
+
+characters counted=177
+===DONE===
+================================================================================
+008+ characters counted=177
+008- characters counted=176
+================================================================================
+
+
+
+
+================================================================================
+BUILD ENVIRONMENT
+================================================================================
+OS:
+Linux - Linux aa720b238dc0 4.15.0-136-generic #140-Ubuntu SMP Thu Jan 28 05:20:47 UTC 2021 x86_64
+
+Autoconf:
+Autoconf version 2.13
+
+Bundled Libtool:
+ltmain.sh (GNU libtool) 1.5.26 (1.1220.2.492 2008/01/30 06:40:56)
+
+Copyright (C) 2008  Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+System Libtool:
+N/A
+Compiler:
+Using built-in specs.
+COLLECT_GCC=gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.9/lto-wrapper
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Debian 4.9.2-10+deb8u2' --with-bugurl=file:///usr/share/doc/gcc-4.9/README.Bugs --enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.9 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.9 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-4.9-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-4.9-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-4.9-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --with-arch-32=i586 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Thread model: posix
+gcc version 4.9.2 (Debian 4.9.2-10+deb8u2) 
+
+Bison:
+
+Libraries:
+	linux-vdso.so.1 (0x00007ffe0cb50000)
+	libcrypt.so.1 => /lib/x86_64-linux-gnu/libcrypt.so.1 (0x00007f7a4657b000)
+	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f7a46360000)
+	libexslt.so.0 => /usr/lib/x86_64-linux-gnu/libexslt.so.0 (0x00007f7a4614a000)
+	libreadline.so.6 => /lib/x86_64-linux-gnu/libreadline.so.6 (0x00007f7a45f00000)
+	libtinfo.so.5 => /lib/x86_64-linux-gnu/libtinfo.so.5 (0x00007f7a45cd6000)
+	librt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007f7a45ace000)
+	libmhash.so.2 => /usr/lib/x86_64-linux-gnu/libmhash.so.2 (0x00007f7a458a2000)
+	libmcrypt.so.4 => /usr/lib/libmcrypt.so.4 (0x00007f7a45670000)
+	libfreetype.so.6 => /usr/lib/x86_64-linux-gnu/libfreetype.so.6 (0x00007f7a453c6000)
+	libX11.so.6 => /usr/lib/x86_64-linux-gnu/libX11.so.6 (0x00007f7a45083000)
+	libXpm.so.4 => /usr/lib/x86_64-linux-gnu/libXpm.so.4 (0x00007f7a44e71000)
+	libpng12.so.0 => /lib/x86_64-linux-gnu/libpng12.so.0 (0x00007f7a44c4a000)
+	libjpeg.so.62 => /usr/lib/x86_64-linux-gnu/libjpeg.so.62 (0x00007f7a449f3000)
+	libmagic.so.1 => /usr/lib/x86_64-linux-gnu/libmagic.so.1 (0x00007f7a447d3000)
+	libbz2.so.1.0 => /lib/x86_64-linux-gnu/libbz2.so.1.0 (0x00007f7a445c3000)
+	libresolv.so.2 => /lib/x86_64-linux-gnu/libresolv.so.2 (0x00007f7a443ac000)
+	libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f7a441a8000)
+	libxml2.so.2 => /usr/lib/x86_64-linux-gnu/libxml2.so.2 (0x00007f7a43e41000)
+	libcurl.so.4 => /usr/lib/x86_64-linux-gnu/libcurl.so.4 (0x00007f7a43bce000)
+	libmysqlclient_r.so.15 => /usr/lib/libmysqlclient_r.so.15 (0x00007f7a437c0000)
+	libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f7a435a3000)
+	libnsl.so.1 => /lib/x86_64-linux-gnu/libnsl.so.1 (0x00007f7a4338b000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f7a4308a000)
+	libssl.so.1.0.0 => /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0 (0x00007f7a42e29000)
+	libcrypto.so.1.0.0 => /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0 (0x00007f7a42a2c000)
+	libxslt.so.1 => /usr/lib/x86_64-linux-gnu/libxslt.so.1 (0x00007f7a427ed000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f7a42442000)
+	libgcrypt.so.20 => /lib/x86_64-linux-gnu/libgcrypt.so.20 (0x00007f7a42160000)
+	libxcb.so.1 => /usr/lib/x86_64-linux-gnu/libxcb.so.1 (0x00007f7a41f3e000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f7a471b7000)
+	liblzma.so.5 => /lib/x86_64-linux-gnu/liblzma.so.5 (0x00007f7a41d1b000)
+	libidn.so.11 => /usr/lib/x86_64-linux-gnu/libidn.so.11 (0x00007f7a41ae7000)
+	librtmp.so.1 => /usr/lib/x86_64-linux-gnu/librtmp.so.1 (0x00007f7a418ca000)
+	libssh2.so.1 => /usr/lib/x86_64-linux-gnu/libssh2.so.1 (0x00007f7a416a0000)
+	libgssapi_krb5.so.2 => /usr/lib/x86_64-linux-gnu/libgssapi_krb5.so.2 (0x00007f7a41455000)
+	libkrb5.so.3 => /usr/lib/x86_64-linux-gnu/libkrb5.so.3 (0x00007f7a41181000)
+	libk5crypto.so.3 => /usr/lib/x86_64-linux-gnu/libk5crypto.so.3 (0x00007f7a40f50000)
+	libcom_err.so.2 => /lib/x86_64-linux-gnu/libcom_err.so.2 (0x00007f7a40d4c000)
+	liblber-2.4.so.2 => /usr/lib/x86_64-linux-gnu/liblber-2.4.so.2 (0x00007f7a40b3d000)
+	libldap_r-2.4.so.2 => /usr/lib/x86_64-linux-gnu/libldap_r-2.4.so.2 (0x00007f7a408eb000)
+	libgpg-error.so.0 => /lib/x86_64-linux-gnu/libgpg-error.so.0 (0x00007f7a406d9000)
+	libXau.so.6 => /usr/lib/x86_64-linux-gnu/libXau.so.6 (0x00007f7a404d5000)
+	libXdmcp.so.6 => /usr/lib/x86_64-linux-gnu/libXdmcp.so.6 (0x00007f7a402d0000)
+	libgnutls-deb0.so.28 => /usr/lib/x86_64-linux-gnu/libgnutls-deb0.so.28 (0x00007f7a3ffaa000)
+	libhogweed.so.2 => /usr/lib/x86_64-linux-gnu/libhogweed.so.2 (0x00007f7a3fd7b000)
+	libnettle.so.4 => /usr/lib/x86_64-linux-gnu/libnettle.so.4 (0x00007f7a3fb49000)
+	libgmp.so.10 => /usr/lib/x86_64-linux-gnu/libgmp.so.10 (0x00007f7a3f8c6000)
+	libkrb5support.so.0 => /usr/lib/x86_64-linux-gnu/libkrb5support.so.0 (0x00007f7a3f6ba000)
+	libkeyutils.so.1 => /lib/x86_64-linux-gnu/libkeyutils.so.1 (0x00007f7a3f4b6000)
+	libsasl2.so.2 => /usr/lib/x86_64-linux-gnu/libsasl2.so.2 (0x00007f7a3f29a000)
+	libp11-kit.so.0 => /usr/lib/x86_64-linux-gnu/libp11-kit.so.0 (0x00007f7a3f054000)
+	libtasn1.so.6 => /usr/lib/x86_64-linux-gnu/libtasn1.so.6 (0x00007f7a3ee40000)
+	libffi.so.6 => /usr/lib/x86_64-linux-gnu/libffi.so.6 (0x00007f7a3ec37000)
+
+
+
+================================================================================
+PHPINFO
+================================================================================
+phpinfo()
+PHP Version => 5.2.17
+
+System => Linux aa720b238dc0 4.15.0-136-generic #140-Ubuntu SMP Thu Jan 28 05:20:47 UTC 2021 x86_64
+Build Date => Mar  4 2021 18:38:45
+Configure Command =>  './configure'  '--prefix=/usr' '--sysconfdir=/etc/php' '--with-config-file-path=/etc/php' '--with-config-file-scan-dir=/etc/php/conf.d' '--datadir=/usr/share/php' '--mandir=/usr/share/man' '--localstatedir=/var' '--disable-debug' '--disable-rpath' '--disable-cgi' '--with-pic' '--with-apxs2=/usr/bin/apxs' '--with-zlib-dir=/usr' '--with-pdo-mysql=/usr' '--with-mysqli=/usr/bin/mysql_config' '--with-bz2' '--with-curl' '--with-gettext' '--with-iconv' '--with-mhash' '--with-openssl' '--with-xsl' '--with-zlib' '--with-mysql' '--with-mcrypt' '--with-ttf' '--enable-gd-native-ttf' '--with-pear=/usr/share/php' '--with-gd' '--with-freetype-dir=/usr' '--with-jpeg-dir=/usr' '--with-xpm-dir=/usr,/usr/X11R6' '--with-png-dir=/usr' '--with-readline=/usr' '--enable-zip' '--enable-wddx' '--enable-apc' '--with-fileinfo' '--enable-oauth' '--enable-bcmath' '--enable-ctype' '--enable-dom' '--enable-ftp' '--enable-json' '--enable-mbstring' '--enable-pdo' '--enable-posix' '--enable-session' '--enable-simplexml' '--enable-soap' '--enable-sockets' '--enable-sysvmsg' '--enable-sysvsem' '--enable-sysvshm' '--enable-xml' '--enable-xmlreader' '--enable-xmlwriter'
+Server API => Command Line Interface
+Virtual Directory Support => enabled
+Configuration File (php.ini) Path => /etc/php
+Loaded Configuration File => (none)
+Scan this dir for additional .ini files => /etc/php/conf.d
+additional .ini files parsed => (none)
+PHP API => 20041225
+PHP Extension => 20060613
+Zend Extension => 220060519
+Debug Build => no
+Thread Safety => enabled
+Zend Memory Manager => enabled
+IPv6 Support => enabled
+Registered PHP Streams => https, ftps, compress.zlib, compress.bzip2, php, file, data, http, ftp, zip  
+Registered Stream Socket Transports => tcp, udp, unix, udg, ssl, sslv3, sslv2, tls
+Registered Stream Filters => zlib.*, bzip2.*, convert.iconv.*, string.rot13, string.toupper, string.tolower, string.strip_tags, convert.*, consumed
+
+
+This program makes use of the Zend Scripting Language Engine:
+Zend Engine v2.2.0, Copyright (c) 1998-2010 Zend Technologies
+
+
+ _______________________________________________________________________
+
+
+Configuration
+
+PHP Core
+
+Directive => Local Value => Master Value
+allow_call_time_pass_reference => On => On
+allow_url_fopen => On => On
+allow_url_include => Off => Off
+always_populate_raw_post_data => Off => Off
+arg_separator.input => & => &
+arg_separator.output => & => &
+asp_tags => Off => Off
+auto_append_file => no value => no value
+auto_globals_jit => On => On
+auto_prepend_file => no value => no value
+browscap => no value => no value
+default_charset => no value => no value
+default_mimetype => text/html => text/html
+define_syslog_variables => Off => Off
+disable_classes => no value => no value
+disable_functions => no value => no value
+display_errors => STDERR => STDERR
+display_startup_errors => Off => Off
+doc_root => no value => no value
+docref_ext => no value => no value
+docref_root => no value => no value
+enable_dl => On => On
+error_append_string => no value => no value
+error_log => no value => no value
+error_prepend_string => no value => no value
+error_reporting => no value => no value
+expose_php => On => On
+extension_dir => /usr/lib/php/extensions => /usr/lib/php/extensions
+file_uploads => On => On
+highlight.bg => <font style="color: #FFFFFF">#FFFFFF</font> => <font style="color: #FFFFFF">#FFFFFF</font>
+highlight.comment => <font style="color: #FF8000">#FF8000</font> => <font style="color: #FF8000">#FF8000</font>
+highlight.default => <font style="color: #0000BB">#0000BB</font> => <font style="color: #0000BB">#0000BB</font>
+highlight.html => <font style="color: #000000">#000000</font> => <font style="color: #000000">#000000</font>
+highlight.keyword => <font style="color: #007700">#007700</font> => <font style="color: #007700">#007700</font>
+highlight.string => <font style="color: #DD0000">#DD0000</font> => <font style="color: #DD0000">#DD0000</font>
+html_errors => Off => Off
+ignore_repeated_errors => Off => Off
+ignore_repeated_source => Off => Off
+ignore_user_abort => Off => Off
+implicit_flush => On => On
+include_path => .:/usr/share/php => .:/usr/share/php
+log_errors => Off => Off
+log_errors_max_len => 1024 => 1024
+magic_quotes_gpc => On => On
+magic_quotes_runtime => Off => Off
+magic_quotes_sybase => Off => Off
+mail.force_extra_parameters => no value => no value
+max_execution_time => 0 => 0
+max_file_uploads => 20 => 20
+max_input_nesting_level => 64 => 64
+max_input_time => -1 => -1
+memory_limit => 128M => 128M
+open_basedir => no value => no value
+output_buffering => 0 => 0
+output_handler => no value => no value
+post_max_size => 8M => 8M
+precision => 14 => 14
+realpath_cache_size => 16K => 16K
+realpath_cache_ttl => 120 => 120
+register_argc_argv => On => On
+register_globals => Off => Off
+register_long_arrays => On => On
+report_memleaks => On => On
+report_zend_debug => Off => Off
+safe_mode => Off => Off
+safe_mode_exec_dir => /usr/local/php/bin => /usr/local/php/bin
+safe_mode_gid => Off => Off
+safe_mode_include_dir => no value => no value
+sendmail_from => no value => no value
+sendmail_path =>  -t -i  =>  -t -i 
+serialize_precision => 100 => 100
+short_open_tag => On => On
+SMTP => localhost => localhost
+smtp_port => 25 => 25
+sql.safe_mode => Off => Off
+track_errors => Off => Off
+unserialize_callback_func => no value => no value
+upload_max_filesize => 2M => 2M
+upload_tmp_dir => no value => no value
+user_dir => no value => no value
+variables_order => EGPCS => EGPCS
+xmlrpc_error_number => 0 => 0
+xmlrpc_errors => Off => Off
+y2k_compliance => On => On
+zend.ze1_compatibility_mode => Off => Off
+
+apc
+
+APC Support => disabled
+Version => 3.1.13
+APC Debugging => Disabled
+MMAP Support => Enabled
+MMAP File Mask =>  
+Locking type => pthread mutex Locks
+Serialization Support => broken
+Revision => $Revision: 327136 $
+Build Date => Mar  4 2021 18:37:20
+
+Directive => Local Value => Master Value
+apc.cache_by_default => On => On
+apc.canonicalize => On => On
+apc.coredump_unmap => Off => Off
+apc.enable_cli => Off => Off
+apc.enabled => On => On
+apc.file_md5 => Off => Off
+apc.file_update_protection => 2 => 2
+apc.filters => no value => no value
+apc.gc_ttl => 3600 => 3600
+apc.include_once_override => Off => Off
+apc.lazy_classes => Off => Off
+apc.lazy_functions => Off => Off
+apc.max_file_size => 1M => 1M
+apc.mmap_file_mask => no value => no value
+apc.num_files_hint => 1000 => 1000
+apc.preload_path => no value => no value
+apc.report_autofilter => Off => Off
+apc.rfc1867 => Off => Off
+apc.rfc1867_freq => 0 => 0
+apc.rfc1867_name => APC_UPLOAD_PROGRESS => APC_UPLOAD_PROGRESS
+apc.rfc1867_prefix => upload_ => upload_
+apc.rfc1867_ttl => 3600 => 3600
+apc.serializer => default => default
+apc.shm_segments => 1 => 1
+apc.shm_size => 32M => 32M
+apc.slam_defense => On => On
+apc.stat => On => On
+apc.stat_ctime => Off => Off
+apc.ttl => 0 => 0
+apc.use_request_time => On => On
+apc.user_entries_hint => 4096 => 4096
+apc.user_ttl => 0 => 0
+apc.write_lock => On => On
+
+bcmath
+
+BCMath support => enabled
+
+bz2
+
+BZip2 Support => Enabled
+Stream Wrapper support => compress.bz2://
+Stream Filter support => bzip2.decompress, bzip2.compress
+BZip2 Version => 1.0.6, 6-Sept-2010
+
+ctype
+
+ctype functions => enabled
+
+curl
+
+cURL support => enabled
+cURL Information => libcurl/7.38.0 OpenSSL/1.0.1t zlib/1.2.8 libidn/1.29 libssh2/1.4.3 librtmp/2.3
+
+date
+
+date/time support => enabled
+"Olson" Timezone Database Version => 2010.9
+Timezone Database => internal
+Default timezone => Europe/Paris
+
+Directive => Local Value => Master Value
+date.default_latitude => 31.7667 => 31.7667
+date.default_longitude => 35.2333 => 35.2333
+date.sunrise_zenith => 90.583333 => 90.583333
+date.sunset_zenith => 90.583333 => 90.583333
+date.timezone => no value => no value
+
+dom
+
+DOM/XML => enabled
+DOM/XML API Version => 20031129
+libxml Version => 2.9.1
+HTML Support => enabled
+XPath Support => enabled
+XPointer Support => enabled
+Schema Support => enabled
+RelaxNG Support => enabled
+
+fileinfo
+
+fileinfo support => enabled
+
+filter
+
+Input Validation and Filtering => enabled
+Revision => $Revision: 298196 $
+
+Directive => Local Value => Master Value
+filter.default => unsafe_raw => unsafe_raw
+filter.default_flags => no value => no value
+
+ftp
+
+FTP support => enabled
+
+gd
+
+GD Support => enabled
+GD Version => bundled (2.0.34 compatible)
+FreeType Support => enabled
+FreeType Linkage => with freetype
+FreeType Version => 2.5.2
+GIF Read Support => enabled
+GIF Create Support => enabled
+JPG Support => enabled
+PNG Support => enabled
+WBMP Support => enabled
+XPM Support => enabled
+XBM Support => enabled
+
+gettext
+
+GetText Support => enabled
+
+hash
+
+hash support => enabled
+Hashing Engines => md2 md4 md5 sha1 sha256 sha384 sha512 ripemd128 ripemd160 ripemd256 ripemd320 whirlpool tiger128,3 tiger160,3 tiger192,3 tiger128,4 tiger160,4 tiger192,4 snefru gost adler32 crc32 crc32b haval128,3 haval160,3 haval192,3 haval224,3 haval256,3 haval128,4 haval160,4 haval192,4 haval224,4 haval256,4 haval128,5 haval160,5 haval192,5 haval224,5 haval256,5 
+
+iconv
+
+iconv support => enabled
+iconv implementation => glibc
+iconv library version => 2.19
+
+Directive => Local Value => Master Value
+iconv.input_encoding => ISO-8859-1 => ISO-8859-1
+iconv.internal_encoding => ISO-8859-1 => ISO-8859-1
+iconv.output_encoding => ISO-8859-1 => ISO-8859-1
+
+json
+
+json support => enabled
+json version => 1.2.1
+
+libxml
+
+libXML support => active
+libXML Version => 2.9.1
+libXML streams => enabled
+
+mbstring
+
+Multibyte Support => enabled
+Multibyte string engine => libmbfl
+Multibyte (japanese) regex support => enabled
+Multibyte regex (oniguruma) version => 4.4.4
+Multibyte regex (oniguruma) backtrack check => On
+
+mbstring extension makes use of "streamable kanji code filter and converter", which is distributed under the GNU Lesser General Public License version 2.1.
+
+Directive => Local Value => Master Value
+mbstring.detect_order => no value => no value
+mbstring.encoding_translation => Off => Off
+mbstring.func_overload => 0 => 0
+mbstring.http_input => pass => pass
+mbstring.http_output => pass => pass
+mbstring.internal_encoding => no value => no value
+mbstring.language => neutral => neutral
+mbstring.strict_detection => Off => Off
+mbstring.substitute_character => no value => no value
+
+mcrypt
+
+mcrypt support => enabled
+Version => 2.5.8
+Api No => 20021217
+Supported ciphers => cast-128 gost rijndael-128 twofish arcfour cast-256 loki97 rijndael-192 saferplus wake blowfish-compat des rijndael-256 serpent xtea blowfish enigma rc2 tripledes 
+Supported modes => cbc cfb ctr ecb ncfb nofb ofb stream 
+
+Directive => Local Value => Master Value
+mcrypt.algorithms_dir => no value => no value
+mcrypt.modes_dir => no value => no value
+
+mhash
+
+MHASH support => Enabled
+MHASH API Version => 20060101
+
+mysql
+
+MySQL Support => enabled
+Active Persistent Links => 0
+Active Links => 0
+Client API version => 5.0.51a
+MYSQL_MODULE_TYPE => external
+MYSQL_SOCKET => /var/run/mysqld/mysqld.sock
+MYSQL_INCLUDE => -I/usr/include/mysql
+MYSQL_LIBS => -L/usr/lib -lmysqlclient_r 
+
+Directive => Local Value => Master Value
+mysql.allow_persistent => On => On
+mysql.connect_timeout => 60 => 60
+mysql.default_host => no value => no value
+mysql.default_password => no value => no value
+mysql.default_port => no value => no value
+mysql.default_socket => no value => no value
+mysql.default_user => no value => no value
+mysql.max_links => Unlimited => Unlimited
+mysql.max_persistent => Unlimited => Unlimited
+mysql.trace_mode => Off => Off
+
+mysqli
+
+MysqlI Support => enabled
+Client API library version => 5.0.51a
+Client API header version => 5.0.51a
+MYSQLI_SOCKET => /var/run/mysqld/mysqld.sock
+
+Directive => Local Value => Master Value
+mysqli.default_host => no value => no value
+mysqli.default_port => 3306 => 3306
+mysqli.default_pw => no value => no value
+mysqli.default_socket => no value => no value
+mysqli.default_user => no value => no value
+mysqli.max_links => Unlimited => Unlimited
+mysqli.reconnect => Off => Off
+
+OAuth
+
+OAuth support => enabled
+PLAINTEXT support => enabled
+RSA-SHA1 support => enabled
+HMAC-SHA1 support => enabled
+Request engine support => php_streams, curl
+source version => $Id: oauth.c 325799 2012-05-24 21:07:51Z jawed $
+version => 1.2.3
+
+openssl
+
+OpenSSL support => enabled
+OpenSSL Version => OpenSSL 1.0.1t  3 May 2016
+
+pcre
+
+PCRE (Perl Compatible Regular Expressions) Support => enabled
+PCRE Library Version => 8.02 2010-03-19
+
+Directive => Local Value => Master Value
+pcre.backtrack_limit => 100000 => 100000
+pcre.recursion_limit => 100000 => 100000
+
+PDO
+
+PDO support => enabled
+PDO drivers => sqlite, mysql, sqlite2
+
+pdo_mysql
+
+PDO Driver for MySQL, client library version => 5.0.51a
+
+pdo_sqlite
+
+PDO Driver for SQLite 3.x => enabled
+PECL Module version => (bundled) 1.0.1 $Id: pdo_sqlite.c 293036 2010-01-03 09:23:27Z sebastian $
+SQLite Library => 3.3.7
+
+posix
+
+Revision => $Revision: 293036 $
+
+Reflection
+
+Reflection => enabled
+Version => $Id: php_reflection.c 300129 2010-06-03 00:43:37Z felipe $
+
+session
+
+Session Support => enabled
+Registered save handlers => files user sqlite 
+Registered serializer handlers => php php_binary wddx 
+
+Directive => Local Value => Master Value
+session.auto_start => Off => Off
+session.bug_compat_42 => On => On
+session.bug_compat_warn => On => On
+session.cache_expire => 180 => 180
+session.cache_limiter => nocache => nocache
+session.cookie_domain => no value => no value
+session.cookie_httponly => Off => Off
+session.cookie_lifetime => 0 => 0
+session.cookie_path => / => /
+session.cookie_secure => Off => Off
+session.entropy_file => no value => no value
+session.entropy_length => 0 => 0
+session.gc_divisor => 100 => 100
+session.gc_maxlifetime => 1440 => 1440
+session.gc_probability => 1 => 1
+session.hash_bits_per_character => 4 => 4
+session.hash_function => 0 => 0
+session.name => PHPSESSID => PHPSESSID
+session.referer_check => no value => no value
+session.save_handler => files => files
+session.save_path => no value => no value
+session.serialize_handler => php => php
+session.use_cookies => On => On
+session.use_only_cookies => Off => Off
+session.use_trans_sid => 0 => 0
+
+SimpleXML
+
+Simplexml support => enabled
+Revision => $Revision: 299016 $
+Schema support => enabled
+
+soap
+
+Soap Client => enabled
+Soap Server => enabled
+
+Directive => Local Value => Master Value
+soap.wsdl_cache => 1 => 1
+soap.wsdl_cache_dir => /tmp => /tmp
+soap.wsdl_cache_enabled => 1 => 1
+soap.wsdl_cache_limit => 5 => 5
+soap.wsdl_cache_ttl => 86400 => 86400
+
+sockets
+
+Sockets Support => enabled
+
+SPL
+
+SPL support => enabled
+Interfaces => Countable, OuterIterator, RecursiveIterator, SeekableIterator, SplObserver, SplSubject
+Classes => AppendIterator, ArrayIterator, ArrayObject, BadFunctionCallException, BadMethodCallException, CachingIterator, DirectoryIterator, DomainException, EmptyIterator, FilterIterator, InfiniteIterator, InvalidArgumentException, IteratorIterator, LengthException, LimitIterator, LogicException, NoRewindIterator, OutOfBoundsException, OutOfRangeException, OverflowException, ParentIterator, RangeException, RecursiveArrayIterator, RecursiveCachingIterator, RecursiveDirectoryIterator, RecursiveFilterIterator, RecursiveIteratorIterator, RecursiveRegexIterator, RegexIterator, RuntimeException, SimpleXMLIterator, SplFileInfo, SplFileObject, SplObjectStorage, SplTempFileObject, UnderflowException, UnexpectedValueException
+
+SQLite
+
+SQLite support => enabled
+PECL Module version => 2.0-dev $Id: sqlite.c 298697 2010-04-28 12:10:10Z iliaa $
+SQLite Library => 2.8.17
+SQLite Encoding => iso8859
+
+Directive => Local Value => Master Value
+sqlite.assoc_case => 0 => 0
+
+standard
+
+Regex Library => Bundled library enabled
+Dynamic Library Support => enabled
+Path to sendmail =>  -t -i 
+
+Directive => Local Value => Master Value
+assert.active => 1 => 1
+assert.bail => 0 => 0
+assert.callback => no value => no value
+assert.quiet_eval => 0 => 0
+assert.warning => 1 => 1
+auto_detect_line_endings => 0 => 0
+default_socket_timeout => 60 => 60
+safe_mode_allowed_env_vars => PHP_ => PHP_
+safe_mode_protected_env_vars => LD_LIBRARY_PATH => LD_LIBRARY_PATH
+url_rewriter.tags => a=href,area=href,frame=src,form=,fieldset= => a=href,area=href,frame=src,form=,fieldset=
+user_agent => no value => no value
+
+sysvmsg
+
+sysvmsg support => enabled
+Revision => $Revision: 293036 $
+
+tokenizer
+
+Tokenizer Support => enabled
+
+wddx
+
+WDDX Support => enabled
+WDDX Session Serializer => enabled
+
+xml
+
+XML Support => active
+XML Namespace Support => active
+libxml2 Version => 2.9.1
+
+xmlreader
+
+XMLReader => enabled
+
+xmlwriter
+
+XMLWriter => enabled
+
+xsl
+
+XSL => enabled
+libxslt Version => 1.1.28
+libxslt compiled against libxml Version => 2.9.1
+EXSLT => enabled
+libexslt Version => 1.1.28
+
+zip
+
+Zip => enabled
+Extension Version => $Id: php_zip.c 305848 2010-11-30 11:04:06Z pajoye $
+Zip version => 1.8.11
+Libzip version => 0.9.0
+
+zlib
+
+ZLib Support => enabled
+Stream Wrapper support => compress.zlib://
+Stream Filter support => zlib.inflate, zlib.deflate
+Compiled Version => 1.2.8
+Linked Version => 1.2.8
+
+Directive => Local Value => Master Value
+zlib.output_compression => Off => Off
+zlib.output_compression_level => -1 => -1
+zlib.output_handler => no value => no value
+
+Additional Modules
+
+Module Name
+readline
+sysvsem
+sysvshm
+
+Environment
+
+Variable => Value
+MAIL => /var/mail/cedric
+USER => cedric
+SSH_CLIENT => deleted
+CXXFLAGS => -pthread -prefer-pic
+BUILD_NUM => 1
+HOSTNAME => aa720b238dc0
+OBJCFLAGS => -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security
+CLI_DEPS => libjpeg62-turbo, libpng12-0, libxpm4, libmcrypt4, libxslt1.1, libcurl3, libfreetype6, libmysqlclient15off, libxml2, libreadline6, libc6, libmagic1
+HOME => /home/cedric
+OLDPWD => /usr/src/php
+TEST_PHP_SRCDIR => /usr/src/php
+DEBVER => jessie
+SSH_TTY => deleted
+LDFLAGS => -fPIE -pie -Wl,-z,relro -Wl,-z,now
+APACHE_RUN_DIR => /var/run/apache2
+DEBNUM => 8
+MAKEFLAGS =>  
+APACHE_PID_FILE => /var/run/apache2/apache2.pid
+LOGNAME => cedric
+TEST_PHP_EXECUTABLE => /usr/src/php/sapi/cli/php
+PATH => /usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+CFLAGS => -I/usr/include -g -O2 -pthread -Wall -g -DZTS -prefer-pic
+MAKELEVEL => 1
+APACHE_LOCK_DIR => /var/lock/apache2
+FCFLAGS => -g -O2 -fPIE -fstack-protector-strong
+OBJCXXFLAGS => -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security
+LANG => C
+CPPFLAGS => -D_REENTRANT -DTHREAD=1
+SSH_AUTH_SOCK => deleted
+SHELL => /bin/sh
+APACHE_RUN_USER => www-data
+APACHE_RUN_GROUP => www-data
+PHP_AUTOCONF => /usr/bin/autoconf2.13
+DEB_BUILD_MAINT_OPTIONS => hardening=+all
+APACHE_LOG_DIR => /var/log/apache2
+PWD => /usr/src/php
+FFLAGS => -g -O2 -fPIE -fstack-protector-strong
+SSH_CONNECTION => deleted
+TZ => Europe/Paris
+GCJFLAGS => -g -O2 -fPIE -fstack-protector-strong
+MFLAGS =>  
+CC => /usr/src/php/meta_ccld
+
+PHP Variables
+
+Variable => Value
+_SERVER["MAIL"] => /var/mail/cedric
+_SERVER["USER"] => cedric
+_SERVER["SSH_CLIENT"] => deleted
+_SERVER["CXXFLAGS"] => -pthread -prefer-pic
+_SERVER["BUILD_NUM"] => 1
+_SERVER["HOSTNAME"] => aa720b238dc0
+_SERVER["OBJCFLAGS"] => -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security
+_SERVER["CLI_DEPS"] => libjpeg62-turbo, libpng12-0, libxpm4, libmcrypt4, libxslt1.1, libcurl3, libfreetype6, libmysqlclient15off, libxml2, libreadline6, libc6, libmagic1
+_SERVER["HOME"] => /home/cedric
+_SERVER["OLDPWD"] => /usr/src/php
+_SERVER["TEST_PHP_SRCDIR"] => /usr/src/php
+_SERVER["DEBVER"] => jessie
+_SERVER["SSH_TTY"] => deleted
+_SERVER["LDFLAGS"] => -fPIE -pie -Wl,-z,relro -Wl,-z,now
+_SERVER["APACHE_RUN_DIR"] => /var/run/apache2
+_SERVER["DEBNUM"] => 8
+_SERVER["MAKEFLAGS"] => 
+_SERVER["APACHE_PID_FILE"] => /var/run/apache2/apache2.pid
+_SERVER["LOGNAME"] => cedric
+_SERVER["TEST_PHP_EXECUTABLE"] => /usr/src/php/sapi/cli/php
+_SERVER["PATH"] => /usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+_SERVER["CFLAGS"] => -I/usr/include -g -O2 -pthread -Wall -g -DZTS -prefer-pic
+_SERVER["MAKELEVEL"] => 1
+_SERVER["APACHE_LOCK_DIR"] => /var/lock/apache2
+_SERVER["FCFLAGS"] => -g -O2 -fPIE -fstack-protector-strong
+_SERVER["OBJCXXFLAGS"] => -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security
+_SERVER["LANG"] => C
+_SERVER["CPPFLAGS"] => -D_REENTRANT -DTHREAD=1
+_SERVER["SSH_AUTH_SOCK"] => deleted
+_SERVER["SHELL"] => /bin/sh
+_SERVER["APACHE_RUN_USER"] => www-data
+_SERVER["APACHE_RUN_GROUP"] => www-data
+_SERVER["PHP_AUTOCONF"] => /usr/bin/autoconf2.13
+_SERVER["DEB_BUILD_MAINT_OPTIONS"] => hardening=+all
+_SERVER["APACHE_LOG_DIR"] => /var/log/apache2
+_SERVER["PWD"] => /usr/src/php
+_SERVER["FFLAGS"] => -g -O2 -fPIE -fstack-protector-strong
+_SERVER["SSH_CONNECTION"] => deleted
+_SERVER["TZ"] => Europe/Paris
+_SERVER["GCJFLAGS"] => -g -O2 -fPIE -fstack-protector-strong
+_SERVER["MFLAGS"] => 
+_SERVER["CC"] => /usr/src/php/meta_ccld
+_SERVER["PHP_SELF"] => 
+_SERVER["SCRIPT_NAME"] => 
+_SERVER["SCRIPT_FILENAME"] => 
+_SERVER["PATH_TRANSLATED"] => 
+_SERVER["DOCUMENT_ROOT"] => 
+_SERVER["REQUEST_TIME"] => 1614893706
+_SERVER["argv"] => Array
+(
+)
+
+_SERVER["argc"] => 0
+_ENV["MAIL"] => /var/mail/cedric
+_ENV["USER"] => cedric
+_ENV["SSH_CLIENT"] => deleted
+_ENV["CXXFLAGS"] => -pthread -prefer-pic
+_ENV["BUILD_NUM"] => 1
+_ENV["HOSTNAME"] => aa720b238dc0
+_ENV["OBJCFLAGS"] => -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security
+_ENV["CLI_DEPS"] => libjpeg62-turbo, libpng12-0, libxpm4, libmcrypt4, libxslt1.1, libcurl3, libfreetype6, libmysqlclient15off, libxml2, libreadline6, libc6, libmagic1
+_ENV["HOME"] => /home/cedric
+_ENV["OLDPWD"] => /usr/src/php
+_ENV["TEST_PHP_SRCDIR"] => /usr/src/php
+_ENV["DEBVER"] => jessie
+_ENV["SSH_TTY"] => deleted
+_ENV["LDFLAGS"] => -fPIE -pie -Wl,-z,relro -Wl,-z,now
+_ENV["APACHE_RUN_DIR"] => /var/run/apache2
+_ENV["DEBNUM"] => 8
+_ENV["MAKEFLAGS"] => 
+_ENV["APACHE_PID_FILE"] => /var/run/apache2/apache2.pid
+_ENV["LOGNAME"] => cedric
+_ENV["TEST_PHP_EXECUTABLE"] => /usr/src/php/sapi/cli/php
+_ENV["PATH"] => /usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+_ENV["CFLAGS"] => -I/usr/include -g -O2 -pthread -Wall -g -DZTS -prefer-pic
+_ENV["MAKELEVEL"] => 1
+_ENV["APACHE_LOCK_DIR"] => /var/lock/apache2
+_ENV["FCFLAGS"] => -g -O2 -fPIE -fstack-protector-strong
+_ENV["OBJCXXFLAGS"] => -g -O2 -fPIE -fstack-protector-strong -Wformat -Werror=format-security
+_ENV["LANG"] => C
+_ENV["CPPFLAGS"] => -D_REENTRANT -DTHREAD=1
+_ENV["SSH_AUTH_SOCK"] => deleted
+_ENV["SHELL"] => /bin/sh
+_ENV["APACHE_RUN_USER"] => www-data
+_ENV["APACHE_RUN_GROUP"] => www-data
+_ENV["PHP_AUTOCONF"] => /usr/bin/autoconf2.13
+_ENV["DEB_BUILD_MAINT_OPTIONS"] => hardening=+all
+_ENV["APACHE_LOG_DIR"] => /var/log/apache2
+_ENV["PWD"] => /usr/src/php
+_ENV["FFLAGS"] => -g -O2 -fPIE -fstack-protector-strong
+_ENV["SSH_CONNECTION"] => deleted
+_ENV["TZ"] => Europe/Paris
+_ENV["GCJFLAGS"] => -g -O2 -fPIE -fstack-protector-strong
+_ENV["MFLAGS"] => 
+_ENV["CC"] => /usr/src/php/meta_ccld
+
+PHP License
+This program is free software; you can redistribute it and/or modify
+it under the terms of the PHP License as published by the PHP Group
+and included in the distribution in the file:  LICENSE
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+If you did not receive a copy of the PHP license, or have any
+questions about PHP licensing, please contact license@php.net.

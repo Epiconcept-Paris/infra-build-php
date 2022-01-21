@@ -1,0 +1,5 @@
+test -d ../top/usr/sbin || mkdir -p ../top/usr/sbin
+cc -O -fPIE -fstack-protector-strong -Wall -Wl,-z,relro -Wl,-z,now -pie -s -o ../top/usr/sbin/waitpid waitpid.c
+test -d ../top/usr/share/man/man8 || mkdir -p ../top/usr/share/man/man8
+cp -p waitpid.8 ../top/usr/share/man/man8
+gzip -n9 ../top/usr/share/man/man8/waitpid.8

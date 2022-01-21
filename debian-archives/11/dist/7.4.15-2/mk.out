@@ -1,0 +1,23 @@
+===== 2021-03-05 07:55:03 CET ==================
+Making PHP 7.4.15-2 packages for Debian bullseye...
+Logs will be in debian/11/dist/7.4.15-2/.logs/
+Deleting the existing 'epi-build-php:bullseye-7.4.15' image...
+Building the 'epi-build-php:bullseye-7.4.15' image...
+Running the 'epi-build-php-7.4.15_bullseye' container:
+    docker run -v /home/cedric/www/e/infra-build-php/debian/11/dist/7.4.15-2:/opt/php-mk/dist --name epi-build-php-7.4.15_bullseye --rm epi-build-php:bullseye-7.4.15
+Found source of PHP 7.4.15 in /opt/php-mk/files/
+Extracting php-7.4.15 source...
+Using option found in 'configure --help': --enable-phpdbg
+Using option found in 'configure --help': --enable-phpdbg-readline
+Using option found in 'configure --help': --enable-phpdbg-webhelper
+Using option found in 'configure --help': --enable-fpm
+Using option found in 'configure --help': --with-fpm-systemd
+Using option found in 'configure --help': --with-pear=/usr/share/php
+Using option found in 'configure --help': --enable-gd
+Using option found in 'configure --help': --with-freetype
+Using option found in 'configure --help': --with-jpeg
+Using option found in 'configure --help': --with-xpm
+Using option found in 'configure --help': --with-readline=/usr
+Using option found in 'configure --help': --with-zip
+Patching file ext/mysql/php_mysql.c
+[31mFAILED to make PHP 7.4.15-2 packages for Debian bullseye![37m

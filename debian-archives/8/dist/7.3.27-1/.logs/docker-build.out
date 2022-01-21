@@ -1,0 +1,102 @@
+Sending build context to Docker daemon  112.5MB
+Step 1/34 : FROM debian:jessie
+ ---> 4eb8376dc2a3
+Step 2/34 : MAINTAINER Epiconcept
+ ---> Using cache
+ ---> 48274d0780aa
+Step 3/34 : ENV DEBVER=jessie
+ ---> Using cache
+ ---> 40f0a4cfe853
+Step 4/34 : ENV DEBNUM=8
+ ---> Using cache
+ ---> 4145c3f1e19a
+Step 5/34 : ENV CLI_DEPS libjpeg62-turbo, libpng12-0, libxpm4, libmcrypt4, libxslt1.1, libcurl3, libfreetype6, libmysqlclient18, libxml2, libreadline6, libc6, libzip2
+ ---> Using cache
+ ---> a0fe2927d5e0
+Step 6/34 : ENV BUILD_NUM=1
+ ---> Using cache
+ ---> 297ac7e32e2c
+Step 7/34 : ENV USER=cedric
+ ---> Using cache
+ ---> 2ba5d183e003
+Step 8/34 : ENV LANG=C
+ ---> Using cache
+ ---> 352900501fb0
+Step 9/34 : ENV TZ=Europe/Paris
+ ---> Using cache
+ ---> dbacce4f293c
+Step 10/34 : RUN groupadd -g 1000 cedric; useradd -u 1000 -g 1000 cedric
+ ---> Using cache
+ ---> 12d49e608425
+Step 11/34 : RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
+ ---> Using cache
+ ---> 57278c7fe485
+Step 12/34 : RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    /opt/php-mk/build\\nto start the build\"" >>/root/.bashrc
+ ---> Using cache
+ ---> 179f3e59e64e
+Step 13/34 : RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends vim apt-rdepends file curl build-essential autoconf pkg-config faketime fakeroot lintian apache2 apache2-dev libmcrypt-dev libmhash-dev libjpeg-dev libxpm-dev libxslt1-dev libbz2-dev libxft-dev libmysqlclient-dev libcurl4-openssl-dev libssl-dev libpcre3-dev libsystemd-dev libreadline-dev libssh2-1-dev libzip-dev
+ ---> Using cache
+ ---> 276f3222a23a
+Step 14/34 : RUN mkdir -p /opt/php-mk/dist /opt/php-mk/files
+ ---> Using cache
+ ---> 602a121153e8
+Step 15/34 : RUN mkdir /opt/php-mk/hooks
+ ---> Using cache
+ ---> dbd99e3707ee
+Step 16/34 : COPY 7/files/apcu-5.1.20.tgz /opt/php-mk/files
+ ---> Using cache
+ ---> 64ae6e3e99e1
+Step 17/34 : COPY 7/hooks/apcu.sh /opt/php-mk/hooks
+ ---> Using cache
+ ---> 1d2aac8852f4
+Step 18/34 : COPY 7/files/oauth-2.0.7.tgz /opt/php-mk/files
+ ---> Using cache
+ ---> ef604c8c7d38
+Step 19/34 : COPY 7/hooks/oauth.sh /opt/php-mk/hooks
+ ---> Using cache
+ ---> 679d8a122d53
+Step 20/34 : COPY 7/files/mcrypt-1.0.4.tgz /opt/php-mk/files
+ ---> Using cache
+ ---> db0e5eff19bc
+Step 21/34 : COPY 7/hooks/mcrypt.sh /opt/php-mk/hooks
+ ---> Using cache
+ ---> 57a2c4f1aba9
+Step 22/34 : COPY 7/files/ssh2-1.3.1.tgz /opt/php-mk/files
+ ---> Using cache
+ ---> fce9464e240e
+Step 23/34 : COPY 7/hooks/ssh2.sh /opt/php-mk/hooks
+ ---> Using cache
+ ---> 7f3f76a63c41
+Step 24/34 : COPY 7/files/ereg.tar.gz /opt/php-mk/files
+ ---> Using cache
+ ---> 375251e6611b
+Step 25/34 : COPY 7/hooks/ereg.sh /opt/php-mk/hooks
+ ---> Using cache
+ ---> 1cb64c7ff965
+Step 26/34 : COPY 7/files/mysql.tar.gz /opt/php-mk/files
+ ---> Using cache
+ ---> 115b76c88b95
+Step 27/34 : COPY 7/files/mysql.patch /opt/php-mk/files
+ ---> Using cache
+ ---> c0f112f49106
+Step 28/34 : COPY 7/hooks/mysql.sh /opt/php-mk/hooks
+ ---> Using cache
+ ---> 70f82dee26fe
+Step 29/34 : COPY files/PEAR_Manpages-1.10.0.tgz /opt/php-mk/files
+ ---> Using cache
+ ---> d15d87afbe48
+Step 30/34 : COPY hooks/pearman.sh /opt/php-mk/hooks
+ ---> Using cache
+ ---> c6ecc958e5ab
+Step 31/34 : COPY 7/7.3.27/php-7.3.27.tar.bz2 /opt/php-mk/files
+ ---> 46ae19d96a2c
+Step 32/34 : COPY pkgs /opt/php-mk/pkgs
+ ---> 1dea2bbb09fe
+Step 33/34 : COPY run/build /opt/php-mk
+ ---> 5a7008e294c8
+Step 34/34 : CMD [ "/opt/php-mk/build" ]
+ ---> Running in 60e58dad2cfa
+Removing intermediate container 60e58dad2cfa
+ ---> 3d27b20ab75d
+Successfully built 3d27b20ab75d
+Successfully tagged epi-build-php:jessie-7.3.27

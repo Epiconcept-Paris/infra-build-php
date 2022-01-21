@@ -1,0 +1,6 @@
+===== 2021-12-28 14:57:59 CET ==================
+Making PHP 7.2.34-1 packages for Debian bullseye...
+Logs will be in debian/11/dist/7.2.34-1/.logs/
+Building the 'epi-build-php:bullseye-7.2.34' image...
+[31mFAILED to build the epi-build-php:bullseye-7.2.34 image![37m
+Examine ../debian/11/dist/7.2.34-1/.logs/docker-build.out for details.

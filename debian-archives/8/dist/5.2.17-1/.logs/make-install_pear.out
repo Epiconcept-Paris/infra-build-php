@@ -1,0 +1,8 @@
+Installing PEAR environment:      /opt/php-mk/pkgs/01-pear/top/usr/share/php/
+[PEAR] Archive_Tar    - installed: 1.3.7
+[PEAR] Console_Getopt - installed: 1.2.3
+[PEAR] Structures_Graph- installed: 1.0.3
+[PEAR] XML_Util       - installed: 1.2.1
+[PEAR] PEAR           - installed: 1.9.1
+Wrote PEAR system config file at: /opt/php-mk/pkgs/01-pear/top/etc/pear/pear.conf
+You may want to add: /usr/share/php to your php.ini include_path

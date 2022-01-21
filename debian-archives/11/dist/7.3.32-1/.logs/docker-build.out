@@ -1,0 +1,79 @@
+Sending build context to Docker daemon  227.5MB
+Step 1/36 : FROM debian:bullseye
+ ---> fd16929ec439
+Step 2/36 : MAINTAINER Epiconcept
+ ---> Using cache
+ ---> 421eef1816fa
+Step 3/36 : ENV DEBVER=bullseye
+ ---> Using cache
+ ---> 39538d8861f0
+Step 4/36 : ENV DEBNUM=11
+ ---> Using cache
+ ---> 352119db3b36
+Step 5/36 : ENV CLI_DEPS libjpeg62-turbo, libpng16-16, libxpm4, libmcrypt4, libxslt1.1, libcurl4, libfreetype6, libmariadb3, libxml2, libreadline8, libc6, libzip4
+ ---> Using cache
+ ---> 1e1a01e1a14c
+Step 6/36 : ENV BUILD_NUM=1
+ ---> Using cache
+ ---> 89774897e7f9
+Step 7/36 : ENV USER=cedric
+ ---> Using cache
+ ---> 69060152fd57
+Step 8/36 : ENV LANG=C
+ ---> Using cache
+ ---> a3b3073e8c03
+Step 9/36 : ENV TZ=Europe/Paris
+ ---> Using cache
+ ---> 49f0c24162eb
+Step 10/36 : RUN groupadd -g 1000 cedric; useradd -u 1000 -g 1000 cedric
+ ---> Using cache
+ ---> 6328c81a8257
+Step 11/36 : RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
+ ---> Using cache
+ ---> 01d19fded2fd
+Step 12/36 : RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    /opt/php-mk/build\\nto start the build\"" >>/root/.bashrc
+ ---> Using cache
+ ---> 972e7b8714f2
+Step 13/36 : RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends ed vim apt-rdepends file curl build-essential autoconf pkg-config faketime fakeroot lintian apache2 apache2-dev libmcrypt-dev libmhash-dev libjpeg-dev libxpm-dev libxslt1-dev libbz2-dev libxft-dev libmariadbclient-dev libmariadb-dev-compat libcurl4-openssl-dev libssl-dev libpcre3-dev libsystemd-dev libreadline-dev libssh2-1-dev libzip-dev
+ ---> Running in 488e47980cb5
+Get:1 http://security.debian.org/debian-security bullseye-security InRelease [44.1 kB]
+Get:2 http://deb.debian.org/debian bullseye InRelease [116 kB]
+Get:3 http://deb.debian.org/debian bullseye-updates InRelease [39.4 kB]
+Get:4 http://security.debian.org/debian-security bullseye-security/main amd64 Packages [85.2 kB]
+Get:5 http://deb.debian.org/debian bullseye/main amd64 Packages [8180 kB]
+Get:6 http://deb.debian.org/debian bullseye-updates/main amd64 Packages [2592 B]
+Fetched 8467 kB in 11s (799 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+Calculating upgrade...
+The following packages will be upgraded:
+  apt base-files base-passwd bash bsdutils debconf debian-archive-keyring dpkg
+  e2fsprogs gcc-9-base gpgv gzip libapt-pkg6.0 libblkid1 libc-bin libc6
+  libcom-err2 libcrypt1 libdb5.3 libdebconfclient0 libext2fs2 libffi7
+  libgcrypt20 libgnutls30 libgssapi-krb5-2 libhogweed6 libk5crypto3 libkrb5-3
+  libkrb5support0 liblz4-1 liblzma5 libmount1 libnettle8 libpam-modules
+  libpam-modules-bin libpam-runtime libpam0g libselinux1 libsmartcols1 libss2
+  libssl1.1 libsystemd0 libudev1 libuuid1 libzstd1 logsave mount perl-base
+  sysvinit-utils tar tzdata util-linux
+52 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+Need to get 24.9 MB of archives.
+After this operation, 162 kB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bullseye/main amd64 base-files amd64 11.1+deb11u1 [70.0 kB]
+Get:2 http://deb.debian.org/debian bullseye/main amd64 bash amd64 5.1-2+b3 [1416 kB]
+Get:3 http://deb.debian.org/debian bullseye/main amd64 bsdutils amd64 1:2.36.1-8 [148 kB]
+Get:4 http://deb.debian.org/debian bullseye/main amd64 tar amd64 1.34+dfsg-1 [847 kB]
+Get:5 http://deb.debian.org/debian bullseye/main amd64 dpkg amd64 1.20.9 [2472 kB]
+Get:6 http://deb.debian.org/debian bullseye/main amd64 gzip amd64 1.10-4 [132 kB]
+Get:7 http://deb.debian.org/debian bullseye/main amd64 perl-base amd64 5.32.1-4+deb11u2 [1628 kB]
+Get:8 http://deb.debian.org/debian bullseye/main amd64 util-linux amd64 2.36.1-8 [1139 kB]
+Get:9 http://deb.debian.org/debian bullseye/main amd64 libcrypt1 amd64 1:4.4.18-4 [87.5 kB]
+Get:10 http://deb.debian.org/debian bullseye/main amd64 libc6 amd64 2.31-13+deb11u2 [2814 kB]
+Get:11 http://deb.debian.org/debian bullseye/main amd64 libgcrypt20 amd64 1.8.7-6 [563 kB]
+Get:12 http://deb.debian.org/debian bullseye/main amd64 liblz4-1 amd64 1.9.3-2 [57.5 kB]
+Get:13 http://deb.debian.org/debian bullseye/main amd64 liblzma5 amd64 5.2.5-2 [168 kB]
+Get:14 http://deb.debian.org/debian bullseye/main amd64 libsystemd0 amd64 247.3-6 [376 kB]
+Get:15 http://deb.debian.org/debian bullseye/main amd64 libudev1 amd64 247.3-6 [168 kB]
+Get:16 http://deb.debian.org/debian bullseye/main amd64 libzstd1 amd64 1.4.8+dfsg-2.1 [319 kB]
+Get:17 http://deb.debian.org/debian bullseye/main amd64 libapt-pkg6.0 amd64 2.2.4 [1013 kB]

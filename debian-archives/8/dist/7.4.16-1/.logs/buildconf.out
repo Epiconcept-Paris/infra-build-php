@@ -1,0 +1,7 @@
+buildconf: Checking installation
+buildconf: autoconf version 2.69 (ok)
+buildconf: Forcing buildconf. The configure files will be regenerated.
+buildconf: Cleaning cache and configure files
+buildconf: Rebuilding configure
+buildconf: Rebuilding main/php_config.h.in
+buildconf: Run ./configure to proceed with customizing the PHP build.

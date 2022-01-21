@@ -1,0 +1,88 @@
+===== 2021-03-04 18:32:10 CET ==================
+Checking php-5.2.17.tar.bz2 for OpCache...
+Using MySQL 5.0.51a packages found in php/5/files/5.2
+Making PHP 5.2.17-1 packages for Debian jessie...
+Logs will be in debian/8/dist/5.2.17-1/.logs/
+Building the 'epi-build-php:jessie-5.2.17' image...
+Running the 'epi-build-php-5.2.17_jessie' container:
+    docker run -v /home/cedric/www/e/infra-build-php/debian/8/dist/5.2.17-1:/opt/php-mk/dist --name epi-build-php-5.2.17_jessie --rm epi-build-php:jessie-5.2.17
+Found source of PHP 5.2.17 in /opt/php-mk/files/
+Extracting php-5.2.17 source...
+Using option found in 'configure --help': --with-mysql
+Using option found in 'configure --help': --with-mcrypt
+Using option found in 'configure --help': --with-ttf
+Using option found in 'configure --help': --enable-gd-native-ttf
+Using option found in 'configure --help': --with-pear=/usr/share/php
+Using option found in 'configure --help': --with-gd
+Using option found in 'configure --help': --with-freetype-dir=/usr
+Using option found in 'configure --help': --with-jpeg-dir=/usr
+Using option found in 'configure --help': --with-xpm-dir=/usr,/usr/X11R6
+Using option found in 'configure --help': --with-png-dir=/usr
+Using option found in 'configure --help': --with-readline=/usr
+Using option found in 'configure --help': --enable-zip
+Using option found in 'configure --help': --enable-wddx
+Configuring php-5.2.17 with APC + FileInfo + OAuth...
+2021-03-04 18:37:00 Building php-5.2.17...
+2021-03-04 18:39:35 Testing php-5.2.17...
+FAILED TEST SUMMARY
+---------------------------------------------------------------------
+Bug #34712 (zend.ze1_compatibility_mode = on segfault) [Zend/tests/bug34712.phpt]
+Bug #62765 (apc_bin_dumpfile report Fatal error when there is "goto" in function) [ext/apc/tests/bug62765.phpt]
+curl_error() function - basic test for curl_error using a fake url [ext/curl/tests/curl_error_basic.phpt]
+Curl_multi_getcontent() basic test with different sources (local file/http) [ext/curl/tests/curl_multi_getcontent_basic3.phpt]
+curl_setopt() basic parameter test [ext/curl/tests/curl_setopt_error.phpt]
+timezone_abbreviations_list() tests [ext/date/tests/010.phpt]
+Test DateTimeZone::listAbbreviations() function : basic functionality [ext/date/tests/DateTimeZone_listAbbreviations_basic1.phpt]
+Test DateTime::modify() function : usage variation - Passing unexpected values to first argument $modify. [ext/date/tests/DateTime_modify_variation1.phpt]
+Test date_modify() function : usage variation - Passing unexpected values to second argument $format. [ext/date/tests/date_modify_variation2.phpt]
+Test timezone_abbreviations_list() function : basic functionality [ext/date/tests/timezone_abbreviations_list_basic1.phpt]
+DOMDocument::validate() should validate an external DTD declaration [ext/dom/tests/DOMDocument_validate_external_dtd.phpt]
+DOMDocument::$validateOnParse - effectual determination (dom_document_validate_on_parse_read/dom_document_validate_on_parse_write) [ext/dom/tests/DOMDocument_validate_on_parse_variation.phpt]
+Test 7: DTD tests [ext/dom/tests/dom007.phpt]
+Bug #43073 (TrueType bounding box is wrong for angle<>0) [ext/gd/tests/bug43073.phpt]
+Bug #48801 (Problem with imagettfbbox) [ext/gd/tests/bug48801.phpt]
+Test imagecolorallocate() function : usage variations  - passing different data types to fourth argument [ext/gd/tests/imagecolorallocate_variation4.phpt]
+mhash() test [ext/mhash/tests/001.phpt]
+mhash_keygen_s2k() test [ext/mhash/tests/003.phpt]
+Bug #28382 (openssl_x509_parse extensions support) [ext/openssl/tests/bug28382.phpt]
+Bug #47828 (segfaults when a UTF-8 conversion fails openssl_x509_parse()) [ext/openssl/tests/bug47828.phpt]
+Bug #41125 (PDO mysql + quote() + prepare() can result in seg fault) [ext/pdo_mysql/tests/bug41125.phpt]
+Bug #44327 (PDORow::queryString property & numeric offsets / Crash) [ext/pdo_mysql/tests/bug44327.phpt]
+Test session_encode() function : error functionality [ext/session/tests/session_encode_error2.phpt]
+SimpleXML: XPath [ext/simplexml/tests/008.phpt]
+Bug #44811 (Improve error messages when creating new SoapClient which contains invalid data) [ext/soap/tests/bugs/bug44811.phpt]
+ext/sockets - socket_strerror - basic test [ext/sockets/tests/socket_strerror.phpt]
+proc_open [ext/standard/tests/general_functions/proc_open02.phpt]
+Test uniqid() function : basic functionality [ext/standard/tests/general_functions/uniqid_basic.phpt]
+time_sleep_until() function - basic test for time_sleep_until() [ext/standard/tests/misc/time_sleep_until_basic.phpt]
+Test setlocale() function : basic functionality - setting system locale to a specific [ext/standard/tests/strings/setlocale_basic1.phpt]
+Test setlocale() function : basic functionality - set locale using an array [ext/standard/tests/strings/setlocale_basic2.phpt]
+Test setlocale() function : basic functionality - passing multiple locales as argument [ext/standard/tests/strings/setlocale_basic3.phpt]
+Test setlocale() function : usage variations - passing multiple valid/invlaid locales as argument [ext/standard/tests/strings/setlocale_variation1.phpt]
+Test setlocale() function : usage variations - setting system locale = 0 [ext/standard/tests/strings/setlocale_variation3.phpt]
+Test strptime() function : basic functionality [ext/standard/tests/time/strptime_basic.phpt]
+sysvmsg functions on non-existing queue [ext/sysvmsg/tests/005.phpt]
+msg_send() data types when not serializing [ext/sysvmsg/tests/006.phpt]
+Test 10: EXSLT Support [ext/xsl/tests/xslt010.phpt]
+Check xsltprocessor::registerPHPFunctions and a non-string function in xsl [ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcnostring.phpt]
+Check xsltprocessor::registerPHPFunctions and a undefined php function [ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcundef.phpt]
+Test function gzgetc() by calling it with its expected arguments [ext/zlib/tests/gzgetc_basic.phpt]
+=====================================================================
+2021-03-04 22:35:07 Tests of php-5.2.17 completed.
+Installing package 'cli'...
+Assembling package 'cli'...
+Checking   package 'cli': epi-php-5.2-cli_5.2.17-1+deb8_amd64.deb...
+Installing package 'pear'...
+Removing extra license file php/doc/PEAR/LICENSE.
+Removing extra license file php/data/Structures_Graph/LICENSE.
+Assembling package 'pear'...
+Checking   package 'pear': epi-php-pear_1.9.1-1_all.deb...
+Installing package 'mod'...
+Assembling package 'mod'...
+Checking   package 'mod': epi-php-5.2-mod_5.2.17-1+deb8_amd64.deb...
+Skipping   package 'fpm'
+Skipping   package 'phpdbg'
+Skipping   package 'mysql'
+FAILED to check the following package(s):
+    cli
+[31mFAILED to make PHP 5.2.17-1 packages for Debian jessie![37m

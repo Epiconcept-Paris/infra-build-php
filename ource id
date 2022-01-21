@@ -1,0 +1,1778 @@
+[33mcommit 91c356b97625e9bbd8dab8c9a253b0644202e879[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Jan 21 09:49:21 2022 +0100
+
+    retrait du build de php 7.2 et 7.3
+
+[33mcommit 5508e699fd5d20ded7e654cb6e681e3d9dbcb84c[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Jan 21 09:46:47 2022 +0100
+
+    build nouveau paquet php-setup
+
+[33mcommit 8a3aa0e81575be65fc0c29e776bd1c5e8d8c21c0[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Jan 21 09:46:02 2022 +0100
+
+    meilleure gestion de la cron de nettoyage de sessions
+
+[33mcommit f1814dcc8477188dc38baf378e0f41a35fc364d6[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Tue Dec 28 15:53:49 2021 +0100
+
+    7.4.27
+
+[33mcommit b0e091ba5a5308f75eb214ddb7175f8dc9a4d2a6[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Tue Dec 28 15:42:27 2021 +0100
+
+    modif script d'envoi
+
+[33mcommit 94503d98e9e8878d1402ee9f7cc236426fd6f5d9[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Mon Nov 22 13:39:24 2021 +0100
+
+    build
+
+[33mcommit ede3c74a25985512f493773399c89ad4f1469e9c[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Nov 5 02:28:21 2021 +0100
+
+    ajout ssh2 à php5
+
+[33mcommit d3af79248d80fde51bba0a5c927e7a348badf331[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Wed Nov 3 20:07:11 2021 +0100
+
+    nouvelle version
+
+[33mcommit dd9c6cc6de76f1bd08d246615970953e9660f592[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Tue Oct 26 18:49:30 2021 +0200
+
+    php 7.4.25
+
+[33mcommit f82a798ed76cba8992014b694b68a2072bab2db8[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Sat Sep 25 00:01:13 2021 +0200
+
+    build
+
+[33mcommit ea83c199a34a4c2b2b0de2dfb6982848e36aea42[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Thu Aug 19 10:34:04 2021 +0200
+
+    Update postinst
+
+[33mcommit 48775a707dffc127647afb89b9d81f39b949d16b[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Mon Aug 2 20:42:49 2021 +0200
+
+    php 7.4.22
+
+[33mcommit db01d41d194f77f496b6713d4bd037b3bac00dba[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Mon Jul 5 07:49:46 2021 +0200
+
+    nettoyage, build php 7.3 et 7.4
+
+[33mcommit 6b68eaeee5c4e7c140f0e43df0f7a01d1f9b7cee[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Apr 30 18:48:49 2021 +0200
+
+    nouvelles versions
+
+[33mcommit 73312a1f7344488f02faf18d06021084b1bd8c3b[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Mon Apr 12 17:37:09 2021 +0200
+
+    rebuild php-setup pour enlever une dépendance idiote
+
+[33mcommit 2f5e1c688c8672afccc63509f83aa5954b2bdb0a[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Mon Apr 12 15:28:15 2021 +0200
+
+    retrait dépendance franchement inutile
+
+[33mcommit 8028331d91ffcce4dd3045448cb784f46d434766[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Mar 5 18:18:07 2021 +0100
+
+    ajout versions
+
+[33mcommit e06b88047d0f5238262482ab61b6696aab174d31[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Thu Mar 4 14:45:14 2021 +0100
+
+    typo
+
+[33mcommit f477a1422e9bf61415457d5732b6a019dd3831bd[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Thu Mar 4 14:44:57 2021 +0100
+
+    retrait de versions PHP qui ne sont pas nécessaires
+    ajout script de build de l'extension SSH2
+
+[33mcommit 21875c646bf4336cddc3652bb9d069de830ea434[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Thu Mar 4 14:28:50 2021 +0100
+
+    build ssh2 pour PHP, up de build_num
+
+[33mcommit db7564fe69081ee9b567dfefb3543172a803806b[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Tue Feb 16 11:01:44 2021 +0100
+
+    nouvelle version epi-php-setup
+
+[33mcommit ba801bf727e4367a5dc9639e0b1eae7dbc3e3f78[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Tue Feb 9 17:07:34 2021 +0100
+
+    correction dossiers /etc/
+
+[33mcommit 9d83a1901be63aa732cbb3065cb15408e3f1fc30[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Tue Feb 9 16:34:26 2021 +0100
+
+    php 7.4.15
+
+[33mcommit 4331c235b19f4af5e8c67849cbdec770cc2cdc61[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Jan 29 17:51:04 2021 +0100
+
+    build php 7.4
+
+[33mcommit 21dd05005a19059d99ac058314ba314ee0c47746[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Jan 22 14:09:27 2021 +0100
+
+    ajout conf pour php buildé maison
+
+[33mcommit acd9a9739e18c2d1cc83df37b23db0d0ab0633c5[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Thu Jan 21 13:14:17 2021 +0100
+
+    correction chemins
+
+[33mcommit 2a13b20d531bbf77679a2b34434d89a0135e5bed[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 21 20:43:43 2020 +0200
+
+    Put 'multi' Port and Domain variables in a separate 'srvconf' file:
+      - change 'multi/bake' to create this 'srvconf' file at build time
+      - change 'multi/run/start' and 'multi/run/run' to use it
+    Exit 'multi/run/run' on 'docker run' failures
+    Update README.md (mostly autonomous container use for 'multi')
+
+[33mcommit 8d6f5f4e0c37723f40b5c6fe20f19ec07a8c12d7[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 21 08:18:45 2020 +0200
+
+    Do not try in 'bake' to build 'multi' for Debian 8 (jessie)
+
+[33mcommit a8777145704f17e9a263962b3152201bcef6ef8e[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 14 12:31:14 2020 +0200
+
+    Correct previous commit: chmod, not chown! (sorry)
+
+[33mcommit fc3ee28e33fc53f1580b10e22006fc186205ea01[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 14 12:23:06 2020 +0200
+
+    Add 'find pkgs | xargs chown go-w' to tools/run/build and php/run/build
+
+[33mcommit 5ef763001d482c9ef0b9ef57eeab73f429a8f527[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 14 12:00:49 2020 +0200
+
+    Add check for lintian failures in tools/run/build and php/run/build
+
+[33mcommit 17447dffdd396bf65cf56113adb7107f35fd76d0[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 14 11:31:59 2020 +0200
+
+    Add umask 022 to tools/run/build
+
+[33mcommit 780a1148feb7bf252395d3d8b699c71bf56b162e[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 13 20:06:43 2020 +0200
+
+    Add tests to abort tools/bake on package compile or assembly error
+
+[33mcommit 84e01e16ebc1e9c752b94a17e460028c437fdadd[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 13 19:48:25 2020 +0200
+
+    In 'bake':
+      - ignore spurious docker-image tag
+      - do not run 'multi' on the latest Debian version unless env MultiRun=y
+      - display toRm: / toMk: values (with 'bake -n') on the same line
+
+[33mcommit d5467e84a022edab4f543da77deb91522b5e5d06[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Tue Oct 13 17:40:31 2020 +0200
+
+    correction script envoi
+
+[33mcommit 364b91bcd094f800a68a04dafaac35972318a17b[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 13 15:14:31 2020 +0200
+
+    Sort elements to remove by Debian version in 'bake'
+
+[33mcommit 18ed0ba6fab5e64a3b80d10f2abb06b15622130a[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 13 14:25:13 2020 +0200
+
+    Update Done-CdT.txt
+
+[33mcommit cc13b97271a524c40d7555e919ec151cb8776fda[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 13 14:04:55 2020 +0200
+
+    Update 'bake' and multi/bake:
+      - add and update comments
+      - display some variables with the -n option (toRm,toMk,rmObjs,mkObjs)
+      - make './bake 9 10 multi ...' work (was giving errors)
+      - in 'bake mk', build all possible 'multi' images, but only run the last one
+      - modify multi/bake to accept a '-' argument for 'no run'
+      - put default values for multi's Domain and TCP port at the top of 'bake'
+      - modify multi/bake to egrep these values from 'bake'
+
+[33mcommit 4826d0f023efc59b9b59a90831bfd5b9afaf83c9[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 22:09:18 2020 +0200
+
+    Correct PEAR package skip
+
+[33mcommit a7570e7f487ffc065a0feb1307765dc6c93a0758[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 20:23:08 2020 +0200
+
+    Add forgotten removal of DEBIAN/postinst / prerm in phpdbg for Debian 8
+    Add missing version to Conflicts: field in DEBIAN/control for phpdbg
+
+[33mcommit 03128bf1346e9a716c8788c74d27e56297f9bfdb[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 17:51:11 2020 +0200
+
+    Add PEAR package skip to php/run/build (for when --with-pear will be unknown)
+
+[33mcommit ab78a12643fe04182df9723333e5a95ee2a2a695[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 17:30:12 2020 +0200
+
+    Update README.md
+    Update Done-CdT.txt
+
+[33mcommit f8c8beef579ea3280e69d46d621a5dc2aca0e73f[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 17:28:32 2020 +0200
+
+    Add -ti options to docker command-line if .norun in php/bake and tools/bbake
+
+[33mcommit 6a1bb3d4d1fe9d3697725bcaf49545441d496a2b[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 17:25:59 2020 +0200
+
+    Replace internal 'bake' variable 'CurDeb' with better named 'AllDeb'
+
+[33mcommit d07dc520e9652e9bb19f32f5e4fcee6a6492a1b3[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 17:22:55 2020 +0200
+
+    Correct libreadline version in debian/10 (was a temp debian-repo error?)
+
+[33mcommit 146eab9ddbc4476071e55fd06316599fb990d015[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 14:02:42 2020 +0200
+
+    Add more 'fail if bad' checks after package assembly, install and test
+    Collect all packages in error and display then together
+
+[33mcommit b552128c3626d6fd11cb4c721e526545c7a15eb2[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 13:55:37 2020 +0200
+
+    Move phpdbg and man page to a separate new '04-phpdbg' package
+
+[33mcommit c31db7b04d51b3c04fa5e08ef0c2bf8514d4402b[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 07:44:58 2020 +0200
+
+    Add libreadline to debian/*/Dockervars.sh and --with-readline to php/run/build
+
+[33mcommit 3c6e8b0be09455d8f9f41884ba61cc3bd4d3f8f5[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 12 07:36:37 2020 +0200
+
+    Make --with-pear a non-constant configure option in php/run/build
+
+[33mcommit 8085c5f0e45a38d19173c99286d905f5421fb9cd[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sun Oct 11 13:48:59 2020 +0200
+
+    Add new (in PHP 7.4) --with-zip configure-option to php/run/build
+
+[33mcommit a54b87a86fa3305a3fa4e2f4443f9a2bb4475ceb[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sun Oct 11 12:38:15 2020 +0200
+
+    Register 05-mysql as replacing 04-mysql
+
+[33mcommit eade6bcbca7e01f71a0e20072314a2d25488bf05[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sun Oct 11 12:36:49 2020 +0200
+
+    Rename 04-mysql to 05-mysql in php/pkgs/
+
+[33mcommit 5841941c604cbcea956cd2d6903d01792bdce8f0[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Oct 9 10:54:29 2020 +0200
+
+    Adapt pkgs/00-cli's lintian/overrides to lintian (i.e. Debian) version
+
+[33mcommit 136efca8765fdbd81bbebdec51b6139f2a623304[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Oct 8 11:10:16 2020 +0200
+
+    Add report of all mods done sinc commit 218d6d94
+
+[33mcommit 392cb6da3c326c37c6fb30f06bda207c89f91f97[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Oct 8 11:03:07 2020 +0200
+
+    Update tools/bake to show success or error after container run
+
+[33mcommit af5a07e05b0f1c78312cbca2cc60aad5a15b7ee7[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Oct 8 10:32:20 2020 +0200
+
+    Update lintian/overrides for Debian bullseye's lintian
+
+[33mcommit 330875fa81ef66b22938e8197cb428c239a9c4a3[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 7 23:45:15 2020 +0200
+
+    Change Apache Listen port when not 80 in multi/run/start
+
+[33mcommit 2fecae88d796ac96826708bd6b416a92c18d3c3b[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 7 23:41:40 2020 +0200
+
+    Correct and enhance multi/bake:
+      - correct handling of LIB7x_ variables from debian/*/Dockervars.sh
+      - correct default value of MultiPort variable
+      - add a check for docker build failure
+
+[33mcommit 22ced6339869b508f41fdef580958ee180f4c6bb[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 7 22:38:06 2020 +0200
+
+    Add check for docker build failure in tools/bake
+
+[33mcommit d8da7376c679f9de1ad460a7f0b0e48959d78a4d[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 7 22:04:43 2020 +0200
+
+    Change some exit codes in php/bake
+
+[33mcommit eb2a2c6a2aca263b7911b07c07b7d18c9374d316[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 6 23:44:22 2020 +0200
+
+    Update lintian/overrides for phpdbg in pkgs/00-cli
+
+[33mcommit 356d98d41b027b42e3c702f8d680757e1358853c[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 6 23:39:14 2020 +0200
+
+    Correct copyright of the epi-php-setup package
+
+[33mcommit 580ac8a270f1930a2fb0a12efdc53ba71525686d[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 6 16:33:34 2020 +0200
+
+    Add lintian/overrides for phpdbg in pkgs/00-cli
+
+[33mcommit 6e02265d1bc97d2a65c4ebeaf63e2a37c2e49654[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 6 16:32:09 2020 +0200
+
+    Allow specifying multi's top-level-domain in the MultiDomain env variable
+    Allow specifying multi's TCP port in the MultiPort env variable
+
+[33mcommit 70b16bebaf578f92f1ab60be3fdd5f0bc169ec05[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 6 16:25:00 2020 +0200
+
+    Put PHP-version-specific packages in DEV7x_ & LIB7x_ in debian/*/Dockervars.sh
+    Modify php/?/Dockervars.sh and multi/bake to use these DEV/LIB variables
+
+[33mcommit 9a42cf311be38bb98a4f1e98db980ea98940aa7e[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 6 16:21:42 2020 +0200
+
+    In php/run/build:
+      - enhance the timeout on 'make test': make will not abort
+        but just show the failing test and continue
+      - correct build failure when not in .debug mode
+      - add timestamps to 'make' / 'make test'
+
+[33mcommit 171fa4519b0062fd686b6fff116995ada92a535a[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 6 16:16:05 2020 +0200
+
+    Enhance and correct the main 'bake' script, php/bake and tools/bake:
+      - allow bake to run in the background (disable docker's -ti options)
+      - add -n option to show commands instead of running them
+      - make 'bake rm 8' (e.g.) only ask to delete Debian 8 files/docker-images
+      - allow 'bake multi 9' (e.g.) (would force before the latest Debian version)
+      - make 8,9,10,11 sort in numeric order in 'bake ls' and 'bake rm'
+      - extend DebDir (Debian directory list like {8,9,10,11}) internal handling
+
+[33mcommit 32339140525cca6382b53dbfde9743e2312f3cb4[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 6 14:31:22 2020 +0200
+
+    Add new PHP versions 7.2.34, 7.3.22 and 7.4.11
+
+[33mcommit 0cde57cf65608e9d73fae92353956b12e630d082[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Oct 5 10:57:23 2020 +0200
+
+    Remove -ti options from 'docker run' commands in 'bake'
+
+[33mcommit 5b0791cc8953cd86ee3002a161ca099419d715b7[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Sep 29 10:22:54 2020 +0200
+
+    Suppress all useless "`" in README.md
+
+[33mcommit bd217b4697d937b926f9a956e94572a268e47f39[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Sep 29 10:17:45 2020 +0200
+
+    Add a timeout to 'make test' in php/run/build
+
+[33mcommit 62d0309d55d8a54ae31a5ce5d02ba6d710c60e30[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Sep 29 01:19:30 2020 +0200
+
+    Add wddx legacy extension to PHP 7.4+
+
+[33mcommit 51f306c66df3071a8adc436f6325b366bfc149c5[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Sep 29 01:15:43 2020 +0200
+
+    Use system's libzip when ZIP extension is deprecated or missing (7.2+)
+
+[33mcommit 3f876750cb22cd85827aa55ce7a6b44e040dd8cf[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Sep 29 01:08:17 2020 +0200
+
+    Update php/run/build to:
+      - check more config-options, for use only if present
+      - handle config-options with values
+      - enable phpdbg as a standard config-option
+      - check for existence of build/buildcheck.sh before greping it
+
+[33mcommit f1374b307b837e9618d34cd82e6f29b5cb214798[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Sep 29 00:53:13 2020 +0200
+
+    Add mods and hooks for Debian 10 (buster)
+
+[33mcommit ee24c9cadf47c4df8d869ac195418e4dfd3f8036[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 28 11:29:42 2020 +0200
+
+    Add check to not use ereg's legacy code if native extension would exist
+
+[33mcommit 25e3154f9e96d0653228848f77c3f9a9763c5cda[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 28 11:19:04 2020 +0200
+
+    Suffix phpdbg and usr/lib/epi-php with PHP version, update 'alternatives'
+
+[33mcommit 8707f94d2b7fad908c05c6d550576c3cce35e722[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 28 11:13:35 2020 +0200
+
+    Add php7.4-cli to Conflicts in php/pkgs/00-cli/top/DEBIAN/control
+
+[33mcommit 700637719a750f5c1c7002d972a84b7592c4d9c8[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 28 11:07:34 2020 +0200
+
+    Remove from 02-mod's-postint-script commands for files moved to epi-php-setup
+
+[33mcommit d67aeb650914c98fa49d94ce6d42c7e131adcd22[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 28 10:54:48 2020 +0200
+
+    Update php/bake to stop on build errors and display final result in color
+
+[33mcommit 4cbb0142fe9b9ab69c96df054f63cc2e1a30c615[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 28 10:49:10 2020 +0200
+
+    Remove dependancy on epiconcept-arborescence for php/pkgs/{02-mod,03-fpm}
+
+[33mcommit 73c32fcf56047e3826e5ff0a3fc2467a9e00be4a[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 28 10:46:42 2020 +0200
+
+    Correct deprecated '#' comment char in php/pkgs/00-cli/top/etc/php/php.ini
+
+[33mcommit 6e4f13d49495f2ccfb5041de93f355797e0d68ef[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 28 10:42:07 2020 +0200
+
+    Update main 'bake' to show and compile versions in numeric order
+
+[33mcommit 21203fc83a5e95d0db0e76e8ece881b12d29b4ae[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 28 10:41:19 2020 +0200
+
+    Add new PHP versions 7.3.22 and 7.4.10
+
+[33mcommit f84872e3d80f6b8e119537d086ca556c1e8961a7[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 28 10:38:41 2020 +0200
+
+    Add support for Debian bullseye (11, unstable so far)
+
+[33mcommit 5fafbb3c008e8e23dc8557ce4768ed0df97bdf9a[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sat Sep 26 19:22:55 2020 +0200
+
+    Add the 01-php-setup package files to tools/pkgs/
+    Modify tools/run/build to use 'epi' as Base instead of epi-tools
+
+[33mcommit 27fbc53a8a484a1a91eaceab786e40629010c851[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sat Sep 26 19:03:04 2020 +0200
+
+    Rename 00-waitpid/ and 01-php-setup/top/usr/bin/php_clean_sessions.sh in tools/pkgs/
+
+[33mcommit f091ec9a67c37ccc5306b7081c967ad90e95b6ea[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Sep 25 07:20:32 2020 +0200
+
+    Move Epiconcept's PHP setup files from php/pkgs/02-mod to tools/pkgs/01-php-setup
+
+[33mcommit 218d6d941b16e9cc3dab2a121cd87510f807e156[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Tue Aug 18 10:52:35 2020 +0200
+
+    build php 7.4, ajout des libs manquantes
+
+[33mcommit 848aaaa25c3e53ef7a219dfdd5c0a5c80d1a1c53[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Mon Aug 17 16:15:58 2020 +0200
+
+    ajout debian buster
+
+[33mcommit c324a74eb2b28fa1d7436ea238ec792aa7da4f03[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Fri Jul 31 18:48:17 2020 +0200
+
+    doc
+
+[33mcommit 794ba9d8d287b39435abbccfb119410ec9852838[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Fri Jul 31 18:43:42 2020 +0200
+
+    doc
+
+[33mcommit 66e098a4f1a9868b4672ff221ed85bf83b6a0d22[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Fri Jul 31 18:42:21 2020 +0200
+
+    makefile
+
+[33mcommit 58a9ebabe66cbafe397ef2b342d9dddd590ff863[m
+Merge: 6913c54 e9c2cfb
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Fri Jul 31 18:40:49 2020 +0200
+
+    Merge branch 'master' of github.com:Epiconcept-Paris/infra-build-php
+
+[33mcommit 6913c54381e34a8d815edf08e4d2eaa5408af718[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Fri Jul 31 18:40:35 2020 +0200
+
+    début image FPM
+
+[33mcommit e9c2cfb1e617d0508316a138f616f8d5f79f4493[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Jul 31 17:14:55 2020 +0200
+
+    nouvelles versions
+
+[33mcommit 1bb5b16322502c31ac3ae47a04381b09021483da[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Fri Jul 31 16:45:52 2020 +0200
+
+    ajout dépendance à epiconcept-arbo pour avoir la conf PHP dans /etc/epiconcept déployée
+
+[33mcommit cea6abfe919ea1889bf30ac01e3cb5c2312efec0[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Fri Apr 17 17:54:42 2020 +0200
+
+    droits corrects pour la cron
+
+[33mcommit 1d280bacd60e28dfe3260eaa61e6355efa40f86b[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 15 15:00:30 2020 +0200
+
+    correction sur la cron, conversion secondes en minutes et droits d'exécution sur la cron
+
+[33mcommit dbf614b92f85277ae409e4ac920865d0533e932c[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 15 02:25:03 2020 +0200
+
+    ajout fin de ligne de sécurité
+
+[33mcommit 678dddd53e8a99f951a37f80d331a2f4d27552c0[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 15 02:24:32 2020 +0200
+
+    ajout fin de ligne
+
+[33mcommit 59ecd78f31d6a476937823768ba86852c6384c29[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 15 01:46:35 2020 +0200
+
+    correction cron
+
+[33mcommit 9d28e07cd5c63208c433db960da43b45dbcf1103[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 15 01:28:08 2020 +0200
+
+    nouvelle version 7.1.33
+
+[33mcommit 277cacc2f29f20361a78758ea5ef39cfcea3176e[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 15 01:17:24 2020 +0200
+
+    intégration contournement pour apcu_bc
+
+[33mcommit 87e6cc225ea64ff0c6fb802923e8e04b6551c145[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 15 00:49:14 2020 +0200
+
+    correction cron (user oublié)
+
+[33mcommit 3203c1c525809f37e0ff2bdafcd57713f5eaca0c[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 15 00:11:48 2020 +0200
+
+    correction sur apc_bc
+
+[33mcommit 1e1b2ee6d5713a8d06f6de8e6a4ee22bb14fb24b[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Tue Apr 14 23:29:15 2020 +0200
+
+    correction sur intégration APCu_bc
+
+[33mcommit 3c00343f27fb4fb2da5fcef1695c85c480fa3d04[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Tue Apr 14 23:25:04 2020 +0200
+
+    correction script d'envoi vers files.ec.fr
+
+[33mcommit c3506de519ef312e9abc3055f88ab26acf83f9e0[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Tue Apr 14 22:08:08 2020 +0200
+
+    ajout script d'envoi des fichiers buildés
+
+[33mcommit 164bdf1c2279239f3aa6834c43be9dde84cbf1f7[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Fri Apr 10 18:32:36 2020 +0200
+
+    build 7.1.33
+
+[33mcommit f7ea2fd2dc50834bf70b6d8d5fb9689c9b30b325[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 8 19:12:41 2020 +0200
+
+    activation apc-bc
+
+[33mcommit 12e1f8ff8b71458b629635abc32f59a2afe49128[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 8 19:11:43 2020 +0200
+
+    activation si demandé pour apc et dbg
+
+[33mcommit d88a9e41859e535910602c48b98e94d7e258d895[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 8 19:11:29 2020 +0200
+
+    création de dossiers nécessaires
+    déplacement de code entre cli et mod, pour être cohérent (sessions que pour mod)
+    cron de nettoyage des fichiers sessions
+    masquage erreurs en modphp, pas en cli
+
+[33mcommit 12726e2a74dae1666484514b85568747689f6742[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 8 19:09:47 2020 +0200
+
+    ajout éléments de conf testés
+
+[33mcommit ffa3b0fbe9f73bc9f7608ce8e57b6308570e9962[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Dec 6 13:05:08 2019 +0100
+
+    Update .gitignore
+
+[33mcommit 33c4ca1c9e1e3e474668e4daac8be9526ae5cbaf[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Oct 24 14:48:32 2019 +0200
+
+    Update php/run/tests to properly remove _mod before installing _fpm
+    Reorganize PHP testing accordingly in php/run/tests and add _fpm test
+
+[33mcommit 00f65312cab59f6e4b04a55685749afb8e737188[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Oct 3 14:51:37 2019 +0200
+
+    Add/del Epiconcept's mod .ini files on mod's install/remove
+    Fixes #3
+
+[33mcommit d739dbb537fd26be495914f29208854a72be4754[m
+Merge: b3da16d b7148e2
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Oct 3 13:50:56 2019 +0200
+
+    Merge branch 'master' of github.com:Epiconcept-Paris/infra-build-php
+
+[33mcommit b3da16d9b1cae3700eaf7462c5280a5430d48255[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Oct 3 13:41:18 2019 +0200
+
+    Add php7.3 to cli and fpm Conflicts
+    Set mod Conflicts to libapache2-mod-php,php-fpm (all other mods+fpms)
+    Fixes #1 (to be tested)
+
+[33mcommit 400a4f5ac57131590743d12b5d3fc599efc8b7a8[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Oct 3 12:49:59 2019 +0200
+
+    Update tests/mypkg to handle a package list and reuse its docker image
+    Simplify tests/mypkg source and run/build file-trees
+
+[33mcommit b7148e2f7d049f641e1ca55fd0702e39b340597e[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Thu Oct 3 00:34:37 2019 +0200
+
+    nouvelles versions
+
+[33mcommit a47bfeccea969bdda87ac57f0047f1997a5c1709[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Oct 2 20:45:58 2019 +0200
+
+    Add tests/mypkg build frame to test package conflicts for issue #1
+
+[33mcommit 11bbc37dace14ff1c2c7954e0cc46b55718693cb[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 30 13:49:10 2019 +0200
+
+    Add prerm script to disable Apache2 mod before removal
+    Fixes #2
+
+[33mcommit 396406817eb8600cdd2ac58dff2a21845a07daba[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 30 11:33:58 2019 +0200
+
+    Update bake to pretty-print debian versions above 9 with 'bake ver'
+
+[33mcommit 35d6b7b964d41e33dedbfe3c0c7ed1dc8a2f0272[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Sep 27 11:49:41 2019 +0200
+
+    deux versions de plus
+
+[33mcommit 97f74339636b0b7172e44c2bbf55c4a9d8084a60[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Dec 14 10:03:34 2018 +0100
+
+    Join apt-get commands on a single line in Dockerfiles
+    to solve docker cache problems with apt-get update
+
+[33mcommit 891819c1379359a330cd1bd95ea11598b54fcf6f[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Dec 13 13:33:35 2018 +0100
+
+    Add PHP and Debian versions to container name, to allow simultaneous builds
+    Update PLANNING.md and README.md about it
+    Check that each docker image exists before running it
+    Do not build PHP 7.0 anymore
+
+[33mcommit 42af7a00c5eddadda88f39c1f5195cc1595fb567[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Dec 12 11:09:32 2018 +0100
+
+    Add 'latest' command to bake script (display only latest PHP versions)
+    Simplify missing.sh accordingly
+    Add (after check-builds) BUILD_NUM for PHP 5.6.39, 7.0.33 and 7.2.13
+
+[33mcommit c56e8aad55b8016b5be8cce38dd25a1f5360135f[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Dec 7 21:54:01 2018 +0100
+
+    Update README.md
+
+[33mcommit 904ca809bae0b1d39f417e09df6c3a950b992154[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Dec 7 16:27:18 2018 +0100
+
+    retrait sudo inutile
+
+[33mcommit 434295a875dc05c99d9fe418a5b79f6d335a1614[m
+Merge: eb67311 7772117
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Dec 7 16:18:20 2018 +0100
+
+    Merge branch 'master' of github.com:Epiconcept-Paris/infra-build-php
+
+[33mcommit eb673115df0b60ae06d13701f748b33301b58133[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Dec 7 16:17:50 2018 +0100
+
+    correction livraison des paquets vers repo apt, nouvelle version php
+
+[33mcommit 7772117e60085ab5ba7473215c08574a182d5bb6[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Fri Dec 7 15:41:00 2018 +0100
+
+    Update README.md
+
+[33mcommit a056cd2e110639111906c747d739d1c3811e5d1c[m
+Author: Cedric GIRARD <cedric@files.epiconcept.fr>
+Date:   Fri Dec 7 15:31:58 2018 +0100
+
+    ajout scripts d'intégration
+
+[33mcommit 92842518a1620fd7565c084ab2a59531eb83ecea[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Wed Nov 7 17:50:21 2018 +0100
+
+    doc
+
+[33mcommit 3f3dc3c455de9ef367119d14643535c155af999a[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Wed Nov 7 17:46:29 2018 +0100
+
+    doc, et build d'une nouvelle version
+
+[33mcommit 71f03d01f7f5ecfac35d6d5881cd39c2be217709[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Oct 9 08:41:24 2018 +0200
+
+    Factorize AddPECL in php/<Maj>/Dockervars.sh to a separate php/lib/AddPECL.sh
+    Cleanup php/<Maj>/Dockervars.sh and php/<Maj>/hooks/ files
+    Make 5.2.17/jessie build also without our custom mysql .deb files
+
+[33mcommit e0d55b1c1f3c6afe1f43ff03835f4356c618b6e9[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Oct 4 09:53:06 2018 +0200
+
+    Remove duplicate --disable-debug in php/run/build
+
+[33mcommit 2445f7b85b928cb331325268d251b88b2a553004[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Sep 19 10:37:42 2018 +0200
+
+    Remove useless "" around `...` in all "`...`" constructs
+
+[33mcommit 0c7348f00c33c208c73b64db9c946032a3ae8887[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Sep 18 18:28:40 2018 +0200
+
+    Add DocRoot as optional argument to multi/run/run
+    Update multi/bake accordingly
+    Move the copies of .conf files made by multi/run/start to the 'logs' directory
+
+[33mcommit b4832aed064f1b66950720814176cf26bc18b993[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sat Sep 15 10:29:44 2018 +0200
+
+    Add (after check-builds) BUILD_NUM for PHP 5.6.38, 7.0.32, 7.1.22 and 7.2.10
+
+[33mcommit d8802eb29d231184ce0f5bed0bc4d9a20abdc5cb[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sat Sep 15 10:28:10 2018 +0200
+
+    Change 'multi' to handle a common DocumentRoot and a template siteconf.in
+    Make multi/run/run a template and move tail code from multi/bake to it
+    Make multi/bake call the run script derived from multi/run/run
+    Update README.md
+
+[33mcommit 910fda86cffcc3b5db46bdb8778d7dc8a7ba5e63[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Sep 14 14:02:03 2018 +0200
+
+    Correct minor error in info.php title
+
+[33mcommit ef700e7111214340b74d66f147ac3f92a3dcb5d4[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Sep 12 21:32:57 2018 +0200
+
+    Add last change to make *contents* of all PEAR 1.10 packages truly identical
+
+[33mcommit 3c229b696d14a3eb6faf715e7a2c5d7c3e402b55[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Sep 12 16:04:47 2018 +0200
+
+    Add debian version as '+deb<n>' to package names
+
+[33mcommit a207528b005cdda8155532d20d674fbc84a88209[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Sep 12 16:03:04 2018 +0200
+
+    Add changes to make all PEAR packages identical (except _lastmodified)
+
+[33mcommit 2b4883e024e6e874efe1a9b1ef4a5d45edf68e41[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Sep 12 15:20:59 2018 +0200
+
+    Add user to tests, tools & multi to make all files owned by our user
+
+[33mcommit 9f6fd09613f4ce2a4e3dddda876be77f3e2592f2[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Sep 11 14:13:57 2018 +0200
+
+    Make detection of debian version stronger in tools and multi
+
+[33mcommit 4a1fe7326b8eaf8a3320e5d06dab4f8f4e091120[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 10 16:51:00 2018 +0200
+
+    Correct minor display bug in 'bake'
+
+[33mcommit 581c362955a4f8ad2933b07da6a8b3f8f7e9bc64[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 10 16:45:32 2018 +0200
+
+    Make 'bake' require at least 1 arg ('mk' is still the default with any target)
+    Add a 'ver' command to 'bake' and remove that function from php/bake
+    Always use mkre to select PHP versions
+    Cleanup docker rmi epi_multi_php in 'bake'
+    Update README.md (changes + add 'bake' doc)
+
+[33mcommit 54086777508a528a85b519dab3dd139c0f627bf2[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 10 13:00:59 2018 +0200
+
+    Correct some echos in ./bake and add the special debian version '-' (all)
+
+[33mcommit e0c3528abf64de547884a17647d8e1135c9125c7[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 10 10:29:56 2018 +0200
+
+    Add support for PHP 7.3.0beta. To build, create php-7.3.0.tar.bz2 like this:
+        cd php/7/7.3.0
+        curl -ORL "https://downloads.php.net/~cmb/php-7.3.0beta3.tar.bz2"
+        tar xf php-7.3.0beta3.tar.bz2
+        mv php-7.3.0beta3 php-7.3.0
+        tar cjf php-7.3.0.tar.bz2 php-7.3.0
+        rm -rf php-7.3.0 php-7.3.0beta3.tar.bz2
+    then
+        cd -
+        ./bake 7.3
+
+[33mcommit 812307df22c5896fc63a0889d9f6d647f873b3f5[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Sep 10 09:42:09 2018 +0200
+
+    Extend top-level 'bake' to list,make,remove any combination of PHP-distribs/tools/multi
+    Allow PHP versions from a merge of network versions and existing PHP-distribs
+        This allows to build PHP (beta,rc) versions not already registered on the network
+    Add multi/mkre to cleanly disable multi on jessie
+    Do not mkdir multi/pkgs if no PHP-distrib specified for multi/bake
+    Do not mention available PHP-distribs in multi/bake if there are none
+    Save php_test_results in PHP build tests as a constant php_test_results.txt in logs
+    Update README.md
+
+[33mcommit fa277a36552ac53c39f10f1ba2eb07463fba36de[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Sep 7 16:27:52 2018 +0200
+
+    Add bin/phpcache script to list/check/save/remove cached files in php/
+
+[33mcommit 5945fd48e9750cff85c0f67f427c3b9baf6f21e3[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Sep 6 10:16:04 2018 +0200
+
+    Check PHP source archive when fetched in php/bake. If wrong, try next URL
+    Make lookup of latest Debian version stronger in php/bake
+    Put PHP-source-archive extension in global $Ext in php/bake and php/run/build
+    Add explicit umask in php/run/build (needed for lintian)
+
+[33mcommit ee9e45edc3bbaf193027a498e020cde441dd3c44[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Aug 27 16:40:32 2018 +0200
+
+    Show PHP handler in multi/run/start and multi/bake
+
+[33mcommit 491e5cf59c27a162af3c3fd8113f76cada0155b8[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Aug 27 11:59:38 2018 +0200
+
+    Correct tiny display error in 'bake'
+
+[33mcommit 784fb8c89c800adf441caf26996c456f9bec2990[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Aug 27 11:48:16 2018 +0200
+
+    Make php-fpm notify its start properly to systemd
+
+[33mcommit 1192d256df2c506783a5aaa74ab78f9581d7c288[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Aug 27 11:42:28 2018 +0200
+
+    Rename host-side build scripts to bake (all.sh), php/bake (mk.sh),
+        multi/bake (multi.sh) & tools/bake (tools/mk.sh)
+    Dispatch Dockerfiles to php/, tools/ & multi/ and remove docker/
+    Move all file COPY commands to the $...COPY variables in Dockerfiles
+    Move pkgs/ in top directory to php/
+    Move all run-side files to run/ subdirs of php/, tools/ & multi/
+    Make php/run/build find the latest PHP version from the PHP source filename
+    Add (docker) run script to debian/*/multi/
+    Add debian/*/mkre files to define PHP versions to make by default
+    Limit PHP release and build numbers to 2 digits
+    Change all CMD commands to exec syntax
+    Update README.md
+
+[33mcommit 1d656ad5ed56e61e015c35101536315f5d860e89[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sat Aug 18 11:53:41 2018 +0200
+
+    Separate versions to rm and to mk in all.sh + other enhancements
+    Add PHP 7.1.21 BUILD_NUM, built on jessie and stretch
+
+[33mcommit 16cc118f1faddcb54452d4287de3c57cccdb075c[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Aug 17 23:52:25 2018 +0200
+
+    Move all package.xml files (in PHP extension hooks) to extension directory
+    Correct our last lintian warning about pear manpage (phew) !
+
+[33mcommit c1ce7e6f11dc844cb98fbc4d0b8aeb614a2cd37b[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Aug 17 18:28:10 2018 +0200
+
+    Add PHP 7.2.9 BUILD_NUM, built on jessie and stretch
+    Add to all.sh a search for new versions, with fallback on existing ones in php/
+    Add this fallback also to mk.sh for version checking
+
+[33mcommit 68c4568ecd2454ca4702ad47b33e365c1820f40d[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Aug 17 13:45:08 2018 +0200
+
+    Correct typo (-Wall twice) in waitpid's Makefile from previous commit
+
+[33mcommit 6617cf43997ffd89ae80911eb37d84e9d578c30e[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Aug 17 12:26:34 2018 +0200
+
+    Correct lintian warning hardening-no-relro for waitpid on jessie
+
+[33mcommit 7b08f45558f38515ea8a59977dc9968ffd3a5ae5[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Aug 16 23:13:08 2018 +0200
+
+    Correct all.sh output: docker output _needs_ the CR removed for mk.out
+
+[33mcommit bd12ca5fdfb76d49bc343037ca2626a2b6678b41[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Aug 16 22:46:09 2018 +0200
+
+    Make the mk.sh script and hooks usable even with stale URLS or network failures
+    Add the non-PECL hook files (most volatile) to the repo (same goal)
+    Move the PEAR_Manpages hook and file to new php/hooks/ and php/files/
+    Add 7.0 to the php/build:SupVer list of "supported" versions (as it compiles)
+    Correct bug with explicit debian version in tools/mk.sh, and add start/end date
+    Correct and enhance the all.sh script
+
+[33mcommit e3009532c2654015af47ea0ab5bbe08b723e2869[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Aug 16 09:20:08 2018 +0000
+
+    Move Dockerfiles to a new docker/ directory
+    Change mk.sh, multi.sh and tools/mk.sh accordingly
+    Add a global all.sh script to build/clean all current versions
+
+[33mcommit b575a5aecaae7908bebfd4323305ff3bd86a09e0[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Aug 15 22:01:24 2018 +0000
+
+    Add forgotten OAuth extension to PHP5 builds
+    Add FileInfo extension when missing from PHP5 (5.2)
+    Add legacy ereg extension to PHP7
+    Disable APCu's APC backward compatibility when option exists
+    Cleanup info.php's HTML, add mhash/ereg detection and enhance page title
+    Reformat CMD message in Dockerfiles .bashrc
+    Show background command in multi.sh
+
+[33mcommit 0f9efec51c2d478fdd76fbacc6f8f85cf7228182[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Aug 14 19:18:32 2018 +0000
+
+    Remove the php/run script, useless with the extra echo in .bashrc
+
+[33mcommit f33d076ea840daa0152d8c1128c923ae63b05926[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Aug 14 16:30:19 2018 +0000
+
+    Make a .deb for the waitpid binary, using a docker build image (in tools/)
+    Use that .deb in the multi.sh image, building the waitpid .deb if missing
+
+[33mcommit 863ecd3b24eec2ed3da129aeb43e6ef689d40fb9[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Aug 14 05:27:28 2018 +0000
+
+    Add the rest of TODO_NEXT.md to the end of README.md, delete TODO_NEXT.md
+
+[33mcommit faa04df13df5a15766efe5bdd1e343160b11e0ef[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Aug 14 05:17:11 2018 +0000
+
+    Correct one more typo in README.md
+
+[33mcommit 3a62d09833f7178615f47bb1fc43c71a26c02efc[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Aug 13 19:32:10 2018 +0000
+
+    Correct some typos and make minor enhancements to README.md
+
+[33mcommit 9909f17891115ce053d23808263960f8d1df5409[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Aug 13 18:34:54 2018 +0000
+
+    Add mysql package (when it exists) to multi.sh packages
+    Restart php-fpm as well as apache2 in mysql package's postinst/postrm
+    Add fake /sbin/runlevel and tweak docker's policy-rc.d to make invoke-rc.d work
+    Simplify mod package's postinst as a consequence
+    Make /etc/init.d/php-fpm status return proper exit codes
+    Re-use the epi-multi-php:... image when it exists. A build needs a docker rmi
+    Add virtual hostname formatting with an optional HOSTFMT environment variable
+    Update README.md, PLANNING.md and TODO_NEXT.md
+
+[33mcommit 7da9eff357ad3e596c75fd70c8374d16a989ac14[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sun Aug 12 18:08:19 2018 +0000
+
+    Move all multi files to debian/<Debian-version>/multi/{pkgs,www,logs}
+    Create minimum sites in multi/www with multi.sh instead of in dist with php/start
+    Remove our user, now useless, from the multi image (multi.sh, Dockerfile, php/start)
+    Add to multi a waitpid utility for easy and proper docker -d, compiled at build time
+    Make our PHP packages owned by our user after build/check
+    Restrict PHP minor version to a single digit
+
+[33mcommit 91f486dc6d35985184a355d0e11af930ab68f0db[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Aug 10 21:17:35 2018 +0000
+
+    Add to the multi container a user copying our user on the docker host
+    Use that user to create directories and files for the PHP sites
+    Enhance the background / foreground indications at the end of multi.sh
+
+[33mcommit 6ab4a49974a99a76ab1889fde1af35ff3e1fed88[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Aug 9 04:57:41 2018 +0000
+
+    Added a primitive background mode to php/start
+
+[33mcommit 3b2c0ced1c2d8adee8754c270b6cd66cea956d9e[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Aug 9 04:20:06 2018 +0000
+
+    Correct some old (a2enmod) and recent (fpm init.d) lintian errors/warnings
+    Add systemd handling to pkgs/03-fpm's pre/post scripts (cannot test with Docker)
+
+[33mcommit 07c99f1bb30b15ea4c36f983ab10cf221f7a0e54[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Aug 7 08:51:41 2018 +0000
+
+    Added multi.sh script and files to test several PHP versions together
+
+[33mcommit cc431572b8f4c51fe80795168fde23d01e0e20d6[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Aug 7 08:18:47 2018 +0000
+
+    Chmod +x pkgs/03-fpm/top/etc/init.d/php-fpm
+
+[33mcommit 9258b72c0d59eefced196adee9f398599a2bc7b1[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Aug 6 18:26:33 2018 +0000
+
+    Add an init.d script to the fpm package, it is needed by docker containers
+    Made minor changes to mk.sh (factorization, changed $Sub to $Rel)
+    Update TODO_NEXT.md
+
+[33mcommit c4cccf8efe7e06b0aeb8c9ae63d9d492eac2663c[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Aug 3 09:47:05 2018 +0000
+
+    Add Apache2 config to pkgs/03-fpm
+
+[33mcommit b3bbfa8e371ca862e8e06eb71ea53a2b72c5ceda[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Aug 3 08:15:13 2018 +0000
+
+    Add to the build container a user copying our user on the docker host
+    Use that user to configure, build and test PHP (not for install)
+    Show unexpected failed tests after make test
+    Remind of main container command in .bashrc (for debug)
+    Add to php/build a SupVer variable containing supported Maj.Min versions
+    Update 02-mod's php.conf to Apache 2.4 syntax (from 2.2)
+    Publish port 80 in tests container
+    Correct 04-mysql's postinst and postrm that were not using %MMD%
+    Add apache2.service detection as a check for apache2 installed
+    Remove unneeded PHP version from tests container and script
+    Correct some wording in mk.sh, update TODO_NEXT.md
+
+[33mcommit c334875957f0562caea3c2e98d3b9ccf7871e238[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Jul 30 20:41:07 2018 +0000
+
+    Change bin/conf paths to allow simultaneous use of several PHP versions
+    Patch all necessary files to allow that and use update-alternatives
+    Only show supported versions (5.2,5.6,7.1,7.2) in mk.sh
+    Update "Conflicts:" fields in control files
+    Remove pkgs/00-cli/moves, integrate its content in pkgs/00-cli/install
+    Add non-default config files to pkgs/03-fpm
+    Add LANG=C to Dockerfiles
+    Remove apt-get -yf from php/tests
+    Update PLANNING.md and TODO_NEXT.md
+
+[33mcommit 7088ed5a681e4d2791fe9c4f961aed69e3b0fcb8[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Jul 26 17:03:31 2018 +0000
+
+    Remove install-programs make target, related to discarded install-build
+    Remove empty directories after move from 00-cli to other packages
+    Minor cleanups of mk.sh messages
+
+[33mcommit 7bd497ce5235d1633706d80eed45f3d90e9857c8[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Jul 26 13:43:14 2018 +0000
+
+    Move chmod +x to 01-pear/install
+
+[33mcommit 355fc4755cda28219bf37ea0319180172895bd9d[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Jul 26 10:19:46 2018 +0000
+
+    Rename 01-cli pkgs dir to 00-cli
+    Add 01-pear pkgs dir for a separate PEAR package (with its own version)
+    PHP binary extensions are now in /usr/lib/php/<PHP-API>
+    Add some Provides: in control files
+    Update TODO_NEXT.md
+
+[33mcommit b2daf15d1bb4a2bc8598baccbcde92f92d4c284c[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Jul 25 08:37:47 2018 +0000
+
+    Make php*.files from "tar tf" if missing, but php*.tar.bz2 exists
+    Add some debug files
+
+[33mcommit ea2ba1175624d9cc8644408e2a131b743dcf92e7[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Jul 25 07:35:03 2018 +0000
+
+    Add check of dowloaded PHP source
+    Build PHP 5.6.37 and 7.1.20
+
+[33mcommit 0d7df04f809b75dd8d5db68efb0656a6794ea2b2[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Jul 24 21:28:59 2018 +0000
+
+    Build PHP 7.2.8
+
+[33mcommit d63c79a408f35994f5e299ad988c1d6f9a99a723[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Jul 24 21:26:25 2018 +0000
+
+    Name .deb packages epi-php-<PHPmajorVersion>.<PHPminorVersion>-<PkgName>
+    Derive <PkgName> from pkgs/ subdirs (strip the [0-9][0-9]- used for ordering)
+    Delete pkgs/*/name files, now useless
+    Add 'ServerName localhost' to apache2 config in tests, to suppress FQDN message
+    Add handling of comments in pkgs/01-cli/moves
+    Add php-fpm service file
+
+[33mcommit 31746567d593ff9f479392bf4c0ac6a22f9432be[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sun Jul 22 18:38:31 2018 +0000
+
+    Move run script to php/
+
+[33mcommit cfb6a18d1c1432146ec57b633cfb27f6e566219b[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sun Jul 22 17:36:24 2018 +0000
+
+    Remove archives directory and NOTES.md
+    Add some details from NOTES.md at the end of README.md
+
+[33mcommit 6ab075ce54d03dab3b8fd5ae6b3f2c30e0e96ee9[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Jul 20 21:40:07 2018 +0000
+
+    Add dist/.debug directory to save copies of configure, Makefile, ...
+    Update TODO_NEXT.md
+
+[33mcommit 8edcd5c633a2133b2db303ff57571f683e396f4f[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Wed Jul 18 15:25:41 2018 +0200
+
+    Update PLANNING.md
+
+[33mcommit 3908e6ead3204628e408dbc74af0899573efef4b[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sun Jul 15 09:12:12 2018 +0000
+
+    Add <Debian-version>-<PHP-version> to docker image name
+    Made minor corrections to ExtOpts and hooks processing
+    Add a check for $d existence in pkgs/01-cli/install
+
+[33mcommit e196b26bb2002573bef167ed201c4d725ebb0036[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Jul 13 18:11:14 2018 +0000
+
+    Add cleanup of PEAR 1.9 .registry/.channels files (PHP 5.2)
+    Add OpenSSL patch for PHP 5.6 on stretch (from zettasystem.com)
+    Add top-level .debug file handling to trigger $Dbg in php/build
+    Configure options are now checked from the output of config --help
+    Add special handling of --enable-phpdbg -> --disable-phpdbg
+    Add mandatory column to pkgs/01-cli/moves to allow for optional files
+    Update README.md, PLANNING.md and TODO_NEXT.md
+
+[33mcommit ce1b342c3db0a0ccac595543626431f03d4ac925[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Jul 12 17:19:03 2018 +0000
+
+    Add fpm optional package as 03-fpm
+    Rename mysql optional package to 04-mysql
+
+[33mcommit 8e5bf2ee9dd0b77ca0eed3347021ccb5cdc5d4cc[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Jul 12 14:46:43 2018 +0000
+
+    Add changes to build PHP 5.6.36 on jessie, with APCu
+    Change PHP top build dir from /usr/src/php/php-$PhpVer to /usr/src/php
+    Add apt-rdepends to BUILD_REQ (not needed for build)
+    Stop build if make fails and display error: log lines
+    Build with make -k
+
+[33mcommit e29720bf81ea7137f6ee364bf5b81f6cc75b4272[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Jul 11 00:00:46 2018 +0000
+
+    Add PHP5 with APC on jessie (Dockervars.sh + hooks)
+    Add missing lenny package mysql-common to php/5/files
+    Add libmhash2 to TESTS_REQ on jessie
+    Add autoconf2.13 to BUILD_REQ on jessie
+    Add apache2 patch for PHP5
+    Split EXTCOPY in mk.sh and hooks to BLDCOPY for Dockerfile-build and TSTCOPY for Dockerfile-tests
+    Add 'debug' extra arg to php/build
+    Made handling of extra-configure-options generic in php/build
+    Add --localstatedir --disable-debug --with-pic configure options
+    Add debian stuff to php/build to remove lintian's hardening-no-relro
+    Skip 03-mysql package in php/build (and hooks) when PHP5
+    Made some conf file's names depend on PHP's $Maj
+    Use xargs -r whenever possible in pkgs/*/install
+    Update TODO_NEXT.md, NOTES.md
+
+[33mcommit e1fffde828609917425e2ede5e9b47a6cc90ceab[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Jul 5 16:12:03 2018 +0000
+
+    Corrected $Dist directory creation in mk.sh
+
+[33mcommit 93c7d486f5a35774f61d5c2c192e8c8e2adf299f[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Jul 5 15:25:33 2018 +0000
+
+    Correct "apache2-module-does-not-depend-on-apache2-api" lintian error
+    Correct "file-in-unusual-dir .depdb"* lintian warnings
+    Override "php-script-but-no-php-cli-dep" lintian error
+    Override "non-standard-apache2-module-package-name" lintian warning
+    Add lintian/overrides comments
+    Simplify BUILD_NUM auto-incrementing and update README.md
+    Cleanup mk.sh
+
+[33mcommit 9b9ccbe21209b1351c22a89d134e32d30d37b64e[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Jun 28 13:55:00 2018 +0000
+
+    Make a separate debian/<Debian-version>/dist/<PHP-version>-<BUILD_NUM> directory for each build
+    Move there the tmp/.date file and the .pkgs-<PHP-version> (as .pkgs)
+    In the new dist directory, make a .logs subdir for container runs
+    Move there the other files in tmp (Dockerfile-*, docker-*.out). This drops tmp usage.
+
+[33mcommit 4c3cec4218cf316dac940f8a43ed39df249f2851[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Jun 28 11:24:43 2018 +0000
+
+    Add jessie support:
+        Add CLI_DEPS to debian/*/Dockervars.sh, propagate it to %DEPS% in the 'cli' control file
+        Enhance extraction of package name for older versions of dpkg-deb --build
+        Detect curl directory in /usr/include, not just symbolic link
+        Add Apache 2 switch to mpm_prefork before package tests
+    Rename (finally) /opt/php top dir (build+tests) to /opt/php-mk
+    Enhance 'Conflicts:' field in control files, based on dependance on php*-cli
+    Add --disable-rpath configure option (as debian official PHP packages do) to clear lintian error
+    Enhance ExtShow/ExtOpts gathering in php/build and hooks
+    Add debug message if extraction of package name from dpkg-deb fails
+    Update and syntax-check README.md, PLANNING.md, TODO_NEXT.md
+
+[33mcommit e27ff4357077e231afdd8a1316d3b0a454e3b2a0[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Jun 26 15:34:10 2018 +0000
+
+    Change BUILD_TOP and TESTS_TOP to /opt/php
+
+[33mcommit a32bd2b428e76e4bed99e1f3f18427a339269cf7[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Jun 26 15:02:43 2018 +0000
+
+    Correct improper return from php/7/hooks/mcrypt.sh
+
+[33mcommit e4c85e4c2ffe1098df61bdbcb6addabb702ce48e[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Jun 26 11:39:12 2018 +0000
+
+    Add explanation of BUILD_NUM auto-increment to README.md
+
+[33mcommit b6eb865a0ebd8a1894dcf8b1f09c1c8c9d59192e[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Jun 26 11:26:05 2018 +0000
+
+    Add auto-increment of BUILD_NUM if unchanged since last commit
+
+[33mcommit 73a4b426d6c0575c8a3574e17d466f42b585b72a[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Tue Jun 26 07:56:17 2018 +0000
+
+    Add MCrypt extension if mcrypt not native (PHP 7.2+)
+    Add patch to remove mysql's 'deprecated' message
+    Update pkgs/03-mysql post* scripts to remove lintian error
+    Clean up BUILD_REQ in debian/9/Dockervars.sh
+    Show configure WARNINGs at build time
+    Add some build and tests messages, cleanup temp files
+    Move hooks to php/7/hooks
+    Move hook files to php/7/files
+    Group '.gitignore's in the top level one
+    Update TODO_NEXT.md
+
+[33mcommit 8c8c52e4cdbd4dbe80e47d6f1f0afa4e44a1edca[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Mon Jun 25 17:23:45 2018 +0200
+
+    Update TODO_NEXT.md
+
+[33mcommit b2583fba6d5644fe1de0ef4dc045f21bdf7872b7[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Mon Jun 25 17:23:03 2018 +0200
+
+    suppression message de deprecation pour l'extension mysql
+
+[33mcommit 52e7500e28336a2c47936762ee3fe8045d8a4476[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Mon Jun 25 16:33:46 2018 +0200
+
+    ajout de la ligne log_errors=on dans php.ini
+
+[33mcommit 791054e5c07a6b1ce92ce64cccd3cdd90162c50d[m
+Author: Cédric Girard <c.girard@epiconcept.fr>
+Date:   Mon Jun 25 16:14:40 2018 +0200
+
+    ajout BUILD_NUM et ignorer quelques fichiers téléchargés
+
+[33mcommit 1d28407a9f8f055d7a6fd0049f26c3f6d615596e[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Jun 25 10:06:54 2018 +0200
+
+    Update TODO_NEXT.md
+
+[33mcommit 739af0b71ad689f12ea3889c0c5db229709c9f9a[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sun Jun 24 20:07:08 2018 +0000
+
+    Move PHP 5.2 files from archives/php52_jessie/files to php/5/files
+
+[33mcommit 0b07785d7733070d670b697ad256ef399697491f[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Jun 22 21:46:31 2018 +0000
+
+    Add test for apache2 service existence in pkgs/03-mysql/top/DEBIAN/post*
+
+[33mcommit 873de9f7b8a87b6837a4daf9d6d1ce11a49c7983[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Jun 22 13:20:08 2018 +0000
+
+    Rename build.sh to mk.sh
+    Rename php/mk to php/build
+    Rename php/tst to php/tests
+    Rename .latest_logs to .logs-<PHP-version>
+    Rename .latest_pkgs to .pkgs-<PHP-version>
+
+[33mcommit e4285a6aa831cc6a26b6d91ef97dc6bbd2ad2560[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Jun 22 12:35:44 2018 +0000
+
+    Rename 01-mod to 02-mod and 02-cli to 01-cli
+    Update Depends: in pkgs control files
+    Add error checks in build.sh and pkgs/*/install
+    Add postinst and postrm scripts to 03-mysql
+    Add TESTS_REQ in tests container
+    Add php/info.php test script
+    Add opcache load to php.ini
+    Complete php/tst script
+    Enhance README.md
+    Update PLANNING.md and TODO_NEXT.md
+
+[33mcommit 6386f333619b5dffaf351973135d0ad6e721448e[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Jun 22 00:12:24 2018 +0000
+
+    Add tests container with draft script php/tst
+    Add PEAR manpages
+    Move php/run to top (.)
+    Move pkgs/.norun to top (.)
+    Correct test for .notest in php/mk
+    Correct deb name in php/mk
+    Add include_path to php.ini
+    Add begin/end timestamps and duration to build.sh
+    Add 'alias l' to containers /root/.bashrc
+    Rename tmp/date to tmp/.date
+
+[33mcommit e03b7ee73f5d23b24dd2f7ade2e5871fa294a20a[m
+Merge: 73a76fc a809746
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Jun 20 15:08:17 2018 +0000
+
+    Merge branch 'master' of github.com:Epiconcept-Paris/infra-build-php
+
+[33mcommit 73a76fcc0b6ba6ce74c22e53dbceeba8a608fb72[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Jun 20 14:58:24 2018 +0000
+
+    Move compiling to 'mk' and move 'mk' to php/
+    Prepend a number to pkgs/ subdirs to enforce an install order
+    Create a 'name' file for each package name in pkgs/ subdirs
+    Rename 'mkpkg' script to 'install' in pkgs/ subdirs
+    Make other packages depend on 02-cli
+    Add pkgs/02-cli/moves to drive mvs to other packages at 02-cli install
+    Add OAuth PHP static extension
+    Add MySQL PHP legacy shared extension (separate package 03-mysql)
+    Add a 'php/run' top script
+    Add optional pkgs/.notest to skip 'make test' in 'mk'
+    Correct DEBIAN/conffiles in pkgs/ subdirs
+    Update PLANNING.md, TODO_NEXT.md
+
+[33mcommit a8097463372c131e0d04366dd7ae771b00481905[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Tue Jun 19 11:29:53 2018 +0200
+
+    Update README.md
+
+[33mcommit a1bd796a6e04e68fd2363a21d7a8f29380584a8f[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sat Jun 9 16:52:19 2018 +0000
+
+    Update TODO_NEXT.md
+
+[33mcommit 8730aea091a88d6bf7efdfe2284fa9d195bd558f[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sat Jun 9 11:15:16 2018 +0000
+
+    Correct BUILD_NUM value that was passed $DEBVER
+    Add date file as reference for Changelog.Debian files
+    Do not refetch APCu source if it exists localy
+    Reduce apcu.sh logs
+    Move mkpkg logs to .latest_logs subdir of shared 'dist' directory
+    Add make test and log, with copy of report in logs subdir
+    Log rmed files
+    Add pear.conf to cli conffiles
+    Correct Changelog.Debian format
+    Add --disable-cli, --disable-cgi, --disable-phpdbg to mod/mkpkg
+    Update tmp/.gitignore
+    Update NOTES.md and PLANNING.md to reflect our progress
+    Add TODO_NEXT.md
+
+[33mcommit a681ca33bce9b4a3b387e43752887b0e629e0380[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Sat Jun 9 11:01:47 2018 +0000
+
+    Rename Dockerfile.in to Dockerfile-build.in
+    Move BUILD_NUM to php/$PhpMaj/$PhpVer (specific PHP version directory)
+
+[33mcommit f8266e4e6e6349beb88ff3d65f4c3a5ea09de141[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Jun 8 15:49:35 2018 +0000
+
+    Add package build number (for updates) in BUILD_NUM
+    Add APCu extension with a configure hook
+    Correct more lintian errors, add overrides
+
+[33mcommit d44c2e251680e887b6a80788ec322754c6cdc459[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Jun 8 06:39:39 2018 +0000
+
+    Correct a typo in changelog
+    Strip binaries
+
+[33mcommit 6e3bd462be8733e7cbd98b7d708f8939dd060d56[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Jun 7 13:17:34 2018 +0000
+
+    Complete first draft of pkgs build
+
+[33mcommit 9270cdf1f8362be1e51f1a8166d4c41c9646bbd2[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Jun 6 21:40:47 2018 +0000
+
+    Update pkgs builds (work in progress)
+
+[33mcommit 6d82d386915fdbb2ab6e185b61b8325189bd2b33[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Wed Jun 6 13:57:31 2018 +0000
+
+    Move {mod,cli}/paquet/ to {mod,cli}/ in a new pkgs directory
+    Add pkgs/{mod,cli}/mkpkg from {mod,cli}/docker-entrypoint.sh and {mod,cli}/scripts/build_paquet.sh
+    Move the remaining mod/ and cli/ dirs to archives
+    Add debian/ with Debian versions each containing a version name and a Dockervars.sh script
+    Add php/ with an mk script and PHP 5/7 versions each containing a Dockervars.sh script
+    Add Dockerfile.in, template for the actual (piped) Dockerfile
+    Add tmp/ for Dockerfile copy and logs
+    Update build.sh
+
+[33mcommit 5d7c9e0cfb39e1b503c1e01ed3854237ce34507e[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Fri Jun 1 17:30:33 2018 +0000
+
+    Add new build script build.sh (unfinished)
+
+[33mcommit 3b458a7edc1a002a1ab282a295d7a60bacc74729[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu May 31 17:41:46 2018 +0000
+
+    Move docker/README.md to NOTES.md
+    Rename docker/cli to cli
+    Rename docker to mod
+
+[33mcommit d9252bd47e5f7c47dd4f6176564bca4e61707ed4[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu May 31 14:39:20 2018 +0000
+
+    Move docker/old-entrypoint.sh to archives/php52_jessie/files/build0.sh
+
+[33mcommit 26f30e88f37ba2e90d4b61925bd015069afd01a5[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu May 3 16:31:11 2018 +0200
+
+    Update PLANNING.md (formatting)
+
+[33mcommit 1327103e6a80fbb4fbc6236d3f5ee607a0791178[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu May 3 14:13:52 2018 +0000
+
+    Split README.md as README.md + NOTES.md + PLANNING.md
+
+[33mcommit 347b4ec7208cc0da1b3808c039c2a6b2e3511e84[m
+Merge: ae81d6c 4edfed6
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Apr 23 14:36:22 2018 +0000
+
+    Merge branch 'master' of github.com:Epiconcept-Paris/infra-build-php
+
+[33mcommit ae81d6c00c27a4291c3ad62e2f539ba1a4e4f54d[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Mon Apr 23 14:34:27 2018 +0000
+
+    Move files/build.sh to  archives/ansible where it belongs
+
+[33mcommit 4edfed6c5f97450c360ad8a51caa1fe24810a50d[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 23 11:07:31 2018 +0200
+
+    Update README.md
+
+[33mcommit c7d00793e14e9a08c2bf2c501f83432667f7a66a[m
+Author: Christophe de Traversay <epiconcept@traversay.com>
+Date:   Thu Apr 19 13:17:59 2018 +0000
+
+    Add legacy PHP 5.2 jessie files
+
+[33mcommit 30e253bd48c4fe96d44bb5bc37a22a912f1fca6c[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Wed Apr 18 17:33:21 2018 +0200
+
+    Update README.md
+
+[33mcommit 8250778152ec5da0168f44f48c96585e05e10bc3[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 16 18:17:50 2018 +0200
+
+    Update README.md
+
+[33mcommit fcf19f30d84a8b09b4a7c28756c2beb95e349dbd[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 16 17:29:02 2018 +0200
+
+    Update README.md
+
+[33mcommit 0570b2e68703805913c5d4e0be41c42da6b2d8df[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 16 17:27:26 2018 +0200
+
+    Update README.md
+
+[33mcommit 87e70628f7edf341adb7d7f324d3a1d79b1c6db1[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 16 17:22:14 2018 +0200
+
+    nettoyage
+
+[33mcommit c3f1233a6675f0f528de8a1364de5b8ffe5d857a[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 16 16:16:50 2018 +0200
+
+    Update README.md
+
+[33mcommit a09ef440479a1ee27ebcd3c499ee00155c791d47[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 16 16:14:58 2018 +0200
+
+    Update README.md
+
+[33mcommit 19ff44ecd88702f21891a1bdcdee6ab0334826e8[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 16 15:58:41 2018 +0200
+
+    Update README.md
+
+[33mcommit ab9dec26de32611c2d8abe721b5dae1afec431ad[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 16 15:02:21 2018 +0200
+
+    Rename README.rst to DOC.rst
+
+[33mcommit c82afd486ed4dc014d7244fbd648eb030d68f97a[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 16 15:00:13 2018 +0200
+
+    ajout code de départ
+
+[33mcommit 354e669eb6e98693695c9e73557911e64881f638[m
+Author: Cédric Girard <cedric@daneel.net>
+Date:   Mon Apr 16 14:49:04 2018 +0200
+
+    Initial commit

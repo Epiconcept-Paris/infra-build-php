@@ -1,0 +1,3 @@
+removed '/opt/php-mk/pkgs/02-mod/top/etc/apache2/mods-enabled/php5.load'
+removed '/opt/php-mk/pkgs/02-mod/top/etc/apache2/mods-enabled/php5.conf'
+rmdir: removing directory, '/opt/php-mk/pkgs/02-mod/top/etc/apache2/mods-enabled'

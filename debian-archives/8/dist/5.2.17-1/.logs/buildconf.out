@@ -1,0 +1,5 @@
+Forcing buildconf
+buildconf: checking installation...
+buildconf: autoconf version 2.13 (ok)
+rebuilding configure
+rebuilding main/php_config.h.in
