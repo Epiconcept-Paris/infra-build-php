@@ -1,5 +1,6 @@
 MAILTO=infra@epiconcept.fr
+MAILFROM=servers@epiconcept.fr
 
-9,39 * * * *	root	/usr/bin/php_clean_sessions
+9,39 * * * *    root    /usr/bin/php_clean_sessions 2>&1 | mail -Es "$(hostname) epi-php clean session" -a "From: $MAILFROM" $MAILTO
 
 # EOF
