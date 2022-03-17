@@ -1,8 +1,10 @@
 tmp=/tmp/sendphp
+user=epiconcept_build
+server=files.epiconcept.fr
 rm -fr $tmp
 mkdir $tmp
 cp $(find -name 'epi*.deb') $tmp/
-rsync -rav $tmp/ epiconcept_build@files.epiconcept.fr:/space/applisdata/php/
+rsync -rav $tmp/ $user@$server:/space/applisdata/php/
 rm -r $tmp
 
-ssh -t $USER@files.epiconcept.fr sudo /usr/local/bin/aptv2_deploy.sh 
+ssh -t $user@$server /usr/local/bin/apt_deploy.sh 
