@@ -1,3 +1,0 @@
-Installing phpdbg package
-'/opt/php-mk/pkgs/00-cli/top/usr/bin/phpdbg' -> '/opt/php-mk/pkgs/04-phpdbg/top/usr/bin/phpdbg'
-'/opt/php-mk/pkgs/00-cli/top/usr/share/man/man1/phpdbg.1' -> '/opt/php-mk/pkgs/04-phpdbg/top/usr/share/man/man1/phpdbg.1'

@@ -1,2 +1,0 @@
-Installing mysql package
-'/opt/php-mk/pkgs/00-cli/top/usr/lib/php/extensions/mysql.so' -> '/opt/php-mk/pkgs/05-mysql/top/usr/lib/php/extensions/mysql.so'

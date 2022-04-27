@@ -1,3 +1,0 @@
-E: epi-php-5.6-cli: conffile-is-not-in-package etc/php//php.ini
-E: epi-php-5.6-cli: file-in-etc-not-marked-as-conffile etc/php/php.ini
-N: 4 tags overridden (4 errors)

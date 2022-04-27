@@ -1,5 +1,0 @@
-Installing fpm package
-'/opt/php-mk/pkgs/00-cli/top/usr/sbin/php-fpm' -> '/opt/php-mk/pkgs/03-fpm/top/usr/sbin/php-fpm'
-'/opt/php-mk/pkgs/00-cli/top/usr/share/man/man8/php-fpm.8' -> '/opt/php-mk/pkgs/03-fpm/top/usr/share/man/man8/php-fpm.8'
-'/opt/php-mk/pkgs/00-cli/top/usr/share/php/fpm/status.html' -> '/opt/php-mk/pkgs/03-fpm/top/usr/share/php/fpm/status.html'
-'/opt/php-mk/pkgs/00-cli/top/etc/php/php-fpm.conf.default' -> '/opt/php-mk/pkgs/03-fpm/top/etc/php/php-fpm.conf.default'

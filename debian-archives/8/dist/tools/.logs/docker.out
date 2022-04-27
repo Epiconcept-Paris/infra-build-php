@@ -1,792 +1,0 @@
-Sending build context to Docker daemon   43.2kB
-Step 1/15 : FROM debian:jessie
- ---> 4eb8376dc2a3
-Step 2/15 : MAINTAINER Epiconcept
- ---> Running in ecd1b108a569
-Removing intermediate container ecd1b108a569
- ---> 70a54beb8fb0
-Step 3/15 : ENV DEBVER=jessie
- ---> Running in 1e17be818b98
-Removing intermediate container 1e17be818b98
- ---> c9b7f0421622
-Step 4/15 : ENV DEBNUM=8
- ---> Running in 51f672d34d76
-Removing intermediate container 51f672d34d76
- ---> eaef2c528231
-Step 5/15 : ENV USER=cedric
- ---> Running in 473f12169862
-Removing intermediate container 473f12169862
- ---> d9f271a87a3a
-Step 6/15 : ENV LANG=C
- ---> Running in 24d76aa3fdc4
-Removing intermediate container 24d76aa3fdc4
- ---> de1848cd212a
-Step 7/15 : ENV TZ=Europe/Paris
- ---> Running in 2a9b07576cea
-Removing intermediate container 2a9b07576cea
- ---> 68baaf811962
-Step 8/15 : RUN groupadd -g 1000 cedric; useradd -u 1000 -g 1000 cedric
- ---> Running in 18bc1d82b435
-Removing intermediate container 18bc1d82b435
- ---> 6bb181323e04
-Step 9/15 : RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
- ---> Running in d2fcb549d5dd
-Removing intermediate container d2fcb549d5dd
- ---> 15c44a15b3a0
-Step 10/15 : RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use: /opt/tools/build\\nto build the packages\"" >>/root/.bashrc
- ---> Running in e11c0eeda28f
-Removing intermediate container e11c0eeda28f
- ---> aa6bbfb8269e
-Step 11/15 : RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends vim file gcc libc-dev make fakeroot lintian manpages-dev
- ---> Running in 1fa41c63628e
-Ign http://deb.debian.org jessie InRelease
-Get:1 http://security.debian.org jessie/updates InRelease [44.9 kB]
-Get:2 http://deb.debian.org jessie-updates InRelease [16.3 kB]
-Get:3 http://deb.debian.org jessie Release.gpg [1652 B]
-Get:4 http://deb.debian.org jessie Release [77.3 kB]
-Get:5 http://security.debian.org jessie/updates/main amd64 Packages [992 kB]
-Get:6 http://deb.debian.org jessie-updates/main amd64 Packages [20 B]
-Get:7 http://deb.debian.org jessie/main amd64 Packages [9098 kB]
-Fetched 10.2 MB in 14s (716 kB/s)
-Reading package lists...
-Reading package lists...
-Building dependency tree...
-Reading state information...
-The following packages will be upgraded:
-  apt base-files bash e2fslibs e2fsprogs gcc-4.9-base gnupg gpgv
-  libapt-pkg4.12 libbz2-1.0 libcomerr2 libgcc1 libgcrypt20 libgnutls-deb0-28
-  libgnutls-openssl27 libncurses5 libncursesw5 libprocps3 libss2 libstdc++6
-  libsystemd0 libtasn1-6 libtinfo5 libudev1 ncurses-base ncurses-bin perl-base
-  procps systemd systemd-sysv tar tzdata udev zlib1g
-34 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
-Need to get 14.7 MB of archives.
-After this operation, 4464 kB of additional disk space will be used.
-Get:1 http://security.debian.org/debian-security/ jessie/updates/main bash amd64 4.3-11+deb8u2 [1173 kB]
-Get:2 http://deb.debian.org/debian/ jessie/main base-files amd64 8+deb8u11 [78.2 kB]
-Get:3 http://deb.debian.org/debian/ jessie/main ncurses-bin amd64 5.9+20140913-1+deb8u3 [347 kB]
-Get:4 http://deb.debian.org/debian/ jessie/main gpgv amd64 1.4.18-7+deb8u5 [209 kB]
-Get:5 http://deb.debian.org/debian/ jessie/main gnupg amd64 1.4.18-7+deb8u5 [1150 kB]
-Get:6 http://security.debian.org/debian-security/ jessie/updates/main e2fslibs amd64 1.42.12-2+deb8u2 [186 kB]
-Get:7 http://deb.debian.org/debian/ jessie/main ncurses-base all 5.9+20140913-1+deb8u3 [222 kB]
-Get:8 http://deb.debian.org/debian/ jessie/main libtinfo5 amd64 5.9+20140913-1+deb8u3 [282 kB]
-Get:9 http://security.debian.org/debian-security/ jessie/updates/main e2fsprogs amd64 1.42.12-2+deb8u2 [751 kB]
-Get:10 http://deb.debian.org/debian/ jessie/main libncursesw5 amd64 5.9+20140913-1+deb8u3 [123 kB]
-Get:11 http://deb.debian.org/debian/ jessie/main libncurses5 amd64 5.9+20140913-1+deb8u3 [96.6 kB]
-Get:12 http://deb.debian.org/debian/ jessie/main libprocps3 amd64 2:3.3.9-9+deb8u1 [56.7 kB]
-Get:13 http://deb.debian.org/debian/ jessie/main procps amd64 2:3.3.9-9+deb8u1 [236 kB]
-Get:14 http://security.debian.org/debian-security/ jessie/updates/main perl-base amd64 5.20.2-3+deb8u12 [1231 kB]
-Get:15 http://security.debian.org/debian-security/ jessie/updates/main tar amd64 1.27.1-2+deb8u2 [676 kB]
-Get:16 http://security.debian.org/debian-security/ jessie/updates/main libbz2-1.0 amd64 1.0.6-7+deb8u2 [43.3 kB]
-Get:17 http://security.debian.org/debian-security/ jessie/updates/main gcc-4.9-base amd64 4.9.2-10+deb8u2 [160 kB]
-Get:18 http://security.debian.org/debian-security/ jessie/updates/main libgcc1 amd64 1:4.9.2-10+deb8u2 [39.4 kB]
-Get:19 http://security.debian.org/debian-security/ jessie/updates/main libstdc++6 amd64 4.9.2-10+deb8u2 [273 kB]
-Get:20 http://security.debian.org/debian-security/ jessie/updates/main zlib1g amd64 1:1.2.8.dfsg-2+deb8u1 [88.3 kB]
-Get:21 http://security.debian.org/debian-security/ jessie/updates/main libapt-pkg4.12 amd64 1.0.9.8.6 [794 kB]
-Get:22 http://security.debian.org/debian-security/ jessie/updates/main apt amd64 1.0.9.8.6 [1109 kB]
-Get:23 http://security.debian.org/debian-security/ jessie/updates/main libudev1 amd64 215-17+deb8u13 [58.8 kB]
-Get:24 http://security.debian.org/debian-security/ jessie/updates/main udev amd64 215-17+deb8u13 [878 kB]
-Get:25 http://security.debian.org/debian-security/ jessie/updates/main libcomerr2 amd64 1.42.12-2+deb8u2 [60.6 kB]
-Get:26 http://security.debian.org/debian-security/ jessie/updates/main libss2 amd64 1.42.12-2+deb8u2 [64.9 kB]
-Get:27 http://security.debian.org/debian-security/ jessie/updates/main libgcrypt20 amd64 1.6.3-2+deb8u8 [394 kB]
-Get:28 http://security.debian.org/debian-security/ jessie/updates/main libsystemd0 amd64 215-17+deb8u13 [90.5 kB]
-Get:29 http://security.debian.org/debian-security/ jessie/updates/main systemd amd64 215-17+deb8u13 [2555 kB]
-Get:30 http://security.debian.org/debian-security/ jessie/updates/main systemd-sysv amd64 215-17+deb8u13 [37.5 kB]
-Get:31 http://security.debian.org/debian-security/ jessie/updates/main libgnutls-openssl27 amd64 3.3.30-0+deb8u1 [180 kB]
-Get:32 http://security.debian.org/debian-security/ jessie/updates/main libtasn1-6 amd64 4.2-3+deb8u4 [49.3 kB]
-Get:33 http://security.debian.org/debian-security/ jessie/updates/main libgnutls-deb0-28 amd64 3.3.30-0+deb8u1 [749 kB]
-Get:34 http://security.debian.org/debian-security/ jessie/updates/main tzdata all 2019c-0+deb8u1 [234 kB]
-[91mdebconf: delaying package configuration, since apt-utils is not installed
-[0mFetched 14.7 MB in 14s (997 kB/s)
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7624 files and directories currently installed.)
-Preparing to unpack .../base-files_8+deb8u11_amd64.deb ...
-Unpacking base-files (8+deb8u11) over (8+deb8u10) ...
-Setting up base-files (8+deb8u11) ...
-Installing new version of config file /etc/debian_version ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7624 files and directories currently installed.)
-Preparing to unpack .../bash_4.3-11+deb8u2_amd64.deb ...
-Unpacking bash (4.3-11+deb8u2) over (4.3-11+deb8u1) ...
-Setting up bash (4.3-11+deb8u2) ...
-update-alternatives: using /usr/share/man/man7/bash-builtins.7.gz to provide /usr/share/man/man7/builtins.7.gz (builtins.7.gz) in auto mode
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7624 files and directories currently installed.)
-Preparing to unpack .../e2fslibs_1.42.12-2+deb8u2_amd64.deb ...
-Unpacking e2fslibs:amd64 (1.42.12-2+deb8u2) over (1.42.12-2+b1) ...
-Setting up e2fslibs:amd64 (1.42.12-2+deb8u2) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7623 files and directories currently installed.)
-Preparing to unpack .../e2fsprogs_1.42.12-2+deb8u2_amd64.deb ...
-Unpacking e2fsprogs (1.42.12-2+deb8u2) over (1.42.12-2+b1) ...
-Setting up e2fsprogs (1.42.12-2+deb8u2) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7622 files and directories currently installed.)
-Preparing to unpack .../ncurses-bin_5.9+20140913-1+deb8u3_amd64.deb ...
-Unpacking ncurses-bin (5.9+20140913-1+deb8u3) over (5.9+20140913-1+deb8u2) ...
-Setting up ncurses-bin (5.9+20140913-1+deb8u3) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7622 files and directories currently installed.)
-Preparing to unpack .../perl-base_5.20.2-3+deb8u12_amd64.deb ...
-Unpacking perl-base (5.20.2-3+deb8u12) over (5.20.2-3+deb8u10) ...
-Setting up perl-base (5.20.2-3+deb8u12) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7622 files and directories currently installed.)
-Preparing to unpack .../tar_1.27.1-2+deb8u2_amd64.deb ...
-Unpacking tar (1.27.1-2+deb8u2) over (1.27.1-2+deb8u1) ...
-Setting up tar (1.27.1-2+deb8u2) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7622 files and directories currently installed.)
-Preparing to unpack .../libbz2-1.0_1.0.6-7+deb8u2_amd64.deb ...
-Unpacking libbz2-1.0:amd64 (1.0.6-7+deb8u2) over (1.0.6-7+b3) ...
-Setting up libbz2-1.0:amd64 (1.0.6-7+deb8u2) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7621 files and directories currently installed.)
-Preparing to unpack .../gcc-4.9-base_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking gcc-4.9-base:amd64 (4.9.2-10+deb8u2) over (4.9.2-10+deb8u1) ...
-Setting up gcc-4.9-base:amd64 (4.9.2-10+deb8u2) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7621 files and directories currently installed.)
-Preparing to unpack .../libgcc1_1%3a4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libgcc1:amd64 (1:4.9.2-10+deb8u2) over (1:4.9.2-10+deb8u1) ...
-Setting up libgcc1:amd64 (1:4.9.2-10+deb8u2) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7621 files and directories currently installed.)
-Preparing to unpack .../libstdc++6_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libstdc++6:amd64 (4.9.2-10+deb8u2) over (4.9.2-10+deb8u1) ...
-Setting up libstdc++6:amd64 (4.9.2-10+deb8u2) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7621 files and directories currently installed.)
-Preparing to unpack .../zlib1g_1%3a1.2.8.dfsg-2+deb8u1_amd64.deb ...
-Unpacking zlib1g:amd64 (1:1.2.8.dfsg-2+deb8u1) over (1:1.2.8.dfsg-2+b1) ...
-Setting up zlib1g:amd64 (1:1.2.8.dfsg-2+deb8u1) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../libapt-pkg4.12_1.0.9.8.6_amd64.deb ...
-Unpacking libapt-pkg4.12:amd64 (1.0.9.8.6) over (1.0.9.8.4) ...
-Setting up libapt-pkg4.12:amd64 (1.0.9.8.6) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../gpgv_1.4.18-7+deb8u5_amd64.deb ...
-Unpacking gpgv (1.4.18-7+deb8u5) over (1.4.18-7+deb8u4) ...
-Setting up gpgv (1.4.18-7+deb8u5) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../gnupg_1.4.18-7+deb8u5_amd64.deb ...
-Unpacking gnupg (1.4.18-7+deb8u5) over (1.4.18-7+deb8u4) ...
-Setting up gnupg (1.4.18-7+deb8u5) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../apt_1.0.9.8.6_amd64.deb ...
-Unpacking apt (1.0.9.8.6) over (1.0.9.8.4) ...
-Setting up apt (1.0.9.8.6) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../ncurses-base_5.9+20140913-1+deb8u3_all.deb ...
-Unpacking ncurses-base (5.9+20140913-1+deb8u3) over (5.9+20140913-1+deb8u2) ...
-Setting up ncurses-base (5.9+20140913-1+deb8u3) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../libtinfo5_5.9+20140913-1+deb8u3_amd64.deb ...
-Unpacking libtinfo5:amd64 (5.9+20140913-1+deb8u3) over (5.9+20140913-1+deb8u2) ...
-Setting up libtinfo5:amd64 (5.9+20140913-1+deb8u3) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../libncursesw5_5.9+20140913-1+deb8u3_amd64.deb ...
-Unpacking libncursesw5:amd64 (5.9+20140913-1+deb8u3) over (5.9+20140913-1+deb8u2) ...
-Setting up libncursesw5:amd64 (5.9+20140913-1+deb8u3) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../libncurses5_5.9+20140913-1+deb8u3_amd64.deb ...
-Unpacking libncurses5:amd64 (5.9+20140913-1+deb8u3) over (5.9+20140913-1+deb8u2) ...
-Setting up libncurses5:amd64 (5.9+20140913-1+deb8u3) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../libprocps3_2%3a3.3.9-9+deb8u1_amd64.deb ...
-Unpacking libprocps3:amd64 (2:3.3.9-9+deb8u1) over (2:3.3.9-9) ...
-Setting up libprocps3:amd64 (2:3.3.9-9+deb8u1) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../procps_2%3a3.3.9-9+deb8u1_amd64.deb ...
-invoke-rc.d: policy-rc.d denied execution of stop.
-Unpacking procps (2:3.3.9-9+deb8u1) over (2:3.3.9-9) ...
-Processing triggers for systemd (215-17+deb8u7) ...
-Setting up procps (2:3.3.9-9+deb8u1) ...
-invoke-rc.d: policy-rc.d denied execution of start.
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../libudev1_215-17+deb8u13_amd64.deb ...
-Unpacking libudev1:amd64 (215-17+deb8u13) over (215-17+deb8u7) ...
-Setting up libudev1:amd64 (215-17+deb8u13) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../udev_215-17+deb8u13_amd64.deb ...
-debconf: unable to initialize frontend: Dialog
-debconf: (TERM is not set, so the dialog frontend is not usable.)
-debconf: falling back to frontend: Readline
-debconf: unable to initialize frontend: Readline
-debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.20.2 /usr/local/share/perl/5.20.2 /usr/lib/x86_64-linux-gnu/perl5/5.20 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl/5.20 /usr/share/perl/5.20 /usr/local/lib/site_perl .) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
-debconf: falling back to frontend: Teletype
-Unpacking udev (215-17+deb8u13) over (215-17+deb8u7) ...
-Processing triggers for systemd (215-17+deb8u7) ...
-Setting up udev (215-17+deb8u13) ...
-addgroup: The group `input' already exists as a system group. Exiting.
-udev does not support containers, not started.
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7620 files and directories currently installed.)
-Preparing to unpack .../libcomerr2_1.42.12-2+deb8u2_amd64.deb ...
-Unpacking libcomerr2:amd64 (1.42.12-2+deb8u2) over (1.42.12-2+b1) ...
-Setting up libcomerr2:amd64 (1.42.12-2+deb8u2) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7619 files and directories currently installed.)
-Preparing to unpack .../libss2_1.42.12-2+deb8u2_amd64.deb ...
-Unpacking libss2:amd64 (1.42.12-2+deb8u2) over (1.42.12-2+b1) ...
-Setting up libss2:amd64 (1.42.12-2+deb8u2) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7618 files and directories currently installed.)
-Preparing to unpack .../libgcrypt20_1.6.3-2+deb8u8_amd64.deb ...
-Unpacking libgcrypt20:amd64 (1.6.3-2+deb8u8) over (1.6.3-2+deb8u4) ...
-Setting up libgcrypt20:amd64 (1.6.3-2+deb8u8) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7618 files and directories currently installed.)
-Preparing to unpack .../libsystemd0_215-17+deb8u13_amd64.deb ...
-Unpacking libsystemd0:amd64 (215-17+deb8u13) over (215-17+deb8u7) ...
-Setting up libsystemd0:amd64 (215-17+deb8u13) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7618 files and directories currently installed.)
-Preparing to unpack .../systemd_215-17+deb8u13_amd64.deb ...
-Unpacking systemd (215-17+deb8u13) over (215-17+deb8u7) ...
-Setting up systemd (215-17+deb8u13) ...
-addgroup: The group `systemd-journal' already exists as a system group. Exiting.
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7618 files and directories currently installed.)
-Preparing to unpack .../systemd-sysv_215-17+deb8u13_amd64.deb ...
-Unpacking systemd-sysv (215-17+deb8u13) over (215-17+deb8u7) ...
-Setting up systemd-sysv (215-17+deb8u13) ...
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7618 files and directories currently installed.)
-Preparing to unpack .../libgnutls-openssl27_3.3.30-0+deb8u1_amd64.deb ...
-Unpacking libgnutls-openssl27:amd64 (3.3.30-0+deb8u1) over (3.3.8-6+deb8u7) ...
-Preparing to unpack .../libtasn1-6_4.2-3+deb8u4_amd64.deb ...
-Unpacking libtasn1-6:amd64 (4.2-3+deb8u4) over (4.2-3+deb8u3) ...
-Preparing to unpack .../libgnutls-deb0-28_3.3.30-0+deb8u1_amd64.deb ...
-Unpacking libgnutls-deb0-28:amd64 (3.3.30-0+deb8u1) over (3.3.8-6+deb8u7) ...
-Preparing to unpack .../tzdata_2019c-0+deb8u1_all.deb ...
-Unpacking tzdata (2019c-0+deb8u1) over (2018d-0+deb8u1) ...
-Setting up tzdata (2019c-0+deb8u1) ...
-debconf: unable to initialize frontend: Dialog
-debconf: (TERM is not set, so the dialog frontend is not usable.)
-debconf: falling back to frontend: Readline
-debconf: unable to initialize frontend: Readline
-debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.20.2 /usr/local/share/perl/5.20.2 /usr/lib/x86_64-linux-gnu/perl5/5.20 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl/5.20 /usr/share/perl/5.20 /usr/local/lib/site_perl .) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
-debconf: falling back to frontend: Teletype
-
-Current default time zone: 'Europe/Paris'
-Local time is now:      Mon Apr 12 15:57:44 CEST 2021.
-Universal Time is now:  Mon Apr 12 13:57:44 UTC 2021.
-Run 'dpkg-reconfigure tzdata' if you wish to change it.
-
-Setting up libtasn1-6:amd64 (4.2-3+deb8u4) ...
-Setting up libgnutls-deb0-28:amd64 (3.3.30-0+deb8u1) ...
-Setting up libgnutls-openssl27:amd64 (3.3.30-0+deb8u1) ...
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-Reading package lists...
-Building dependency tree...
-Reading state information...
-The following extra packages will be installed:
-  binutils bsdmainutils bzip2 cpp cpp-4.9 diffstat gcc-4.9 gettext
-  gettext-base groff-base hardening-includes intltool-debian libapt-pkg-perl
-  libarchive-zip-perl libasan1 libasprintf0c2 libatomic1 libc-dev-bin
-  libcilkrts5 libclass-accessor-perl libclone-perl libcloog-isl4 libcroco3
-  libdigest-hmac-perl libdpkg-perl libemail-valid-perl libfakeroot
-  libfile-basedir-perl libgcc-4.9-dev libgdbm3 libglib2.0-0 libgomp1 libgpm2
-  libio-pty-perl libio-socket-inet6-perl libio-socket-ssl-perl
-  libio-string-perl libipc-run-perl libisl10 libitm1 liblist-moreutils-perl
-  liblsan0 libmagic1 libmailtools-perl libmpc3 libmpfr4 libnet-dns-perl
-  libnet-domain-tld-perl libnet-ip-perl libnet-smtp-ssl-perl
-  libnet-ssleay-perl libparse-debianchangelog-perl libpipeline1 libquadmath0
-  libsocket6-perl libssl1.0.0 libsub-name-perl libtext-levenshtein-perl
-  libtimedate-perl libtsan0 libubsan0 libunistring0 liburi-perl libxml2
-  linux-libc-dev man-db manpages netbase patch patchutils perl perl-modules
-  t1utils vim-common vim-runtime
-Suggested packages:
-  binutils-doc wamerican wordlist whois vacation bzip2-doc cpp-doc
-  gcc-4.9-locales gcc-multilib autoconf automake libtool flex bison gdb
-  gcc-doc gcc-4.9-multilib gcc-4.9-doc libgcc1-dbg libgomp1-dbg libitm1-dbg
-  libatomic1-dbg libasan1-dbg liblsan0-dbg libtsan0-dbg libubsan0-dbg
-  libcilkrts5-dbg libquadmath0-dbg gettext-doc groff glibc-doc debian-keyring
-  gpm ca-certificates libmime-base64-perl libhtml-parser-perl
-  libhtml-template-perl libxml-simple-perl libwww-perl binutils-multiarch
-  dpkg-dev libtext-template-perl libyaml-perl make-doc less www-browser
-  man-browser ed diffutils-doc perl-doc libterm-readline-gnu-perl
-  libterm-readline-perl-perl libb-lint-perl libcpanplus-dist-build-perl
-  libcpanplus-perl libfile-checktree-perl liblog-message-simple-perl
-  liblog-message-perl libobject-accessor-perl ctags vim-doc vim-scripts
-Recommended packages:
-  curl wget lynx-cur autopoint libasprintf-dev libgettextpo-dev
-  libfile-fcntllock-perl xz-utils libglib2.0-data shared-mime-info
-  xdg-user-dirs libauthen-sasl-perl xml-core libperlio-gzip-perl ifupdown
-  rename libarchive-extract-perl libmodule-pluggable-perl libpod-latex-perl
-  libterm-ui-perl libtext-soundex-perl libcgi-pm-perl libmodule-build-perl
-  libpackage-constants-perl
-The following NEW packages will be installed:
-  binutils bsdmainutils bzip2 cpp cpp-4.9 diffstat fakeroot file gcc gcc-4.9
-  gettext gettext-base groff-base hardening-includes intltool-debian
-  libapt-pkg-perl libarchive-zip-perl libasan1 libasprintf0c2 libatomic1
-  libc-dev-bin libc6-dev libcilkrts5 libclass-accessor-perl libclone-perl
-  libcloog-isl4 libcroco3 libdigest-hmac-perl libdpkg-perl libemail-valid-perl
-  libfakeroot libfile-basedir-perl libgcc-4.9-dev libgdbm3 libglib2.0-0
-  libgomp1 libgpm2 libio-pty-perl libio-socket-inet6-perl
-  libio-socket-ssl-perl libio-string-perl libipc-run-perl libisl10 libitm1
-  liblist-moreutils-perl liblsan0 libmagic1 libmailtools-perl libmpc3 libmpfr4
-  libnet-dns-perl libnet-domain-tld-perl libnet-ip-perl libnet-smtp-ssl-perl
-  libnet-ssleay-perl libparse-debianchangelog-perl libpipeline1 libquadmath0
-  libsocket6-perl libssl1.0.0 libsub-name-perl libtext-levenshtein-perl
-  libtimedate-perl libtsan0 libubsan0 libunistring0 liburi-perl libxml2
-  lintian linux-libc-dev make man-db manpages manpages-dev netbase patch
-  patchutils perl perl-modules t1utils vim vim-common vim-runtime
-0 upgraded, 83 newly installed, 0 to remove and 0 not upgraded.
-Need to get 48.9 MB of archives.
-After this operation, 196 MB of additional disk space will be used.
-Get:1 http://security.debian.org/debian-security/ jessie/updates/main libssl1.0.0 amd64 1.0.1t-1+deb8u12 [1049 kB]
-Get:2 http://deb.debian.org/debian/ jessie/main libgdbm3 amd64 1.8.3-13.1 [30.0 kB]
-Get:3 http://deb.debian.org/debian/ jessie/main libpipeline1 amd64 1.4.0-1 [27.9 kB]
-Get:4 http://deb.debian.org/debian/ jessie/main groff-base amd64 1.22.2-8 [1183 kB]
-Get:5 http://security.debian.org/debian-security/ jessie/updates/main libmagic1 amd64 1:5.22+15-2+deb8u7 [250 kB]
-Get:6 http://security.debian.org/debian-security/ jessie/updates/main libxml2 amd64 2.9.1+dfsg1-5+deb8u8 [803 kB]
-Get:7 http://deb.debian.org/debian/ jessie/main bsdmainutils amd64 9.0.6 [183 kB]
-Get:8 http://deb.debian.org/debian/ jessie/main man-db amd64 2.7.0.2-5 [1000 kB]
-Get:9 http://security.debian.org/debian-security/ jessie/updates/main perl-modules all 5.20.2-3+deb8u12 [2553 kB]
-Get:10 http://deb.debian.org/debian/ jessie/main libasprintf0c2 amd64 0.19.3-2 [31.3 kB]
-Get:11 http://deb.debian.org/debian/ jessie/main libgpm2 amd64 1.20.4-6.1+b2 [34.0 kB]
-Get:12 http://deb.debian.org/debian/ jessie/main libisl10 amd64 0.12.2-2 [440 kB]
-Get:13 http://deb.debian.org/debian/ jessie/main libcloog-isl4 amd64 0.18.2-1+b2 [61.8 kB]
-Get:14 http://deb.debian.org/debian/ jessie/main libcroco3 amd64 0.6.8-3+b1 [135 kB]
-Get:15 http://deb.debian.org/debian/ jessie/main libmpfr4 amd64 3.1.2-2 [527 kB]
-Get:16 http://security.debian.org/debian-security/ jessie/updates/main perl amd64 5.20.2-3+deb8u12 [2658 kB]
-Get:17 http://deb.debian.org/debian/ jessie/main libunistring0 amd64 0.9.3-5.2+b1 [288 kB]
-Get:18 http://deb.debian.org/debian/ jessie/main libmpc3 amd64 1.0.2-1 [39.3 kB]
-Get:19 http://deb.debian.org/debian/ jessie/main manpages all 3.74-1 [997 kB]
-Get:20 http://deb.debian.org/debian/ jessie/main netbase all 5.3 [19.0 kB]
-Get:21 http://deb.debian.org/debian/ jessie/main gettext-base amd64 0.19.3-2 [121 kB]
-Get:22 http://deb.debian.org/debian/ jessie/main binutils amd64 2.25-5+deb8u1 [3496 kB]
-Get:23 http://security.debian.org/debian-security/ jessie/updates/main libasan1 amd64 4.9.2-10+deb8u2 [195 kB]
-Get:24 http://security.debian.org/debian-security/ jessie/updates/main libatomic1 amd64 4.9.2-10+deb8u2 [9000 B]
-Get:25 http://security.debian.org/debian-security/ jessie/updates/main libcilkrts5 amd64 4.9.2-10+deb8u2 [40.1 kB]
-Get:26 http://security.debian.org/debian-security/ jessie/updates/main libglib2.0-0 amd64 2.42.1-1+deb8u3 [2400 kB]
-Get:27 http://security.debian.org/debian-security/ jessie/updates/main libgomp1 amd64 4.9.2-10+deb8u2 [37.8 kB]
-Get:28 http://security.debian.org/debian-security/ jessie/updates/main libitm1 amd64 4.9.2-10+deb8u2 [29.3 kB]
-Get:29 http://security.debian.org/debian-security/ jessie/updates/main liblsan0 amd64 4.9.2-10+deb8u2 [92.7 kB]
-Get:30 http://security.debian.org/debian-security/ jessie/updates/main libquadmath0 amd64 4.9.2-10+deb8u2 [129 kB]
-Get:31 http://security.debian.org/debian-security/ jessie/updates/main libtsan0 amd64 4.9.2-10+deb8u2 [213 kB]
-Get:32 http://security.debian.org/debian-security/ jessie/updates/main libubsan0 amd64 4.9.2-10+deb8u2 [82.4 kB]
-Get:33 http://deb.debian.org/debian/ jessie/main cpp amd64 4:4.9.2-2 [17.3 kB]
-Get:34 http://deb.debian.org/debian/ jessie/main diffstat amd64 1.58-1 [29.4 kB]
-Get:35 http://deb.debian.org/debian/ jessie/main libfakeroot amd64 1.20.2-1 [44.7 kB]
-Get:36 http://security.debian.org/debian-security/ jessie/updates/main vim-common amd64 2:7.4.488-7+deb8u4 [185 kB]
-Get:37 http://deb.debian.org/debian/ jessie/main fakeroot amd64 1.20.2-1 [84.7 kB]
-Get:38 http://deb.debian.org/debian/ jessie/main gcc amd64 4:4.9.2-2 [5136 B]
-Get:39 http://security.debian.org/debian-security/ jessie/updates/main bzip2 amd64 1.0.6-7+deb8u2 [46.8 kB]
-Get:40 http://deb.debian.org/debian/ jessie/main gettext amd64 0.19.3-2 [1240 kB]
-Get:41 http://security.debian.org/debian-security/ jessie/updates/main file amd64 1:5.22+15-2+deb8u7 [60.8 kB]
-Get:42 http://security.debian.org/debian-security/ jessie/updates/main patch amd64 2.7.5-1+deb8u3 [109 kB]
-Get:43 http://security.debian.org/debian-security/ jessie/updates/main cpp-4.9 amd64 4.9.2-10+deb8u2 [5169 kB]
-Get:44 http://deb.debian.org/debian/ jessie/main make amd64 4.0-8.1 [349 kB]
-Get:45 http://deb.debian.org/debian/ jessie/main hardening-includes all 2.6 [17.4 kB]
-Get:46 http://deb.debian.org/debian/ jessie/main intltool-debian all 0.35.0+20060710.1 [30.8 kB]
-Get:47 http://deb.debian.org/debian/ jessie/main libapt-pkg-perl amd64 0.1.29+b2 [77.4 kB]
-Get:48 http://deb.debian.org/debian/ jessie/main libc-dev-bin amd64 2.19-18+deb8u10 [238 kB]
-Get:49 http://deb.debian.org/debian/ jessie/main libc6-dev amd64 2.19-18+deb8u10 [2003 kB]
-Get:50 http://deb.debian.org/debian/ jessie/main libsub-name-perl amd64 0.12-1 [12.1 kB]
-Get:51 http://deb.debian.org/debian/ jessie/main libclass-accessor-perl all 0.34-1 [25.9 kB]
-Get:52 http://deb.debian.org/debian/ jessie/main libclone-perl amd64 0.37-1+b1 [14.2 kB]
-Get:53 http://deb.debian.org/debian/ jessie/main libdigest-hmac-perl all 1.03+dfsg-1 [12.3 kB]
-Get:54 http://deb.debian.org/debian/ jessie/main libtimedate-perl all 2.3000-2 [42.2 kB]
-Get:55 http://deb.debian.org/debian/ jessie/main libdpkg-perl all 1.17.27 [1075 kB]
-Get:56 http://security.debian.org/debian-security/ jessie/updates/main libgcc-4.9-dev amd64 4.9.2-10+deb8u2 [2064 kB]
-Get:57 http://deb.debian.org/debian/ jessie/main libnet-ssleay-perl amd64 1.65-1+deb8u1 [277 kB]
-Get:58 http://deb.debian.org/debian/ jessie/main libio-socket-ssl-perl all 2.002-2+deb8u3 [172 kB]
-Get:59 http://deb.debian.org/debian/ jessie/main libnet-smtp-ssl-perl all 1.01-3 [5996 B]
-Get:60 http://deb.debian.org/debian/ jessie/main libmailtools-perl all 2.13-1 [96.6 kB]
-Get:61 http://deb.debian.org/debian/ jessie/main libsocket6-perl amd64 0.25-1+b1 [28.5 kB]
-Get:62 http://security.debian.org/debian-security/ jessie/updates/main gcc-4.9 amd64 4.9.2-10+deb8u2 [5373 kB]
-Get:63 http://deb.debian.org/debian/ jessie/main libio-socket-inet6-perl all 2.72-1 [16.6 kB]
-Get:64 http://deb.debian.org/debian/ jessie/main libnet-ip-perl all 1.26-1 [33.2 kB]
-Get:65 http://deb.debian.org/debian/ jessie/main libnet-dns-perl amd64 0.81-2+deb8u1 [331 kB]
-Get:66 http://deb.debian.org/debian/ jessie/main libnet-domain-tld-perl all 1.72-1 [17.7 kB]
-Get:67 http://deb.debian.org/debian/ jessie/main libemail-valid-perl all 1.195-1 [22.2 kB]
-Get:68 http://deb.debian.org/debian/ jessie/main libfile-basedir-perl all 0.03-1 [10.4 kB]
-Get:69 http://deb.debian.org/debian/ jessie/main libio-pty-perl amd64 1:1.08-1+b4 [35.8 kB]
-Get:70 http://deb.debian.org/debian/ jessie/main libio-string-perl all 1.08-3 [12.3 kB]
-Get:71 http://deb.debian.org/debian/ jessie/main libipc-run-perl all 0.92-1+deb8u1 [101 kB]
-Get:72 http://deb.debian.org/debian/ jessie/main liblist-moreutils-perl amd64 0.33-2+b1 [44.4 kB]
-Get:73 http://deb.debian.org/debian/ jessie/main libparse-debianchangelog-perl all 1.2.0-1.1 [57.9 kB]
-Get:74 http://deb.debian.org/debian/ jessie/main libtext-levenshtein-perl all 0.11-1 [10.6 kB]
-Get:75 http://deb.debian.org/debian/ jessie/main liburi-perl all 1.64-1 [95.5 kB]
-Get:76 http://deb.debian.org/debian/ jessie/main patchutils amd64 0.3.3-1 [87.0 kB]
-Get:77 http://deb.debian.org/debian/ jessie/main t1utils amd64 1.38-4 [58.2 kB]
-Get:78 http://deb.debian.org/debian/ jessie/main lintian all 2.5.30+deb8u4 [793 kB]
-Get:79 http://deb.debian.org/debian/ jessie/main manpages-dev all 3.74-1 [1865 kB]
-Get:80 http://security.debian.org/debian-security/ jessie/updates/main libarchive-zip-perl all 1.39-1+deb8u1 [97.3 kB]
-Get:81 http://security.debian.org/debian-security/ jessie/updates/main linux-libc-dev amd64 3.16.84-1 [1165 kB]
-Get:82 http://security.debian.org/debian-security/ jessie/updates/main vim-runtime all 2:7.4.488-7+deb8u4 [5052 kB]
-Get:83 http://security.debian.org/debian-security/ jessie/updates/main vim amd64 2:7.4.488-7+deb8u4 [953 kB]
-[91mdebconf: delaying package configuration, since apt-utils is not installed
-[0mFetched 48.9 MB in 45s (1082 kB/s)
-Selecting previously unselected package libgdbm3:amd64.
-(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7621 files and directories currently installed.)
-Preparing to unpack .../libgdbm3_1.8.3-13.1_amd64.deb ...
-Unpacking libgdbm3:amd64 (1.8.3-13.1) ...
-Selecting previously unselected package libpipeline1:amd64.
-Preparing to unpack .../libpipeline1_1.4.0-1_amd64.deb ...
-Unpacking libpipeline1:amd64 (1.4.0-1) ...
-Selecting previously unselected package libssl1.0.0:amd64.
-Preparing to unpack .../libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb ...
-Unpacking libssl1.0.0:amd64 (1.0.1t-1+deb8u12) ...
-Selecting previously unselected package groff-base.
-Preparing to unpack .../groff-base_1.22.2-8_amd64.deb ...
-Unpacking groff-base (1.22.2-8) ...
-Selecting previously unselected package bsdmainutils.
-Preparing to unpack .../bsdmainutils_9.0.6_amd64.deb ...
-Unpacking bsdmainutils (9.0.6) ...
-Selecting previously unselected package man-db.
-Preparing to unpack .../man-db_2.7.0.2-5_amd64.deb ...
-Unpacking man-db (2.7.0.2-5) ...
-Selecting previously unselected package libasprintf0c2:amd64.
-Preparing to unpack .../libasprintf0c2_0.19.3-2_amd64.deb ...
-Unpacking libasprintf0c2:amd64 (0.19.3-2) ...
-Selecting previously unselected package libgpm2:amd64.
-Preparing to unpack .../libgpm2_1.20.4-6.1+b2_amd64.deb ...
-Unpacking libgpm2:amd64 (1.20.4-6.1+b2) ...
-Selecting previously unselected package libmagic1:amd64.
-Preparing to unpack .../libmagic1_1%3a5.22+15-2+deb8u7_amd64.deb ...
-Unpacking libmagic1:amd64 (1:5.22+15-2+deb8u7) ...
-Selecting previously unselected package libxml2:amd64.
-Preparing to unpack .../libxml2_2.9.1+dfsg1-5+deb8u8_amd64.deb ...
-Unpacking libxml2:amd64 (2.9.1+dfsg1-5+deb8u8) ...
-Selecting previously unselected package perl-modules.
-Preparing to unpack .../perl-modules_5.20.2-3+deb8u12_all.deb ...
-Unpacking perl-modules (5.20.2-3+deb8u12) ...
-Selecting previously unselected package perl.
-Preparing to unpack .../perl_5.20.2-3+deb8u12_amd64.deb ...
-Unpacking perl (5.20.2-3+deb8u12) ...
-Selecting previously unselected package libasan1:amd64.
-Preparing to unpack .../libasan1_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libasan1:amd64 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package libatomic1:amd64.
-Preparing to unpack .../libatomic1_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libatomic1:amd64 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package libcilkrts5:amd64.
-Preparing to unpack .../libcilkrts5_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libcilkrts5:amd64 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package libisl10:amd64.
-Preparing to unpack .../libisl10_0.12.2-2_amd64.deb ...
-Unpacking libisl10:amd64 (0.12.2-2) ...
-Selecting previously unselected package libcloog-isl4:amd64.
-Preparing to unpack .../libcloog-isl4_0.18.2-1+b2_amd64.deb ...
-Unpacking libcloog-isl4:amd64 (0.18.2-1+b2) ...
-Selecting previously unselected package libglib2.0-0:amd64.
-Preparing to unpack .../libglib2.0-0_2.42.1-1+deb8u3_amd64.deb ...
-Unpacking libglib2.0-0:amd64 (2.42.1-1+deb8u3) ...
-Selecting previously unselected package libcroco3:amd64.
-Preparing to unpack .../libcroco3_0.6.8-3+b1_amd64.deb ...
-Unpacking libcroco3:amd64 (0.6.8-3+b1) ...
-Selecting previously unselected package libgomp1:amd64.
-Preparing to unpack .../libgomp1_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libgomp1:amd64 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package libitm1:amd64.
-Preparing to unpack .../libitm1_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libitm1:amd64 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package liblsan0:amd64.
-Preparing to unpack .../liblsan0_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking liblsan0:amd64 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package libmpfr4:amd64.
-Preparing to unpack .../libmpfr4_3.1.2-2_amd64.deb ...
-Unpacking libmpfr4:amd64 (3.1.2-2) ...
-Selecting previously unselected package libquadmath0:amd64.
-Preparing to unpack .../libquadmath0_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libquadmath0:amd64 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package libtsan0:amd64.
-Preparing to unpack .../libtsan0_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libtsan0:amd64 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package libubsan0:amd64.
-Preparing to unpack .../libubsan0_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libubsan0:amd64 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package libunistring0:amd64.
-Preparing to unpack .../libunistring0_0.9.3-5.2+b1_amd64.deb ...
-Unpacking libunistring0:amd64 (0.9.3-5.2+b1) ...
-Selecting previously unselected package libmpc3:amd64.
-Preparing to unpack .../libmpc3_1.0.2-1_amd64.deb ...
-Unpacking libmpc3:amd64 (1.0.2-1) ...
-Selecting previously unselected package manpages.
-Preparing to unpack .../manpages_3.74-1_all.deb ...
-Unpacking manpages (3.74-1) ...
-Selecting previously unselected package netbase.
-Preparing to unpack .../archives/netbase_5.3_all.deb ...
-Unpacking netbase (5.3) ...
-Selecting previously unselected package vim-common.
-Preparing to unpack .../vim-common_2%3a7.4.488-7+deb8u4_amd64.deb ...
-Unpacking vim-common (2:7.4.488-7+deb8u4) ...
-Selecting previously unselected package bzip2.
-Preparing to unpack .../bzip2_1.0.6-7+deb8u2_amd64.deb ...
-Unpacking bzip2 (1.0.6-7+deb8u2) ...
-Selecting previously unselected package file.
-Preparing to unpack .../file_1%3a5.22+15-2+deb8u7_amd64.deb ...
-Unpacking file (1:5.22+15-2+deb8u7) ...
-Selecting previously unselected package gettext-base.
-Preparing to unpack .../gettext-base_0.19.3-2_amd64.deb ...
-Unpacking gettext-base (0.19.3-2) ...
-Selecting previously unselected package patch.
-Preparing to unpack .../patch_2.7.5-1+deb8u3_amd64.deb ...
-Unpacking patch (2.7.5-1+deb8u3) ...
-Selecting previously unselected package binutils.
-Preparing to unpack .../binutils_2.25-5+deb8u1_amd64.deb ...
-Unpacking binutils (2.25-5+deb8u1) ...
-Selecting previously unselected package cpp-4.9.
-Preparing to unpack .../cpp-4.9_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking cpp-4.9 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package cpp.
-Preparing to unpack .../cpp_4%3a4.9.2-2_amd64.deb ...
-Unpacking cpp (4:4.9.2-2) ...
-Selecting previously unselected package diffstat.
-Preparing to unpack .../diffstat_1.58-1_amd64.deb ...
-Unpacking diffstat (1.58-1) ...
-Selecting previously unselected package libfakeroot:amd64.
-Preparing to unpack .../libfakeroot_1.20.2-1_amd64.deb ...
-Unpacking libfakeroot:amd64 (1.20.2-1) ...
-Selecting previously unselected package fakeroot.
-Preparing to unpack .../fakeroot_1.20.2-1_amd64.deb ...
-Unpacking fakeroot (1.20.2-1) ...
-Selecting previously unselected package libgcc-4.9-dev:amd64.
-Preparing to unpack .../libgcc-4.9-dev_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking libgcc-4.9-dev:amd64 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package gcc-4.9.
-Preparing to unpack .../gcc-4.9_4.9.2-10+deb8u2_amd64.deb ...
-Unpacking gcc-4.9 (4.9.2-10+deb8u2) ...
-Selecting previously unselected package gcc.
-Preparing to unpack .../gcc_4%3a4.9.2-2_amd64.deb ...
-Unpacking gcc (4:4.9.2-2) ...
-Selecting previously unselected package gettext.
-Preparing to unpack .../gettext_0.19.3-2_amd64.deb ...
-Unpacking gettext (0.19.3-2) ...
-Selecting previously unselected package make.
-Preparing to unpack .../make_4.0-8.1_amd64.deb ...
-Unpacking make (4.0-8.1) ...
-Selecting previously unselected package hardening-includes.
-Preparing to unpack .../hardening-includes_2.6_all.deb ...
-Unpacking hardening-includes (2.6) ...
-Selecting previously unselected package intltool-debian.
-Preparing to unpack .../intltool-debian_0.35.0+20060710.1_all.deb ...
-Unpacking intltool-debian (0.35.0+20060710.1) ...
-Selecting previously unselected package libapt-pkg-perl.
-Preparing to unpack .../libapt-pkg-perl_0.1.29+b2_amd64.deb ...
-Unpacking libapt-pkg-perl (0.1.29+b2) ...
-Selecting previously unselected package libarchive-zip-perl.
-Preparing to unpack .../libarchive-zip-perl_1.39-1+deb8u1_all.deb ...
-Unpacking libarchive-zip-perl (1.39-1+deb8u1) ...
-Selecting previously unselected package libc-dev-bin.
-Preparing to unpack .../libc-dev-bin_2.19-18+deb8u10_amd64.deb ...
-Unpacking libc-dev-bin (2.19-18+deb8u10) ...
-Selecting previously unselected package linux-libc-dev:amd64.
-Preparing to unpack .../linux-libc-dev_3.16.84-1_amd64.deb ...
-Unpacking linux-libc-dev:amd64 (3.16.84-1) ...
-Selecting previously unselected package libc6-dev:amd64.
-Preparing to unpack .../libc6-dev_2.19-18+deb8u10_amd64.deb ...
-Unpacking libc6-dev:amd64 (2.19-18+deb8u10) ...
-Selecting previously unselected package libsub-name-perl.
-Preparing to unpack .../libsub-name-perl_0.12-1_amd64.deb ...
-Unpacking libsub-name-perl (0.12-1) ...
-Selecting previously unselected package libclass-accessor-perl.
-Preparing to unpack .../libclass-accessor-perl_0.34-1_all.deb ...
-Unpacking libclass-accessor-perl (0.34-1) ...
-Selecting previously unselected package libclone-perl.
-Preparing to unpack .../libclone-perl_0.37-1+b1_amd64.deb ...
-Unpacking libclone-perl (0.37-1+b1) ...
-Selecting previously unselected package libdigest-hmac-perl.
-Preparing to unpack .../libdigest-hmac-perl_1.03+dfsg-1_all.deb ...
-Unpacking libdigest-hmac-perl (1.03+dfsg-1) ...
-Selecting previously unselected package libtimedate-perl.
-Preparing to unpack .../libtimedate-perl_2.3000-2_all.deb ...
-Unpacking libtimedate-perl (2.3000-2) ...
-Selecting previously unselected package libdpkg-perl.
-Preparing to unpack .../libdpkg-perl_1.17.27_all.deb ...
-Unpacking libdpkg-perl (1.17.27) ...
-Selecting previously unselected package libnet-ssleay-perl.
-Preparing to unpack .../libnet-ssleay-perl_1.65-1+deb8u1_amd64.deb ...
-Unpacking libnet-ssleay-perl (1.65-1+deb8u1) ...
-Selecting previously unselected package libio-socket-ssl-perl.
-Preparing to unpack .../libio-socket-ssl-perl_2.002-2+deb8u3_all.deb ...
-Unpacking libio-socket-ssl-perl (2.002-2+deb8u3) ...
-Selecting previously unselected package libnet-smtp-ssl-perl.
-Preparing to unpack .../libnet-smtp-ssl-perl_1.01-3_all.deb ...
-Unpacking libnet-smtp-ssl-perl (1.01-3) ...
-Selecting previously unselected package libmailtools-perl.
-Preparing to unpack .../libmailtools-perl_2.13-1_all.deb ...
-Unpacking libmailtools-perl (2.13-1) ...
-Selecting previously unselected package libsocket6-perl.
-Preparing to unpack .../libsocket6-perl_0.25-1+b1_amd64.deb ...
-Unpacking libsocket6-perl (0.25-1+b1) ...
-Selecting previously unselected package libio-socket-inet6-perl.
-Preparing to unpack .../libio-socket-inet6-perl_2.72-1_all.deb ...
-Unpacking libio-socket-inet6-perl (2.72-1) ...
-Selecting previously unselected package libnet-ip-perl.
-Preparing to unpack .../libnet-ip-perl_1.26-1_all.deb ...
-Unpacking libnet-ip-perl (1.26-1) ...
-Selecting previously unselected package libnet-dns-perl.
-Preparing to unpack .../libnet-dns-perl_0.81-2+deb8u1_amd64.deb ...
-Unpacking libnet-dns-perl (0.81-2+deb8u1) ...
-Selecting previously unselected package libnet-domain-tld-perl.
-Preparing to unpack .../libnet-domain-tld-perl_1.72-1_all.deb ...
-Unpacking libnet-domain-tld-perl (1.72-1) ...
-Selecting previously unselected package libemail-valid-perl.
-Preparing to unpack .../libemail-valid-perl_1.195-1_all.deb ...
-Unpacking libemail-valid-perl (1.195-1) ...
-Selecting previously unselected package libfile-basedir-perl.
-Preparing to unpack .../libfile-basedir-perl_0.03-1_all.deb ...
-Unpacking libfile-basedir-perl (0.03-1) ...
-Selecting previously unselected package libio-pty-perl.
-Preparing to unpack .../libio-pty-perl_1%3a1.08-1+b4_amd64.deb ...
-Unpacking libio-pty-perl (1:1.08-1+b4) ...
-Selecting previously unselected package libio-string-perl.
-Preparing to unpack .../libio-string-perl_1.08-3_all.deb ...
-Unpacking libio-string-perl (1.08-3) ...
-Selecting previously unselected package libipc-run-perl.
-Preparing to unpack .../libipc-run-perl_0.92-1+deb8u1_all.deb ...
-Unpacking libipc-run-perl (0.92-1+deb8u1) ...
-Selecting previously unselected package liblist-moreutils-perl.
-Preparing to unpack .../liblist-moreutils-perl_0.33-2+b1_amd64.deb ...
-Unpacking liblist-moreutils-perl (0.33-2+b1) ...
-Selecting previously unselected package libparse-debianchangelog-perl.
-Preparing to unpack .../libparse-debianchangelog-perl_1.2.0-1.1_all.deb ...
-Unpacking libparse-debianchangelog-perl (1.2.0-1.1) ...
-Selecting previously unselected package libtext-levenshtein-perl.
-Preparing to unpack .../libtext-levenshtein-perl_0.11-1_all.deb ...
-Unpacking libtext-levenshtein-perl (0.11-1) ...
-Selecting previously unselected package liburi-perl.
-Preparing to unpack .../liburi-perl_1.64-1_all.deb ...
-Unpacking liburi-perl (1.64-1) ...
-Selecting previously unselected package patchutils.
-Preparing to unpack .../patchutils_0.3.3-1_amd64.deb ...
-Unpacking patchutils (0.3.3-1) ...
-Selecting previously unselected package t1utils.
-Preparing to unpack .../t1utils_1.38-4_amd64.deb ...
-Unpacking t1utils (1.38-4) ...
-Selecting previously unselected package lintian.
-Preparing to unpack .../lintian_2.5.30+deb8u4_all.deb ...
-Unpacking lintian (2.5.30+deb8u4) ...
-Selecting previously unselected package manpages-dev.
-Preparing to unpack .../manpages-dev_3.74-1_all.deb ...
-Unpacking manpages-dev (3.74-1) ...
-Selecting previously unselected package vim-runtime.
-Preparing to unpack .../vim-runtime_2%3a7.4.488-7+deb8u4_all.deb ...
-Adding 'diversion of /usr/share/vim/vim74/doc/help.txt to /usr/share/vim/vim74/doc/help.txt.vim-tiny by vim-runtime'
-Adding 'diversion of /usr/share/vim/vim74/doc/tags to /usr/share/vim/vim74/doc/tags.vim-tiny by vim-runtime'
-Unpacking vim-runtime (2:7.4.488-7+deb8u4) ...
-Selecting previously unselected package vim.
-Preparing to unpack .../vim_2%3a7.4.488-7+deb8u4_amd64.deb ...
-Unpacking vim (2:7.4.488-7+deb8u4) ...
-Setting up libgdbm3:amd64 (1.8.3-13.1) ...
-Setting up libpipeline1:amd64 (1.4.0-1) ...
-Setting up libssl1.0.0:amd64 (1.0.1t-1+deb8u12) ...
-debconf: unable to initialize frontend: Dialog
-debconf: (TERM is not set, so the dialog frontend is not usable.)
-debconf: falling back to frontend: Readline
-Setting up groff-base (1.22.2-8) ...
-Setting up bsdmainutils (9.0.6) ...
-update-alternatives: using /usr/bin/bsd-write to provide /usr/bin/write (write) in auto mode
-update-alternatives: using /usr/bin/bsd-from to provide /usr/bin/from (from) in auto mode
-Setting up man-db (2.7.0.2-5) ...
-debconf: unable to initialize frontend: Dialog
-debconf: (TERM is not set, so the dialog frontend is not usable.)
-debconf: falling back to frontend: Readline
-Building database of manual pages ...
-Setting up libasprintf0c2:amd64 (0.19.3-2) ...
-Setting up libgpm2:amd64 (1.20.4-6.1+b2) ...
-Setting up libmagic1:amd64 (1:5.22+15-2+deb8u7) ...
-Setting up libxml2:amd64 (2.9.1+dfsg1-5+deb8u8) ...
-Setting up perl-modules (5.20.2-3+deb8u12) ...
-Setting up perl (5.20.2-3+deb8u12) ...
-update-alternatives: using /usr/bin/prename to provide /usr/bin/rename (rename) in auto mode
-Setting up libasan1:amd64 (4.9.2-10+deb8u2) ...
-Setting up libatomic1:amd64 (4.9.2-10+deb8u2) ...
-Setting up libcilkrts5:amd64 (4.9.2-10+deb8u2) ...
-Setting up libisl10:amd64 (0.12.2-2) ...
-Setting up libcloog-isl4:amd64 (0.18.2-1+b2) ...
-Setting up libglib2.0-0:amd64 (2.42.1-1+deb8u3) ...
-No schema files found: doing nothing.
-Setting up libcroco3:amd64 (0.6.8-3+b1) ...
-Setting up libgomp1:amd64 (4.9.2-10+deb8u2) ...
-Setting up libitm1:amd64 (4.9.2-10+deb8u2) ...
-Setting up liblsan0:amd64 (4.9.2-10+deb8u2) ...
-Setting up libmpfr4:amd64 (3.1.2-2) ...
-Setting up libquadmath0:amd64 (4.9.2-10+deb8u2) ...
-Setting up libtsan0:amd64 (4.9.2-10+deb8u2) ...
-Setting up libubsan0:amd64 (4.9.2-10+deb8u2) ...
-Setting up libunistring0:amd64 (0.9.3-5.2+b1) ...
-Setting up libmpc3:amd64 (1.0.2-1) ...
-Setting up manpages (3.74-1) ...
-Setting up netbase (5.3) ...
-Setting up vim-common (2:7.4.488-7+deb8u4) ...
-Setting up bzip2 (1.0.6-7+deb8u2) ...
-Setting up file (1:5.22+15-2+deb8u7) ...
-Setting up gettext-base (0.19.3-2) ...
-Setting up patch (2.7.5-1+deb8u3) ...
-Setting up binutils (2.25-5+deb8u1) ...
-Setting up cpp-4.9 (4.9.2-10+deb8u2) ...
-Setting up cpp (4:4.9.2-2) ...
-Setting up diffstat (1.58-1) ...
-Setting up libfakeroot:amd64 (1.20.2-1) ...
-Setting up fakeroot (1.20.2-1) ...
-update-alternatives: using /usr/bin/fakeroot-sysv to provide /usr/bin/fakeroot (fakeroot) in auto mode
-Setting up libgcc-4.9-dev:amd64 (4.9.2-10+deb8u2) ...
-Setting up gcc-4.9 (4.9.2-10+deb8u2) ...
-Setting up gcc (4:4.9.2-2) ...
-Setting up gettext (0.19.3-2) ...
-Setting up make (4.0-8.1) ...
-Setting up hardening-includes (2.6) ...
-Setting up intltool-debian (0.35.0+20060710.1) ...
-Setting up libapt-pkg-perl (0.1.29+b2) ...
-Setting up libarchive-zip-perl (1.39-1+deb8u1) ...
-Setting up libc-dev-bin (2.19-18+deb8u10) ...
-Setting up linux-libc-dev:amd64 (3.16.84-1) ...
-Setting up libc6-dev:amd64 (2.19-18+deb8u10) ...
-Setting up libsub-name-perl (0.12-1) ...
-Setting up libclass-accessor-perl (0.34-1) ...
-Setting up libclone-perl (0.37-1+b1) ...
-Setting up libdigest-hmac-perl (1.03+dfsg-1) ...
-Setting up libtimedate-perl (2.3000-2) ...
-Setting up libdpkg-perl (1.17.27) ...
-Setting up libnet-ssleay-perl (1.65-1+deb8u1) ...
-Setting up libio-socket-ssl-perl (2.002-2+deb8u3) ...
-Setting up libnet-smtp-ssl-perl (1.01-3) ...
-Setting up libmailtools-perl (2.13-1) ...
-Setting up libsocket6-perl (0.25-1+b1) ...
-Setting up libio-socket-inet6-perl (2.72-1) ...
-Setting up libnet-ip-perl (1.26-1) ...
-Setting up libnet-dns-perl (0.81-2+deb8u1) ...
-Setting up libnet-domain-tld-perl (1.72-1) ...
-Setting up libemail-valid-perl (1.195-1) ...
-Setting up libfile-basedir-perl (0.03-1) ...
-Setting up libio-pty-perl (1:1.08-1+b4) ...
-Setting up libio-string-perl (1.08-3) ...
-Setting up libipc-run-perl (0.92-1+deb8u1) ...
-Setting up liblist-moreutils-perl (0.33-2+b1) ...
-Setting up libparse-debianchangelog-perl (1.2.0-1.1) ...
-Setting up libtext-levenshtein-perl (0.11-1) ...
-Setting up liburi-perl (1.64-1) ...
-Setting up patchutils (0.3.3-1) ...
-Setting up t1utils (1.38-4) ...
-Setting up lintian (2.5.30+deb8u4) ...
-Setting up manpages-dev (3.74-1) ...
-Setting up vim-runtime (2:7.4.488-7+deb8u4) ...
-Processing /usr/share/vim/addons/doc
-Setting up vim (2:7.4.488-7+deb8u4) ...
-update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/vim (vim) in auto mode
-update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/vimdiff (vimdiff) in auto mode
-update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/rvim (rvim) in auto mode
-update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/rview (rview) in auto mode
-update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/vi (vi) in auto mode
-update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/view (view) in auto mode
-update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/ex (ex) in auto mode
-update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/editor (editor) in auto mode
-Processing triggers for libc-bin (2.19-18+deb8u10) ...
-Removing intermediate container 1fa41c63628e
- ---> 69d1ed0a4ac5
-Step 12/15 : RUN mkdir -p /opt/tools/pkgs /opt/tools/dist
- ---> Running in ebada9181fe7
-Removing intermediate container ebada9181fe7
- ---> 278c011fc014
-Step 13/15 : COPY pkgs /opt/tools/pkgs
- ---> 7b24f745ee1c
-Step 14/15 : COPY run/build /opt/tools/build
- ---> 3301aa1ff570
-Step 15/15 : CMD [ "/opt/tools/build" ]
- ---> Running in 1afdbed79dce
-Removing intermediate container 1afdbed79dce
- ---> b5946e6b6ede
-Successfully built b5946e6b6ede
-Successfully tagged epi-tools:jessie

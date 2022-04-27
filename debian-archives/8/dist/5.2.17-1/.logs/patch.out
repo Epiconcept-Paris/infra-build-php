@@ -1,8 +1,0 @@
------ apache2.patch -----
-patching file sapi/apache2handler/php_functions.c
------ libxml2.patch -----
-patching file ext/dom/documenttype.c
-patching file ext/dom/node.c
-patching file ext/simplexml/simplexml.c
------ openssl.patch -----
-patching file ext/openssl/xp_ssl.c

@@ -1,3 +1,0 @@
-test -d ../top/usr/share/man/man8 || mkdir -p ../top/usr/share/man/man8
-cp -p php_clean_sessions.8 ../top/usr/share/man/man8
-gzip -n9 ../top/usr/share/man/man8/php_clean_sessions.8

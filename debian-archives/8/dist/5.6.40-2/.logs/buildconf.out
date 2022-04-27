@@ -1,6 +1,0 @@
-Forcing buildconf
-Removing configure caches
-buildconf: checking installation...
-buildconf: autoconf version 2.69 (ok)
-rebuilding configure
-rebuilding main/php_config.h.in
