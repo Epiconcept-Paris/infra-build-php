@@ -130,7 +130,7 @@ Vers()
 #
 Usage()
 {
-    echo "Usage: ./bake [ mk | rm | <Debian-version> | <PHP-version> | tools | multi ...]" >&2
+    echo "Usage: ./bake [ mk | rm | <PHP-version> | <Debian-version> | tools | multi ...]" >&2
     echo -e "\t<Debian-version> is an integer or '-' for all versions" >&2
     echo -e "\t<PHP-version> is <Major>.<minor> or <Major>.<minor>.<release> or" >&2
     echo -e "\t\t\t <Major>.<minor>.<release>-<build>" >&2
@@ -221,14 +221,8 @@ do
 		echo "$Prg: invalid PHP-version or distrib '$1'" >&2
 		exit 3
 	    fi
-	    test "$AllDeb" && Debs="$AllDeb" || Debs="$DebVer"
-	    for deb in $Debs
-	    do
-		if [ "$1" = 'multi' ]; then
-		    echo $deb | egrep "^(`cat $MulTop/mkre`)$" >/dev/null || continue
-		fi
-		eval echo "\" \$to$Mode\"" | grep " $deb:$1 " >/dev/null || eval "to$Mode=\"\${to$Mode}$deb:$1 \""
-	    done
+	    Tgts=$Tgts$TgtSep$1
+	    TgtSep=' '
 	    ;;
 	help)
 	    Usage 0
@@ -241,6 +235,17 @@ do
 	    ;;
     esac
     shift
+done
+test "$AllDeb" && Debs="$AllDeb" || Debs="$DebVer"
+for deb in $Debs
+do
+    for tgt in $Tgts
+    do
+	if [ "$tgt" = 'multi' ]; then
+	    echo $deb | egrep "^(`cat $MulTop/mkre`)$" >/dev/null || continue
+	fi
+	eval echo "\" \$to$Mode\"" | grep " $deb:$tgt " >/dev/null || eval "to$Mode=\"\${to$Mode}$deb:$tgt \""
+    done
 done
 test "$isMk" -o "$isRm" || { echo "$Prg: no mode [mk|rm] specified" >&2; Usage; }
 #echo "nbarg=$nbarg Do=\"$Do\" Mode=$Mode AllDeb=\"$AllDeb\" DebVer=\"$DebVer\" isMk=\"$isMk\" isRm=\"$isRm\" toMk=\"$toMk\" toRm=\"$toRm\""
@@ -309,7 +314,7 @@ if [ "$isRm" ]; then
 		test "$dir" -o "$imgs" && Objs="$Objs$dir+$imgs$what$LF"
 	    # Maj.min or version
 	    else
-		vers=`(cd $DebTop/$deb/dist; ls -d $key* 2>/dev/null | sed -r "s/^([\.0-9]+)-[0-9]+$/\1/"; echo "$DockImgs" | sed -nr "s/^(epi-(build|tests)-php)  *$name-($key[\.0-9]*) .*$/\3/p") | sort -u`
+		test -d $DebTop/$deb/dist && vers=`(cd $DebTop/$deb/dist; ls -d $key* 2>/dev/null | sed -r "s/^([\.0-9]+)-[0-9]+$/\1/"; echo "$DockImgs" | sed -nr "s/^(epi-(build|tests)-php)  *$name-($key[\.0-9]*) .*$/\3/p") | sort -u`
 		#echo "vers=\"$vers\""
 		for ver in $vers
 		do
