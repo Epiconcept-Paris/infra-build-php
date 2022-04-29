@@ -33,6 +33,9 @@ AddPECL()
 	curl -sSL "http://$PECLGET/$File" -o $Php/files/$Tgz
     fi
     BLDCOPY="$BLDCOPY
-COPY $Php/files/$Tgz $BUILD_TOP/files
+COPY $Php/files/$Tgz $BUILD_TOP/files"
+    test -f $Php/files/$2.patch && BLDCOPY="$BLDCOPY
+COPY $Php/files/$2.patch $BUILD_TOP/files"
+    BLDCOPY="$BLDCOPY
 COPY $Php/hooks/$4.sh $BUILD_TOP/hooks"
 }

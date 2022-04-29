@@ -1,6 +1,6 @@
-diff -rupN php-5.6.31.orig/ext/openssl/openssl.c php-5.6.31/ext/openssl/openssl.c
---- php-5.6.31.orig/ext/openssl/openssl.c	2017-07-06 00:25:00.000000000 +0200
-+++ php-5.6.31/ext/openssl/openssl.c	2017-08-01 10:55:28.108819344 +0200
+diff -rupN php.orig/ext/openssl/openssl.c php/ext/openssl/openssl.c
+--- php.orig/ext/openssl/openssl.c	2017-07-06 00:25:00.000000000 +0200
++++ php/ext/openssl/openssl.c	2017-08-01 10:55:28.108819344 +0200
 @@ -42,6 +42,12 @@
  
  /* OpenSSL includes */

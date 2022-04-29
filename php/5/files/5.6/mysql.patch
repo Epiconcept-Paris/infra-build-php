@@ -1,0 +1,14 @@
+diff -urN php.orig/ext/mysql/php_mysql.c php/ext/mysql/php_mysql.c
+--- php.orig/ext/mysql/php_mysql.c	2019-01-09 10:54:13.000000000 +0100
++++ php/ext/mysql/php_mysql.c	2022-04-27 11:39:30.540755554 +0200
+@@ -731,10 +731,6 @@
+ 	zend_bool free_host=0, new_link=0;
+ 	long connect_timeout;
+ 
+-    php_error_docref(NULL TSRMLS_CC,
+-                     E_DEPRECATED,
+-                     "The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead");
+-
+ #if !defined(MYSQL_USE_MYSQLND)
+ 	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
+ 		php_error_docref(NULL TSRMLS_CC, E_WARNING,

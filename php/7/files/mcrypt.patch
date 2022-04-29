@@ -1,0 +1,12 @@
+diff -urN ext/mcrypt.orig/mcrypt_filter.c ext/mcrypt/mcrypt_filter.c
+--- ext/mcrypt.orig/mcrypt_filter.c	2020-12-02 11:14:25.000000000 +0100
++++ ext/mcrypt/mcrypt_filter.c	2022-04-27 09:38:31.600704065 +0200
+@@ -159,8 +159,6 @@
+ 	char *mode = "cbc";
+ 	php_mcrypt_filter_data *data;
+ 
+-	php_error_docref(NULL, E_DEPRECATED, "mcrypt and mdecrypt stream filters have been deprecated");
+-
+ 	if (strncasecmp(filtername, "mdecrypt.", sizeof("mdecrypt.") - 1) == 0) {
+ 		encrypt = 0;
+ 		cipher += sizeof("de") - 1;
