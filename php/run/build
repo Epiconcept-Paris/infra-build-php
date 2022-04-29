@@ -5,22 +5,14 @@
 #
 Prg=`basename $0`
 Bld=`dirname $0`
-test -d $Bld/files -a -d $Bld/pkgs -a -d $Bld/dist || { "$0: cannot find 'files', 'pkgs' and 'dist' directories"; exit 1; }
-
-Ext=.tar.bz2
-# Get version of latest PHP source
-Ver=`expr "\`ls $Bld/files/php-*$Ext 2>/dev/null\`" : ".*/php-\([0-9\.]*\)$Ext"`
-if [ "$Ver" ]; then
-    echo "Found source of PHP $Ver in $Bld/files/"
-else
-    echo "$0: cannot find $Bld/files/php-<PHP-version>$Ext"
-    exit 1
-fi
-SupVer="5.2 5.6 7.1 7.4 8.1"		# UPDATE THIS on new PHP version
 Own="$USER:`id -gn $USER`"
 umask 022					# Needed for lintian
-find $Bld/pkgs | xargs chmod go-w
 
+test -d $Bld/files -a -d $Bld/pkgs -a -d $Bld/dist || {
+    "$0: cannot find 'files', 'pkgs' and 'dist' directories"
+    exit 1
+}
+find $Bld/pkgs | xargs chmod go-w
 Logs="$Bld/dist/.logs"				# Directory for log files
 Pkgs="$Bld/dist/.pkgs"				# List of packages built
 Debug="$Bld/dist/.debug"			# Directory for debug files
@@ -28,17 +20,34 @@ if [ -f $Bld/.debug -o "$2" = 'debug' ]; then
     su -c "mkdir -p $Debug" $USER
     Dbg=y					# Debug option
 fi
+
+# Get version of latest PHP source
+SupVer="5.2 5.6 7.1 7.4 8.1"		# UPDATE THIS on new PHP version
+Ext=.tar.bz2
+Ver=$(expr "$(ls $Bld/files/php-*$Ext 2>/dev/null)" : ".*/php-\([0-9\.]*\)$Ext")
+if [ "$Ver" ]; then
+    echo "Found source of PHP $Ver in $Bld/files/"
+else
+    echo "$0: cannot find $Bld/files/php-<PHP-version>$Ext"
+    exit 1
+fi
 Maj=`echo $Ver | awk -F. '{print $1}'`
 MajMin=`echo $Ver | awk -F. '{print $1 "." $2}'`
-echo " $SupVer " | grep " $MajMin " >/dev/null || echo "NOTICE: PHP version $MajMin is unsupported. Update SupVer= in $0 ?"
+echo " $SupVer " | grep " $MajMin " >/dev/null || {
+    echo "NOTICE: PHP version $MajMin is unsupported. Update SupVer= in $0 ?"
+    exit 2
+}
+#   Unpack if not done
+if [ ! -d /usr/src/php ]; then
+    echo "Extracting php-$Ver source..."
+    test -d /usr/src/php && rm -rf /usr/src/php
+    mkdir /usr/src/php-$Ver; chown $Own /usr/src/php-$Ver
+    su -c "tar xf $Bld/files/php-$Ver$Ext -C /usr/src" $USER
+    mv /usr/src/php-$Ver /usr/src/php
+fi
+test -f $Bld/.unpack && exit 0
 
 set -e	# Stop on errors
-
-echo "Extracting php-$Ver source..."
-test -d /usr/src/php && rm -rf /usr/src/php
-mkdir /usr/src/php-$Ver; chown $Own /usr/src/php-$Ver
-su -c "tar xf $Bld/files/php-$Ver$Ext -C /usr/src" $USER
-mv /usr/src/php-$Ver /usr/src/php
 
 cd /usr/src/php		# All relative paths are to here: do NOT change it!
 PhpAPI=`sed -n 's/ *#define ZEND_MODULE_API_NO //p' Zend/zend_modules.h`
@@ -152,6 +161,19 @@ chkln /usr/include curl x86_64-linux-gnu	# For OAuth
 
 test -d /var/run/apache2 || mkdir /var/run/apache2	# For apache2 -V in configure
 eval `grep '^export APACHE_' /etc/apache2/envvars`	# For apache2 -V in configure
+#
+#   Variables MM (Majeur/Mineur)
+#	Permettent d'éviter les tests répétés de version Debian cible
+#
+#   MM ($MM, %MM%)
+#	Suffixe des binaires, pages de man, fichiers de config. Vide sur Debian jessie
+#
+#   MMD ($MMD, %MMD%)
+#	Sous-répertoire de version PHP de /etc/php. Absent sur Debian jessie
+#
+#   MMJ ($MMJ, %MMJ%)
+#	Suffixe du module Apache2 libphp.so. Majeur seulement sous jessie
+#
 if [ "$DEBVER" = 'jessie' ]; then
     MM=""
     MMD=""
