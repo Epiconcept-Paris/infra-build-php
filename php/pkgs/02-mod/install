@@ -14,10 +14,12 @@ if [ "$Lib" ]; then
 else
     echo "\aERROR: no .so in $Top/usr/lib. Package will be useless."
 fi
+test -f $ModDir/php.load && mv $ModDir/php.load $ModDir/php$Maj.load	# PHP 8.1
 sed -i "s;$Top;;g" $ModDir/php$Maj.load
 if [ "$MMJ" != "$Maj" ]; then
     mv $ModDir/php$Maj.load $ModDir/php$MMJ.load
-    Ren="s/libphp$Maj/libphp$MMJ/"
+    test "`basename "$Lib"`" = 'libphp.so' && lpv= || lpv=$Maj		# PHP 8.1
+    Ren="s/libphp$lpv/libphp$MMJ/"
     sed -i "$Ren" $ModDir/php$MMJ.load
     test "$Lib" && mv $Lib `echo "$Lib" | sed "$Ren"`
 fi

@@ -37,7 +37,7 @@ test -d $DebTop || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
 #
 # Get existing PHP 5.x and 7.x versions
 #
-Versions=`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`
+Versions=`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" "http://$PHPSITE/ChangeLog-8.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`
 test "$Versions" || echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
 Versions="$Versions$LF`ls -d $PhpTop[5-9]/[5-9].* | sed "s;^$PhpTop./;;"`"
 Versions=`echo "$Versions" | sort -nru -t. -k 1,1 -k 2,2 -k 3,3`

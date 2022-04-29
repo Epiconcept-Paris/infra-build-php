@@ -11,3 +11,6 @@ LIB72_="libzip4"
 
 DEV74_="libonig-dev libsqlite3-dev"
 LIB74_="libonig4"
+
+DEV81_="$DEV72_ $DEV74_"
+LIB81_="$LIB72_ $LIB74_"
