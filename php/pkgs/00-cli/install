@@ -78,7 +78,7 @@ if [ "$MM" ]; then
      mv phar.phar.1.gz phar$MM.phar.1.gz
     )
     (cd $Top/usr/lib/php; mv extensions $MM)
-    sed -i -e "s/%MM%/$MM/g" -e "s/%PRI%/`echo $MM | tr -d .`/" $Top/DEBIAN/postinst
+    sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;g" -e "s/%PRI%/`echo $MM | tr -d .`/" $Top/DEBIAN/postinst
     sed -i "s/%MM%/$MM/g" $Top/DEBIAN/prerm
     mkdir -p $Top/usr/lib/epi-php$MMD
     if [ $Maj -ge 7 ]; then
