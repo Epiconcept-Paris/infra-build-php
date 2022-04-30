@@ -10,6 +10,7 @@ Dbg="$Tst/dist/.debug"
 test -d $Dbg || Dbg=
 LF='
 '
+unset HTTP_PROXY http_proxy
 
 #  AddVar var val [sep]
 AddVar()
