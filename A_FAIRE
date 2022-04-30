@@ -1,0 +1,9 @@
+install serveur:
+    recup fichiers source non-commités
+    fini quand push apt fonctionnel
+Ubuntu 20.04 LTS: /usr/share/{doc,man} de cli ignoré ??
+upgrade mysql en PHP 8
+pb version mariadb / php (dependances ?)
+x erreur info_mod.out
+x deprecated mcrypt et mysql (vérifier toutes versions)
+~ libssh2-1 ??
