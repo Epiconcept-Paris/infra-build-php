@@ -1,0 +1,106 @@
+#!/bin/sh
+#
+#	inst - Test Ubuntu focal (to be run from docker)
+#
+Prg=`basename $0`
+Pkgs=".pkgs"
+Logs=".ulog"
+Dbg=".udbg"
+LF='
+'
+
+set -e	# Stop on errors
+umask 022
+
+if [ ! -f $Pkgs ]; then
+    echo "$Prg: cannot find $Pkgs file" >&2
+    exit 1
+fi
+apt-get update
+apt-get upgrade -y
+apt-get install -y --no-install-recommends vim curl apache2 libpng16-16 libxpm4 libmcrypt4 libxslt1.1 libcurl4 libfreetype6 libmariadb3 libonig5 libreadline8 libssh2-1
+dpkg -i /opt/ubuntu/libjpeg62-turbo_*_amd64.deb
+dpkg -i /opt/ubuntu/libzip4_*_amd64.deb
+
+if [ ! -x /sbin/runlevel ]; then	# Needed by invoke-rc.d
+    echo "#!/bin/sh\necho \"${PREVLEVEL:-N} ${RUNLEVEL:-5}\"" >/sbin/runlevel
+    chmod +x /sbin/runlevel
+fi
+test -x /usr/sbin/policy-rc.d && grep 'exit 101' /usr/sbin/policy-rc.d >/dev/null && sed -i 's/exit 101/exit 104/' /usr/sbin/policy-rc.d
+
+test -d $Logs || mkdir "$Logs"
+test -d $Dbg || mkdir "$Dbg"
+>$Logs/a2.out
+echo "Setting Apache 2 to prefork mode..."
+sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf
+a2dismod mpm_event >>$Logs/a2.out 2>&1
+a2enmod mpm_prefork >>$Logs/a2.out 2>&1
+ln -s /opt/ubuntu/info.php /var/www/html
+unset HTTP_PROXY http_proxy
+echo "--- init-done -----" >>$Logs/a2.out
+
+set +e
+ApaCtl='/usr/sbin/apache2ctl'
+test "$Dbg" && >$Dbg/ps-ef.out
+>$Logs/dpkg-i.out
+while read Deb
+do
+    Pkg=`echo $Deb | awk -F_ '{print $1}'`
+    echo "----- $Deb"
+    if dpkg -l $Pkg >/dev/null 2>&1; then
+	echo "  . $Deb is already installed."
+	continue
+    fi
+    test "$Dbg" && (echo "--- pre-dpkg $Pkg -----"; ps -ef) >>$Dbg/ps-ef.out 2>&1
+    echo "----------------------------------------" >>$Logs/dpkg-i.out
+    Out="`dpkg -i $Deb 2>&1`"
+    xc=$?
+    if [ $xc -gt 0 ]; then
+	Cfl=`echo "$Out" | sed -nr 's/^ ([^ ]*) conflicts with.*$/\1/p'`
+	if [ "$Cfl" ]; then
+	    Out="$Out$LF    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	    Out="$Out$LF`dpkg -P $Cfl 2>&1`"
+	    echo "  ~ $Cfl removed as conflicting with $Pkg"
+	    Out="$Out$LF    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	    Out="$Out$LF`dpkg -i $Deb 2>&1`"
+	    xc=$?
+	fi
+    fi
+    echo "$Out" >>$Logs/dpkg-i.out
+    if [ $xc -eq 0 ]; then
+	echo "  - $Deb"
+	case "$Pkg" in
+	    *-cli)  echo -n "    Testing PHP CLI... "
+		    php /opt/ubuntu/info.php >$Logs/info_cli.out
+		    echo "done."
+		    ;;
+	    *-mod)  echo -n "    Testing PHP Apache module... "
+		    echo "--- mod-inst-done -----" >>$Logs/a2.out
+		    test "$Dbg" && (echo "--- post-install -----"; ps -ef) >>$Dbg/ps-ef.out 2>&1
+		    curl -sSL http://localhost/info.php >$Logs/info_mod.out
+		    $ApaCtl stop >>$Logs/a2.out 2>&1
+		    echo "--- mod-stop-done -----" >>$Logs/a2.out
+		    sleep 1
+		    echo "done."
+		    ;;
+	    *-fpm)  echo -n "    Testing PHP Apache FPM... "
+		    echo "--- fpm-inst-done -----" >>$Logs/a2.out
+		    a2enmod proxy_fcgi >>$Logs/a2.out 2>&1
+		    a2enconf $Pkg >>$Logs/a2.out 2>&1
+		    $ApaCtl restart >>$Logs/a2.out 2>&1
+		    echo "--- fpm-restart-done -----" >>$Logs/a2.out
+		    sleep 1
+		    test "$Dbg" && (echo "--- post-restart -----"; ps -ef) >>$Dbg/ps-ef.out 2>&1
+		    curl -sSL http://localhost/info.php >$Logs/info_fpm.out
+		    rc=/etc/init.d/php*-fpm
+		    $rc stop >>$Logs/a2.out 2>&1
+		    $ApaCtl stop >>$Logs/a2.out 2>&1
+		    echo "--- fpm-stop-done -----" >>$Logs/a2.out
+		    sleep 1
+		    echo "done."
+		    ;;
+	esac
+    fi
+    test "$Dbg" && (echo "--- post-dpkg $Pkg -----"; ps -ef) >>$Dbg/ps-ef.out 2>&1
+done <$Pkgs
+chown -R $UID:$UID $Logs $Dbg

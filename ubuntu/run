@@ -1,0 +1,2 @@
+#!/bin/sh
+docker run -ti -v /home/cdt/projects/infra-build-php:/opt -e UID=$(id -u) --name epi-ubu --rm ubuntu:focal
