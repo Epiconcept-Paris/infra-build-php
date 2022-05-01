@@ -16,6 +16,7 @@ if [ ! -f $Pkgs ]; then
     echo "$Prg: cannot find $Pkgs file" >&2
     exit 1
 fi
+rm -fv /etc/dpkg/dpkg.cfg.d/excludes | sed 's/^r/R/'
 apt-get update
 apt-get upgrade -y
 apt-get install -y --no-install-recommends vim curl apache2 libpng16-16 libxpm4 libmcrypt4 libxslt1.1 libcurl4 libfreetype6 libmariadb3 libonig5 libreadline8 libssh2-1
