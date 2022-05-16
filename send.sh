@@ -1,4 +1,4 @@
-tmp=/tmp/sendphp
+tmp=/space/tmp/sendphp
 user=epiconcept_build
 server=files.epiconcept.fr
 rm -fr $tmp
