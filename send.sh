@@ -3,7 +3,7 @@ user=epiconcept_build
 server=files.epiconcept.fr
 rm -fr $tmp
 mkdir $tmp
-cp $(find -name 'epi*.deb') $tmp/
+cp $(find -name 'epi*.deb' | grep -v '/dist/') $tmp/
 rsync -rav $tmp/ $user@$server:/space/applisdata/php/
 rm -r $tmp
 
