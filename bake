@@ -100,7 +100,7 @@ Vers()
     Sup=$(echo -n "$Sup" | tr '\n' '|')
 
     # Collect from Internet
-    Versions=`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`
+    Versions=`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" "http://$PHPSITE/ChangeLog-8.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`
     test "$Versions" || echo -e "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
     # Collect from our local PHP tree
     Versions="$Versions$LF`ls -d $PhpTop/[5-9]/[5-9].* | sed "s;^$PhpTop/./;;"`"
