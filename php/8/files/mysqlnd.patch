@@ -1,0 +1,83 @@
+diff -urN ext/mysqlnd.orig/mysqlnd.h ext/mysqlnd/mysqlnd.h
+--- ext/mysqlnd.orig/mysqlnd.h	2022-06-07 20:21:38.000000000 +0200
++++ ext/mysqlnd/mysqlnd.h	2022-06-25 18:56:05.261285346 +0200
+@@ -100,6 +100,7 @@
+ /* Query */
+ #define mysqlnd_fetch_into(result, flags, ret_val)	(result)->m.fetch_into((result), (flags), (ret_val) ZEND_FILE_LINE_CC)
+ #define mysqlnd_fetch_row_c(result)						(result)->m.fetch_row_c((result))
++#define mysqlnd_result_fetch_field_data(res,offset,ret)	(res)->m.fetch_field_data((res), (offset), (ret))
+ #define mysqlnd_fetch_row_zval(result, row_ptr, fetched) \
+ 	(result)->m.fetch_row((result), (row_ptr), 0, (fetched))
+ #define mysqlnd_get_connection_stats(conn, values)		((conn)->data)->m->get_statistics((conn)->data,  (values) ZEND_FILE_LINE_CC)
+diff -urN ext/mysqlnd.orig/mysqlnd_result.c ext/mysqlnd/mysqlnd_result.c
+--- ext/mysqlnd.orig/mysqlnd_result.c	2022-06-07 20:21:38.000000000 +0200
++++ ext/mysqlnd/mysqlnd_result.c	2022-06-25 21:03:19.290233114 +0200
+@@ -1048,12 +1048,49 @@
+ /* }}} */
+ 
+ 
++/* {{{ mysqlnd_res::fetch_field_data */
++static void
++MYSQLND_METHOD(mysqlnd_res, fetch_field_data)(MYSQLND_RES * result, const unsigned int offset, zval *return_value)
++{
++	zval row;
++	zval *entry;
++	unsigned int i = 0;
++
++	DBG_ENTER("mysqlnd_res::fetch_field_data");
++	DBG_INF_FMT("offset=%u", offset);
++	/*
++	  Hint Zend how many elements we will have in the hash. Thus it won't
++	  extend and rehash the hash constantly.
++	*/
++	mysqlnd_fetch_into(result, MYSQLND_FETCH_NUM, &row);
++	if (Z_TYPE(row) != IS_ARRAY) {
++		zval_ptr_dtor_nogc(&row);
++		RETVAL_NULL();
++		DBG_VOID_RETURN;
++	}
++
++	zend_hash_internal_pointer_reset(Z_ARRVAL(row));
++	while (i++ < offset) {
++		zend_hash_move_forward(Z_ARRVAL(row));
++	}
++
++	entry = zend_hash_get_current_data(Z_ARRVAL(row));
++
++	ZVAL_COPY(return_value, entry);
++	zval_ptr_dtor_nogc(&row);
++
++	DBG_VOID_RETURN;
++}
++/* }}} */
++
++
+ MYSQLND_CLASS_METHODS_START(mysqlnd_res)
+ 	MYSQLND_METHOD(mysqlnd_res, fetch_row),
+ 	MYSQLND_METHOD(mysqlnd_res, use_result),
+ 	MYSQLND_METHOD(mysqlnd_res, store_result),
+ 	MYSQLND_METHOD(mysqlnd_res, fetch_into),
+ 	MYSQLND_METHOD(mysqlnd_res, fetch_row_c),
++	MYSQLND_METHOD(mysqlnd_res, fetch_field_data),
+ 	MYSQLND_METHOD(mysqlnd_res, num_rows),
+ 	MYSQLND_METHOD(mysqlnd_res, num_fields),
+ 	MYSQLND_METHOD(mysqlnd_res, skip_result),
+diff -urN ext/mysqlnd.orig/mysqlnd_structs.h ext/mysqlnd/mysqlnd_structs.h
+--- ext/mysqlnd.orig/mysqlnd_structs.h	2022-06-07 20:21:38.000000000 +0200
++++ ext/mysqlnd/mysqlnd_structs.h	2022-06-26 00:41:11.584993922 +0200
+@@ -630,6 +630,7 @@
+ typedef MYSQLND_RES *		(*func_mysqlnd_res__store_result)(MYSQLND_RES * result, MYSQLND_CONN_DATA * const conn, MYSQLND_STMT_DATA *stmt);
+ typedef void 				(*func_mysqlnd_res__fetch_into)(MYSQLND_RES *result, const unsigned int flags, zval *return_value ZEND_FILE_LINE_DC);
+ typedef MYSQLND_ROW_C 		(*func_mysqlnd_res__fetch_row_c)(MYSQLND_RES *result);
++typedef void 				(*func_mysqlnd_res__fetch_field_data)(MYSQLND_RES *result, const unsigned int offset, zval *return_value);
+ typedef uint64_t			(*func_mysqlnd_res__num_rows)(const MYSQLND_RES * const result);
+ typedef unsigned int		(*func_mysqlnd_res__num_fields)(const MYSQLND_RES * const result);
+ typedef enum_func_status	(*func_mysqlnd_res__skip_result)(MYSQLND_RES * const result);
+@@ -660,6 +661,7 @@
+ 	func_mysqlnd_res__store_result store_result;
+ 	func_mysqlnd_res__fetch_into fetch_into;
+ 	func_mysqlnd_res__fetch_row_c fetch_row_c;
++	func_mysqlnd_res__fetch_field_data fetch_field_data;
+ 	func_mysqlnd_res__num_rows num_rows;
+ 	func_mysqlnd_res__num_fields num_fields;
+ 	func_mysqlnd_res__skip_result skip_result;

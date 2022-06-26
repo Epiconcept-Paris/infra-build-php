@@ -10,6 +10,15 @@ AddExtra()
 {
     # global Php Min BLDCOPY BUILD_TOP
 
+    #	MySQL legacy PHP extension
+    #	From https://github.com/php/pecl-database-mysql
+    #	Latest: https://github.com/php/pecl-database-mysql/archive/master.tar.gz
+    BLDCOPY="$BLDCOPY
+COPY $Php/files/mysql.tar.gz $BUILD_TOP/files
+COPY $Php/files/mysql.patch $BUILD_TOP/files
+COPY $Php/files/mysqlnd.patch $BUILD_TOP/files
+COPY $Php/hooks/mysql.sh $BUILD_TOP/hooks"
+
     #	PEAR man pages
     #	From http://pear.php.net/package/PEAR_Manpages/download (see Download link)
     #	Latest: http://download.pear.php.net/package/PEAR_Manpages-1.10.0.tgz

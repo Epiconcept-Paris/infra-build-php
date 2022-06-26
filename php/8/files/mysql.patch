@@ -1,0 +1,93 @@
+diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
+--- ext/mysql.orig/php_mysql.c	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/php_mysql.c	2022-06-26 17:12:26.018869560 +0200
+@@ -1,6 +1,6 @@
+ /*
+    +----------------------------------------------------------------------+
+-   | PHP Version 7                                                        |
++   | PHP Version 8                                                        |
+    +----------------------------------------------------------------------+
+    | Copyright (c) 1997-2015 The PHP Group                                |
+    +----------------------------------------------------------------------+
+@@ -740,10 +740,6 @@
+ 	zend_string *hashed_details = NULL;
+ 	zend_bool free_host = 0, new_link = 0;
+ 
+-    php_error_docref(NULL,
+-                     E_DEPRECATED,
+-                     "The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead");
+-
+ #if !defined(MYSQL_USE_MYSQLND)
+ 	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
+ 		php_error_docref(NULL, E_WARNING,
+@@ -900,7 +896,7 @@
+ #ifndef MYSQL_USE_MYSQLND
+ 			mysql->conn = mysql_init(NULL);
+ #else
+-			mysql->conn = mysqlnd_init(MYSQLND_CLIENT_KNOWS_RSET_COPY_DATA, persistent);
++			mysql->conn = mysqlnd_init(MYSQLND_CLIENT_NO_FLAG, persistent);
+ #endif
+ 
+ 			if (connect_timeout != -1) {
+@@ -909,7 +905,7 @@
+ #ifndef MYSQL_USE_MYSQLND
+ 			if (mysql_real_connect(mysql->conn, host, user, passwd, NULL, port, socket, client_flags)==NULL)
+ #else
+-			if (mysqlnd_connect(mysql->conn, host, user, passwd, passwd_len, NULL, 0, port, socket, client_flags, MYSQLND_CLIENT_KNOWS_RSET_COPY_DATA) == NULL)
++			if (mysqlnd_connect(mysql->conn, host, user, passwd, passwd_len, NULL, 0, port, socket, client_flags, MYSQLND_CLIENT_NO_FLAG) == NULL)
+ #endif
+ 			{
+ 				/* Populate connect error globals so that the error functions can read them */
+@@ -968,7 +964,7 @@
+ #ifndef MYSQL_USE_MYSQLND
+ 					if (mysql_real_connect(mysql->conn, host, user, passwd, NULL, port, socket, client_flags)==NULL)
+ #else
+-					if (mysqlnd_connect(mysql->conn, host, user, passwd, passwd_len, NULL, 0, port, socket, client_flags, MYSQLND_CLIENT_KNOWS_RSET_COPY_DATA) == NULL)
++					if (mysqlnd_connect(mysql->conn, host, user, passwd, passwd_len, NULL, 0, port, socket, client_flags, MYSQLND_CLIENT_NO_FLAG) == NULL)
+ #endif
+ 					{
+ 						php_error_docref(NULL, E_WARNING, "Link to server lost, unable to reconnect");
+@@ -1029,7 +1025,7 @@
+ #ifndef MYSQL_USE_MYSQLND
+ 		mysql->conn = mysql_init(NULL);
+ #else
+-		mysql->conn = mysqlnd_init(MYSQLND_CLIENT_KNOWS_RSET_COPY_DATA, persistent);
++		mysql->conn = mysqlnd_init(MYSQLND_CLIENT_NO_FLAG, persistent);
+ #endif
+ 		if (!mysql->conn) {
+ 			MySG(connect_error) = estrdup("OOM");
+@@ -1046,7 +1042,7 @@
+ #ifndef MYSQL_USE_MYSQLND
+ 		if (mysql_real_connect(mysql->conn, host, user, passwd, NULL, port, socket, client_flags)==NULL)
+ #else
+-		if (mysqlnd_connect(mysql->conn, host, user, passwd, passwd_len, NULL, 0, port, socket, client_flags, MYSQLND_CLIENT_KNOWS_RSET_COPY_DATA) == NULL)
++		if (mysqlnd_connect(mysql->conn, host, user, passwd, passwd_len, NULL, 0, port, socket, client_flags, MYSQLND_CLIENT_NO_FLAG) == NULL)
+ #endif
+ 		{
+ 			/* Populate connect error globals so that the error functions can read them */
+@@ -2240,7 +2236,7 @@
+ 		}
+ 	}
+ #else
+-	mysqlnd_fetch_into(mysql_result, ((result_type & MYSQL_NUM)? MYSQLND_FETCH_NUM:0) | ((result_type & MYSQL_ASSOC)? MYSQLND_FETCH_ASSOC:0), return_value, MYSQLND_MYSQL);
++	mysqlnd_fetch_into(mysql_result, ((result_type & MYSQL_NUM)? MYSQLND_FETCH_NUM:0) | ((result_type & MYSQL_ASSOC)? MYSQLND_FETCH_ASSOC:0), return_value);
+ #endif
+ 
+ 	/* mysqlnd might return FALSE if no more rows */
+@@ -2272,7 +2268,6 @@
+ 			fci.retval = &retval;
+ 			fci.params = NULL;
+ 			fci.param_count = 0;
+-			fci.no_separation = 1;
+ 
+ 			if (ctor_params && Z_TYPE_P(ctor_params) != IS_NULL) {
+ 				if (zend_fcall_info_args(&fci, ctor_params) == FAILURE) {
+@@ -2520,7 +2515,7 @@
+ #endif
+ 	add_property_stringl(return_value, "table", (mysql_field->table?mysql_field->table:""), mysql_field->table_length);
+ 	add_property_stringl(return_value, "def", (mysql_field->def?mysql_field->def:""), mysql_field->def_length);
+-	add_property_long(return_value, "max_length", mysql_field->max_length);
++	add_property_long(return_value, "max_length", 0);
+ 	add_property_long(return_value, "not_null", IS_NOT_NULL(mysql_field->flags)?1:0);
+ 	add_property_long(return_value, "primary_key", IS_PRI_KEY(mysql_field->flags)?1:0);
+ 	add_property_long(return_value, "multiple_key", (mysql_field->flags&MULTIPLE_KEY_FLAG?1:0));
