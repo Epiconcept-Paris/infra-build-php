@@ -253,6 +253,19 @@ if ! su -c "make -k >$Logs/make.out 2>&1" $USER; then
     exit 2
 fi
 
+test -x /etc/init.d/mysql && /etc/init.d/mysql start || {
+    test -x /etc/init.d/mariadb && /etc/init.d/mariadb start
+}
+mysql -e "CREATE USER '$USER'@'localhost'"
+mysql -e "GRANT ALL ON *.* TO '$USER'@'localhost' WITH GRANT OPTION"
+mysql -e "FLUSH PRIVILEGES"
+mysql -e "CREATE DATABASE test"
+export MYSQL_TEST_USER="$USER"
+export MYSQL_TEST_SOCKET='/var/run/mysqld/mysqld.sock'
+export PDO_MYSQL_TEST_USER="$MYSQL_TEST_USER"
+export PDO_MYSQL_TEST_SOCKET="$MYSQL_TEST_SOCKET"
+ln -s $MYSQL_TEST_SOCKET /tmp/mysql.sock
+
 set +e	# Continue on errors
 if [ -f $Bld/.notest ]; then
     echo "Skiping php-$Ver tests."
