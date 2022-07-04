@@ -1,6 +1,6 @@
 diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
 --- ext/mysql.orig/php_mysql.c	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/php_mysql.c	2022-06-26 17:12:26.018869560 +0200
++++ ext/mysql/php_mysql.c	2022-07-03 23:16:54.214862559 +0200
 @@ -1,6 +1,6 @@
  /*
     +----------------------------------------------------------------------+
@@ -9,6 +9,183 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
     +----------------------------------------------------------------------+
     | Copyright (c) 1997-2015 The PHP Group                                |
     +----------------------------------------------------------------------+
+@@ -239,65 +239,65 @@
+ /* {{{ mysql_functions[]
+  */
+ static const zend_function_entry mysql_functions[] = {
+-	PHP_FE(mysql_connect,								arginfo_mysql_connect)
+-	PHP_FE(mysql_pconnect,								arginfo_mysql_pconnect)
+-	PHP_FE(mysql_close,									arginfo__optional_mysql_link)
+-	PHP_FE(mysql_select_db,								arginfo_mysql_select_db)
++	PHP_FE(mysql_connect,			arginfo_mysql_connect)
++	PHP_FE(mysql_pconnect,			arginfo_mysql_pconnect)
++	PHP_FE(mysql_close,			arginfo__optional_mysql_link)
++	PHP_FE(mysql_select_db,			arginfo_mysql_select_db)
+ #ifndef NETWARE		/* The below two functions not supported on NetWare */
+ #if MYSQL_VERSION_ID < 40000
+-	PHP_DEP_FE(mysql_create_db,							arginfo_mysql_select_db)
+-	PHP_DEP_FE(mysql_drop_db,							arginfo_mysql_select_db)
++	PHP_DEP_FE(mysql_create_db,		arginfo_mysql_select_db)
++	PHP_DEP_FE(mysql_drop_db,		arginfo_mysql_select_db)
+ #endif
+ #endif	/* NETWARE */
+-	PHP_FE(mysql_query,									arginfo_mysql_query)
+-	PHP_FE(mysql_unbuffered_query,						arginfo_mysql_query)
+-	PHP_DEP_FE(mysql_db_query,							arginfo_mysql_db_query)
+-	PHP_DEP_FE(mysql_list_dbs,							arginfo__optional_mysql_link)
+-	PHP_DEP_FE(mysql_list_tables,						arginfo_mysql_select_db)
+-	PHP_FE(mysql_list_fields,							arginfo_mysql_list_fields)
+-	PHP_FE(mysql_list_processes,						arginfo__optional_mysql_link)
+-	PHP_FE(mysql_error,									arginfo__optional_mysql_link)
++	PHP_FE(mysql_query,			arginfo_mysql_query)
++	PHP_FE(mysql_unbuffered_query,		arginfo_mysql_query)
++	PHP_DEP_FE(mysql_db_query,		arginfo_mysql_db_query)
++	PHP_DEP_FE(mysql_list_dbs,		arginfo__optional_mysql_link)
++	PHP_DEP_FE(mysql_list_tables,		arginfo_mysql_select_db)
++	PHP_FE(mysql_list_fields,		arginfo_mysql_list_fields)
++	PHP_FE(mysql_list_processes,		arginfo__optional_mysql_link)
++	PHP_FE(mysql_error,			arginfo__optional_mysql_link)
+ #ifdef HAVE_MYSQL_ERRNO
+-	PHP_FE(mysql_errno,									arginfo__optional_mysql_link)
++	PHP_FE(mysql_errno,			arginfo__optional_mysql_link)
+ #endif
+-	PHP_FE(mysql_affected_rows,							arginfo__optional_mysql_link)
+-	PHP_FE(mysql_insert_id,								arginfo__optional_mysql_link)
+-	PHP_FE(mysql_result,								arginfo_mysql_result)
+-	PHP_FE(mysql_num_rows,								arginfo__result_mysql_arg)
+-	PHP_FE(mysql_num_fields,							arginfo__result_mysql_arg)
+-	PHP_FE(mysql_fetch_row,								arginfo__result_mysql_arg)
+-	PHP_FE(mysql_fetch_array,							arginfo_mysql_fetch_array)
+-	PHP_FE(mysql_fetch_assoc,							arginfo__result_mysql_arg)
+-	PHP_FE(mysql_fetch_object,							arginfo_mysql_fetch_object)
+-	PHP_FE(mysql_data_seek,								arginfo_mysql_data_seek)
+-	PHP_FE(mysql_fetch_lengths,							arginfo__result_mysql_arg)
+-	PHP_FE(mysql_fetch_field,							arginfo_mysql_fetch_field)
+-	PHP_FE(mysql_field_seek,							arginfo_mysql_field_seek)
+-	PHP_FE(mysql_free_result,							arginfo__result_mysql_arg)
+-	PHP_FE(mysql_field_name,							arginfo_mysql_field_name)
+-	PHP_FE(mysql_field_table,							arginfo_mysql_field_seek)
+-	PHP_FE(mysql_field_len,								arginfo_mysql_field_seek)
+-	PHP_FE(mysql_field_type,							arginfo_mysql_field_seek)
+-	PHP_FE(mysql_field_flags,							arginfo_mysql_field_seek)
+-	PHP_FE(mysql_escape_string,							arginfo_mysql_escape_string)
+-	PHP_FE(mysql_real_escape_string,					arginfo_mysql_real_escape_string)
+-	PHP_FE(mysql_stat,									arginfo__optional_mysql_link)
+-	PHP_FE(mysql_thread_id,								arginfo__optional_mysql_link)
+-	PHP_FE(mysql_client_encoding,						arginfo__optional_mysql_link)
+-	PHP_FE(mysql_ping,									arginfo__optional_mysql_link)
++	PHP_FE(mysql_affected_rows,		arginfo__optional_mysql_link)
++	PHP_FE(mysql_insert_id,			arginfo__optional_mysql_link)
++	PHP_FE(mysql_result,			arginfo_mysql_result)
++	PHP_FE(mysql_num_rows,			arginfo__result_mysql_arg)
++	PHP_FE(mysql_num_fields,		arginfo__result_mysql_arg)
++	PHP_FE(mysql_fetch_row,			arginfo__result_mysql_arg)
++	PHP_FE(mysql_fetch_array,		arginfo_mysql_fetch_array)
++	PHP_FE(mysql_fetch_assoc,		arginfo__result_mysql_arg)
++	PHP_FE(mysql_fetch_object,		arginfo_mysql_fetch_object)
++	PHP_FE(mysql_data_seek,			arginfo_mysql_data_seek)
++	PHP_FE(mysql_fetch_lengths,		arginfo__result_mysql_arg)
++	PHP_FE(mysql_fetch_field,		arginfo_mysql_fetch_field)
++	PHP_FE(mysql_field_seek,		arginfo_mysql_field_seek)
++	PHP_FE(mysql_free_result,		arginfo__result_mysql_arg)
++	PHP_FE(mysql_field_name,		arginfo_mysql_field_name)
++	PHP_FE(mysql_field_table,		arginfo_mysql_field_seek)
++	PHP_FE(mysql_field_len,			arginfo_mysql_field_seek)
++	PHP_FE(mysql_field_type,		arginfo_mysql_field_seek)
++	PHP_FE(mysql_field_flags,		arginfo_mysql_field_seek)
++	PHP_FE(mysql_escape_string,		arginfo_mysql_escape_string)
++	PHP_FE(mysql_real_escape_string,	arginfo_mysql_real_escape_string)
++	PHP_FE(mysql_stat,			arginfo__optional_mysql_link)
++	PHP_FE(mysql_thread_id,			arginfo__optional_mysql_link)
++	PHP_FE(mysql_client_encoding,		arginfo__optional_mysql_link)
++	PHP_FE(mysql_ping,			arginfo__optional_mysql_link)
+ #ifdef HAVE_GETINFO_FUNCS
+-	PHP_FE(mysql_get_client_info,						arginfo__void_mysql_arg)
+-	PHP_FE(mysql_get_host_info,							arginfo__optional_mysql_link)
+-	PHP_FE(mysql_get_proto_info,						arginfo__optional_mysql_link)
+-	PHP_FE(mysql_get_server_info,						arginfo__optional_mysql_link)
++	PHP_FE(mysql_get_client_info,		arginfo__void_mysql_arg)
++	PHP_FE(mysql_get_host_info,		arginfo__optional_mysql_link)
++	PHP_FE(mysql_get_proto_info,		arginfo__optional_mysql_link)
++	PHP_FE(mysql_get_server_info,		arginfo__optional_mysql_link)
+ #endif
+ 
+-	PHP_FE(mysql_info,									arginfo__optional_mysql_link)
++	PHP_FE(mysql_info,			arginfo__optional_mysql_link)
+ #ifdef MYSQL_HAS_SET_CHARSET
+-	PHP_FE(mysql_set_charset,							arginfo_mysql_set_charset)
++	PHP_FE(mysql_set_charset,		arginfo_mysql_set_charset)
+ #endif
+ 	/* for downwards compatibility */
+-	PHP_DEP_FALIAS(mysql,				mysql_db_query,		arginfo_mysql_db_query)
++	PHP_DEP_FALIAS(mysql,			mysql_db_query,		arginfo_mysql_db_query)
+ 	PHP_DEP_FALIAS(mysql_fieldname,		mysql_field_name,	arginfo_mysql_field_name)
+ 	PHP_DEP_FALIAS(mysql_fieldtable,	mysql_field_table,	arginfo_mysql_field_seek)
+ 	PHP_DEP_FALIAS(mysql_fieldlen,		mysql_field_len,	arginfo_mysql_field_seek)
+@@ -306,20 +306,20 @@
+ 	PHP_DEP_FALIAS(mysql_selectdb,		mysql_select_db,	arginfo_mysql_select_db)
+ #ifndef NETWARE		/* The below two functions not supported on NetWare */
+ #if MYSQL_VERSION_ID < 40000
+-	PHP_DEP_FALIAS(mysql_createdb,	mysql_create_db,	arginfo_mysql_select_db)
+-	PHP_DEP_FALIAS(mysql_dropdb,	mysql_drop_db,		arginfo_mysql_select_db)
++	PHP_DEP_FALIAS(mysql_createdb,		mysql_create_db,	arginfo_mysql_select_db)
++	PHP_DEP_FALIAS(mysql_dropdb,		mysql_drop_db,		arginfo_mysql_select_db)
+ #endif
+ #endif	/* NETWARE */
+ 	PHP_DEP_FALIAS(mysql_freeresult,	mysql_free_result,	arginfo__result_mysql_arg)
+ 	PHP_DEP_FALIAS(mysql_numfields,		mysql_num_fields,	arginfo__result_mysql_arg)
+ 	PHP_DEP_FALIAS(mysql_numrows,		mysql_num_rows,		arginfo__result_mysql_arg)
+ 	PHP_DEP_FALIAS(mysql_listdbs,		mysql_list_dbs,		arginfo__optional_mysql_link)
+-	PHP_DEP_FALIAS(mysql_listtables,mysql_list_tables,	arginfo_mysql_select_db)
++	PHP_DEP_FALIAS(mysql_listtables,	mysql_list_tables,	arginfo_mysql_select_db)
+ 	PHP_DEP_FALIAS(mysql_listfields,	mysql_list_fields,	arginfo_mysql_list_fields)
+ 	PHP_FALIAS(mysql_db_name,		mysql_result,		arginfo_mysql_result)
+ 	PHP_DEP_FALIAS(mysql_dbname,		mysql_result,		arginfo_mysql_result)
+ 	PHP_FALIAS(mysql_tablename,		mysql_result,		arginfo_mysql_result)
+-	PHP_FALIAS(mysql_table_name,	mysql_result,		arginfo_mysql_result)
++	PHP_FALIAS(mysql_table_name,		mysql_result,		arginfo_mysql_result)
+ 	PHP_FE_END
+ };
+ /* }}} */
+@@ -501,19 +501,19 @@
+ PHP_INI_BEGIN()
+ 	STD_PHP_INI_BOOLEAN("mysql.allow_persistent",	"1",	PHP_INI_SYSTEM,		OnUpdateLong,		allow_persistent,	zend_mysql_globals,		mysql_globals)
+ 	STD_PHP_INI_ENTRY_EX("mysql.max_persistent",	"-1",	PHP_INI_SYSTEM,		OnUpdateLong,		max_persistent,		zend_mysql_globals,		mysql_globals,	display_link_numbers)
+-	STD_PHP_INI_ENTRY_EX("mysql.max_links",			"-1",	PHP_INI_SYSTEM,		OnUpdateLong,		max_links,			zend_mysql_globals,		mysql_globals,	display_link_numbers)
+-	STD_PHP_INI_ENTRY("mysql.default_host",			NULL,	PHP_INI_ALL,		OnUpdateString,		default_host,		zend_mysql_globals,		mysql_globals)
+-	STD_PHP_INI_ENTRY("mysql.default_user",			NULL,	PHP_INI_ALL,		OnUpdateString,		default_user,		zend_mysql_globals,		mysql_globals)
+-	STD_PHP_INI_ENTRY("mysql.default_password",		NULL,	PHP_INI_ALL,		OnUpdateString,		default_password,	zend_mysql_globals,		mysql_globals)
+-	PHP_INI_ENTRY("mysql.default_port",				NULL,	PHP_INI_ALL,		OnMySQLPort)
++	STD_PHP_INI_ENTRY_EX("mysql.max_links",		"-1",	PHP_INI_SYSTEM,		OnUpdateLong,		max_links,		zend_mysql_globals,		mysql_globals,	display_link_numbers)
++	STD_PHP_INI_ENTRY("mysql.default_host",		NULL,	PHP_INI_ALL,		OnUpdateString,		default_host,		zend_mysql_globals,		mysql_globals)
++	STD_PHP_INI_ENTRY("mysql.default_user",		NULL,	PHP_INI_ALL,		OnUpdateString,		default_user,		zend_mysql_globals,		mysql_globals)
++	STD_PHP_INI_ENTRY("mysql.default_password",	NULL,	PHP_INI_ALL,		OnUpdateString,		default_password,	zend_mysql_globals,		mysql_globals)
++	PHP_INI_ENTRY("mysql.default_port",		NULL,	PHP_INI_ALL,		OnMySQLPort)
+ #ifdef MYSQL_UNIX_ADDR
+-	STD_PHP_INI_ENTRY("mysql.default_socket",		MYSQL_UNIX_ADDR,PHP_INI_ALL,OnUpdateStringUnempty,	default_socket,	zend_mysql_globals,		mysql_globals)
++	STD_PHP_INI_ENTRY("mysql.default_socket",	MYSQL_UNIX_ADDR,PHP_INI_ALL,	OnUpdateStringUnempty,	default_socket,		zend_mysql_globals,		mysql_globals)
+ #else
+-	STD_PHP_INI_ENTRY("mysql.default_socket",		NULL,	PHP_INI_ALL,		OnUpdateStringUnempty,	default_socket,	zend_mysql_globals,		mysql_globals)
++	STD_PHP_INI_ENTRY("mysql.default_socket",	NULL,	PHP_INI_ALL,		OnUpdateStringUnempty,	default_socket,		zend_mysql_globals,		mysql_globals)
+ #endif
+-	STD_PHP_INI_ENTRY("mysql.connect_timeout",		"60",	PHP_INI_ALL,		OnUpdateLong,		connect_timeout, 	zend_mysql_globals,		mysql_globals)
+-	STD_PHP_INI_BOOLEAN("mysql.trace_mode",			"0",	PHP_INI_ALL,		OnUpdateLong,		trace_mode, 		zend_mysql_globals,		mysql_globals)
+-	STD_PHP_INI_BOOLEAN("mysql.allow_local_infile",	"1",	PHP_INI_SYSTEM,		OnUpdateLong,		allow_local_infile, zend_mysql_globals,		mysql_globals)
++	STD_PHP_INI_ENTRY("mysql.connect_timeout",	"60",	PHP_INI_ALL,		OnUpdateLong,		connect_timeout, 	zend_mysql_globals,		mysql_globals)
++	STD_PHP_INI_BOOLEAN("mysql.trace_mode",		"0",	PHP_INI_ALL,		OnUpdateLong,		trace_mode, 		zend_mysql_globals,		mysql_globals)
++	STD_PHP_INI_BOOLEAN("mysql.allow_local_infile",	"1",	PHP_INI_SYSTEM,		OnUpdateLong,		allow_local_infile,	zend_mysql_globals,		mysql_globals)
+ PHP_INI_END()
+ /* }}} */
+ 
+@@ -666,7 +666,7 @@
+ 
+ 	if (MySG(trace_mode)) {
+ 		if (MySG(result_allocated)){
+-			php_error_docref("function.mysql-free-result", E_WARNING, "%pu result set(s) not freed. Use mysql_free_result to free result sets which were requested using mysql_query()", MySG(result_allocated));
++			php_error_docref("function.mysql-free-result", E_WARNING, ZEND_ULONG_FMT " result set(s) not freed. Use mysql_free_result to free result sets which were requested using mysql_query()", MySG(result_allocated));
+ 		}
+ 	}
+ 
 @@ -740,10 +740,6 @@
  	zend_string *hashed_details = NULL;
  	zend_bool free_host = 0, new_link = 0;
@@ -20,7 +197,58 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  #if !defined(MYSQL_USE_MYSQLND)
  	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
  		php_error_docref(NULL, E_WARNING,
-@@ -900,7 +896,7 @@
+@@ -788,17 +784,24 @@
+ 	} else {
+ 		/* mysql_pconnect does not support new_link parameter */
+ 		if (persistent) {
+-			if (zend_parse_parameters(ZEND_NUM_ARGS(), "|s!s!s!l", &host_and_port, &host_len,
+-									&user, &user_len, &passwd, &passwd_len,
+-									&client_flags)==FAILURE) {
+-				return;
+-        	}
++			/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|s!s!s!l", &host_and_port, &host_len, &user, &user_len, &passwd, &passwd_len, &client_flags)==FAILURE) { return; } */
++			ZEND_PARSE_PARAMETERS_START(0, 4)
++				Z_PARAM_OPTIONAL
++				Z_PARAM_STRING_OR_NULL(host_and_port,host_len)
++				Z_PARAM_STRING_OR_NULL(user,user_len)
++				Z_PARAM_STRING_OR_NULL(passwd,passwd_len)
++				Z_PARAM_LONG(client_flags)
++			ZEND_PARSE_PARAMETERS_END();
+ 		} else {
+-			if (zend_parse_parameters(ZEND_NUM_ARGS(), "|s!s!s!bl", &host_and_port, &host_len,
+-										&user, &user_len, &passwd, &passwd_len,
+-										&new_link, &client_flags)==FAILURE) {
+-				return;
+-			}
++			/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|s!s!s!bl", &host_and_port, &host_len, &user, &user_len, &passwd, &passwd_len, &new_link, &client_flags)==FAILURE) { return; } */
++			ZEND_PARSE_PARAMETERS_START(0, 5)
++				Z_PARAM_OPTIONAL
++				Z_PARAM_STRING_OR_NULL(host_and_port,host_len)
++				Z_PARAM_STRING_OR_NULL(user,user_len)
++				Z_PARAM_STRING_OR_NULL(passwd,passwd_len)
++				Z_PARAM_BOOL(new_link)
++				Z_PARAM_LONG(client_flags)
++			ZEND_PARSE_PARAMETERS_END();
+ 		}
+ 
+ 		if (!host_and_port) {
+@@ -874,13 +877,13 @@
+ #endif
+ 
+ 			if (MySG(max_links) != -1 && MySG(num_links) >= MySG(max_links)) {
+-				php_error_docref(NULL, E_WARNING, "Too many open links (%pd)", MySG(num_links));
++				php_error_docref(NULL, E_WARNING, "Too many open links (" ZEND_LONG_FMT ")", MySG(num_links));
+ 				zend_string_release(hashed_details);
+ 				MYSQL_DO_CONNECT_RETURN_FALSE();
+ 			}
+ 
+ 			if (MySG(max_persistent) != -1 && MySG(num_persistent) >= MySG(max_persistent)) {
+-				php_error_docref(NULL, E_WARNING, "Too many open persistent links (%pd)", MySG(num_persistent));
++				php_error_docref(NULL, E_WARNING, "Too many open persistent links (" ZEND_LONG_FMT ")", MySG(num_persistent));
+ 				zend_string_release(hashed_details);
+ 				MYSQL_DO_CONNECT_RETURN_FALSE();
+ 			}
+@@ -900,7 +903,7 @@
  #ifndef MYSQL_USE_MYSQLND
  			mysql->conn = mysql_init(NULL);
  #else
@@ -29,7 +257,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  #endif
  
  			if (connect_timeout != -1) {
-@@ -909,7 +905,7 @@
+@@ -909,7 +912,7 @@
  #ifndef MYSQL_USE_MYSQLND
  			if (mysql_real_connect(mysql->conn, host, user, passwd, NULL, port, socket, client_flags)==NULL)
  #else
@@ -38,7 +266,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  #endif
  			{
  				/* Populate connect error globals so that the error functions can read them */
-@@ -968,7 +964,7 @@
+@@ -968,7 +971,7 @@
  #ifndef MYSQL_USE_MYSQLND
  					if (mysql_real_connect(mysql->conn, host, user, passwd, NULL, port, socket, client_flags)==NULL)
  #else
@@ -47,7 +275,16 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  #endif
  					{
  						php_error_docref(NULL, E_WARNING, "Link to server lost, unable to reconnect");
-@@ -1029,7 +1025,7 @@
+@@ -1015,7 +1018,7 @@
+ 		}
+ 
+ 		if (MySG(max_links) != -1 && MySG(num_links) >= MySG(max_links)) {
+-			php_error_docref(NULL, E_WARNING, "Too many open links (%pd)", MySG(num_links));
++			php_error_docref(NULL, E_WARNING, "Too many open links (" ZEND_LONG_FMT ")", MySG(num_links));
+ 			zend_string_release(hashed_details);
+ 			MYSQL_DO_CONNECT_RETURN_FALSE();
+ 		}
+@@ -1029,7 +1032,7 @@
  #ifndef MYSQL_USE_MYSQLND
  		mysql->conn = mysql_init(NULL);
  #else
@@ -56,7 +293,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  #endif
  		if (!mysql->conn) {
  			MySG(connect_error) = estrdup("OOM");
-@@ -1046,7 +1042,7 @@
+@@ -1046,7 +1049,7 @@
  #ifndef MYSQL_USE_MYSQLND
  		if (mysql_real_connect(mysql->conn, host, user, passwd, NULL, port, socket, client_flags)==NULL)
  #else
@@ -65,7 +302,504 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  #endif
  		{
  			/* Populate connect error globals so that the error functions can read them */
-@@ -2240,7 +2236,7 @@
+@@ -1124,9 +1127,11 @@
+ 	zval *mysql_link = NULL;
+ 	php_mysql_conn *mysql;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (mysql_link) {
+ 		if (!(mysql = (php_mysql_conn *)zend_fetch_resource2(Z_RES_P(mysql_link), "MySQL-Link", le_link, le_plink))) {
+@@ -1136,7 +1141,7 @@
+ 		if (!MySG(default_link)) {
+ 			zend_fetch_resource2_ex(NULL, "MySQL-Link", le_link, le_plink); /* trigger a warning to be consistent */
+ 			RETURN_FALSE;
+-		}	
++		}
+ 		if (!(mysql = (php_mysql_conn *)zend_fetch_resource2(MySG(default_link), "MySQL-Link", le_link, le_plink))) {
+ 			RETURN_FALSE;
+ 		}
+@@ -1175,9 +1180,12 @@
+ 	php_mysql_conn *mysql;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &db, &db_len, &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &db, &db_len, &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 2)
++		Z_PARAM_STRING(db,db_len)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1203,9 +1211,8 @@
+    Returns a string that represents the client library version */
+ PHP_FUNCTION(mysql_get_client_info)
+ {
+-	if (zend_parse_parameters_none() == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters_none() == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_NONE();
+ 
+ 	RETURN_STRING((char *)mysql_get_client_info());
+ }
+@@ -1218,9 +1225,11 @@
+ 	zval *mysql_link = NULL;
+ 	php_mysql_conn *mysql;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1243,9 +1252,11 @@
+ 	zval *mysql_link = NULL;
+ 	php_mysql_conn *mysql;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1268,9 +1279,11 @@
+ 	zval *mysql_link = NULL;
+ 	php_mysql_conn *mysql;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1294,9 +1307,11 @@
+ 	zval *mysql_link = NULL;
+ 	php_mysql_conn *mysql;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1323,9 +1338,11 @@
+ 	zval *mysql_link = NULL;
+ 	php_mysql_conn *mysql;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1353,10 +1370,11 @@
+ 	zend_string *stat;
+ #endif
+ 
+-
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1389,9 +1407,11 @@
+ 	php_mysql_conn *mysql;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1418,9 +1438,12 @@
+ 	php_mysql_conn *mysql;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &csname, &csname_len, &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &csname, &csname_len, &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 2)
++		Z_PARAM_STRING(csname,csname_len)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1591,7 +1614,7 @@
+ 	}
+ 	MySG(result_allocated)++;
+ 	ZVAL_RES(return_value, zend_register_resource(mysql_result, le_result));
+-	
++
+ 	if (use_store == MYSQL_USE_RESULT) {
+ 		mysql->active_result_res = Z_RES_P(return_value);
+ 		Z_ADDREF_P(return_value);
+@@ -1608,9 +1631,12 @@
+ 	zval *mysql_link = NULL;
+ 	php_mysql_conn *mysql;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &query, &query_len, &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &query, &query_len, &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 2)
++		Z_PARAM_STRING(query,query_len)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1651,9 +1677,13 @@
+ 	php_mysql_conn *mysql;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|r", &db, &db_len, &query, &query_len, &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|r", &db, &db_len, &query, &query_len, &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(2, 3)
++		Z_PARAM_STRING(db,db_len)
++		Z_PARAM_STRING(query,query_len)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1679,9 +1709,11 @@
+ 	MYSQL_RES *mysql_result;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1717,9 +1749,12 @@
+ 	zval *mysql_link = NULL;
+ 	MYSQL_RES *mysql_result;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &db, &db_len, &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &db, &db_len, &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 2)
++		Z_PARAM_STRING(db,db_len)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1756,9 +1791,13 @@
+ 	php_mysql_conn *mysql;
+ 	MYSQL_RES *mysql_result;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|r", &db, &db_len, &table, &table_len, &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss|r", &db, &db_len, &table, &table_len, &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(2, 3)
++		Z_PARAM_STRING(db,db_len)
++		Z_PARAM_STRING(table,table_len)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1776,6 +1815,7 @@
+ 
+ 	PHPMY_UNBUFFERED_QUERY_CHECK();
+ 
++	/* NOTE: the #if's below DO mean that this function will always fail in PHP 7.1+ */
+ #if PHP_VERSION_ID < 70100
+ 	if ((mysql_result=mysql_list_fields(mysql->conn, table, NULL))==NULL) {
+ #endif
+@@ -1797,9 +1837,11 @@
+ 	zval *mysql_link = NULL;
+ 	MYSQL_RES *mysql_result;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1831,9 +1873,11 @@
+ 	php_mysql_conn *mysql;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		if (MySG(default_link) == NULL) {
+@@ -1862,9 +1906,11 @@
+ 	php_mysql_conn *mysql;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		if (MySG(default_link) == NULL) {
+@@ -1893,9 +1939,11 @@
+ 	php_mysql_conn *mysql;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1920,9 +1968,10 @@
+ 	size_t str_len;
+ 	zend_string *escaped_str;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &str, &str_len) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &str, &str_len) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 1)
++		Z_PARAM_STRING(str,str_len)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	/* assume worst case situation, which is 2x of the original string.
+ 	 * we don't realloc() down to the real size since it'd most probably not
+@@ -1946,9 +1995,12 @@
+ 	php_mysql_conn *mysql;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &str, &str_len, &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &str, &str_len, &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 2)
++		Z_PARAM_STRING(str,str_len)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -1978,9 +2030,11 @@
+ 	php_mysql_conn *mysql;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+@@ -2015,16 +2069,20 @@
+ Do 2 zend_parse_parameters calls instead of type "z" and switch below
+ Q: String or long first?
+ */
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "rl|z", &result, &row, &field) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "rl|z", &result, &row, &field) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(2, 3)
++		Z_PARAM_RESOURCE(result)
++		Z_PARAM_LONG(row)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_ZVAL(field)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if ((mysql_result = (MYSQL_RES*)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
+ 		RETURN_FALSE;
+ 	}
+ 
+ 	if (row < 0 || row >= (int)mysql_num_rows(mysql_result)) {
+-		php_error_docref(NULL, E_WARNING, "Unable to jump to row %pd on MySQL result index %d", row, Z_RES_P(result)->handle);
++		php_error_docref(NULL, E_WARNING, "Unable to jump to row " ZEND_LONG_FMT " on MySQL result index " ZEND_LONG_FMT, row, Z_RES_P(result)->handle);
+ 		RETURN_FALSE;
+ 	}
+ 	mysql_data_seek(mysql_result, row);
+@@ -2054,7 +2112,7 @@
+ 						i++;
+ 					}
+ 					if (!tmp_field) { /* no match found */
+-						php_error_docref(NULL, E_WARNING, "%s%s%s not found in MySQL result index %d",
++						php_error_docref(NULL, E_WARNING, "%s%s%s not found in MySQL result index " ZEND_LONG_FMT,
+ 									(table_name?table_name:""), (table_name?".":""), field_name, Z_RES_P(result)->handle);
+ 						efree(field_name);
+ 						if (table_name) {
+@@ -2102,9 +2160,10 @@
+ 	zval *result;
+ 	MYSQL_RES *mysql_result;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "r", &result) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "r", &result) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 1)
++		Z_PARAM_RESOURCE(result)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if ((mysql_result = (MYSQL_RES*)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
+ 		RETURN_FALSE;
+@@ -2122,9 +2181,10 @@
+ 	zval *result;
+ 	MYSQL_RES *mysql_result;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "r", &result) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "r", &result) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 1)
++		Z_PARAM_RESOURCE(result)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if ((mysql_result = (MYSQL_RES*)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
+ 		RETURN_FALSE;
+@@ -2151,18 +2211,13 @@
+ 	if (into_object) {
+ 		zend_string *class_name = NULL;
+ 
+-#ifndef FAST_ZPP
+-		if (zend_parse_parameters(ZEND_NUM_ARGS(), "z|Sz", &res, &class_name, &ctor_params) == FAILURE) {
+-			return;
+-		}
+-#else
+-	ZEND_PARSE_PARAMETERS_START(1, 3)
+-		Z_PARAM_ZVAL(res)
+-		Z_PARAM_OPTIONAL
+-		Z_PARAM_STR(class_name)
+-		Z_PARAM_ZVAL(ctor_params)
+-	ZEND_PARSE_PARAMETERS_END();
+-#endif
++		/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "z|Sz", &res, &class_name, &ctor_params) == FAILURE) { return; } */
++		ZEND_PARSE_PARAMETERS_START(1, 3)
++			Z_PARAM_ZVAL(res)
++			Z_PARAM_OPTIONAL
++			Z_PARAM_STR(class_name)
++			Z_PARAM_ZVAL(ctor_params)
++		ZEND_PARSE_PARAMETERS_END();
+ 
+ 		if (ZEND_NUM_ARGS() < 2) {
+ 			ce = zend_standard_class_def;
+@@ -2175,24 +2230,19 @@
+ 		}
+ 		result_type = MYSQL_ASSOC;
+ 	} else {
+-#ifndef FAST_ZPP
+-		if (zend_parse_parameters(ZEND_NUM_ARGS(), "r|l", &res, &result_type) == FAILURE) {
+-			return;
+-		}
+-#else
+-	ZEND_PARSE_PARAMETERS_START(1, 2)
+-		Z_PARAM_RESOURCE(res)
+-		Z_PARAM_OPTIONAL
+-		Z_PARAM_LONG(result_type)
+-	ZEND_PARSE_PARAMETERS_END();
+-#endif
++		/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "r|l", &res, &result_type) == FAILURE) { return; } */
++		ZEND_PARSE_PARAMETERS_START(1, 2)
++			Z_PARAM_RESOURCE(res)
++			Z_PARAM_OPTIONAL
++			Z_PARAM_LONG(result_type)
++		ZEND_PARSE_PARAMETERS_END();
+ 		if (!result_type) {
+ 			/* result_type might have been set outside, so only overwrite when not set */
+ 			result_type = MYSQL_BOTH;
+ 		}
+ 	}
+ 
+-	if (result_type & ~MYSQL_BOTH) {
++	if (result_type < MYSQL_ASSOC || result_type > MYSQL_BOTH) {
+ 		php_error_docref(NULL, E_WARNING, "The result type should be either MYSQL_NUM, MYSQL_ASSOC or MYSQL_BOTH");
+ 		result_type = MYSQL_BOTH;
+ 	}
+@@ -2240,11 +2290,11 @@
  		}
  	}
  #else
@@ -74,15 +808,74 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  #endif
  
  	/* mysqlnd might return FALSE if no more rows */
-@@ -2272,7 +2268,6 @@
+-	if (into_object && Z_TYPE_P(return_value) != IS_FALSE) {
++	if (into_object && Z_TYPE_P(return_value) != IS_FALSE && Z_TYPE_P(return_value) != IS_NULL) {
+ 		zval dataset;
+ 		zend_fcall_info fci;
+ 		zend_fcall_info_cache fcc;
+@@ -2272,7 +2322,7 @@
  			fci.retval = &retval;
  			fci.params = NULL;
  			fci.param_count = 0;
 -			fci.no_separation = 1;
++			fci.named_params = NULL;
  
  			if (ctor_params && Z_TYPE_P(ctor_params) != IS_NULL) {
  				if (zend_fcall_info_args(&fci, ctor_params) == FAILURE) {
-@@ -2520,7 +2515,7 @@
+@@ -2361,16 +2411,18 @@
+ 	zend_long offset;
+ 	MYSQL_RES *mysql_result;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "rl", &result, &offset)) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "rl", &result, &offset) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(2, 2)
++		Z_PARAM_RESOURCE(result)
++		Z_PARAM_LONG(offset)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if ((mysql_result = zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
+ 		RETURN_FALSE;
+ 	}
+ 
+ 	if (offset < 0 || offset >= (int)mysql_num_rows(mysql_result)) {
+-		php_error_docref(NULL, E_WARNING, "Offset %pd is invalid for MySQL result index %d (or the query data is unbuffered)", offset, Z_RES_P(result)->handle);
++		php_error_docref(NULL, E_WARNING, "Offset " ZEND_LONG_FMT " is invalid for MySQL result index " ZEND_LONG_FMT " (or the query data is unbuffered)", offset, Z_RES_P(result)->handle);
+ 		RETURN_FALSE;
+ 	}
+ 	mysql_data_seek(mysql_result, offset);
+@@ -2388,9 +2440,10 @@
+ 	int num_fields;
+ 	int i;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "r", &result) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "r", &result) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 1)
++		Z_PARAM_RESOURCE(result)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
+ 		RETURN_FALSE;
+@@ -2493,9 +2546,12 @@
+ 	MYSQL_RES *mysql_result;
+ 	const MYSQL_FIELD *mysql_field;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "r|l", &result, &field) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "r|l", &result, &field) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 2)
++		Z_PARAM_RESOURCE(result)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_LONG(field)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
+ 		RETURN_FALSE;
+@@ -2520,7 +2576,7 @@
  #endif
  	add_property_stringl(return_value, "table", (mysql_field->table?mysql_field->table:""), mysql_field->table_length);
  	add_property_stringl(return_value, "def", (mysql_field->def?mysql_field->def:""), mysql_field->def_length);
@@ -91,3 +884,3585 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  	add_property_long(return_value, "not_null", IS_NOT_NULL(mysql_field->flags)?1:0);
  	add_property_long(return_value, "primary_key", IS_PRI_KEY(mysql_field->flags)?1:0);
  	add_property_long(return_value, "multiple_key", (mysql_field->flags&MULTIPLE_KEY_FLAG?1:0));
+@@ -2541,16 +2597,18 @@
+ 	zend_long offset;
+ 	MYSQL_RES *mysql_result;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "rl", &result, &offset) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "rl", &result, &offset) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(2, 2)
++		Z_PARAM_RESOURCE(result)
++		Z_PARAM_LONG(offset)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
+ 		RETURN_FALSE;
+ 	}
+ 
+ 	if (offset < 0 || offset >= (int)mysql_num_fields(mysql_result)) {
+-		php_error_docref(NULL, E_WARNING, "Field %pd is invalid for MySQL result index %d", offset, Z_RES_P(result)->handle);
++		php_error_docref(NULL, E_WARNING, "Field " ZEND_LONG_FMT " is invalid for MySQL result index " ZEND_LONG_FMT, offset, Z_RES_P(result)->handle);
+ 		RETURN_FALSE;
+ 	}
+ 	mysql_field_seek(mysql_result, offset);
+@@ -2575,16 +2633,18 @@
+ 	char buf[512];
+ 	int  len;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "rl", &result, &field) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "rl", &result, &field) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(2, 2)
++		Z_PARAM_RESOURCE(result)
++		Z_PARAM_LONG(field)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
+ 		RETURN_FALSE;
+ 	}
+ 
+ 	if (field < 0 || field >= (int)mysql_num_fields(mysql_result)) {
+-		php_error_docref(NULL, E_WARNING, "Field %pd is invalid for MySQL result index %d", field, Z_RES_P(result)->handle);
++		php_error_docref(NULL, E_WARNING, "Field " ZEND_LONG_FMT " is invalid for MySQL result index " ZEND_LONG_FMT, field, Z_RES_P(result)->handle);
+ 		RETURN_FALSE;
+ 	}
+ 	mysql_field_seek(mysql_result, field);
+@@ -2734,9 +2794,10 @@
+ 	zval *result;
+ 	MYSQL_RES *mysql_result;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "r", &result) == FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "r", &result) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(1, 1)
++		Z_PARAM_RESOURCE(result)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
+ 		RETURN_FALSE;
+@@ -2754,9 +2815,11 @@
+ 	php_mysql_conn *mysql;
+ 	zval *mysql_link = NULL;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link)==FAILURE) {
+-		return;
+-	}
++	/* if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &mysql_link) == FAILURE) { return; } */
++	ZEND_PARSE_PARAMETERS_START(0, 1)
++		Z_PARAM_OPTIONAL
++		Z_PARAM_RESOURCE(mysql_link)
++	ZEND_PARSE_PARAMETERS_END();
+ 
+ 	if (!mysql_link) {
+ 		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+diff -urN ext/mysql.orig/tests/001.phpt ext/mysql/tests/001.phpt
+--- ext/mysql.orig/tests/001.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/001.phpt	2022-06-27 13:45:22.876210981 +0200
+@@ -29,8 +29,5 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ string(2) "11"
+ done!
+diff -urN ext/mysql.orig/tests/002.phpt ext/mysql/tests/002.phpt
+--- ext/mysql.orig/tests/002.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/002.phpt	2022-06-27 13:19:29.143245378 +0200
+@@ -37,7 +37,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ resource(%d) of type (mysql link)
+ bool(true)
+ bool(true)
+diff -urN ext/mysql.orig/tests/003.phpt ext/mysql/tests/003.phpt
+--- ext/mysql.orig/tests/003.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/003.phpt	2022-06-27 13:19:35.759879721 +0200
+@@ -57,7 +57,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ ==stdClass==
+ object(stdClass)#%d (1) {
+   ["a"]=>
+diff -urN ext/mysql.orig/tests/bug47438.phpt ext/mysql/tests/bug47438.phpt
+--- ext/mysql.orig/tests/bug47438.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/bug47438.phpt	2022-06-27 13:19:41.380418571 +0200
+@@ -47,7 +47,6 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ 0.a
+ 1.b
+ 2.c
+diff -urN ext/mysql.orig/tests/bug48754.phpt ext/mysql/tests/bug48754.phpt
+--- ext/mysql.orig/tests/bug48754.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/bug48754.phpt	2022-07-01 16:37:18.627393792 +0200
+@@ -35,7 +35,9 @@
+ var_dump($link);
+ 
+ // we sohuld have no default link anymore
++try {
+ mysql_close();
++} catch(Throwable $e) { show_catched($e); }
+ 
+ echo "\nClosing default link\n";
+ $link = my_mysql_connect($host, $user, $passwd, $db, $port, $socket);
+@@ -46,7 +48,9 @@
+ var_dump($link);
+ mysql_close();
+ var_dump($link);
++try {
+ mysql_close($link);
++} catch(Throwable $e) { show_catched($e); }
+ var_dump($link);
+ 
+ echo "\nExplicit resource and pconnect\n";
+@@ -56,7 +60,9 @@
+ var_dump($link);
+ 
+ // we sohuld have no default link
++try {
+ mysql_close();
++} catch(Throwable $e) { show_catched($e); }
+ 
+ echo "\nDefault link and pconnect\n";
+ $link = my_mysql_pconnect($host, $user, $passwd, $db, $port, $socket);
+@@ -68,33 +74,23 @@
+ ?>
+ --EXPECTF--
+ Explicit connection on close
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ Expect same thread id for $link and default conn: bool(true)
+ resource(%d) of type (mysql link)
+ resource(%d) of type (Unknown)
+-
+-Warning: mysql_close(): no MySQL-Link resource supplied in %s on line %d
++TypeError: mysql_close(): no MySQL-Link resource supplied in %s on line %d
+ 
+ Closing default link
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ Expect same thread id for $link and default conn but not the previous: bool(true)
+ resource(%d) of type (mysql link)
+ resource(%d) of type (mysql link)
+ resource(%d) of type (Unknown)
+ 
+ Explicit resource and pconnect
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ resource(%d) of type (mysql link persistent)
+ resource(%d) of type (Unknown)
+-
+-Warning: mysql_close(): no MySQL-Link resource supplied in %s on line %d
++TypeError: mysql_close(): no MySQL-Link resource supplied in %s on line %d
+ 
+ Default link and pconnect
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ resource(%d) of type (mysql link persistent)
+ resource(%d) of type (mysql link persistent)
+ resource(%d) of type (Unknown)
+diff -urN ext/mysql.orig/tests/bug51242.phpt ext/mysql/tests/bug51242.phpt
+--- ext/mysql.orig/tests/bug51242.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/bug51242.phpt	2022-06-27 13:20:05.922771515 +0200
+@@ -35,5 +35,4 @@
+ }
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ resource(%d) of type (mysql link)
+diff -urN ext/mysql.orig/tests/bug53649.phpt ext/mysql/tests/bug53649.phpt
+--- ext/mysql.orig/tests/bug53649.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/bug53649.phpt	2022-07-03 19:49:00.724062344 +0200
+@@ -18,7 +18,8 @@
+ 
+ if (!mysql_query("LOAD DATA LOCAL INFILE 'bug53649.data' INTO TABLE test", $link) &&
+ 	1148 == mysql_errno($link))
+-		die("skip LOAD DATA LOAD INFILE not allowed\n");
++		die("skip LOAD DATA LOCAL INFILE not allowed\n");
++unlink('bug53649.data');
+ ?>
+ --FILE--
+ <?php
+@@ -49,6 +50,7 @@
+ 		echo "done";
+ 	}
+ 	mysql_close($link);
++	unlink('bug53649.data');
+ ?>
+ --CLEAN--
+ <?php
+@@ -68,5 +70,4 @@
+ unlink('bug53649.data');
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done
+diff -urN ext/mysql.orig/tests/bug55473.phpt ext/mysql/tests/bug55473.phpt
+--- ext/mysql.orig/tests/bug55473.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/bug55473.phpt	2022-07-03 16:07:38.752201419 +0200
+@@ -1,5 +1,5 @@
+ --TEST--
+-Bug #5547 (mysql_pconnect leaks file descriptors on reconnect)
++Bug #55473 (mysql_pconnect leaks file descriptors on reconnect)
+ --SKIPIF--
+ <?php
+ require_once('skipif.inc');
+@@ -9,10 +9,13 @@
+ }
+ 
+ if (!$IS_MYSQLND)
+-    die("skip mysqlnd only, libmysql does not warning about server gone away");
++    die("skip mysqlnd only, libmysql does not warn about server gone away");
+ 
+ if (!($output = @exec("lsof -np " . getmypid())))
+ 	die("skip Test can't find command line tool lsof");
++
++if (file_exists('nodelay'))
++	die("skip File 'nodelay' exists");
+ ?>
+ --INI--
+ mysql.max_persistent=30
+@@ -60,7 +63,7 @@
+ 
+ 		if ($opened_files == -1) {
+ 			$opened_files = trim(exec("lsof -np " . getmypid() . " | wc -l"));
+-			printf("[005] Setting openened files...\n");
++			printf("[005] Setting opened files...\n");
+ 		} else if (($tmp = trim(exec("lsof -np " . getmypid() . " | wc -l"))) != $opened_files) {
+ 			printf("[006] [%d] different number of opened_files : expected %d, got %d", $i, $opened_files, $tmp);
+ 		} else {
+@@ -71,29 +74,12 @@
+ 	print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_ping(): MySQL server has gone away in %s on line %d
+ [003] reconnect 0
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-[005] Setting openened files...
+-
+-Warning: mysql_ping(): MySQL server has gone away in %s on line %d
++[005] Setting opened files...
+ [003] reconnect 1
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [007] Opened files as expected
+-
+-Warning: mysql_ping(): MySQL server has gone away in %s on line %d
+ [003] reconnect 2
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [007] Opened files as expected
+-
+-Warning: mysql_ping(): MySQL server has gone away in %s on line %d
+ [003] reconnect 3
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [007] Opened files as expected
+ done!
+diff -urN ext/mysql.orig/tests/connect.inc ext/mysql/tests/connect.inc
+--- ext/mysql.orig/tests/connect.inc	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/connect.inc	2022-07-01 16:19:53.795593761 +0200
+@@ -55,17 +55,30 @@
+ 	printf("skip Eeeek/BUG/FIXME - connect.inc included twice! skipif bug?\n");
+ }
+ 
++if (!function_exists('show_catched')) {
++	function show_catched($e)
++	{
++		$what = get_class($e);
++		$code = $e->getCode();
++		$mesg = $e->getMessage();
++		$file = $e->getFile();
++		$line = $e->getLine();
++		$num = $code > 0 ? " ($code)" : '';
++		echo "$what: $mesg$num in $file on line $line\n";
++	}
++}
++
+ /*
+ Default values are "localhost", "root", database "test" and empty password.
+ Change the MYSQL_TEST_* environment values if you want to use another configuration.
+ */
+ 
+-$host		= getenv("MYSQL_TEST_HOST")	? getenv("MYSQL_TEST_HOST")	: "localhost";
+-$port		= getenv("MYSQL_TEST_PORT")	? getenv("MYSQL_TEST_PORT")	: 3306;
+-$user		= getenv("MYSQL_TEST_USER")	? getenv("MYSQL_TEST_USER")	: "root";
++$host	= getenv("MYSQL_TEST_HOST")	? getenv("MYSQL_TEST_HOST")	: "localhost";
++$port	= getenv("MYSQL_TEST_PORT")	? getenv("MYSQL_TEST_PORT")	: 3306;
++$user	= getenv("MYSQL_TEST_USER")	? getenv("MYSQL_TEST_USER")	: "root";
+ $passwd	= getenv("MYSQL_TEST_PASSWD")	? getenv("MYSQL_TEST_PASSWD")	: "";
+ 
+-$db			= getenv("MYSQL_TEST_DB")	? getenv("MYSQL_TEST_DB")	: "test";
++$db	= getenv("MYSQL_TEST_DB")	? getenv("MYSQL_TEST_DB")	: "test";
+ $engine	= getenv("MYSQL_TEST_ENGINE")	? getenv("MYSQL_TEST_ENGINE")	: "MyISAM";
+ $socket	= getenv("MYSQL_TEST_SOCKET")	? getenv("MYSQL_TEST_SOCKET")	: null;
+ $skip_on_connect_failure  = getenv("MYSQL_TEST_SKIP_CONNECT_FAILURE") ? getenv("MYSQL_TEST_SKIP_CONNECT_FAILURE") : true;
+diff -urN ext/mysql.orig/tests/mysql_affected_rows.phpt ext/mysql/tests/mysql_affected_rows.phpt
+--- ext/mysql.orig/tests/mysql_affected_rows.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_affected_rows.phpt	2022-07-02 22:11:31.933480987 +0200
+@@ -13,14 +13,20 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (0 !== ($tmp = @mysql_affected_rows()))
+ 	printf("[001] Expecting int/0, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (null !== ($tmp = @mysql_affected_rows($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (!is_null($tmp = @mysql_affected_rows($link, $link)))
+ 	printf("[003] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (!$link = my_mysql_connect($host, $user, $passwd, $db, $port, $socket))
+ 	printf("[004] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+@@ -112,8 +118,10 @@
+ 
+ mysql_close($link);
+ 
++try {
+ if (false !== ($tmp = @mysql_affected_rows($link)))
+ 	printf("[029] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ print "done!";
+ ?>
+@@ -122,5 +130,7 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++TypeError: mysql_affected_rows(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++ArgumentCountError: mysql_affected_rows() expects at most 1 argument, 2 given in %s on line %d
++TypeError: mysql_affected_rows(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_client_encoding.phpt ext/mysql/tests/mysql_client_encoding.phpt
+--- ext/mysql.orig/tests/mysql_client_encoding.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_client_encoding.phpt	2022-07-02 22:27:18.212011888 +0200
+@@ -63,11 +63,13 @@
+ 
+ mysql_close($link);
+ 
++try {
+ if (false !== ($tmp = @mysql_client_encoding($link)))
+ 	printf("[012] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++TypeError: mysql_client_encoding(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_close.phpt ext/mysql/tests/mysql_close.phpt
+--- ext/mysql.orig/tests/mysql_close.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_close.phpt	2022-07-02 22:37:04.020048782 +0200
+@@ -12,17 +12,23 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (false !== ($tmp = @mysql_close()))
+ 	printf("[001] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_close($link, $link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (!$link = my_mysql_connect($host, $user, $passwd, $db, $port, $socket))
+ 	printf("[003] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+ 		$host, $user, $db, $port, $socket);
+ 
++try {
+ $tmp = @mysql_close(NULL);
++} catch(Throwable $e) { show_catched($e); }
+ if (null !== $tmp)
+ 	printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
+ 
+@@ -30,11 +36,16 @@
+ if (true !== $tmp)
+ 	printf("[005] Expecting boolean/true, got %s/%s\n", gettype($tmp), $tmp);
+ 
++try {
+ if (false !== ($tmp = @mysql_query("SELECT 1", $link)))
+ 	printf("[006] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ print "done!\n";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++TypeError: mysql_close(): no MySQL-Link resource supplied in %s on line %d
++ArgumentCountError: mysql_close() expects at most 1 argument, 2 given in %s on line %d
++TypeError: mysql_close(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++TypeError: mysql_query(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_connect.phpt ext/mysql/tests/mysql_connect.phpt
+--- ext/mysql.orig/tests/mysql_connect.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_connect.phpt	2022-07-03 16:05:33.704238393 +0200
+@@ -13,8 +13,10 @@
+ $link   = NULL;
+ 
+ // mysql_connect ( [string server [, string username [, string password [, bool new_link [, int client_flags]]]]] )
++try {
+ if (NULL !== ($tmp = @mysql_connect($link, $link, $link, $link, $link, $link)))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ $myhost = (is_null($socket)) ? ((is_null($port)) ? $host : $host . ':' . $port) : $host . ':' . $socket;
+ if (!$link = mysql_connect($myhost, $user, $passwd, true))
+@@ -104,25 +106,7 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_connect() expects at most 5 arguments, 6 given in %s on line %d
+ 
+ Warning: mysql_connect(): Access denied for user '%s'@'%s' (using password: YES) in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_constants.phpt ext/mysql/tests/mysql_constants.phpt
+--- ext/mysql.orig/tests/mysql_constants.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_constants.phpt	2022-06-27 13:23:08.428270230 +0200
+@@ -62,5 +62,4 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_create_db.phpt ext/mysql/tests/mysql_create_db.phpt
+--- ext/mysql.orig/tests/mysql_create_db.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_create_db.phpt	2022-06-27 13:23:16.305025506 +0200
+@@ -53,7 +53,4 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_data_seek.phpt ext/mysql/tests/mysql_data_seek.phpt
+--- ext/mysql.orig/tests/mysql_data_seek.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_data_seek.phpt	2022-07-02 22:58:22.231061663 +0200
+@@ -12,14 +12,20 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (NULL !== ($tmp = @mysql_data_seek()))
+ 	printf("[001] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_data_seek($link)))
+ 	printf("[002] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_data_seek($link, $link)))
+ 	printf("[003] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query('SELECT * FROM test ORDER BY id LIMIT 4', $link))
+@@ -55,8 +61,10 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ if (false !== ($tmp = mysql_data_seek($res, 1)))
+ 	printf("[013] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ 
+@@ -67,13 +75,14 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_data_seek() expects exactly 2 arguments, 0 given in %s on line %d
++ArgumentCountError: mysql_data_seek() expects exactly 2 arguments, 1 given in %s on line %d
++TypeError: mysql_data_seek(): Argument #1 ($result) must be of type resource, null given in %s on line %d
+ 
+ Warning: mysql_data_seek(): Offset 4 is invalid for MySQL result index %d (or the query data is unbuffered) in %s on line %d
+ 
+ Warning: mysql_data_seek(): Offset -1 is invalid for MySQL result index %d (or the query data is unbuffered) in %s on line %d
+ 
+ Warning: mysql_data_seek(): Offset 3 is invalid for MySQL result index %d (or the query data is unbuffered) in %s on line %d
+-
+-Warning: mysql_data_seek(): supplied resource is not a valid MySQL result resource in %s on line %d
++TypeError: mysql_data_seek(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_db_name.phpt ext/mysql/tests/mysql_db_name.phpt
+--- ext/mysql.orig/tests/mysql_db_name.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_db_name.phpt	2022-07-02 23:05:52.834265884 +0200
+@@ -12,11 +12,15 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (NULL !== ($tmp = @mysql_db_name()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_db_name($link, $link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ 
+@@ -50,20 +54,22 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ if (false !== ($tmp = mysql_db_name($res, $num)))
+ 	printf("[999] Expecting boolean/false, got %s/%s. [%d] %s\n",
+ 		gettype($tmp), $tmp, mysql_errno($link), mysql_error($link));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ 
+ print "done!\n";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_db_name() expects at least 2 arguments, 0 given in %s on line %d
++TypeError: mysql_db_name(): Argument #1 ($result) must be of type resource, null given in %s on line %d
+ 
+ Warning: mysql_db_name(): Unable to jump to row -1 on MySQL result index %d in %s on line %d
+ 
+ Warning: mysql_db_name(): Unable to jump to row %d on MySQL result index %d in %s on line %d
+-
+-Warning: mysql_db_name(): supplied resource is not a valid MySQL result resource in %s on line %d
++TypeError: mysql_db_name(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_db_query.phpt ext/mysql/tests/mysql_db_query.phpt
+--- ext/mysql.orig/tests/mysql_db_query.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_db_query.phpt	2022-07-02 23:15:46.235401898 +0200
+@@ -15,14 +15,20 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (NULL !== ($tmp = @mysql_db_query()))
+ 	printf("[001] Expecting NULL/NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_db_query($link)))
+ 	printf("[002] Expecting NULL/NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_db_query($link)))
+ 	printf("[003] Expecting NULL/NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = @mysql_db_query($db, 'SELECT id, label FROM test ORDER BY id LIMIT 1', $link))
+@@ -66,5 +72,7 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_db_query() expects at least 2 arguments, 0 given in %s on line %d
++ArgumentCountError: mysql_db_query() expects at least 2 arguments, 1 given in %s on line %d
++ArgumentCountError: mysql_db_query() expects at least 2 arguments, 1 given in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_deprecated_api.phpt ext/mysql/tests/mysql_deprecated_api.phpt
+--- ext/mysql.orig/tests/mysql_deprecated_api.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_deprecated_api.phpt	2022-06-27 13:24:08.662045925 +0200
+@@ -75,5 +75,4 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_drop_db.phpt ext/mysql/tests/mysql_drop_db.phpt
+--- ext/mysql.orig/tests/mysql_drop_db.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_drop_db.phpt	2022-06-27 13:24:14.202577204 +0200
+@@ -52,5 +52,4 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_errno.phpt ext/mysql/tests/mysql_errno.phpt
+--- ext/mysql.orig/tests/mysql_errno.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_errno.phpt	2022-07-02 23:23:28.984110398 +0200
+@@ -15,11 +15,15 @@
+ if (false !== ($tmp = @mysql_errno()))
+ 	printf("[001] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+ 
++try {
+ if (null !== ($tmp = @mysql_errno($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (!is_null($tmp = @mysql_errno($link, 'too many args')))
+ 	printf("[002b] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (!$link = my_mysql_connect($host, $user, $passwd, $db, $port, $socket)) {
+ 	printf("[003] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+@@ -36,7 +40,9 @@
+ 
+ mysql_close($link);
+ 
++try {
+ var_dump(mysql_errno($link));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if ($link = @mysql_connect($host . '_unknown', $user . '_unknown', $passwd, true)) {
+ 	printf("[005] Can connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+@@ -55,10 +61,9 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++TypeError: mysql_errno(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++ArgumentCountError: mysql_errno() expects at most 1 argument, 2 given in %s on line %d
+ int(0)
+ int(%d)
+-
+-Warning: mysql_errno(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+-bool(false)
++TypeError: mysql_errno(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_error.phpt ext/mysql/tests/mysql_error.phpt
+--- ext/mysql.orig/tests/mysql_error.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_error.phpt	2022-07-02 23:43:10.349738884 +0200
+@@ -15,11 +15,15 @@
+ if (false !== ($tmp = @mysql_error()))
+ 	printf("[001] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+ 
++try {
+ if (NULL !== ($tmp = @mysql_error($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (!is_null($tmp = @mysql_error($link, 'too many args')))
+ 	printf("[002b] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (!$link = my_mysql_connect($host, $user, $passwd, $db, $port, $socket)) {
+ 	printf("[003] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+@@ -48,7 +52,9 @@
+ 
+ mysql_close($link);
+ 
++try {
+ var_dump(mysql_error($link));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if ($link = @mysql_connect($host . '_unknown', $user . '_unknown', $passwd, true)) {
+ 	printf("[008] Can connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+@@ -64,8 +70,7 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_error(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+-bool(false)
++TypeError: mysql_error(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++ArgumentCountError: mysql_error() expects at most 1 argument, 2 given in %s on line %d
++TypeError: mysql_error(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_escape_string.phpt ext/mysql/tests/mysql_escape_string.phpt
+--- ext/mysql.orig/tests/mysql_escape_string.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_escape_string.phpt	2022-07-03 00:05:26.282603103 +0200
+@@ -9,8 +9,10 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (NULL !== ($tmp = @mysql_escape_string()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ var_dump(@mysql_escape_string("Am I a unicode string in PHP 6?"));
+ var_dump(@mysql_escape_string('\\'));
+@@ -23,6 +25,7 @@
+ print "done!";
+ ?>
+ --EXPECTF--
++ArgumentCountError: mysql_escape_string() expects exactly 1 argument, 0 given in %s on line %d
+ string(31) "Am I a unicode string in PHP 6?"
+ string(2) "\\"
+ string(2) "\""
+diff -urN ext/mysql.orig/tests/mysql_fetch_array.phpt ext/mysql/tests/mysql_fetch_array.phpt
+--- ext/mysql.orig/tests/mysql_fetch_array.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_array.phpt	2022-07-03 00:33:23.460422658 +0200
+@@ -12,11 +12,15 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (NULL !== ($tmp = @mysql_fetch_array()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL != ($tmp = @mysql_fetch_array($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT * FROM test ORDER BY id LIMIT 5", $link)) {
+@@ -62,8 +66,8 @@
+ 		gettype($tmp), $tmp, mysql_errno($link), mysql_error($link));
+ 
+ $tmp = @mysql_fetch_array($res, $illegal_mode);
+-if (false !== $tmp)
+-	printf("[014] Expecting boolean/false, got %s/%s. [%d] %s\n",
++if (!is_null($tmp))
++	printf("[014] Expecting NULL, got %s/%s. [%d] %s\n",
+ 		gettype($tmp), $tmp, mysql_errno($link), mysql_error($link));
+ 
+ mysql_free_result($res);
+@@ -271,8 +275,10 @@
+ 
+ mysql_close($link);
+ 
++try {
+ if (false !== ($tmp = mysql_fetch_array($res, MYSQL_ASSOC)))
+-printf("[015] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++	printf("[015] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ print "done!";
+ ?>
+@@ -281,7 +287,8 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_fetch_array() expects at least 1 argument, 0 given in %s on line %d
++TypeError: mysql_fetch_array(): Argument #1 ($result) must be of type resource, null given in %s on line %d
+ [005]
+ array(4) {
+   [0]=>
+@@ -356,6 +363,5 @@
+ }
+ 
+ Warning: mysql_fetch_array(): The result type should be either MYSQL_NUM, MYSQL_ASSOC or MYSQL_BOTH in %s on line %d
+-
+-Warning: mysql_fetch_array(): supplied resource is not a valid MySQL result resource in %s on line %d
++TypeError: mysql_fetch_array(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_fetch_assoc.phpt ext/mysql/tests/mysql_fetch_assoc.phpt
+--- ext/mysql.orig/tests/mysql_fetch_assoc.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_assoc.phpt	2022-07-03 01:20:43.342233626 +0200
+@@ -14,11 +14,15 @@
+ 
+ // Note: no SQL type tests, internally the same function gets used as for mysql_fetch_array() which does a lot of SQL type test
+ 
++try {
+ if (!is_null($tmp = @mysql_fetch_assoc()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_fetch_assoc($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id, label FROM test ORDER BY id LIMIT 1", $link)) {
+@@ -41,8 +45,10 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ if (false !== ($tmp = mysql_fetch_assoc($res)))
+ 	printf("[008] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ 
+@@ -63,7 +69,8 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_fetch_assoc() expects at least 1 argument, 0 given in %s on line %d
++TypeError: mysql_fetch_assoc(): Argument #1 ($result) must be of type resource, null given in %s on line %d
+ [005]
+ array(2) {
+   ["id"]=>
+@@ -72,7 +79,7 @@
+   string(1) "a"
+ }
+ [006]
+-bool(false)
++NULL
+ [008]
+ array(5) {
+   ["a"]=>
+@@ -86,10 +93,7 @@
+   ["e"]=>
+   string(1) "1"
+ }
+-
+-Warning: mysql_fetch_assoc(): supplied resource is not a valid MySQL result resource in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++TypeError: mysql_fetch_assoc(): supplied resource is not a valid MySQL result resource in %s on line %d
+ [010]
+ array(5) {
+   ["id"]=>
+diff -urN ext/mysql.orig/tests/mysql_fetch_field.phpt ext/mysql/tests/mysql_fetch_field.phpt
+--- ext/mysql.orig/tests/mysql_fetch_field.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_field.phpt	2022-07-03 20:58:22.674636657 +0200
+@@ -13,11 +13,15 @@
+ 	$link   = NULL;
+ 
+ 	// Note: no SQL type tests, internally the same function gets used as for mysql_fetch_array() which does a lot of SQL type test
++	try {
+ 	if (!is_null($tmp = @mysql_fetch_field()))
+ 		printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++	} catch(Throwable $e) { show_catched($e); }
+ 
++	try {
+ 	if (NULL !== ($tmp = @mysql_fetch_field($link)))
+ 		printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++	} catch(Throwable $e) { show_catched($e); }
+ 
+ 	require('table.inc');
+ 
+@@ -44,8 +48,10 @@
+ 
+ 	mysql_free_result($res);
+ 
++	try {
+ 	if (false !== ($tmp = mysql_fetch_field($res)))
+ 		printf("[007] Expecting boolean/false, got %s/%s\n", gettype($tmp), var_export($tmp, true));
++	} catch(Throwable $e) { show_catched($e); }
+ 
+ 	$types = array(
+ 		'BIT'               => array(1, 'int'),
+@@ -131,22 +137,21 @@
+ 	var_dump(mysql_fetch_field($res));
+ 	mysql_free_result($res);
+ 
+-	if (!$res = mysql_query("SELECT id FROM test", $link)) {
++	if ($res = mysql_query("SELECT id FROM test", $link))
++		mysql_free_result($res);
++	else
+ 		printf("[017] [%d] %s\n", mysql_errno($link), mysql_error($link));
+-	}
+-	$res = mysql_list_fields($db, 'test');
+-	$found = false;
+-	while ($tmp = mysql_fetch_field($res)) {
+-		if ($tmp->name == 'id') {
+-			printf("Fetch field from mysql_list_fields result set.\n");
+-			$found = true;
++
++	if ($res = mysql_query("SHOW FULL COLUMNS FROM test")) {
++		while ($tmp = mysql_fetch_assoc($res)) {
++			if ($tmp['Field'] == 'id')
++				printf("Fetch field from 'SHOW FULL COLUMNS FROM test' result set.\n");
+ 			var_dump($tmp);
+ 		}
++		mysql_free_result($res);
+ 	}
+-	if (!$found)
+-		printf("[018] mysqli_list_fields result set processing has failed.\n");
+-
+-	mysql_free_result($res);
++	else
++		printf("[018] [%d] %s\n", mysql_errno($link), mysql_error($link));
+ 
+ 	mysql_close($link);
+ 	print "done!";
+@@ -156,7 +161,8 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_fetch_field() expects at least 1 argument, 0 given in %s on line %d
++TypeError: mysql_fetch_field(): Argument #1 ($result) must be of type resource, null given in %s on line %d
+ object(stdClass)#%d (13) {
+   ["name"]=>
+   string(2) "ID"
+@@ -165,7 +171,7 @@
+   ["def"]=>
+   string(0) ""
+   ["max_length"]=>
+-  int(1)
++  int(0)
+   ["not_null"]=>
+   int(1)
+   ["primary_key"]=>
+@@ -193,7 +199,7 @@
+   ["def"]=>
+   string(0) ""
+   ["max_length"]=>
+-  int(1)
++  int(0)
+   ["not_null"]=>
+   int(0)
+   ["primary_key"]=>
+@@ -216,8 +222,7 @@
+ bool(false)
+ 
+ Warning: mysql_fetch_field(): Bad field offset in %s on line %d
+-
+-Warning: mysql_fetch_field(): supplied resource is not a valid MySQL result resource in %s on line %d
++TypeError: mysql_fetch_field(): supplied resource is not a valid MySQL result resource in %s on line %d
+ object(stdClass)#%d (13) {
+   ["name"]=>
+   string(2) "id"
+@@ -226,7 +231,7 @@
+   ["def"]=>
+   string(0) ""
+   ["max_length"]=>
+-  int(1)
++  int(0)
+   ["not_null"]=>
+   int(0)
+   ["primary_key"]=>
+@@ -246,33 +251,25 @@
+   ["zerofill"]=>
+   int(0)
+ }
+-Fetch field from mysql_list_fields result set.
+-object(stdClass)#%d (13) {
+-  ["name"]=>
++Fetch field from 'SHOW FULL COLUMNS FROM test' result set.
++array(9) {
++  ["Field"]=>
+   string(2) "id"
+-  ["table"]=>
+-  string(4) "test"
+-  ["def"]=>
++  ["Type"]=>
++  string(7) "int(11)"
++  ["Collation"]=>
++  NULL
++  ["Null"]=>
++  string(3) "YES"
++  ["Key"]=>
++  string(0) ""
++  ["Default"]=>
+   string(1) "1"
+-  ["max_length"]=>
+-  int(0)
+-  ["not_null"]=>
+-  int(0)
+-  ["primary_key"]=>
+-  int(0)
+-  ["multiple_key"]=>
+-  int(0)
+-  ["unique_key"]=>
+-  int(0)
+-  ["numeric"]=>
+-  int(1)
+-  ["blob"]=>
+-  int(0)
+-  ["type"]=>
+-  string(3) "int"
+-  ["unsigned"]=>
+-  int(0)
+-  ["zerofill"]=>
+-  int(0)
++  ["Extra"]=>
++  string(0) ""
++  ["Privileges"]=>
++  string(31) "select,insert,update,references"
++  ["Comment"]=>
++  string(0) ""
+ }
+ done!
+diff -urN ext/mysql.orig/tests/mysql_fetch_lengths.phpt ext/mysql/tests/mysql_fetch_lengths.phpt
+--- ext/mysql.orig/tests/mysql_fetch_lengths.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_lengths.phpt	2022-07-03 21:03:20.519115556 +0200
+@@ -12,11 +12,15 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_fetch_lengths()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_fetch_lengths($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id, label FROM test ORDER BY id LIMIT 1", $link)) {
+@@ -29,7 +33,9 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ var_dump(mysql_fetch_lengths($res));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ print "done!";
+@@ -39,7 +45,8 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_fetch_lengths() expects exactly 1 argument, 0 given in %s on line %d
++TypeError: mysql_fetch_lengths(): Argument #1 ($result) must be of type resource, null given in %s on line %d
+ array(2) {
+   [0]=>
+   int(1)
+@@ -47,7 +54,5 @@
+   int(1)
+ }
+ bool(false)
+-
+-Warning: mysql_fetch_lengths(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++TypeError: mysql_fetch_lengths(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_fetch_object.phpt ext/mysql/tests/mysql_fetch_object.phpt
+--- ext/mysql.orig/tests/mysql_fetch_object.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_object.phpt	2022-06-27 13:25:07.399678338 +0200
+@@ -82,7 +82,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ object(stdClass)#%d (2) {
+   ["ID"]=>
+   string(1) "1"
+diff -urN ext/mysql.orig/tests/mysql_fetch_row.phpt ext/mysql/tests/mysql_fetch_row.phpt
+--- ext/mysql.orig/tests/mysql_fetch_row.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_row.phpt	2022-07-03 22:16:35.811587696 +0200
+@@ -12,11 +12,15 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_fetch_row()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_fetch_row($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id, label FROM test ORDER BY id LIMIT 1", $link)) {
+@@ -31,7 +35,9 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ var_dump(mysql_fetch_row($res));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ print "done!";
+@@ -41,7 +47,8 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_fetch_row() expects at least 1 argument, 0 given in %s on line %d
++TypeError: mysql_fetch_row(): Argument #1 ($result) must be of type resource, null given in %s on line %d
+ [004]
+ array(2) {
+   [0]=>
+@@ -50,8 +57,6 @@
+   string(1) "a"
+ }
+ [005]
+-bool(false)
+-
+-Warning: mysql_fetch_row(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++NULL
++TypeError: mysql_fetch_row(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_field_flags.phpt ext/mysql/tests/mysql_field_flags.phpt
+--- ext/mysql.orig/tests/mysql_field_flags.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_flags.phpt	2022-07-04 00:05:43.332144472 +0200
+@@ -12,19 +12,25 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_field_flags()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (null !== ($tmp = @mysql_field_flags($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id, label FROM test ORDER BY id LIMIT 2", $link)) {
+ 	printf("[003] [%d] %s\n", mysql_errno($link), mysql_error($link));
+ }
+ 
++try {
+ if (NULL !== ($tmp = mysql_field_flags($res)))
+ 	printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (false !== ($tmp = mysql_field_flags($res, -1)))
+ 	printf("[005] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+@@ -103,13 +109,14 @@
+ 		continue;
+ 	}
+ 	$sql = sprintf("CREATE TABLE test(id INT, %s) ENGINE = %s", $columns, $engine);
+-		if (!@mysql_query($sql, $link)) {
++	if (!@mysql_query($sql, $link)) {
+ 		// server or engine might not support this
+ 		continue;
+ 	}
+ 
+ 	reset($expected);
+-	list($k, $values) = each($expected);
++	$values = current($expected);
++	$k = key($expected);
+ 	$sql = sprintf("INSERT INTO test(id, %s) VALUES (1, %s)", $values[0], $values[1]);
+ 	if (!mysql_query($sql, $link)) {
+ 		printf("[011/%s] '%s', [%d] %s\n", $columns, $sql, mysql_errno($link), mysql_error($link));
+@@ -122,14 +129,15 @@
+ 	}
+ 
+ 	$i = 1;
+-	while (list($field, $flags) = each($expected)) {
++	while (($flags = next($expected)) !== false) {
++		$field = key($expected);
+ 		$tmp = mysql_field_flags($res, $i++);
+ 
+ 		foreach ($flags as $k => $flag) {
+-		if (!preg_match(sprintf('@\s*%s\s*@ismU', $flag), $tmp)) {
+-			printf("[013/%s] Field '%s', flag '%s' not found, [%d] %s\n", $columns, $field, $flag, mysql_errno($link), mysql_error($link));
++			if (!preg_match(sprintf('@\s*%s\s*@ismU', $flag), $tmp)) {
++				printf("[013/%s] Field '%s', flag '%s' not found, [%d] %s\n", $columns, $field, $flag, mysql_errno($link), mysql_error($link));
++			}
+ 		}
+-	}
+ 		foreach ($flags as $k => $flag) {
+ 			$tmp = preg_replace(sprintf('@\s*%s\s*@ismU', $flag), '', $tmp);
+ 		}
+@@ -139,7 +147,9 @@
+ 	mysql_free_result($res);
+ }
+ 
++try {
+ var_dump(mysql_field_flags($res, 0));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ print "done!";
+@@ -149,14 +159,12 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_field_flags() expects exactly 2 parameters, 1 given in %s on line %d
++ArgumentCountError: mysql_field_flags() expects exactly 2 arguments, 0 given in %s on line %d
++ArgumentCountError: mysql_field_flags() expects exactly 2 arguments, 1 given in %s on line %d
++ArgumentCountError: mysql_field_flags() expects exactly 2 arguments, 1 given in %s on line %d
+ 
+ Warning: mysql_field_flags(): Field -1 is invalid for MySQL result index %d in %s on line %d
+ 
+ Warning: mysql_field_flags(): Field 2 is invalid for MySQL result index %d in %s on line %d
+-
+-Warning: mysql_field_flags(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++TypeError: mysql_field_flags(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_field_len.phpt ext/mysql/tests/mysql_field_len.phpt
+--- ext/mysql.orig/tests/mysql_field_len.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_len.phpt	2022-07-04 00:09:36.206488375 +0200
+@@ -12,19 +12,25 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_field_len()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (null !== ($tmp = @mysql_field_len($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id, label FROM test ORDER BY id LIMIT 2", $link)) {
+ 	printf("[003] [%d] %s\n", mysql_errno($link), mysql_error($link));
+ }
+ 
++try {
+ if (NULL !== ($tmp = mysql_field_len($res)))
+-printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++	printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (false !== ($tmp = mysql_field_len($res, -1)))
+ 	printf("[005] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+@@ -37,7 +43,9 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ var_dump(mysql_field_len($res, 0));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ print "done!";
+@@ -47,14 +55,12 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_field_len() expects exactly 2 parameters, 1 given in %s on line %d
++ArgumentCountError: mysql_field_len() expects exactly 2 arguments, 0 given in %s on line %d
++ArgumentCountError: mysql_field_len() expects exactly 2 arguments, 1 given in %s on line %d
++ArgumentCountError: mysql_field_len() expects exactly 2 arguments, 1 given in %s on line %d
+ 
+ Warning: mysql_field_len(): Field -1 is invalid for MySQL result index %d in %s on line %d
+ 
+ Warning: mysql_field_len(): Field 2 is invalid for MySQL result index %d in %s on line %d
+-
+-Warning: mysql_field_len(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++TypeError: mysql_field_len(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_field_name.phpt ext/mysql/tests/mysql_field_name.phpt
+--- ext/mysql.orig/tests/mysql_field_name.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_name.phpt	2022-07-04 00:13:48.998743267 +0200
+@@ -12,19 +12,25 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_field_name()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (null !== ($tmp = @mysql_field_name($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id, label FROM test ORDER BY id LIMIT 2", $link)) {
+ 	printf("[003] [%d] %s\n", mysql_errno($link), mysql_error($link));
+ }
+ 
++try {
+ if (NULL !== ($tmp = mysql_field_name($res)))
+ 	printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (false !== ($tmp = mysql_field_name($res, -1)))
+ 	printf("[005] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+@@ -36,7 +42,9 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ var_dump(mysql_field_name($res, 0));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ print "done!";
+@@ -46,15 +54,13 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_field_name() expects exactly 2 parameters, 1 given in %s on line %d
++ArgumentCountError: mysql_field_name() expects exactly 2 arguments, 0 given in %s on line %d
++ArgumentCountError: mysql_field_name() expects exactly 2 arguments, 1 given in %s on line %d
++ArgumentCountError: mysql_field_name() expects exactly 2 arguments, 1 given in %s on line %d
+ 
+ Warning: mysql_field_name(): Field -1 is invalid for MySQL result index %d in %s on line %d
+ string(2) "id"
+ 
+ Warning: mysql_field_name(): Field 2 is invalid for MySQL result index %d in %s on line %d
+-
+-Warning: mysql_field_name(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++TypeError: mysql_field_name(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_field_seek.phpt ext/mysql/tests/mysql_field_seek.phpt
+--- ext/mysql.orig/tests/mysql_field_seek.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_seek.phpt	2022-07-04 00:18:30.598064041 +0200
+@@ -12,11 +12,15 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_field_seek()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (!is_null($tmp = @mysql_field_seek($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id, label FROM test ORDER BY id LIMIT 1", $link)) {
+@@ -34,7 +38,9 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ var_dump(mysql_field_seek($res, 0));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ print "done!";
+@@ -44,7 +50,8 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_field_seek() expects exactly 2 arguments, 0 given in %s on line %d
++ArgumentCountError: mysql_field_seek() expects exactly 2 arguments, 1 given in %s on line %d
+ 
+ Warning: mysql_field_seek(): Field -1 is invalid for MySQL result index %d in %s on line %d
+ bool(false)
+@@ -56,7 +63,7 @@
+   ["def"]=>
+   string(0) ""
+   ["max_length"]=>
+-  int(1)
++  int(0)
+   ["not_null"]=>
+   int(1)
+   ["primary_key"]=>
+@@ -85,7 +92,7 @@
+   ["def"]=>
+   string(0) ""
+   ["max_length"]=>
+-  int(1)
++  int(0)
+   ["not_null"]=>
+   int(1)
+   ["primary_key"]=>
+@@ -114,7 +121,7 @@
+   ["def"]=>
+   string(0) ""
+   ["max_length"]=>
+-  int(1)
++  int(0)
+   ["not_null"]=>
+   int(0)
+   ["primary_key"]=>
+@@ -138,7 +145,5 @@
+ Warning: mysql_field_seek(): Field %d is invalid for MySQL result index %d in %s on line %d
+ bool(false)
+ bool(false)
+-
+-Warning: mysql_field_seek(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++TypeError: mysql_field_seek(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_field_table.phpt ext/mysql/tests/mysql_field_table.phpt
+--- ext/mysql.orig/tests/mysql_field_table.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_table.phpt	2022-07-04 00:21:25.643010198 +0200
+@@ -12,19 +12,25 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_field_table()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (null !== ($tmp = @mysql_field_table($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id, label FROM test ORDER BY id LIMIT 2", $link)) {
+ 	printf("[003] [%d] %s\n", mysql_errno($link), mysql_error($link));
+ }
+ 
++try {
+ if (NULL !== ($tmp = mysql_field_table($res)))
+ 	printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (false !== ($tmp = mysql_field_table($res, -1)))
+ 	printf("[005] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+@@ -36,7 +42,9 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ var_dump(mysql_field_table($res, 0));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ print "done!";
+@@ -46,15 +54,13 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_field_table() expects exactly 2 parameters, 1 given in %s on line %d
++ArgumentCountError: mysql_field_table() expects exactly 2 arguments, 0 given in %s on line %d
++ArgumentCountError: mysql_field_table() expects exactly 2 arguments, 1 given in %s on line %d
++ArgumentCountError: mysql_field_table() expects exactly 2 arguments, 1 given in %s on line %d
+ 
+ Warning: mysql_field_table(): Field -1 is invalid for MySQL result index %d in %s on line %d
+ string(4) "test"
+ 
+ Warning: mysql_field_table(): Field 2 is invalid for MySQL result index %d in %s on line %d
+-
+-Warning: mysql_field_table(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++TypeError: mysql_field_table(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_field_type.phpt ext/mysql/tests/mysql_field_type.phpt
+--- ext/mysql.orig/tests/mysql_field_type.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_type.phpt	2022-07-04 00:24:16.515519830 +0200
+@@ -12,19 +12,25 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_field_type()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (null !== ($tmp = @mysql_field_type($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id, label FROM test ORDER BY id LIMIT 2", $link)) {
+ 	printf("[003] [%d] %s\n", mysql_errno($link), mysql_error($link));
+ }
+ 
++try {
+ if (NULL !== ($tmp = mysql_field_type($res)))
+ 	printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (false !== ($tmp = mysql_field_type($res, -1)))
+ 	printf("[005] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+@@ -36,7 +42,9 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ var_dump(mysql_field_type($res, 0));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ print "done!";
+@@ -46,15 +54,13 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_field_type() expects exactly 2 parameters, 1 given in %s on line %d
++ArgumentCountError: mysql_field_type() expects exactly 2 arguments, 0 given in %s on line %d
++ArgumentCountError: mysql_field_type() expects exactly 2 arguments, 1 given in %s on line %d
++ArgumentCountError: mysql_field_type() expects exactly 2 arguments, 1 given in %s on line %d
+ 
+ Warning: mysql_field_type(): Field -1 is invalid for MySQL result index %d in %s on line %d
+ string(3) "int"
+ 
+ Warning: mysql_field_type(): Field 2 is invalid for MySQL result index %d in %s on line %d
+-
+-Warning: mysql_field_type(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++TypeError: mysql_field_type(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_free_result.phpt ext/mysql/tests/mysql_free_result.phpt
+--- ext/mysql.orig/tests/mysql_free_result.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_free_result.phpt	2022-07-04 00:38:52.435903537 +0200
+@@ -12,11 +12,15 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_free_result()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (null !== ($tmp = @mysql_free_result($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id FROM test ORDER BY id LIMIT 1", $link)) {
+@@ -24,13 +28,17 @@
+ }
+ 
+ var_dump(mysql_free_result($res));
++try {
+ var_dump(mysql_free_result($res));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if ($tmp = sys_get_temp_dir()) {
+ 	$tmpname = tempnam($tmp, 'free_result');
+ 	if ($fp = fopen($tmpname, 'w')) {
++		try {
+ 		if (false !== ($tmp = @mysql_free_result($fp)))
+ 			printf("[004] Expecting boolean/false got %s/%s\n", gettype($tmp), $tmp);
++		} catch(Throwable $e) { show_catched($e); }
+ 		fclose($fp);
+ 		@unlink($tmpname);
+ 	}
+@@ -44,9 +52,9 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_free_result() expects exactly 1 argument, 0 given in /usr/src/php/ext/mysql/tests/mysql_free_result.php on line 8
++TypeError: mysql_free_result(): Argument #1 ($result) must be of type resource, null given in /usr/src/php/ext/mysql/tests/mysql_free_result.php on line 13
+ bool(true)
+-
+-Warning: mysql_free_result(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++TypeError: mysql_free_result(): supplied resource is not a valid MySQL result resource in /usr/src/php/ext/mysql/tests/mysql_free_result.php on line 24
++TypeError: mysql_free_result(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_get_client_info.phpt ext/mysql/tests/mysql_get_client_info.phpt
+--- ext/mysql.orig/tests/mysql_get_client_info.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_get_client_info.phpt	2022-07-04 00:30:31.323662190 +0200
+@@ -15,11 +15,14 @@
+ 	var_inspect($info);
+ }
+ 
++try {
+ if (!is_null($tmp = @mysql_get_client_info("too many arguments"))) {
+ 	printf("[003] Expecting NULL/NULL got %s/%s\n", $tmp, gettype($tmp));
+ }
++} catch(Throwable $e) { show_catched($e); }
+ 
+ print "done!";
+ ?>
+ --EXPECTF--
+-done!
+\ No newline at end of file
++ArgumentCountError: mysql_get_client_info() expects exactly 0 arguments, 1 given in %s on line %d
++done!
+diff -urN ext/mysql.orig/tests/mysql_get_host_info.phpt ext/mysql/tests/mysql_get_host_info.phpt
+--- ext/mysql.orig/tests/mysql_get_host_info.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_get_host_info.phpt	2022-07-04 00:31:18.360193182 +0200
+@@ -9,8 +9,10 @@
+ <?php
+ include_once "connect.inc";
+ 
++try {
+ if (NULL !== ($tmp = @mysql_get_host_info(NULL)))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require "table.inc";
+ if (!is_string($info = mysql_get_host_info($link)) || ('' === $info))
+@@ -32,9 +34,11 @@
+ 	var_inspect($info);
+ }
+ 
++try {
+ if (!is_null($tmp = @mysql_get_host_info($link, "too many arguments"))) {
+ 	printf("[006] Expecting NULL/NULL got %s/%s\n", $tmp, gettype($tmp));
+ }
++} catch(Throwable $e) { show_catched($e); }
+ 
+ print "done!";
+ ?>
+@@ -43,5 +47,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++TypeError: mysql_get_host_info(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++ArgumentCountError: mysql_get_host_info() expects at most 1 argument, 2 given in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_get_proto_info.phpt ext/mysql/tests/mysql_get_proto_info.phpt
+--- ext/mysql.orig/tests/mysql_get_proto_info.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_get_proto_info.phpt	2022-07-04 00:31:58.576066558 +0200
+@@ -9,8 +9,10 @@
+ <?php
+ include_once "connect.inc";
+ 
++try {
+ if (NULL !== ($tmp = @mysql_get_proto_info(NULL)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require "table.inc";
+ if (!is_int($info = mysql_get_proto_info($link)) || (0 === $info))
+@@ -21,8 +23,10 @@
+ 
+ assert($info === $info2);
+ 
++try {
+ if (NULL !== ($tmp = @mysql_get_proto_info('too many', 'arguments')))
+ 	printf("[005] Expecting NULL got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ print "done!";
+ ?>
+@@ -31,5 +35,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++TypeError: mysql_get_proto_info(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++ArgumentCountError: mysql_get_proto_info() expects at most 1 argument, 2 given in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_get_server_info.phpt ext/mysql/tests/mysql_get_server_info.phpt
+--- ext/mysql.orig/tests/mysql_get_server_info.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_get_server_info.phpt	2022-07-04 00:32:32.099294938 +0200
+@@ -9,8 +9,10 @@
+ <?php
+ include "connect.inc";
+ 
++try {
+ if (null !== ($tmp = @mysql_get_server_info(NULL)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require "table.inc";
+ if (!is_string($info = mysql_get_server_info($link)) || ('' === $info))
+@@ -32,11 +34,14 @@
+ 	var_inspect($info);
+ }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_get_server_info('too many', 'just too many')))
+ 	printf("[006] Expecting NULL got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++TypeError: mysql_get_server_info(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++ArgumentCountError: mysql_get_server_info() expects at most 1 argument, 2 given in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_info.phpt ext/mysql/tests/mysql_info.phpt
+--- ext/mysql.orig/tests/mysql_info.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_info.phpt	2022-07-04 00:43:11.520828281 +0200
+@@ -9,11 +9,15 @@
+ <?php
+ include "connect.inc";
+ 
++try {
+ if (false !== ($tmp = @mysql_info()))
+ 	printf("[001] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_info(NULL)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require "table.inc";
+ if (!$res = mysql_query("INSERT INTO test(id, label) VALUES (100, 'a')", $link))
+@@ -72,5 +76,5 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++TypeError: mysql_info(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_insert_id.phpt ext/mysql/tests/mysql_insert_id.phpt
+--- ext/mysql.orig/tests/mysql_insert_id.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_insert_id.phpt	2022-07-04 01:00:18.367148402 +0200
+@@ -13,14 +13,20 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (0 !== ($tmp = @mysql_insert_id()))
+ 	printf("[001] Expecting int/0, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_insert_id($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (!is_null($tmp = @mysql_insert_id($link, 'too many args')))
+ 	printf("[002a] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ 
+@@ -57,7 +63,9 @@
+ 
+ mysql_close($link);
+ 
++try {
+ var_dump(mysql_insert_id($link));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ print "done!";
+ ?>
+@@ -66,8 +74,7 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_insert_id(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+-bool(false)
++TypeError: mysql_insert_id(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++ArgumentCountError: mysql_insert_id() expects at most 1 argument, 2 given in %s on line %d
++TypeError: mysql_insert_id(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_list_dbs.phpt ext/mysql/tests/mysql_list_dbs.phpt
+--- ext/mysql.orig/tests/mysql_list_dbs.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_list_dbs.phpt	2022-07-04 00:53:11.146267372 +0200
+@@ -12,11 +12,15 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (NULL !== ($tmp = @mysql_list_dbs(NULL)))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_list_dbs($link, $link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ 
+@@ -53,5 +57,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++TypeError: mysql_list_dbs(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++ArgumentCountError: mysql_list_dbs() expects at most 1 argument, 2 given in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_list_fields.phpt ext/mysql/tests/mysql_list_fields.phpt
+--- ext/mysql.orig/tests/mysql_list_fields.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_list_fields.phpt	2022-07-03 22:26:03.513933151 +0200
+@@ -1,5 +1,5 @@
+ --TEST--
+-mysql_list_fields()
++mysql_list_fields() always fails since PHP 7.1
+ --SKIPIF--
+ <?php
+ require_once 'skipif.inc';
+@@ -15,7 +15,12 @@
+ require 'table.inc';
+ 
+ if (!$res = mysql_list_fields($db, 'test', $link))
++{
++	# mysql_list_fields() used ext/mysqlnd code that was removed in PHP 7.1
+ 	printf("[003] [%d] %s\n", mysql_errno($link), mysql_error($link));
++	mysql_close($link);
++	exit;
++}
+ 
+ if (2 !== ($num = mysql_num_fields($res)))
+ 	printf("[004] Expecting two fields from 'test', got %d. [%d] %s\n", $num, mysql_errno($link), mysql_error($link));
+@@ -64,17 +69,5 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-[006] [%d] %s
+-bool(false)
+-Field Offset 0
+-mysql_field_flags()%s
+-mysql_field_len(): 11
+-mysql_field_name(): id
+-mysql_field_type(): int
+-Field Offset 1
+-mysql_field_flags()%s
+-mysql_field_len(): %s
+-mysql_field_name(): label
+-mysql_field_type(): string
+-done!
++Warning: mysql_list_fields(): Unable to save MySQL query result in %s on line %d
++[003] [0] 
+diff -urN ext/mysql.orig/tests/mysql_list_processes.phpt ext/mysql/tests/mysql_list_processes.phpt
+--- ext/mysql.orig/tests/mysql_list_processes.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_list_processes.phpt	2022-07-04 00:54:08.147714084 +0200
+@@ -12,8 +12,10 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (NULL !== ($tmp = @mysql_list_processes($link, $link)))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ 
+@@ -53,5 +55,5 @@
+ print "done!\n";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_list_processes() expects at most 1 argument, 2 given in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_list_tables.phpt ext/mysql/tests/mysql_list_tables.phpt
+--- ext/mysql.orig/tests/mysql_list_tables.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_list_tables.phpt	2022-07-04 00:55:15.110116286 +0200
+@@ -12,17 +12,25 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (NULL !== ($tmp = @mysql_list_tables()))
+ 	printf("[001] Expecting NULL got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_list_tables('too', 'many', 'arguments')))
+ 	printf("[002] Expecting NULL got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (false !== ($tmp = @mysql_list_tables(NULL)))
+ 	printf("[003] Expecting boolean/false got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_list_tables($db, NULL)))
+ 	printf("[004] Expecting NULL got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require_once('table.inc');
+ 
+@@ -82,5 +90,7 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_list_tables() expects at least 1 argument, 0 given in %s on line %d
++ArgumentCountError: mysql_list_tables() expects at most 2 arguments, 3 given in %s on line %d
++TypeError: mysql_list_tables(): Argument #2 ($link_identifier) must be of type resource, null given in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_max_links.phpt ext/mysql/tests/mysql_max_links.phpt
+--- ext/mysql.orig/tests/mysql_max_links.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_max_links.phpt	2022-06-27 13:28:20.286175463 +0200
+@@ -54,19 +54,9 @@
+ print "done!\n";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_connect(): Too many open links (2) in %s on line %s
+ [030] Cannot connect using host '%s', user '%s', password '****', [0] 0
+ 
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_connect(): Too many open links (2) in %s on line %s
+ [060] Cannot connect using host '%s', user '%s', password '****', [0] 0
+ array(3) {
+diff -urN ext/mysql.orig/tests/mysql_max_persistent.phpt ext/mysql/tests/mysql_max_persistent.phpt
+--- ext/mysql.orig/tests/mysql_max_persistent.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_max_persistent.phpt	2022-07-04 05:22:18.710393477 +0200
+@@ -90,14 +90,8 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_pconnect(): Too many open persistent links (1) in %s on line %d
+ [020] Cannot connect using host '%s', user '%s', password '****', [0] 0
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(1) {
+   [0]=>
+   resource(%d) of type (mysql link persistent)
+diff -urN ext/mysql.orig/tests/mysql_mysqlnd_read_timeout_long.phpt ext/mysql/tests/mysql_mysqlnd_read_timeout_long.phpt
+--- ext/mysql.orig/tests/mysql_mysqlnd_read_timeout_long.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_mysqlnd_read_timeout_long.phpt	2022-06-27 13:28:53.417352741 +0200
+@@ -30,7 +30,6 @@
+ 	print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(1) {
+   ["SLEEP(6)"]=>
+   string(1) "0"
+diff -urN ext/mysql.orig/tests/mysql_num_fields.phpt ext/mysql/tests/mysql_num_fields.phpt
+--- ext/mysql.orig/tests/mysql_num_fields.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_num_fields.phpt	2022-07-04 01:36:44.844612807 +0200
+@@ -12,30 +12,35 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_num_fields()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_num_fields($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ 
+ function func_test_mysql_num_fields($link, $query, $expected, $offset, $test_free = false) {
+-
+-if (!($res = mysql_query($query, $link))) {
+-	printf("[%03d] [%d] %s\n", $offset, mysql_errno($link), mysql_error($link));
+-	return;
+-}
+-
+-if ($expected !== ($tmp = mysql_num_fields($res)))
+-	printf("[%03d] Expecting %s/%d, got %s/%d\n", $offset + 1,
+-	gettype($expected), $expected,
+-	gettype($tmp), $tmp);
+-
+-mysql_free_result($res);
+-
+-if ($test_free && (false !== ($tmp = mysql_num_fields($res))))
+-	printf("[%03d] Expecting boolean/false, got %s/%s\n", $offset + 2, gettype($tmp), $tmp);
++	if (!($res = mysql_query($query, $link))) {
++		printf("[%03d] [%d] %s\n", $offset, mysql_errno($link), mysql_error($link));
++		return;
++	}
++
++	if ($expected !== ($tmp = mysql_num_fields($res)))
++		printf("[%03d] Expecting %s/%d, got %s/%d\n", $offset + 1,
++		gettype($expected), $expected,
++		gettype($tmp), $tmp);
++
++	mysql_free_result($res);
++
++	try {
++	if ($test_free && (false !== ($tmp = mysql_num_fields($res))))
++		printf("[%03d] Expecting boolean/false, got %s/%s\n", $offset + 2, gettype($tmp), $tmp);
++	} catch(Throwable $e) { show_catched($e); }
+ }
+ 
+ func_test_mysql_num_fields($link, "SELECT 1 AS a", 1, 5);
+@@ -52,7 +57,7 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_num_fields(): supplied resource is not a valid MySQL result resource in %s on line %d
++ArgumentCountError: mysql_num_fields() expects exactly 1 argument, 0 given in %s on line %d
++TypeError: mysql_num_fields(): Argument #1 ($result) must be of type resource, null given in %s on line %d
++TypeError: mysql_num_fields(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_num_rows.phpt ext/mysql/tests/mysql_num_rows.phpt
+--- ext/mysql.orig/tests/mysql_num_rows.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_num_rows.phpt	2022-07-04 02:02:45.374223096 +0200
+@@ -12,17 +12,21 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_num_rows()))
+-printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (NULL !== ($tmp = @mysql_num_rows($link)))
+-printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ 
+ function func_test_mysql_num_rows($link, $query, $expected, $offset, $test_free = false) {
+ 
+-	if (!$res = mysql_query($query, $link)) {
++	if (gettype($res = mysql_query($query, $link)) != 'resource') {
+ 		printf("[%03d] [%d] %s\n", $offset, mysql_errno($link), mysql_error($link));
+ 		return;
+ 	}
+@@ -34,8 +38,10 @@
+ 
+ 	mysql_free_result($res);
+ 
++	try {
+ 	if ($test_free && (false !== ($tmp = mysql_num_rows($res))))
+ 		printf("[%03d] Expecting boolean/false, got %s/%s\n", $offset + 2, gettype($tmp), $tmp);
++	} catch(Throwable $e) { show_catched($e); }
+ }
+ 
+ func_test_mysql_num_rows($link, "SELECT 1 AS a", 1, 5);
+@@ -79,11 +85,8 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_num_rows() expects parameter 1 to be resource, boolean given in %s on line %d
+-
+-Warning: mysql_free_result() expects parameter 1 to be resource, boolean given in %s on line %d
+-
+-Warning: mysql_num_rows(): supplied resource is not a valid MySQL result resource in %s on line %d
++ArgumentCountError: mysql_num_rows() expects exactly 1 argument, 0 given in %s on line %d
++TypeError: mysql_num_rows(): Argument #1 ($result) must be of type resource, null given in %s on line %d
++[015] [0] 
++TypeError: mysql_num_rows(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_pconn_disable.phpt ext/mysql/tests/mysql_pconn_disable.phpt
+--- ext/mysql.orig/tests/mysql_pconn_disable.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_pconn_disable.phpt	2022-07-04 05:11:56.970723237 +0200
+@@ -11,51 +11,44 @@
+ mysql.max_links=2
+ --FILE--
+ <?php
+-	require_once("connect.inc");
+-	require_once("table.inc");
++require_once("connect.inc");
++require_once("table.inc");
+ 
+-	if (($plink = my_mysql_connect($host, $user, $passwd, $db, $port, $socket, NULL, true)))
+-		printf("[001] Can connect to the server.\n");
++if (($plink = my_mysql_connect($host, $user, $passwd, $db, $port, $socket, NULL, true)))
++	printf("[001] Can connect to the server.\n");
+ 
+-	if (($res = mysql_query('SELECT id FROM test ORDER BY id ASC', $plink)) &&
+-			($row = mysql_fetch_assoc($res)) &&
+-			(mysql_free_result($res))) {
+-		printf("[002] Can fetch data using persistent connection! Data = '%s'\n",
+-			$row['id']);
+-	}
++if (($res = mysql_query('SELECT id FROM test ORDER BY id ASC', $plink)) &&
++		($row = mysql_fetch_assoc($res)) &&
++		(mysql_free_result($res))) {
++	printf("[002] Can fetch data using persistent connection! Data = '%s'\n",
++		$row['id']);
++}
+ 
+-	$thread_id = mysql_thread_id($plink);
+-	mysql_close($plink);
++$thread_id = mysql_thread_id($plink);
++mysql_close($plink);
+ 
+-	if (!($plink = my_mysql_connect($host, $user, $passwd, $db, $port, $socket, NULL, true)))
+-		printf("[003] Cannot connect, [%d] %s\n", mysql_errno(), mysql_error());
++if (!($plink = my_mysql_connect($host, $user, $passwd, $db, $port, $socket, NULL, true)))
++	printf("[003] Cannot connect, [%d] %s\n", mysql_errno(), mysql_error());
+ 
+-	if (mysql_thread_id($plink) != $thread_id)
+-		printf("[004] Looks like the second call to pconnect() did not give us the same connection.\n");
++if (mysql_thread_id($plink) != $thread_id)
++	printf("[004] Looks like the second call to pconnect() did not give us the same connection.\n");
+ 
+-	$thread_id = mysql_thread_id($plink);
+-	mysql_close($plink);
++$thread_id = mysql_thread_id($plink);
++mysql_close($plink);
+ 
+-	if (!($plink = my_mysql_connect($host, $user, $passwd, $db, $port, $socket)))
+-		printf("[005] Cannot connect, [%d] %s\n", mysql_errno(), mysql_error());
++if (!($plink = my_mysql_connect($host, $user, $passwd, $db, $port, $socket)))
++	printf("[005] Cannot connect, [%d] %s\n", mysql_errno(), mysql_error());
+ 
+-	if (mysql_thread_id($plink) == $thread_id)
+-		printf("[006] Looks like connect() did not return a new connection.\n");
++if (mysql_thread_id($plink) == $thread_id)
++	printf("[006] Looks like connect() did not return a new connection.\n");
+ 
+-	print "done!";
++print "done!";
+ ?>
+ --CLEAN--
+ <?php
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [001] Can connect to the server.
+ [002] Can fetch data using persistent connection! Data = '1'
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_pconnect.phpt ext/mysql/tests/mysql_pconnect.phpt
+--- ext/mysql.orig/tests/mysql_pconnect.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_pconnect.phpt	2022-07-04 05:10:02.923771211 +0200
+@@ -10,88 +10,80 @@
+ mysql.allow_persistent=1
+ --FILE--
+ <?php
+-	include "connect.inc";
++include "connect.inc";
+ 
+-	$tmp    = NULL;
+-	$link   = NULL;
++$tmp    = NULL;
++$link   = NULL;
+ 
+-	// mysql_pconnect ( [string server [, string username [, string password [, bool new_link [, int client_flags]]]]] )
+-	if (NULL !== ($tmp = @mysql_pconnect($link, $link, $link, $link, $link, $link)))
+-		printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++// mysql_pconnect ( [string server [, string username [, string password [, bool new_link [, int client_flags]]]]] )
++try {
++if (NULL !== ($tmp = @mysql_pconnect($link, $link, $link, $link, $link, $link)))
++	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+-	$myhost = (is_null($socket)) ? ((is_null($port)) ? $host : $host . ':' . $port) : $host . ':' . $socket;
+-	if (!$link = mysql_pconnect($myhost, $user, $passwd, true))
+-		printf("[002] Cannot connect to the server using host=%s/%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+-			$host, $myhost, $user, $db, $port, $socket);
++$myhost = (is_null($socket)) ? ((is_null($port)) ? $host : $host . ':' . $port) : $host . ':' . $socket;
++if (!$link = mysql_pconnect($myhost, $user, $passwd, true))
++	printf("[002] Cannot connect to the server using host=%s/%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
++		$host, $myhost, $user, $db, $port, $socket);
+ 
+-	mysql_close($link);
++mysql_close($link);
+ 
+-	if ($link = mysql_pconnect($myhost, $user . 'unknown_really', $passwd . 'non_empty', true))
+-		printf("[003] Can connect to the server using host=%s/%s, user=%s, passwd=***non_empty, dbname=%s, port=%s, socket=%s\n",
+-			$host, $myhost, $user . 'unknown_really', $db, $port, $socket);
++if ($link = mysql_pconnect($myhost, $user . 'unknown_really', $passwd . 'non_empty', true))
++	printf("[003] Can connect to the server using host=%s/%s, user=%s, passwd=***non_empty, dbname=%s, port=%s, socket=%s\n",
++		$host, $myhost, $user . 'unknown_really', $db, $port, $socket);
+ 
+-	if (false !== $link)
+-		printf("[004] Expecting boolean/false, got %s/%s\n", gettype($link), $link);
++if (false !== $link)
++	printf("[004] Expecting boolean/false, got %s/%s\n", gettype($link), $link);
+ 
+-	// Run the following tests without an anoynmous MySQL user and use a password for the test user!
++// Run the following tests without an anoynmous MySQL user and use a password for the test user!
+ 
+ 
+-	if (!ini_get('sql.safe_mode')) {
++if (!ini_get('sql.safe_mode')) {
+ 
+-		if ($socket) {
+-			ini_set('mysql.default_socket', $socket);
+-			if (!is_resource($link = mysql_pconnect($host, $user, $passwd, true))) {
+-				printf("[005] Usage of mysql.default_socket failed\n") ;
+-			} else {
+-				mysql_close($link);
+-			}
+-		} else {
+-			ini_set('mysql.default_socket', null);
+-		}
+-
+-		ini_set('mysql.default_port', $port);
++	if ($socket) {
++		ini_set('mysql.default_socket', $socket);
+ 		if (!is_resource($link = mysql_pconnect($host, $user, $passwd, true))) {
+-			printf("[006] Usage of mysql.default_port failed\n") ;
++			printf("[005] Usage of mysql.default_socket failed\n") ;
+ 		} else {
+ 			mysql_close($link);
+ 		}
++	} else {
++		ini_set('mysql.default_socket', null);
++	}
+ 
+-		ini_set('mysql.default_password', $passwd);
+-		if (!is_resource($link = mysql_pconnect($myhost, $user))) {
+-			printf("[007] Usage of mysql.default_password failed\n") ;
+-		} else {
+-			mysql_close($link);
+-		}
++	ini_set('mysql.default_port', $port);
++	if (!is_resource($link = mysql_pconnect($host, $user, $passwd, true))) {
++		printf("[006] Usage of mysql.default_port failed\n") ;
++	} else {
++		mysql_close($link);
++	}
+ 
+-		ini_set('mysql.default_user', $user);
+-		if (!is_resource($link = mysql_pconnect($myhost))) {
+-			printf("[008] Usage of mysql.default_user failed\n");
+-		} else {
+-			mysql_close($link);
+-		}
++	ini_set('mysql.default_password', $passwd);
++	if (!is_resource($link = mysql_pconnect($myhost, $user))) {
++		printf("[007] Usage of mysql.default_password failed\n") ;
++	} else {
++		mysql_close($link);
++	}
+ 
+-		ini_set('mysql.default_host', $myhost);
+-		if (!is_resource($link = mysql_pconnect())) {
+-			printf("[009] Usage of mysql.default_host failed\n") ;
+-		} else {
+-			mysql_close($link);
+-		}
++	ini_set('mysql.default_user', $user);
++	if (!is_resource($link = mysql_pconnect($myhost))) {
++		printf("[008] Usage of mysql.default_user failed\n");
++	} else {
++		mysql_close($link);
++	}
++
++	ini_set('mysql.default_host', $myhost);
++	if (!is_resource($link = mysql_pconnect())) {
++		printf("[009] Usage of mysql.default_host failed\n") ;
++	} else {
++		mysql_close($link);
+ 	}
++}
+ 
+-	print "done!";
++print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_pconnect() expects at most 4 arguments, 6 given in %s on line %d
+ 
+ Warning: mysql_pconnect(): Access denied for user '%s'@'%s' (using password: YES) in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_pconn_kill.phpt ext/mysql/tests/mysql_pconn_kill.phpt
+--- ext/mysql.orig/tests/mysql_pconn_kill.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_pconn_kill.phpt	2022-07-04 05:34:56.543005537 +0200
+@@ -10,108 +10,105 @@
+ mysql.max_persistent=2
+ --FILE--
+ <?php
+-	include "connect.inc";
+-	include "table.inc";
++include "connect.inc";
++include "table.inc";
+ 
+-	if ($socket)
+-		$myhost = sprintf("%s:%s", $host, $socket);
+-	else if ($port)
+-		$myhost = sprintf("%s:%s", $host, $port);
+-	else
+-		$myhost = $host;
+-
+-	if (!($plink = mysql_pconnect($myhost, $user, $passwd)))
+-		printf("[001] Cannot connect to the server using host=%s/%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+-			$host, $myhost, $user, $db, $port, $socket);
+-	mysql_select_db($db, $plink);
++if ($socket)
++	$myhost = sprintf("%s:%s", $host, $socket);
++else if ($port)
++	$myhost = sprintf("%s:%s", $host, $port);
++else
++	$myhost = $host;
++
++if (!($plink = mysql_pconnect($myhost, $user, $passwd)))
++	printf("[001] Cannot connect to the server using host=%s/%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
++		$host, $myhost, $user, $db, $port, $socket);
++mysql_select_db($db, $plink);
++
++$pthread_id = mysql_thread_id($plink);
++$thread_id = mysql_thread_id($link);
++
++if (!($res = mysql_query("SHOW FULL PROCESSLIST", $link)))
++	printf("[002] Cannot get processlist, [%d] %s\n", mysql_errno($link), mysql_error($link));
++
++$processlist = array();
++while ($row = mysql_fetch_assoc($res))
++	$processlist[$row['Id']] = $row;
++mysql_free_result($res);
++
++if (!isset($processlist[$thread_id]))
++	printf("[003] Cannot find regular connection thread in process list, [%d] %s\n", mysql_errno($link), mysql_error($link));
++if (!isset($processlist[$pthread_id]))
++	printf("[004] Cannot find persistent connection thread in process list, [%d] %s\n", mysql_errno($link), mysql_error($link));
+ 
+-	$pthread_id = mysql_thread_id($plink);
+-	$thread_id = mysql_thread_id($link);
++if (!mysql_query(sprintf("KILL %d", $pthread_id), $link))
++	printf("[005] Cannot kill persistent connection thread, [%d] %s\n", mysql_errno($link), mysql_error($link));
+ 
++while (1) {
+ 	if (!($res = mysql_query("SHOW FULL PROCESSLIST", $link)))
+-		printf("[002] Cannot get processlist, [%d] %s\n", mysql_errno($link), mysql_error($link));
++		printf("[006] Cannot get processlist, [%d] %s\n", mysql_errno($link), mysql_error($link));
+ 
+-	$processlist = array();
++	$processlist2 = array();
+ 	while ($row = mysql_fetch_assoc($res))
+-		$processlist[$row['Id']] = $row;
++		$processlist2[$row['Id']] = $row;
+ 	mysql_free_result($res);
+-
+-	if (!isset($processlist[$thread_id]))
+-		printf("[003] Cannot find regular connection thread in process list, [%d] %s\n", mysql_errno($link), mysql_error($link));
+-	if (!isset($processlist[$pthread_id]))
+-		printf("[004] Cannot find persistent connection thread in process list, [%d] %s\n", mysql_errno($link), mysql_error($link));
+-
+-	if (!mysql_query(sprintf("KILL %d", $pthread_id), $link))
+-		printf("[005] Cannot kill persistent connection thread, [%d] %s\n", mysql_errno($link), mysql_error($link));
+-
+-	while (1) {
+-		if (!($res = mysql_query("SHOW FULL PROCESSLIST", $link)))
+-			printf("[006] Cannot get processlist, [%d] %s\n", mysql_errno($link), mysql_error($link));
+-
+-		$processlist2 = array();
+-		while ($row = mysql_fetch_assoc($res))
+-			$processlist2[$row['Id']] = $row;
+-		mysql_free_result($res);
+-		if (isset($processlist2[$pthread_id])) {
+-			sleep(1);
+-		} else {
+-			break;
+-		}
++	if (isset($processlist2[$pthread_id])) {
++		sleep(1);
++	} else {
++		break;
+ 	}
++}
+ 
+-	if (!isset($processlist2[$thread_id]))
+-		printf("[007] Cannot find regular connection thread in process list, [%d] %s\n", mysql_errno($link), mysql_error($link));
++if (!isset($processlist2[$thread_id]))
++	printf("[007] Cannot find regular connection thread in process list, [%d] %s\n", mysql_errno($link), mysql_error($link));
+ 
+-	mysql_close($plink);
++mysql_close($plink);
+ 
+-	if (!($plink = @mysql_pconnect($myhost, $user, $passwd)))
+-		printf("[009] Cannot create new persistent connection, [%d] %s\n", mysql_errno(), mysql_error());
+-	mysql_select_db($db, $plink);
++if (!($plink = @mysql_pconnect($myhost, $user, $passwd)))
++	printf("[009] Cannot create new persistent connection, [%d] %s\n", mysql_errno(), mysql_error());
++mysql_select_db($db, $plink);
+ 
+-	if (!($res = mysql_query("SELECT 1", $plink)))
+-		printf("[010] Cannot run query on new persistent connection, [%d] %s\n", @mysql_errno($plink), @mysql_error($plink));
++if (!($res = mysql_query("SELECT 1", $plink)))	# FIXME ?
++	printf("[010] Cannot run query on new persistent connection, [%d] %s\n", @mysql_errno($plink), @mysql_error($plink));
++else
+ 	mysql_free_result($res);
+ 
+-	var_dump(mysql_ping($plink));
++var_dump(mysql_ping($plink));
+ 
+-	if (!($res = mysql_query("SELECT 1", $plink)))
+-		printf("[011] Cannot run query on new persistent connection, [%d] %s\n", @mysql_errno($plink), @mysql_error($plink));
++if (!($res = mysql_query("SELECT 1", $plink)))	# FIXME ?
++	printf("[011] Cannot run query on new persistent connection, [%d] %s\n", @mysql_errno($plink), @mysql_error($plink));
++else
+ 	mysql_free_result($res);
+ 
+-	if (!($link2 = mysql_connect($myhost, $user, $passwd, true)))
+-		printf("[012] Cannot connect to the server using host=%s/%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+-			$host, $myhost, $user, $db, $port, $socket);
+-	mysql_select_db($db, $link2);
+-	if (!mysql_query(sprintf("KILL %d", $thread_id), $link2))
+-		printf("[013] Cannot kill regular connection thread, [%d] %s\n", mysql_errno($link2), mysql_error($link2));
+-
+-	if (!($link = mysql_connect($myhost, $user, $passwd, true)))
+-		printf("[014] Cannot connect to the server using host=%s/%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+-			$host, $myhost, $user, $db, $port, $socket);
+-	mysql_select_db($db, $link);
+-	if (!($res = mysql_query("SELECT * FROM test", $link)))
+-		printf("[015] Cannot run query on new regular connection, [%d] %s\n", @mysql_errno($link), @mysql_error($link));
+-
+-	if (!($res = mysql_query("SELECT * FROM test", $link2)))
+-		printf("[016] Cannot run query on other regular connection, [%d] %s\n", @mysql_errno($link2), @mysql_error($link2));
+-
+-	mysql_free_result($res);
+-	mysql_close($plink);
+-	mysql_close($link);
+-	mysql_close($link2);
+-	print "done!";
++if (!($link2 = mysql_connect($myhost, $user, $passwd, true)))
++	printf("[012] Cannot connect to the server using host=%s/%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
++		$host, $myhost, $user, $db, $port, $socket);
++mysql_select_db($db, $link2);
++if (!mysql_query(sprintf("KILL %d", $thread_id), $link2))
++	printf("[013] Cannot kill regular connection thread, [%d] %s\n", mysql_errno($link2), mysql_error($link2));
++
++if (!($link = mysql_connect($myhost, $user, $passwd, true)))
++	printf("[014] Cannot connect to the server using host=%s/%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
++		$host, $myhost, $user, $db, $port, $socket);
++mysql_select_db($db, $link);
++if (!($res = mysql_query("SELECT * FROM test", $link)))
++	printf("[015] Cannot run query on new regular connection, [%d] %s\n", @mysql_errno($link), @mysql_error($link));
++
++if (!($res = mysql_query("SELECT * FROM test", $link2)))
++	printf("[016] Cannot run query on other regular connection, [%d] %s\n", @mysql_errno($link2), @mysql_error($link2));
++
++mysql_free_result($res);
++mysql_close($plink);
++mysql_close($link);
++mysql_close($link2);
++print "done!";
+ ?>
+ --CLEAN--
+ <?php
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-bool(true)
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++[010] Cannot run query on new persistent connection, [2006] MySQL server has gone away
++bool(false)
++[011] Cannot run query on new persistent connection, [2006] MySQL server has gone away
+ done!
+diff -urN ext/mysql.orig/tests/mysql_pconn_max_links.phpt ext/mysql/tests/mysql_pconn_max_links.phpt
+--- ext/mysql.orig/tests/mysql_pconn_max_links.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_pconn_max_links.phpt	2022-07-04 05:20:52.158098302 +0200
+@@ -63,111 +63,111 @@
+ mysql.allow_persistent=1
+ --FILE--
+ <?php
+-	require_once("connect.inc");
+-	require_once('table.inc');
++require_once("connect.inc");
++require_once('table.inc');
++
++if ($socket)
++	$host = sprintf("%s:%s", $host, $socket);
++else if ($port)
++	$host = sprintf("%s:%s", $host, $port);
++
++if (!$plink = mysql_pconnect($host, $user, $passwd))
++	printf("[001] Cannot connect using the second DB user created during SKIPIF, [%d] %s\n",
++		mysql_errno(), mysql_error());
++
++if (!mysql_select_db($db, $plink))
++	printf("[002] [%d] %s\n", mysql_errno($plink), mysql_error($plink));
++
++ob_start();
++phpinfo();
++$phpinfo = strip_tags(ob_get_contents());
++ob_end_clean();
++$phpinfo = substr($phpinfo, strpos($phpinfo, 'MySQL Support => enabled'), 500);
++if (!preg_match('@Active Persistent Links\s+=>\s+(\d+)@ismU', $phpinfo, $matches))
++	printf("[003] Cannot get # active persistent links from phpinfo()");
++$num_plinks = $matches[1];
++
++if (!$res = mysql_query('SELECT id, label FROM test WHERE id = 1', $plink))
++	printf("[004] Cannot run query on persistent connection of second DB user, [%d] %s\n",
++		mysql_errno($plink), mysql_error($plink));
++
++if (!$row = mysql_fetch_assoc($res))
++	printf("[005] Cannot run fetch result, [%d] %s\n",
++		mysql_errno($plink), mysql_error($plink));
++mysql_free_result($res);
++var_dump($row);
++
++// change the password for the second DB user and kill the persistent connection
++if (!$res = mysql_query("SELECT CURRENT_USER() AS _user", $link))
++	printf("[006] [%d] %s", mysql_errno($link), mysql_error($link));
++
++$row = mysql_fetch_assoc($res);
++mysql_free_result($res);
++$host = substr($row['_user'], strrpos($row['_user'], "@") + 1, strlen($row['_user']));
+ 
+-	if ($socket)
+-		$host = sprintf("%s:%s", $host, $socket);
+-	else if ($port)
+-		$host = sprintf("%s:%s", $host, $port);
+-
+-	if (!$plink = mysql_pconnect($host, $user, $passwd))
+-		printf("[001] Cannot connect using the second DB user created during SKIPIF, [%d] %s\n",
+-			mysql_errno(), mysql_error());
+-
+-	if (!mysql_select_db($db, $plink))
+-		printf("[002] [%d] %s\n", mysql_errno($plink), mysql_error($plink));
+-
+-	ob_start();
+-	phpinfo();
+-	$phpinfo = strip_tags(ob_get_contents());
+-	ob_end_clean();
+-	$phpinfo = substr($phpinfo, strpos($phpinfo, 'MySQL Support => enabled'), 500);
+-	if (!preg_match('@Active Persistent Links\s+=>\s+(\d+)@ismU', $phpinfo, $matches))
+-		printf("[003] Cannot get # active persistent links from phpinfo()");
+-	$num_plinks = $matches[1];
+-
+-	if (!$res = mysql_query('SELECT id, label FROM test WHERE id = 1', $plink))
+-		printf("[004] Cannot run query on persistent connection of second DB user, [%d] %s\n",
+-			mysql_errno($plink), mysql_error($plink));
+-
+-	if (!$row = mysql_fetch_assoc($res))
+-		printf("[005] Cannot run fetch result, [%d] %s\n",
+-			mysql_errno($plink), mysql_error($plink));
+-	mysql_free_result($res);
+-	var_dump($row);
+-
+-	// change the password for the second DB user and kill the persistent connection
+-	if (!$res = mysql_query("SELECT CURRENT_USER() AS _user", $link))
+-		printf("[006] [%d] %s", mysql_errno($link), mysql_error($link));
+-
+-	$row = mysql_fetch_assoc($res);
+-	mysql_free_result($res);
+-	$host = substr($row['_user'], strrpos($row['_user'], "@") + 1, strlen($row['_user']));
+-
+-	$sql = sprintf('SET PASSWORD FOR pcontest@"%s" = PASSWORD("newpass")', mysql_real_escape_string($host, $link));
+-	if (!mysql_query($sql, $link))
+-		printf("[007] Cannot change PW of second DB user, [%d] %s\n", mysql_errno($link), mysql_error($link));
+-
+-	// persistent connections cannot be closed but only be killed
+-	$pthread_id = mysql_thread_id($plink);
+-	if (!mysql_query(sprintf('KILL %d', $pthread_id), $link))
+-		printf("[008] Cannot KILL persistent connection of second DB user, [%d] %s\n", mysql_errno($link), mysql_error($link));
+-	// give the server a second to really kill the thread
+-	sleep(1);
+-
+-	if (!$res = mysql_query("SHOW FULL PROCESSLIST", $link))
+-		printf("[009] [%d] %s\n", mysql_errno($link), mysql_error($link));
+-
+-	$running_threads = array();
+-	while ($row = mysql_fetch_assoc($res))
+-		$running_threads[$row['Id']] = $row;
+-	mysql_free_result($res);
+-
+-	if (isset($running_threads[$pthread_id]))
+-		printf("[010] Persistent connection has not been killed\n");
+-
+-	// we might get the old handle
+-	if ($plink = @mysql_pconnect($host, 'pcontest', 'pcontest'))
+-		printf("[011] Can connect using the old password, [%d] %s\n",
+-			mysql_errno(), mysql_error());
+-
+-	ob_start();
+-	phpinfo();
+-	$phpinfo = strip_tags(ob_get_contents());
+-	ob_end_clean();
+-	$phpinfo = substr($phpinfo, strpos($phpinfo, 'MySQL Support => enabled'), 500);
+-	if (!preg_match('@Active Persistent Links\s+=>\s+(\d+)@ismU', $phpinfo, $matches))
+-		printf("[012] Cannot get # active persistent links from phpinfo()\n");
+-
+-	$num_plinks_kill = $matches[1];
+-	if ($num_plinks_kill > $num_plinks)
+-		printf("[013] Statistics seems to be wrong, got %d active persistent links, expecting < %d links\n",
+-			$num_plinks_kill, $num_plinks);
+-
+-	// The first connection has been closed, the last pconnect() was unable to connect -> no connection open
+-	// We must be able to connect because max_persistent limit has not been reached
+-	if (!$plink = mysql_pconnect($host, 'pcontest', 'newpass'))
+-		die(sprintf("[014] Cannot connect using the second DB, [%d] %s\n",
+-			mysql_errno(), mysql_error()));
+-
+-	if (!mysql_select_db($db, $plink))
+-		printf("[015] [%d] %s\n", mysql_errno($plink), mysql_error($plink));
+-
+-	if (!$res = mysql_query('SELECT id, label FROM test WHERE id = 1', $plink))
+-		printf("[016] Cannot run query on persistent connection of second DB user, [%d] %s\n",
+-			mysql_errno($plink), mysql_error($plink));
+-
+-	if (!$row = mysql_fetch_assoc($res))
+-		printf("[017] Cannot run fetch result, [%d] %s\n",
+-			mysql_errno($plink), mysql_error($plink));
+-	mysql_free_result($res);
+-	var_dump($row);
+-
+-	mysql_query(sprintf('REVOKE ALL PRIVILEGES, GRANT OPTION FROM pcontest@"%s"', mysql_real_escape_string($host, $link)), $link);
+-	mysql_query(sprintf('DROP USER pcontest@"%s"', mysql_real_escape_string($host, $link)), $link);
+-	mysql_close($link);
+-	print "done!";
++$sql = sprintf('SET PASSWORD FOR pcontest@"%s" = PASSWORD("newpass")', mysql_real_escape_string($host, $link));
++if (!mysql_query($sql, $link))
++	printf("[007] Cannot change PW of second DB user, [%d] %s\n", mysql_errno($link), mysql_error($link));
++
++// persistent connections cannot be closed but only be killed
++$pthread_id = mysql_thread_id($plink);
++if (!mysql_query(sprintf('KILL %d', $pthread_id), $link))
++	printf("[008] Cannot KILL persistent connection of second DB user, [%d] %s\n", mysql_errno($link), mysql_error($link));
++// give the server a second to really kill the thread
++sleep(1);
++
++if (!$res = mysql_query("SHOW FULL PROCESSLIST", $link))
++	printf("[009] [%d] %s\n", mysql_errno($link), mysql_error($link));
++
++$running_threads = array();
++while ($row = mysql_fetch_assoc($res))
++	$running_threads[$row['Id']] = $row;
++mysql_free_result($res);
++
++if (isset($running_threads[$pthread_id]))
++	printf("[010] Persistent connection has not been killed\n");
++
++// we might get the old handle
++if ($plink = @mysql_pconnect($host, 'pcontest', 'pcontest'))
++	printf("[011] Can connect using the old password, [%d] %s\n",
++		mysql_errno(), mysql_error());
++
++ob_start();
++phpinfo();
++$phpinfo = strip_tags(ob_get_contents());
++ob_end_clean();
++$phpinfo = substr($phpinfo, strpos($phpinfo, 'MySQL Support => enabled'), 500);
++if (!preg_match('@Active Persistent Links\s+=>\s+(\d+)@ismU', $phpinfo, $matches))
++	printf("[012] Cannot get # active persistent links from phpinfo()\n");
++
++$num_plinks_kill = $matches[1];
++if ($num_plinks_kill > $num_plinks)
++	printf("[013] Statistics seems to be wrong, got %d active persistent links, expecting < %d links\n",
++		$num_plinks_kill, $num_plinks);
++
++// The first connection has been closed, the last pconnect() was unable to connect -> no connection open
++// We must be able to connect because max_persistent limit has not been reached
++if (!$plink = mysql_pconnect($host, 'pcontest', 'newpass'))
++	die(sprintf("[014] Cannot connect using the second DB, [%d] %s\n",
++		mysql_errno(), mysql_error()));
++
++if (!mysql_select_db($db, $plink))
++	printf("[015] [%d] %s\n", mysql_errno($plink), mysql_error($plink));
++
++if (!$res = mysql_query('SELECT id, label FROM test WHERE id = 1', $plink))
++	printf("[016] Cannot run query on persistent connection of second DB user, [%d] %s\n",
++		mysql_errno($plink), mysql_error($plink));
++
++if (!$row = mysql_fetch_assoc($res))
++	printf("[017] Cannot run fetch result, [%d] %s\n",
++		mysql_errno($plink), mysql_error($plink));
++mysql_free_result($res);
++var_dump($row);
++
++mysql_query(sprintf('REVOKE ALL PRIVILEGES, GRANT OPTION FROM pcontest@"%s"', mysql_real_escape_string($host, $link)), $link);
++mysql_query(sprintf('DROP USER pcontest@"%s"', mysql_real_escape_string($host, $link)), $link);
++mysql_close($link);
++print "done!";
+ ?>
+ --CLEAN--
+ <?php
+@@ -191,17 +191,12 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(2) {
+   ["id"]=>
+   string(1) "1"
+   ["label"]=>
+   string(1) "a"
+ }
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(2) {
+   ["id"]=>
+   string(1) "1"
+diff -urN ext/mysql.orig/tests/mysql_pconn_reuse.phpt ext/mysql/tests/mysql_pconn_reuse.phpt
+--- ext/mysql.orig/tests/mysql_pconn_reuse.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_pconn_reuse.phpt	2022-06-27 13:32:10.516242848 +0200
+@@ -59,17 +59,8 @@
+ 	print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [001] Can connect to the server.
+ [002] Can fetch data using persistent connection! Data = '1'
+ 
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_connect(): Too many open links (2) in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_phpinfo.phpt ext/mysql/tests/mysql_phpinfo.phpt
+--- ext/mysql.orig/tests/mysql_phpinfo.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_phpinfo.phpt	2022-07-04 11:16:19.458813921 +0200
+@@ -1,5 +1,5 @@
+ --TEST--
+-phpinfo() mysql section
++phpinfo() mysql / mysqlnd sections
+ --SKIPIF--
+ <?php
+ require_once('skipif.inc');
+@@ -49,7 +49,9 @@
+ if (!stristr($phpinfo, "mysql.allow_persistent"))
+ 	printf("[011] php.ini setting mysql.allow_persistent not shown.\n");
+ 
+-if ($IS_MYSQLND) {
++if ($IS_MYSQLND &&
++	ini_get('mysqlnd.collect_memory_statistics') > 0 &&
++	version_compare(PHP_VERSION, '7.4.0', '<') == 1) {
+ 	$expected = array(
+ 		'mysqlnd statistics',
+ 		'bytes_sent', 'bytes_received', 'packets_sent', 'packets_received',
+diff -urN ext/mysql.orig/tests/mysql_ping.phpt ext/mysql/tests/mysql_ping.phpt
+--- ext/mysql.orig/tests/mysql_ping.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_ping.phpt	2022-07-04 05:33:42.075866230 +0200
+@@ -14,8 +14,10 @@
+ 
+ require('table.inc');
+ 
++try {
+ if (!is_null($tmp = @mysql_ping($link, $link)))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ var_dump(mysql_ping($link));
+ 
+@@ -27,12 +29,12 @@
+ var_dump(mysql_ping($link));
+ 
+ if ($errno === mysql_errno($link))
+-	printf("[003] Error codes should have been reset\n");
++	printf("[003] Error code should have been reset\n");
+ 
+ var_dump(mysql_ping());
+-mysql_close($link);
++mysql_close();
+ 
+-if (false !== ($tmp = mysql_ping($link)))
++if (false !== ($tmp = mysql_ping($link)))	# FIXME ?
+ 	printf("[004] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+ 
+ print "done!";
+@@ -42,10 +44,9 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_ping() expects at most 1 argument, 2 given in %s on line %d
+ bool(true)
+ bool(true)
+ bool(true)
+-
+-Warning: mysql_ping(): supplied resource is not a valid MySQL-Link resource in %s on line %d
++[004] Expecting boolean/false, got boolean/1
+ done!
+diff -urN ext/mysql.orig/tests/mysql_query_load_data_openbasedir.phpt ext/mysql/tests/mysql_query_load_data_openbasedir.phpt
+--- ext/mysql.orig/tests/mysql_query_load_data_openbasedir.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_query_load_data_openbasedir.phpt	2022-07-04 11:11:50.797174772 +0200
+@@ -1,22 +1,23 @@
+ --TEST--
+-LOAD DATA INFILE - open_basedir
++LOAD DATA LOCAL INFILE - open_basedir
+ --SKIPIF--
+ <?php
+ include_once('skipif.inc');
+ include_once('skipifconnectfailure.inc');
+ 
++$file = 'simple.csv';
+ 
+ if (!$IS_MYSQLND)
+ 	die("skip mysqlnd only, libmysql does not know about open_basedir restrictions");
+ 
+-if (file_exists('./simple.csv') && !unlink('./simple.csv'))
++if (file_exists($file) && !unlink($file))
+ 	die("skip Cannot remove previous CSV file");
+ 
+-if (!$fp = fopen('./simple.csv', 'w'))
++if (!$fp = fopen($file, 'w'))
+ 	die("skip Cannot create test CSV file");
+ 
+ fclose($fp);
+-@unlink('./simple.csv');
++@unlink($file);
+ 
+ if ($socket == "" && $host != NULL && $host != 'localhost' && $host != '.') {
+ 	/* could be a remote TCP/IP connection. LOCAL INFILE may not work */
+@@ -56,23 +57,25 @@
+ 	printf("[002] [%d] %s\n", mysql_errno($link), mysql_error($link));
+ }
+ 
+-if (file_exists('./simple.csv'))
+-	unlink('./simple.csv');
++$file = 'simple.csv';
+ 
+-if (!$fp = fopen('./simple.csv', 'w'))
++if (file_exists($file))
++	unlink($file);
++
++if (!$fp = fopen($file, 'w'))
+ 	printf("[003] Cannot open CSV file\n");
+ 
+ if (version_compare(PHP_VERSION, '5.9.9', '>') >= 0) {
+ 	if (!fwrite($fp, (binary)"'97';'x';\n") ||
+ 		!fwrite($fp, (binary)"'98';'y';\n") ||
+ 		!fwrite($fp, (binary)"99;'z';\n")) {
+-		printf("[004] Cannot write CVS file '%s'\n", $file);
++		printf("[004] Cannot write CSV file '%s'\n", $file);
+ 	}
+ } else {
+ 	if (!fwrite($fp, "97;'x';\n") ||
+ 		!fwrite($fp, "98;'y';\n") ||
+ 		!fwrite($fp, "99;'z';\n")) {
+-		printf("[005] Cannot write CVS file '%s'\n", $file);
++		printf("[005] Cannot write CSV file '%s'\n", $file);
+ 	}
+ }
+ fclose($fp);
+@@ -81,7 +84,7 @@
+ 			INTO TABLE test
+ 			FIELDS TERMINATED BY ';' OPTIONALLY ENCLOSED BY '\''
+ 			LINES TERMINATED BY '\n'",
+-			mysql_real_escape_string(realpath('./simple.csv'), $link));
++			mysql_real_escape_string(realpath($file), $link));
+ 
+ if (!mysql_query($sql, $link))
+ 	printf("[006] [%d] %s\n", mysql_errno($link), mysql_error($link));
+@@ -106,16 +109,10 @@
+ 	printf("[010] [%d] %s\n", mysql_errno($link), mysql_error($link));
+ 
+ mysql_close($link);
+-unlink("./simple.csv");
++unlink($file);
+ 
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-[006] [1148] %s
+-[007] [0] ''
+-[008] LOAD DATA not run?
+-[010] [1148] %s
++[010] [2000] %s
+ done!
+diff -urN ext/mysql.orig/tests/mysql_query.phpt ext/mysql/tests/mysql_query.phpt
+--- ext/mysql.orig/tests/mysql_query.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_query.phpt	2022-07-04 05:35:53.012419699 +0200
+@@ -12,16 +12,20 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_query()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (false !== ($tmp = @mysql_query($link)))
+ 	printf("[002] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+ 
+ require('table.inc');
+ 
++try {
+ if (NULL !== ($tmp = @mysql_query("SELECT 1 AS a", $link, "foo")))
+ 	printf("[003] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (false !== ($tmp = mysql_query('THIS IS NOT SQL', $link)))
+ 	printf("[004] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+@@ -91,7 +95,7 @@
+ 
+ mysql_close($link);
+ 
+-if (false !== ($tmp = mysql_query("SELECT id FROM test", $link)))
++if (false !== ($tmp = mysql_query("SELECT id FROM test", $link)))	# FIXME ?
+ 	printf("[011] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+ 
+ print "done!";
+@@ -117,7 +121,8 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_query() expects at least 1 argument, 0 given in %s on line %d
++ArgumentCountError: mysql_query() expects at most 2 arguments, 3 given in %s on line %d
+ array(1) {
+   ["valid"]=>
+   string(30) "this is sql but with semicolon"
+@@ -127,6 +132,5 @@
+   string(1) "a"
+ }
+ string(1) "a"
+-
+-Warning: mysql_query(): supplied resource is not a valid MySQL-Link resource in %s on line %d
++[011] Expecting boolean/false, got resource/Resource id #13
+ done!
+diff -urN ext/mysql.orig/tests/mysql_real_escape_string.phpt ext/mysql/tests/mysql_real_escape_string.phpt
+--- ext/mysql.orig/tests/mysql_real_escape_string.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_real_escape_string.phpt	2022-07-04 04:52:05.407804689 +0200
+@@ -12,13 +12,17 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (NULL !== ($tmp = @mysql_real_escape_string()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ 
++try {
+ if (NULL !== ($tmp = @mysql_real_escape_string('foo', $link, $link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ var_dump(mysql_real_escape_string("Am I a unicode string in PHP 6?", $link));
+ var_dump(mysql_real_escape_string('\\', $link));
+@@ -33,7 +37,8 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_real_escape_string() expects at least 1 argument, 0 given in %s on line %d
++ArgumentCountError: mysql_real_escape_string() expects at most 2 arguments, 3 given in %s on line %d
+ string(31) "Am I a unicode string in PHP 6?"
+ string(2) "\\"
+ string(2) "\""
+diff -urN ext/mysql.orig/tests/mysql_reflection_functions.phpt ext/mysql/tests/mysql_reflection_functions.phpt
+--- ext/mysql.orig/tests/mysql_reflection_functions.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_reflection_functions.phpt	2022-06-28 11:20:08.403414156 +0200
+@@ -37,31 +37,31 @@
+     Required parameters: 2
+       Parameter #0 [ <required> $database_name ]
+       Parameter #1 [ <required> $query ]
+-      Parameter #2 [ <optional> $link_identifier ]
++      Parameter #2 [ <optional> $link_identifier = <default> ]
+   mysql_affected_rows
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_client_encoding
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_close
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_connect
+     Deprecated: no
+     Accepted parameters: 5
+     Required parameters: 0
+-      Parameter #0 [ <optional> $hostname ]
+-      Parameter #1 [ <optional> $username ]
+-      Parameter #2 [ <optional> $password ]
+-      Parameter #3 [ <optional> $new ]
+-      Parameter #4 [ <optional> $flags ]
++      Parameter #0 [ <optional> $hostname = <default> ]
++      Parameter #1 [ <optional> $username = <default> ]
++      Parameter #2 [ <optional> $password = <default> ]
++      Parameter #3 [ <optional> $new = <default> ]
++      Parameter #4 [ <optional> $flags = <default> ]
+   mysql_data_seek
+     Deprecated: no
+     Accepted parameters: 2
+@@ -74,31 +74,31 @@
+     Required parameters: 2
+       Parameter #0 [ <required> $result ]
+       Parameter #1 [ <required> $row ]
+-      Parameter #2 [ <optional> $field ]
++      Parameter #2 [ <optional> $field = <default> ]
+   mysql_db_query
+     Deprecated: yes
+     Accepted parameters: 3
+     Required parameters: 2
+       Parameter #0 [ <required> $database_name ]
+       Parameter #1 [ <required> $query ]
+-      Parameter #2 [ <optional> $link_identifier ]
++      Parameter #2 [ <optional> $link_identifier = <default> ]
+   mysql_dbname
+     Deprecated: yes
+     Accepted parameters: 3
+     Required parameters: 2
+       Parameter #0 [ <required> $result ]
+       Parameter #1 [ <required> $row ]
+-      Parameter #2 [ <optional> $field ]
++      Parameter #2 [ <optional> $field = <default> ]
+   mysql_errno
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_error
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_escape_string
+     Deprecated: no
+     Accepted parameters: 1
+@@ -109,7 +109,7 @@
+     Accepted parameters: 2
+     Required parameters: 1
+       Parameter #0 [ <required> $result ]
+-      Parameter #1 [ <optional> $result_type ]
++      Parameter #1 [ <optional> $result_type = <default> ]
+   mysql_fetch_assoc
+     Deprecated: no
+     Accepted parameters: 1
+@@ -120,7 +120,7 @@
+     Accepted parameters: 2
+     Required parameters: 1
+       Parameter #0 [ <required> $result ]
+-      Parameter #1 [ <optional> $field_offset ]
++      Parameter #1 [ <optional> $field_offset = <default> ]
+   mysql_fetch_lengths
+     Deprecated: no
+     Accepted parameters: 1
+@@ -131,8 +131,8 @@
+     Accepted parameters: 3
+     Required parameters: 1
+       Parameter #0 [ <required> $result ]
+-      Parameter #1 [ <optional> $class_name ]
+-      Parameter #2 [ <optional> $ctor_params ]
++      Parameter #1 [ <optional> $class_name = <default> ]
++      Parameter #2 [ <optional> $ctor_params = <default> ]
+   mysql_fetch_row
+     Deprecated: no
+     Accepted parameters: 1
+@@ -222,68 +222,68 @@
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_get_proto_info
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_get_server_info
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_info
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_insert_id
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_list_dbs
+     Deprecated: yes
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_list_fields
+     Deprecated: no
+     Accepted parameters: 3
+     Required parameters: 2
+       Parameter #0 [ <required> $database_name ]
+       Parameter #1 [ <required> $table_name ]
+-      Parameter #2 [ <optional> $link_identifier ]
++      Parameter #2 [ <optional> $link_identifier = <default> ]
+   mysql_list_processes
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_list_tables
+     Deprecated: yes
+     Accepted parameters: 2
+     Required parameters: 1
+       Parameter #0 [ <required> $database_name ]
+-      Parameter #1 [ <optional> $link_identifier ]
++      Parameter #1 [ <optional> $link_identifier = <default> ]
+   mysql_listdbs
+     Deprecated: yes
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_listfields
+     Deprecated: yes
+     Accepted parameters: 3
+     Required parameters: 2
+       Parameter #0 [ <required> $database_name ]
+       Parameter #1 [ <required> $table_name ]
+-      Parameter #2 [ <optional> $link_identifier ]
++      Parameter #2 [ <optional> $link_identifier = <default> ]
+   mysql_listtables
+     Deprecated: yes
+     Accepted parameters: 2
+     Required parameters: 1
+       Parameter #0 [ <required> $database_name ]
+-      Parameter #1 [ <optional> $link_identifier ]
++      Parameter #1 [ <optional> $link_identifier = <default> ]
+   mysql_num_fields
+     Deprecated: no
+     Accepted parameters: 1
+@@ -308,80 +308,80 @@
+     Deprecated: no
+     Accepted parameters: 4
+     Required parameters: 0
+-      Parameter #0 [ <optional> $hostname ]
+-      Parameter #1 [ <optional> $username ]
+-      Parameter #2 [ <optional> $password ]
+-      Parameter #3 [ <optional> $flags ]
++      Parameter #0 [ <optional> $hostname = <default> ]
++      Parameter #1 [ <optional> $username = <default> ]
++      Parameter #2 [ <optional> $password = <default> ]
++      Parameter #3 [ <optional> $flags = <default> ]
+   mysql_ping
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_query
+     Deprecated: no
+     Accepted parameters: 2
+     Required parameters: 1
+       Parameter #0 [ <required> $query ]
+-      Parameter #1 [ <optional> $link_identifier ]
++      Parameter #1 [ <optional> $link_identifier = <default> ]
+   mysql_real_escape_string
+     Deprecated: no
+     Accepted parameters: 2
+     Required parameters: 1
+       Parameter #0 [ <required> $string ]
+-      Parameter #1 [ <optional> $link_identifier ]
++      Parameter #1 [ <optional> $link_identifier = <default> ]
+   mysql_result
+     Deprecated: no
+     Accepted parameters: 3
+     Required parameters: 2
+       Parameter #0 [ <required> $result ]
+       Parameter #1 [ <required> $row ]
+-      Parameter #2 [ <optional> $field ]
++      Parameter #2 [ <optional> $field = <default> ]
+   mysql_select_db
+     Deprecated: no
+     Accepted parameters: 2
+     Required parameters: 1
+       Parameter #0 [ <required> $database_name ]
+-      Parameter #1 [ <optional> $link_identifier ]
++      Parameter #1 [ <optional> $link_identifier = <default> ]
+   mysql_selectdb
+     Deprecated: yes
+     Accepted parameters: 2
+     Required parameters: 1
+       Parameter #0 [ <required> $database_name ]
+-      Parameter #1 [ <optional> $link_identifier ]
++      Parameter #1 [ <optional> $link_identifier = <default> ]
+   mysql_set_charset
+     Deprecated: no
+     Accepted parameters: 2
+     Required parameters: 1
+       Parameter #0 [ <required> $charset_name ]
+-      Parameter #1 [ <optional> $link_identifier ]
++      Parameter #1 [ <optional> $link_identifier = <default> ]
+   mysql_stat
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_table_name
+     Deprecated: no
+     Accepted parameters: 3
+     Required parameters: 2
+       Parameter #0 [ <required> $result ]
+       Parameter #1 [ <required> $row ]
+-      Parameter #2 [ <optional> $field ]
++      Parameter #2 [ <optional> $field = <default> ]
+   mysql_tablename
+     Deprecated: no
+     Accepted parameters: 3
+     Required parameters: 2
+       Parameter #0 [ <required> $result ]
+       Parameter #1 [ <required> $row ]
+-      Parameter #2 [ <optional> $field ]
++      Parameter #2 [ <optional> $field = <default> ]
+   mysql_thread_id
+     Deprecated: no
+     Accepted parameters: 1
+     Required parameters: 0
+-      Parameter #0 [ <optional> $link_identifier ]
++      Parameter #0 [ <optional> $link_identifier = <default> ]
+   mysql_unbuffered_query
+     Deprecated: no
+     Accepted parameters: 2
+     Required parameters: 1
+       Parameter #0 [ <required> $query ]
+-      Parameter #1 [ <optional> $link_identifier ]
+-done!
+\ No newline at end of file
++      Parameter #1 [ <optional> $link_identifier = <default> ]
++done!
+diff -urN ext/mysql.orig/tests/mysql_result.phpt ext/mysql/tests/mysql_result.phpt
+--- ext/mysql.orig/tests/mysql_result.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_result.phpt	2022-07-04 05:04:59.390609749 +0200
+@@ -14,11 +14,15 @@
+ 
+ // string mysql_result ( resource result, int row [, mixed field] )
+ 
++try {
+ if (!is_null($tmp = @mysql_result()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (!is_null($tmp = @mysql_result($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require_once('table.inc');
+ if (!$res = mysql_query("SELECT id, label, id AS _id, CONCAT(label, 'a') _label, NULL as _foo FROM test _test ORDER BY id ASC LIMIT 1", $link)) {
+@@ -55,7 +59,9 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ var_dump(mysql_result($res, 0));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ print "done!";
+@@ -65,7 +71,8 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_result() expects at least 2 arguments, 0 given in %s on line %d
++ArgumentCountError: mysql_result() expects at least 2 arguments, 1 given in %s on line %d
+ 
+ Warning: mysql_result(): Unable to jump to row -1 on MySQL result index %d in %s on line %d
+ bool(false)
+@@ -110,7 +117,5 @@
+ 
+ Warning: mysql_result(): test.label not found in MySQL result index %d in %s on line %d
+ bool(false)
+-
+-Warning: mysql_result(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++TypeError: mysql_result(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_select_db.phpt ext/mysql/tests/mysql_select_db.phpt
+--- ext/mysql.orig/tests/mysql_select_db.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_select_db.phpt	2022-07-04 05:37:35.902285217 +0200
+@@ -12,15 +12,19 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (false !== ($tmp = @mysql_select_db($link)))
+ 	printf("[001] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (!$link = my_mysql_connect($host, $user, $passwd, $db, $port, $socket))
+ 	printf("[002] Cannot connect to the server using host=%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+ 		$host, $user, $db, $port, $socket);
+ 
++try {
+ if (!is_null($tmp = @mysql_select_db($db, $link, "foo")))
+ 	printf("[003] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ /* does not make too much sense, unless we have access to at least one more database than $db */
+ if (!mysql_select_db($db, $link))
+@@ -60,15 +64,14 @@
+ 
+ mysql_close($link);
+ 
+-if (false !== ($tmp = mysql_select_db($db, $link)))
++if (false !== ($tmp = mysql_select_db($db, $link)))	# FIXME ?
+ 	printf("[012] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+ 
+ print "done!\n";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_select_db() expects at most 2 arguments, 3 given in %s on line %d
+ string(%d) "%s"
+ bool(false)
+-
+-Warning: mysql_select_db(): supplied resource is not a valid MySQL-Link resource in %s on line %d
++[012] Expecting boolean/false, got boolean/1
+ done!
+diff -urN ext/mysql.orig/tests/mysql_set_charset.phpt ext/mysql/tests/mysql_set_charset.phpt
+--- ext/mysql.orig/tests/mysql_set_charset.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_set_charset.phpt	2022-07-04 05:51:20.325351389 +0200
+@@ -6,7 +6,7 @@
+ require_once('skipifconnectfailure.inc');
+ 
+ if (version_compare(PHP_VERSION, '5.9.9', '>') == 1) {
+-	die('skip set character set not functional with PHP 6 (fomerly PHP 6 && unicode.semantics=On)');
++	die('skip set_charset not functional with PHP 7 (formerly PHP 6 && unicode.semantics=On)');
+ }
+ 
+ if (!function_exists('mysql_set_charset'))
+@@ -58,5 +58,4 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_stat.phpt ext/mysql/tests/mysql_stat.phpt
+--- ext/mysql.orig/tests/mysql_stat.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_stat.phpt	2022-07-04 05:38:30.923561184 +0200
+@@ -13,13 +13,17 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_stat($link)))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ 
++try {
+ if (!is_null($tmp = @mysql_stat($link, "foo")))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if ((!is_string($stat = mysql_stat($link))) || ('' === $stat))
+ 	printf("[003] Expecting non empty string, got %s/'%s', [%d] %s\n",
+@@ -40,13 +44,13 @@
+ 
+ mysql_close($link);
+ 
+-if (false !== ($tmp = mysql_stat($link)))
++if (false !== ($tmp = mysql_stat($link)))	# FIXME ?
+ 	printf("[005] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+ 
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_stat(): supplied resource is not a valid MySQL-Link resource in %s on line %d
++TypeError: mysql_stat(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++ArgumentCountError: mysql_stat() expects at most 1 argument, 2 given in %s on line %d
++[005] Expecting boolean/false, got string/Uptime: %d  Threads: %d  Questions: %d  Slow queries: %d  Opens: %d  Open tables: %d  Queries per second avg: %f
+ done!
+diff -urN ext/mysql.orig/tests/mysql_tablename.phpt ext/mysql/tests/mysql_tablename.phpt
+--- ext/mysql.orig/tests/mysql_tablename.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_tablename.phpt	2022-07-04 04:42:10.842568605 +0200
+@@ -12,19 +12,25 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_tablename()))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
++try {
+ if (null !== ($tmp = @mysql_tablename($link)))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ if (!$res = mysql_query("SELECT id, label FROM test ORDER BY id LIMIT 2", $link)) {
+ 	printf("[003] [%d] %s\n", mysql_errno($link), mysql_error($link));
+ }
+ 
++try {
+ if (NULL !== ($tmp = mysql_tablename($res)))
+ 	printf("[004] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (false !== ($tmp = mysql_tablename($res, -1)))
+ 	printf("[005] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+@@ -36,21 +42,21 @@
+ 
+ mysql_free_result($res);
+ 
++try {
+ var_dump(mysql_tablename($res, 0));
++} catch(Throwable $e) { show_catched($e); }
+ 
+ mysql_close($link);
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_tablename() expects at least 2 parameters, 1 given in %s on line %d
++ArgumentCountError: mysql_tablename() expects at least 2 arguments, 0 given in %s on line %d
++ArgumentCountError: mysql_tablename() expects at least 2 arguments, 1 given in %s on line %d
++ArgumentCountError: mysql_tablename() expects at least 2 arguments, 1 given in %s on line %d
+ 
+ Warning: mysql_tablename(): Unable to jump to row -1 on MySQL result index %d in %s on line %d
+ string(1) "1"
+ 
+ Warning: mysql_tablename(): Unable to jump to row 2 on MySQL result index %d in %s on line %d
+-
+-Warning: mysql_tablename(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
++TypeError: mysql_tablename(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_thread_id.phpt ext/mysql/tests/mysql_thread_id.phpt
+--- ext/mysql.orig/tests/mysql_thread_id.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_thread_id.phpt	2022-07-04 04:29:46.623430595 +0200
+@@ -12,8 +12,10 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (!is_null($tmp = @mysql_thread_id($link)))
+ 	printf("[001] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ 
+@@ -29,13 +31,14 @@
+ 
+ mysql_close($link);
+ 
++try {
+ if (false !== ($tmp = mysql_thread_id($link)))
+ 	printf("[003] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_thread_id(): supplied resource is not a valid MySQL-Link resource in %s on line %d
++TypeError: mysql_thread_id(): Argument #1 ($link_identifier) must be of type resource, null given in %s on line %d
++TypeError: mysql_thread_id(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_trace_mode.phpt ext/mysql/tests/mysql_trace_mode.phpt
+--- ext/mysql.orig/tests/mysql_trace_mode.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_trace_mode.phpt	2022-06-27 13:34:32.953896523 +0200
+@@ -29,7 +29,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ I don\'t mind character sets, do I?\n
+ Warning: mysql_query(): You have an error in your SQL syntax; check the manual that corresponds to your %s server version for the right syntax to use near 'BOGUS_SQL' at line 1 in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_unbuffered_query.phpt ext/mysql/tests/mysql_unbuffered_query.phpt
+--- ext/mysql.orig/tests/mysql_unbuffered_query.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_unbuffered_query.phpt	2022-07-04 05:39:21.788438751 +0200
+@@ -12,13 +12,17 @@
+ $tmp    = NULL;
+ $link   = NULL;
+ 
++try {
+ if (false !== ($tmp = @mysql_unbuffered_query($link)))
+ 	printf("[001] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ require('table.inc');
+ 
++try {
+ if (NULL !== ($tmp = @mysql_unbuffered_query("SELECT 1 AS a", $link, "foo")))
+ 	printf("[002] Expecting NULL, got %s/%s\n", gettype($tmp), $tmp);
++} catch(Throwable $e) { show_catched($e); }
+ 
+ if (false !== ($tmp = mysql_unbuffered_query('THIS IS NOT SQL', $link)))
+ 	printf("[003] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+@@ -85,7 +89,7 @@
+ 
+ mysql_close($link);
+ 
+-if (false !== ($tmp = mysql_unbuffered_query("SELECT id FROM test", $link)))
++if (false !== ($tmp = mysql_unbuffered_query("SELECT id FROM test", $link)))	# FIXME ?
+ 	printf("[010] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
+ 
+ print "done!";
+@@ -111,7 +115,7 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++ArgumentCountError: mysql_unbuffered_query() expects at most 2 arguments, 3 given in %s on line %d
+ array(1) {
+   ["valid"]=>
+   string(30) "this is sql but with semicolon"
+@@ -121,6 +125,5 @@
+ int(0)
+ 
+ Notice: mysql_close(): Function called without first fetching all rows from a previous unbuffered query in %s on line %d
+-
+-Warning: mysql_unbuffered_query(): supplied resource is not a valid MySQL-Link resource in %s on line %d
++[010] Expecting boolean/false, got resource/Resource id #%d
+ done!

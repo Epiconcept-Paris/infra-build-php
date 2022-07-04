@@ -256,6 +256,7 @@ fi
 test -x /etc/init.d/mysql && /etc/init.d/mysql start || {
     test -x /etc/init.d/mariadb && /etc/init.d/mariadb start
 }
+mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY ''"
 mysql -e "CREATE USER '$USER'@'localhost'"
 mysql -e "GRANT ALL ON *.* TO '$USER'@'localhost' WITH GRANT OPTION"
 mysql -e "FLUSH PRIVILEGES"
