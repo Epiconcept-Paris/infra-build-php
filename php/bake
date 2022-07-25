@@ -203,13 +203,14 @@ echo "Making PHP $PhpVer-$Bld packages for Debian $DebVer..."
 echo "Logs will be in debian/$DebNum/dist/$PhpVer-$Bld/.logs/"
 test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir $Dist/.logs
 User=`id -un`
+test "$User" = 'php' && Type='epi' || Type='dev'
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 
 #
 #   Make build image and start container
 #
 Tag=$DebVer-$PhpVer
-BUILD_BASE=epi-build-php
+BUILD_BASE=$Type-build-php
 BUILD_IMG=$BUILD_BASE:$Tag	# Keep all build images separate
 BUILD_NAME=$BUILD_BASE-${PhpVer}_$DebVer
 
@@ -267,7 +268,7 @@ echo "------------------------------------------------"
 #
 #   Make tests image and start container
 #
-TESTS_BASE=epi-tests-php
+TESTS_BASE=$Type-tests-php
 TESTS_IMG=$TESTS_BASE:$Tag	# Keep all tests images separate
 TESTS_NAME=$TESTS_BASE-${PhpVer}_$DebVer
 
