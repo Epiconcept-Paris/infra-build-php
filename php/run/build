@@ -253,19 +253,35 @@ if ! su -c "make -k >$Logs/make.out 2>&1" $USER; then
     exit 2
 fi
 
-test -x /etc/init.d/mysql && /etc/init.d/mysql start || {
-    test -x /etc/init.d/mariadb && /etc/init.d/mariadb start
-}
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY ''"
-mysql -e "CREATE USER '$USER'@'localhost'"
-mysql -e "GRANT ALL ON *.* TO '$USER'@'localhost' WITH GRANT OPTION"
-mysql -e "FLUSH PRIVILEGES"
-mysql -e "CREATE DATABASE test"
-export MYSQL_TEST_USER="$USER"
-export MYSQL_TEST_SOCKET='/var/run/mysqld/mysqld.sock'
-export PDO_MYSQL_TEST_USER="$MYSQL_TEST_USER"
-export PDO_MYSQL_TEST_SOCKET="$MYSQL_TEST_SOCKET"
-ln -s $MYSQL_TEST_SOCKET /tmp/mysql.sock
+#   Install mysql-server if needed (PHP 5.2.17)
+if [ "$debLst" -a -f "$debLst" ]; then
+    echo "================================================================" >>$debLog
+    test "$Dbg" && echo "Installing lenny mysql-server packages"
+    for f in $(sed -nr 's;^[^ ].*/;;p' $debLst)
+    do
+	DEBIAN_FRONTEND='noninteractive' dpkg -i "$Bld/files/$f.deb" >>$debLog 2>&1
+    done
+fi
+
+#   Start and configure mysql-server
+test -x /etc/init.d/mysql && Init='mysql' || Init='mariadb'
+if [ -x /etc/init.d/$Init ]; then
+    /etc/init.d/$Init start
+    if [ "$(mysql -NBe "SELECT Password FROM mysql.user WHERE User = 'root'")" = 'invalid' ]; then
+	mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY ''"
+    fi
+    mysql -e "CREATE USER '$USER'@'localhost'"
+    mysql -e "GRANT ALL ON *.* TO '$USER'@'localhost' WITH GRANT OPTION"
+    mysql -e "FLUSH PRIVILEGES"
+    mysql -e "CREATE DATABASE test"
+    #	ext/mysql and ext/mysqli
+    export MYSQL_TEST_USER="$USER"
+    export MYSQL_TEST_SOCKET='/Var/run/mysqld/mysqld.sock'
+    #	ext/pdo_mysql
+    export PDO_MYSQL_TEST_USER="$MYSQL_TEST_USER"
+    export PDO_MYSQL_TEST_SOCKET="$MYSQL_TEST_SOCKET"
+    ln -s $MYSQL_TEST_SOCKET /tmp/mysql.sock
+fi
 
 set +e	# Continue on errors
 if [ -f $Bld/.notest ]; then
@@ -388,6 +404,21 @@ else
     fi
 fi
 test "$Dbg" && { find . ! -user $USER >$Debug/not-$USER; chown $Own $Debug/not-$USER; }
+
+#   Stop mysql-server
+test -x /etc/init.d/$Init && /etc/init.d/$Init stop
+
+#   Uninstall mysql-server if needed (PHP 5.2.17)
+if [ "$debLst" -a -f "$debLst" ]; then
+    echo "================================================================" >>$debLog
+    test "$Dbg" && echo "Removing lenny mysql-server packages"
+    for f in $(sed -nr '2,$s;^[^ ].*/([^_]+).*$;\1;p' $debLst | tac)
+    do
+	DEBIAN_FRONTEND='noninteractive' dpkg -P "$f" >>$debLog 2>&1
+    done
+    echo "================================================================" >>$debLog
+    apt-get install perl-base >>$debLog 2>&1
+fi
 
 rm -f $Pkgs
 Base='epi-php'

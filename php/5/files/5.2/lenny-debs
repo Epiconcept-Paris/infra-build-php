@@ -1,0 +1,13 @@
+p/perl/perl-base_5.10.0-19lenny5_amd64
+p/psmisc/psmisc_22.6-1_amd64
+ m/mysql-dfsg-5.0/mysql-common_5.0.51a-24+lenny5_all
+r/readline5/libreadline5_5.2-2_amd64
+t/tcp-wrappers/libwrap0_7.6.q-16_amd64
+libn/libnet-daemon-perl/libnet-daemon-perl_0.38-1.1_all
+libp/libplrpc-perl/libplrpc-perl_0.2017-1.1_all
+libd/libdbi-perl/libdbi-perl_1.605-1_amd64
+ m/mysql-dfsg-5.0/libmysqlclient15off_5.0.51a-24+lenny5_amd64
+libd/libdbd-mysql-perl/libdbd-mysql-perl_4.007-1+lenny1_amd64
+ m/mysql-dfsg-5.0/libmysqlclient15-dev_5.0.51a-24+lenny5_amd64
+m/mysql-dfsg-5.0/mysql-client-5.0_5.0.51a-24+lenny5_amd64
+m/mysql-dfsg-5.0/mysql-server-5.0_5.0.51a-24+lenny5_amd64

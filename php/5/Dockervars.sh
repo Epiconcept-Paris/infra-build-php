@@ -12,11 +12,23 @@ AddExtra()
     local dir file lib off cmn
 
     #   Handle specific patch/package files
-    dir=$Php/files/$Maj.$Min
+    dir="$Php/files/$Maj.$Min"
     if [ -d $dir ]; then
-	for file in $dir/*
+	if [ -f "$dir/lenny-debs" ]; then
+	    Main='http://archive.debian.org/debian/pool/main'
+	    mkdir -p "$dir/srv"
+	    while read deb
+	    do
+		file="$(basename $deb).deb"
+		test -f $dir/$file && continue
+		(cd "$dir/srv"; curl -sOR "$Main/$deb.deb")
+	    done <"$dir/lenny-debs"
+	    BLDCOPY="$BLDCOPY
+COPY $dir/lenny-debs $BUILD_TOP/files"
+	fi
+	for file in $dir/*.patch $dir/*.deb $dir/srv/*.deb
 	do
-	    # Packages (*.deb) are from http://archive.debian.org/debian/pool/main/m/mysql-dfsg-5.0
+	    test -f "$file" || continue	# *.deb patterns may not match
 	    case $file in
 		*mysql*off_*.deb)	off=$file; lib=`basename "$file" | awk -F_ '{print $1}'`;;
 		*mysql-common_*.deb)	cmn=$file;;
@@ -33,7 +45,7 @@ COPY $Php/hooks/files.sh $BUILD_TOP/hooks"
 	    TSTCOPY="RUN mkdir $BUILD_TOP/pkgs
 COPY $cmn $TESTS_TOP/pkgs
 COPY $off $TESTS_TOP/pkgs"
-	    BUILD_REQ=`echo "$BUILD_REQ" | sed 's/ [^ ]*libmysqlclient-dev//'`
+	    BUILD_REQ=`echo "$BUILD_REQ" | sed 's/ [^ ]*mysql[^ ]*//g'`
 	    TESTS_REQ=`echo "$TESTS_REQ" | sed -r 's/ lib(mysql|mariadb)client[^ ]*//'`
 	    CLI_DEPS=`echo "$CLI_DEPS"   | sed -r "s/ lib(mysql|mariadb)client[^ ]*/ $lib,/"`
 	fi
