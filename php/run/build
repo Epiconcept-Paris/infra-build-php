@@ -276,7 +276,7 @@ if [ -x /etc/init.d/$Init ]; then
     mysql -e "CREATE DATABASE test"
     #	ext/mysql and ext/mysqli
     export MYSQL_TEST_USER="$USER"
-    export MYSQL_TEST_SOCKET='/Var/run/mysqld/mysqld.sock'
+    export MYSQL_TEST_SOCKET='/var/run/mysqld/mysqld.sock'
     #	ext/pdo_mysql
     export PDO_MYSQL_TEST_USER="$MYSQL_TEST_USER"
     export PDO_MYSQL_TEST_SOCKET="$MYSQL_TEST_SOCKET"
