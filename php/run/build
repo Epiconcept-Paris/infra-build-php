@@ -266,6 +266,7 @@ fi
 #   Start and configure mysql-server
 test -x /etc/init.d/mysql && Init='mysql' || Init='mariadb'
 if [ -x /etc/init.d/$Init ]; then
+    echo -n "$(date '+%Y-%m-%d %H:%M:%S') "
     /etc/init.d/$Init start
     if [ "$(mysql -NBe "SELECT Password FROM mysql.user WHERE User = 'root'")" = 'invalid' ]; then
 	mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY ''"

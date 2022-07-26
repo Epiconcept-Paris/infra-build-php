@@ -362,7 +362,7 @@ if [ "$isRm" ]; then
 		    what=`expr "$img" : '[^#]*#\(.*\)' | tr '_' ' '`
 		    img=`expr "$img" : '\([^#]*\)'`
 		fi
-		test "`basename "$dir"`" = 'multi' && docker ps | grep epi_multi_php >/dev/null && $Do eval "echo \"Stopping the 'epi_multi_php' container...\"; docker stop epi_multi_php >/dev/null"
+		test "`basename "$dir"`" = 'multi' && docker ps | grep ${Type}_multi_php >/dev/null && $Do eval "echo \"Stopping the '${Type}_multi_php' container...\"; docker stop ${Type}_multi_php >/dev/null"
 		echo -n "Removing "
 		test "$dir" -a "$img" && sep='and ' || sep=
 		test "$dir" && { echo -n "$dir "; $Do rm -rf $dir; }

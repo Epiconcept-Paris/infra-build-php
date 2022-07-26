@@ -56,15 +56,16 @@ DebVer=`cat $DebTop/$DebNum/name`
 Tools=$DebTop/$DebNum/dist/tools
 Logs=$Tools/.logs
 User=`id -un`
+test "$User" = 'php' && Type='epi' || Type='dev'
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 
 #
 #   Build the image
 #
 TOOLS_TOP=/opt/tools
-TOOLS_BASE=epi-tools
+TOOLS_BASE=$Type-tools
 TOOLS_IMG=$TOOLS_BASE:$DebVer
-TOOLS_NAME=epi_tools
+TOOLS_NAME=${Type}_tools
 date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 Now=`date '+%s'`
 

@@ -148,15 +148,16 @@ test -f $MultDir/www/index.php || echo "<?php header('Location: info.php'); ?>" 
 test -f $MultDir/www/info.php || cp -p $PhpTop/run/info.php $MultDir/www
 
 User=`id -un`
+test "$User" = 'php' && Type='epi' || Type='dev'
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
 
 #
 #   Build container
 #
 MULTI_TOP=/opt/multi
-MULTI_BASE=epi-multi-php
+MULTI_BASE=$Type-multi-php
 MULTI_IMG=$MULTI_BASE:$DebVer
-MULTI_NAME=epi_multi_php
+MULTI_NAME=${Type}_multi_php
 
 if docker ps | grep $MULTI_NAME >/dev/null; then
     if [ "$NoRun" ]; then
