@@ -1,6 +1,6 @@
-diff -urN mysql.orig/php_mysql.c mysql/php_mysql.c
---- ext/mysql.orig/php_mysql.c	2018-02-26 16:48:07.000000000 +0000
-+++ ext/mysql/php_mysql.c	2018-06-25 16:08:21.920000000 +0000
+diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
+--- ext/mysql.orig/php_mysql.c	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/php_mysql.c	2022-07-31 15:01:06.000000000 +0200
 @@ -740,10 +740,6 @@
  	zend_string *hashed_details = NULL;
  	zend_bool free_host = 0, new_link = 0;
@@ -12,3 +12,1109 @@ diff -urN mysql.orig/php_mysql.c mysql/php_mysql.c
  #if !defined(MYSQL_USE_MYSQLND)
  	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
  		php_error_docref(NULL, E_WARNING,
+diff -urN ext/mysql.orig/tests/001.phpt ext/mysql/tests/001.phpt
+--- ext/mysql.orig/tests/001.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/001.phpt	2022-07-27 10:07:10.000000000 +0200
+@@ -29,8 +29,5 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ string(2) "11"
+ done!
+diff -urN ext/mysql.orig/tests/002.phpt ext/mysql/tests/002.phpt
+--- ext/mysql.orig/tests/002.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/002.phpt	2022-07-27 10:08:11.000000000 +0200
+@@ -37,7 +37,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ resource(%d) of type (mysql link)
+ bool(true)
+ bool(true)
+diff -urN ext/mysql.orig/tests/003.phpt ext/mysql/tests/003.phpt
+--- ext/mysql.orig/tests/003.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/003.phpt	2022-07-27 10:08:28.000000000 +0200
+@@ -57,7 +57,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ ==stdClass==
+ object(stdClass)#%d (1) {
+   ["a"]=>
+diff -urN ext/mysql.orig/tests/bug47438.phpt ext/mysql/tests/bug47438.phpt
+--- ext/mysql.orig/tests/bug47438.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/bug47438.phpt	2022-07-27 10:08:48.000000000 +0200
+@@ -47,7 +47,6 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ 0.a
+ 1.b
+ 2.c
+diff -urN ext/mysql.orig/tests/bug48754.phpt ext/mysql/tests/bug48754.phpt
+--- ext/mysql.orig/tests/bug48754.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/bug48754.phpt	2022-07-27 10:09:49.000000000 +0200
+@@ -68,8 +68,6 @@
+ ?>
+ --EXPECTF--
+ Explicit connection on close
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ Expect same thread id for $link and default conn: bool(true)
+ resource(%d) of type (mysql link)
+ resource(%d) of type (Unknown)
+@@ -77,24 +75,18 @@
+ Warning: mysql_close(): no MySQL-Link resource supplied in %s on line %d
+ 
+ Closing default link
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ Expect same thread id for $link and default conn but not the previous: bool(true)
+ resource(%d) of type (mysql link)
+ resource(%d) of type (mysql link)
+ resource(%d) of type (Unknown)
+ 
+ Explicit resource and pconnect
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ resource(%d) of type (mysql link persistent)
+ resource(%d) of type (Unknown)
+ 
+ Warning: mysql_close(): no MySQL-Link resource supplied in %s on line %d
+ 
+ Default link and pconnect
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ resource(%d) of type (mysql link persistent)
+ resource(%d) of type (mysql link persistent)
+ resource(%d) of type (Unknown)
+diff -urN ext/mysql.orig/tests/bug51242.phpt ext/mysql/tests/bug51242.phpt
+--- ext/mysql.orig/tests/bug51242.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/bug51242.phpt	2022-07-27 10:10:07.000000000 +0200
+@@ -35,5 +35,4 @@
+ }
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ resource(%d) of type (mysql link)
+diff -urN ext/mysql.orig/tests/bug53649.phpt ext/mysql/tests/bug53649.phpt
+--- ext/mysql.orig/tests/bug53649.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/bug53649.phpt	2022-07-27 10:10:55.000000000 +0200
+@@ -68,5 +68,4 @@
+ unlink('bug53649.data');
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done
+diff -urN ext/mysql.orig/tests/bug55473.phpt ext/mysql/tests/bug55473.phpt
+--- ext/mysql.orig/tests/bug55473.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/bug55473.phpt	2022-07-27 10:14:21.000000000 +0200
+@@ -71,29 +71,12 @@
+ 	print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_ping(): MySQL server has gone away in %s on line %d
+ [003] reconnect 0
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [005] Setting openened files...
+-
+-Warning: mysql_ping(): MySQL server has gone away in %s on line %d
+ [003] reconnect 1
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [007] Opened files as expected
+-
+-Warning: mysql_ping(): MySQL server has gone away in %s on line %d
+ [003] reconnect 2
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [007] Opened files as expected
+-
+-Warning: mysql_ping(): MySQL server has gone away in %s on line %d
+ [003] reconnect 3
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [007] Opened files as expected
+ done!
+diff -urN ext/mysql.orig/tests/mysql_affected_rows.phpt ext/mysql/tests/mysql_affected_rows.phpt
+--- ext/mysql.orig/tests/mysql_affected_rows.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_affected_rows.phpt	2022-07-27 10:14:39.000000000 +0200
+@@ -122,5 +122,4 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_client_encoding.phpt ext/mysql/tests/mysql_client_encoding.phpt
+--- ext/mysql.orig/tests/mysql_client_encoding.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_client_encoding.phpt	2022-07-27 10:15:05.000000000 +0200
+@@ -69,5 +69,4 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_close.phpt ext/mysql/tests/mysql_close.phpt
+--- ext/mysql.orig/tests/mysql_close.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_close.phpt	2022-07-27 10:15:39.000000000 +0200
+@@ -36,5 +36,4 @@
+ print "done!\n";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_connect.phpt ext/mysql/tests/mysql_connect.phpt
+--- ext/mysql.orig/tests/mysql_connect.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_connect.phpt	2022-07-31 18:10:16.000000000 +0200
+@@ -104,25 +104,5 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_connect(): Access denied for user '%s'@'%s' (using password: YES) in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++Warning: %s: Access denied for user '%s'@'%s'%r( \([^)]+\))?%r in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_constants.phpt ext/mysql/tests/mysql_constants.phpt
+--- ext/mysql.orig/tests/mysql_constants.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_constants.phpt	2022-07-27 10:18:13.000000000 +0200
+@@ -62,5 +62,4 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_create_db.phpt ext/mysql/tests/mysql_create_db.phpt
+--- ext/mysql.orig/tests/mysql_create_db.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_create_db.phpt	2022-07-31 14:12:02.000000000 +0200
+@@ -53,7 +53,4 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_data_seek.phpt ext/mysql/tests/mysql_data_seek.phpt
+--- ext/mysql.orig/tests/mysql_data_seek.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_data_seek.phpt	2022-07-27 10:18:47.000000000 +0200
+@@ -67,8 +67,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_data_seek(): Offset 4 is invalid for MySQL result index %d (or the query data is unbuffered) in %s on line %d
+ 
+ Warning: mysql_data_seek(): Offset -1 is invalid for MySQL result index %d (or the query data is unbuffered) in %s on line %d
+diff -urN ext/mysql.orig/tests/mysql_db_name.phpt ext/mysql/tests/mysql_db_name.phpt
+--- ext/mysql.orig/tests/mysql_db_name.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_db_name.phpt	2022-07-27 10:19:10.000000000 +0200
+@@ -59,8 +59,6 @@
+ print "done!\n";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_db_name(): Unable to jump to row -1 on MySQL result index %d in %s on line %d
+ 
+ Warning: mysql_db_name(): Unable to jump to row %d on MySQL result index %d in %s on line %d
+diff -urN ext/mysql.orig/tests/mysql_db_query.phpt ext/mysql/tests/mysql_db_query.phpt
+--- ext/mysql.orig/tests/mysql_db_query.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_db_query.phpt	2022-07-27 10:19:25.000000000 +0200
+@@ -66,5 +66,4 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_deprecated_api.phpt ext/mysql/tests/mysql_deprecated_api.phpt
+--- ext/mysql.orig/tests/mysql_deprecated_api.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_deprecated_api.phpt	2022-07-27 10:19:58.000000000 +0200
+@@ -75,5 +75,4 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_drop_db.phpt ext/mysql/tests/mysql_drop_db.phpt
+--- ext/mysql.orig/tests/mysql_drop_db.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_drop_db.phpt	2022-07-31 14:12:24.000000000 +0200
+@@ -52,5 +52,4 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_errno.phpt ext/mysql/tests/mysql_errno.phpt
+--- ext/mysql.orig/tests/mysql_errno.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_errno.phpt	2022-07-27 10:20:24.000000000 +0200
+@@ -55,7 +55,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ int(0)
+ int(%d)
+ 
+diff -urN ext/mysql.orig/tests/mysql_error.phpt ext/mysql/tests/mysql_error.phpt
+--- ext/mysql.orig/tests/mysql_error.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_error.phpt	2022-07-27 10:21:02.000000000 +0200
+@@ -64,8 +64,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_error(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ bool(false)
+ done!
+diff -urN ext/mysql.orig/tests/mysql_fetch_array.phpt ext/mysql/tests/mysql_fetch_array.phpt
+--- ext/mysql.orig/tests/mysql_fetch_array.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_array.phpt	2022-07-27 10:21:26.000000000 +0200
+@@ -281,7 +281,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [005]
+ array(4) {
+   [0]=>
+diff -urN ext/mysql.orig/tests/mysql_fetch_assoc.phpt ext/mysql/tests/mysql_fetch_assoc.phpt
+--- ext/mysql.orig/tests/mysql_fetch_assoc.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_assoc.phpt	2022-07-27 10:21:59.000000000 +0200
+@@ -63,7 +63,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [005]
+ array(2) {
+   ["id"]=>
+@@ -88,8 +87,6 @@
+ }
+ 
+ Warning: mysql_fetch_assoc(): supplied resource is not a valid MySQL result resource in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [010]
+ array(5) {
+   ["id"]=>
+diff -urN ext/mysql.orig/tests/mysql_fetch_field.phpt ext/mysql/tests/mysql_fetch_field.phpt
+--- ext/mysql.orig/tests/mysql_fetch_field.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_field.phpt	2022-07-31 16:58:56.000000000 +0200
+@@ -131,22 +131,21 @@
+ 	var_dump(mysql_fetch_field($res));
+ 	mysql_free_result($res);
+ 
+-	if (!$res = mysql_query("SELECT id FROM test", $link)) {
++	if ($res = mysql_query("SELECT id FROM test", $link))
++		mysql_free_result($res);
++	else
+ 		printf("[017] [%d] %s\n", mysql_errno($link), mysql_error($link));
+-	}
+-	$res = mysql_list_fields($db, 'test');
+-	$found = false;
+-	while ($tmp = mysql_fetch_field($res)) {
+-		if ($tmp->name == 'id') {
+-			printf("Fetch field from mysql_list_fields result set.\n");
+-			$found = true;
++
++	if ($res = mysql_query("SHOW FULL COLUMNS FROM test")) {
++		while ($tmp = mysql_fetch_assoc($res)) {
++			if ($tmp['Field'] == 'id')
++				printf("Fetch field from 'SHOW FULL COLUMNS FROM test' result set.\n");
+ 			var_dump($tmp);
+ 		}
++		mysql_free_result($res);
+ 	}
+-	if (!$found)
+-		printf("[018] mysqli_list_fields result set processing has failed.\n");
+-
+-	mysql_free_result($res);
++	else
++		printf("[018] [%d] %s\n", mysql_errno($link), mysql_error($link));
+ 
+ 	mysql_close($link);
+ 	print "done!";
+@@ -156,7 +155,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ object(stdClass)#%d (13) {
+   ["name"]=>
+   string(2) "ID"
+@@ -246,33 +244,25 @@
+   ["zerofill"]=>
+   int(0)
+ }
+-Fetch field from mysql_list_fields result set.
+-object(stdClass)#%d (13) {
+-  ["name"]=>
++Fetch field from 'SHOW FULL COLUMNS FROM test' result set.
++array(9) {
++  ["Field"]=>
+   string(2) "id"
+-  ["table"]=>
+-  string(4) "test"
+-  ["def"]=>
++  ["Type"]=>
++  string(7) "int(11)"
++  ["Collation"]=>
++  NULL
++  ["Null"]=>
++  string(3) "YES"
++  ["Key"]=>
++  string(0) ""
++  ["Default"]=>
+   string(1) "1"
+-  ["max_length"]=>
+-  int(0)
+-  ["not_null"]=>
+-  int(0)
+-  ["primary_key"]=>
+-  int(0)
+-  ["multiple_key"]=>
+-  int(0)
+-  ["unique_key"]=>
+-  int(0)
+-  ["numeric"]=>
+-  int(1)
+-  ["blob"]=>
+-  int(0)
+-  ["type"]=>
+-  string(3) "int"
+-  ["unsigned"]=>
+-  int(0)
+-  ["zerofill"]=>
+-  int(0)
++  ["Extra"]=>
++  string(0) ""
++  ["Privileges"]=>
++  string(31) "select,insert,update,references"
++  ["Comment"]=>
++  string(0) ""
+ }
+ done!
+diff -urN ext/mysql.orig/tests/mysql_fetch_lengths.phpt ext/mysql/tests/mysql_fetch_lengths.phpt
+--- ext/mysql.orig/tests/mysql_fetch_lengths.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_lengths.phpt	2022-07-30 13:29:17.000000000 +0200
+@@ -39,7 +39,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(2) {
+   [0]=>
+   int(1)
+diff -urN ext/mysql.orig/tests/mysql_fetch_object.phpt ext/mysql/tests/mysql_fetch_object.phpt
+--- ext/mysql.orig/tests/mysql_fetch_object.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_object.phpt	2022-07-31 17:12:34.000000000 +0200
+@@ -9,6 +9,19 @@
+ <?php
+ include "connect.inc";
+ 
++if (!function_exists('show_catched')) {
++	function show_catched($e)
++	{
++		$what = get_class($e);
++		$code = $e->getCode();
++		$mesg = $e->getMessage();
++		$file = $e->getFile();
++		$line = $e->getLine();
++		$num = $code > 0 ? " ($code)" : '';
++		echo "$what: $mesg$num in $file on line $line\n";
++	}
++}
++
+ $tmp    = NULL;
+ $link   = NULL;
+ 
+@@ -46,8 +59,12 @@
+ 
+ }
+ 
++try {
+ var_dump(mysql_fetch_object($res, 'mysql_fetch_object_construct', null));
++} catch(Throwable $e) { show_catched($e); }
++try {
+ var_dump(mysql_fetch_object($res, 'mysql_fetch_object_construct', array('a')));
++} catch(Throwable $e) { show_catched($e); }
+ var_dump(mysql_fetch_object($res, 'mysql_fetch_object_construct', array('a', 'b')));
+ var_dump(mysql_fetch_object($res, 'mysql_fetch_object_construct', array('a', 'b', 'c')));
+ var_dump(mysql_fetch_object($res, 'mysql_fetch_object_construct', "no array and not null"));
+@@ -82,7 +99,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ object(stdClass)#%d (2) {
+   ["ID"]=>
+   string(1) "1"
+@@ -99,38 +115,8 @@
+   ["label"]=>
+   string(1) "b"
+ }
+-
+-Warning: Missing argument 1 for mysql_fetch_object_construct::__construct() in %s on line %d
+-
+-Warning: Missing argument 2 for mysql_fetch_object_construct::__construct() in %s on line %d
+-
+-Notice: Undefined variable: a in %s on line %d
+-
+-Notice: Undefined variable: b in %s on line %d
+-object(mysql_fetch_object_construct)#%d (4) {
+-  ["a"]=>
+-  NULL
+-  ["b"]=>
+-  NULL
+-  ["ID"]=>
+-  string(1) "3"
+-  ["label"]=>
+-  string(1) "c"
+-}
+-
+-Warning: Missing argument 2 for mysql_fetch_object_construct::__construct() in %s on line %d
+-
+-Notice: Undefined variable: b in %s on line %d
+-object(mysql_fetch_object_construct)#%d (4) {
+-  ["a"]=>
+-  string(1) "a"
+-  ["b"]=>
+-  NULL
+-  ["ID"]=>
+-  string(1) "4"
+-  ["label"]=>
+-  string(1) "d"
+-}
++ArgumentCountError: Too few arguments to function mysql_fetch_object_construct::__construct(), 0 passed and exactly 2 expected in %s on line %d
++ArgumentCountError: Too few arguments to function mysql_fetch_object_construct::__construct(), 1 passed and exactly 2 expected in %s on line %d
+ object(mysql_fetch_object_construct)#%d (4) {
+   ["a"]=>
+   string(1) "a"
+diff -urN ext/mysql.orig/tests/mysql_fetch_row.phpt ext/mysql/tests/mysql_fetch_row.phpt
+--- ext/mysql.orig/tests/mysql_fetch_row.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_fetch_row.phpt	2022-07-30 13:31:31.000000000 +0200
+@@ -41,7 +41,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [004]
+ array(2) {
+   [0]=>
+diff -urN ext/mysql.orig/tests/mysql_field_flags.phpt ext/mysql/tests/mysql_field_flags.phpt
+--- ext/mysql.orig/tests/mysql_field_flags.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_flags.phpt	2022-07-31 15:29:59.000000000 +0200
+@@ -103,13 +103,14 @@
+ 		continue;
+ 	}
+ 	$sql = sprintf("CREATE TABLE test(id INT, %s) ENGINE = %s", $columns, $engine);
+-		if (!@mysql_query($sql, $link)) {
++	if (!@mysql_query($sql, $link)) {
+ 		// server or engine might not support this
+ 		continue;
+ 	}
+ 
+ 	reset($expected);
+-	list($k, $values) = each($expected);
++	$values = current($expected);
++	$k = key($expected);
+ 	$sql = sprintf("INSERT INTO test(id, %s) VALUES (1, %s)", $values[0], $values[1]);
+ 	if (!mysql_query($sql, $link)) {
+ 		printf("[011/%s] '%s', [%d] %s\n", $columns, $sql, mysql_errno($link), mysql_error($link));
+@@ -122,14 +123,15 @@
+ 	}
+ 
+ 	$i = 1;
+-	while (list($field, $flags) = each($expected)) {
++	while (($flags = next($expected)) !== false) {
++		$field = key($expected);
+ 		$tmp = mysql_field_flags($res, $i++);
+ 
+ 		foreach ($flags as $k => $flag) {
+-		if (!preg_match(sprintf('@\s*%s\s*@ismU', $flag), $tmp)) {
+-			printf("[013/%s] Field '%s', flag '%s' not found, [%d] %s\n", $columns, $field, $flag, mysql_errno($link), mysql_error($link));
++			if (!preg_match(sprintf('@\s*%s\s*@ismU', $flag), $tmp)) {
++				printf("[013/%s] Field '%s', flag '%s' not found, [%d] %s\n", $columns, $field, $flag, mysql_errno($link), mysql_error($link));
++			}
+ 		}
+-	}
+ 		foreach ($flags as $k => $flag) {
+ 			$tmp = preg_replace(sprintf('@\s*%s\s*@ismU', $flag), '', $tmp);
+ 		}
+@@ -149,8 +151,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_field_flags() expects exactly 2 parameters, 1 given in %s on line %d
+ 
+ Warning: mysql_field_flags(): Field -1 is invalid for MySQL result index %d in %s on line %d
+diff -urN ext/mysql.orig/tests/mysql_field_len.phpt ext/mysql/tests/mysql_field_len.phpt
+--- ext/mysql.orig/tests/mysql_field_len.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_len.phpt	2022-07-30 13:34:48.000000000 +0200
+@@ -47,8 +47,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_field_len() expects exactly 2 parameters, 1 given in %s on line %d
+ 
+ Warning: mysql_field_len(): Field -1 is invalid for MySQL result index %d in %s on line %d
+diff -urN ext/mysql.orig/tests/mysql_field_name.phpt ext/mysql/tests/mysql_field_name.phpt
+--- ext/mysql.orig/tests/mysql_field_name.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_name.phpt	2022-07-30 13:35:13.000000000 +0200
+@@ -46,8 +46,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_field_name() expects exactly 2 parameters, 1 given in %s on line %d
+ 
+ Warning: mysql_field_name(): Field -1 is invalid for MySQL result index %d in %s on line %d
+diff -urN ext/mysql.orig/tests/mysql_field_seek.phpt ext/mysql/tests/mysql_field_seek.phpt
+--- ext/mysql.orig/tests/mysql_field_seek.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_seek.phpt	2022-07-30 13:35:38.000000000 +0200
+@@ -44,8 +44,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_field_seek(): Field -1 is invalid for MySQL result index %d in %s on line %d
+ bool(false)
+ object(stdClass)#%d (13) {
+diff -urN ext/mysql.orig/tests/mysql_field_table.phpt ext/mysql/tests/mysql_field_table.phpt
+--- ext/mysql.orig/tests/mysql_field_table.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_table.phpt	2022-07-30 13:35:58.000000000 +0200
+@@ -46,8 +46,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_field_table() expects exactly 2 parameters, 1 given in %s on line %d
+ 
+ Warning: mysql_field_table(): Field -1 is invalid for MySQL result index %d in %s on line %d
+diff -urN ext/mysql.orig/tests/mysql_field_type.phpt ext/mysql/tests/mysql_field_type.phpt
+--- ext/mysql.orig/tests/mysql_field_type.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_field_type.phpt	2022-07-30 13:36:22.000000000 +0200
+@@ -46,8 +46,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_field_type() expects exactly 2 parameters, 1 given in %s on line %d
+ 
+ Warning: mysql_field_type(): Field -1 is invalid for MySQL result index %d in %s on line %d
+diff -urN ext/mysql.orig/tests/mysql_free_result.phpt ext/mysql/tests/mysql_free_result.phpt
+--- ext/mysql.orig/tests/mysql_free_result.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_free_result.phpt	2022-07-30 13:36:54.000000000 +0200
+@@ -44,7 +44,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ bool(true)
+ 
+ Warning: mysql_free_result(): supplied resource is not a valid MySQL result resource in %s on line %d
+diff -urN ext/mysql.orig/tests/mysql_get_host_info.phpt ext/mysql/tests/mysql_get_host_info.phpt
+--- ext/mysql.orig/tests/mysql_get_host_info.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_get_host_info.phpt	2022-07-30 13:37:20.000000000 +0200
+@@ -43,5 +43,4 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_get_proto_info.phpt ext/mysql/tests/mysql_get_proto_info.phpt
+--- ext/mysql.orig/tests/mysql_get_proto_info.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_get_proto_info.phpt	2022-07-30 13:37:46.000000000 +0200
+@@ -31,5 +31,4 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_get_server_info.phpt ext/mysql/tests/mysql_get_server_info.phpt
+--- ext/mysql.orig/tests/mysql_get_server_info.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_get_server_info.phpt	2022-07-30 13:38:00.000000000 +0200
+@@ -38,5 +38,4 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_info.phpt ext/mysql/tests/mysql_info.phpt
+--- ext/mysql.orig/tests/mysql_info.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_info.phpt	2022-07-30 13:38:18.000000000 +0200
+@@ -72,5 +72,4 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_insert_id.phpt ext/mysql/tests/mysql_insert_id.phpt
+--- ext/mysql.orig/tests/mysql_insert_id.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_insert_id.phpt	2022-07-30 13:38:39.000000000 +0200
+@@ -66,8 +66,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_insert_id(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ bool(false)
+ done!
+diff -urN ext/mysql.orig/tests/mysql_list_dbs.phpt ext/mysql/tests/mysql_list_dbs.phpt
+--- ext/mysql.orig/tests/mysql_list_dbs.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_list_dbs.phpt	2022-07-30 13:40:02.000000000 +0200
+@@ -53,5 +53,4 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_list_fields.phpt ext/mysql/tests/mysql_list_fields.phpt
+--- ext/mysql.orig/tests/mysql_list_fields.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_list_fields.phpt	2022-07-31 16:19:20.000000000 +0200
+@@ -1,5 +1,5 @@
+ --TEST--
+-mysql_list_fields()
++mysql_list_fields() always fails since PHP 7.1
+ --SKIPIF--
+ <?php
+ require_once 'skipif.inc';
+@@ -15,7 +15,12 @@
+ require 'table.inc';
+ 
+ if (!$res = mysql_list_fields($db, 'test', $link))
++{
++	# mysql_list_fields() used ext/mysqlnd code that was removed in PHP 7.1
+ 	printf("[003] [%d] %s\n", mysql_errno($link), mysql_error($link));
++	mysql_close($link);
++	exit;
++}
+ 
+ if (2 !== ($num = mysql_num_fields($res)))
+ 	printf("[004] Expecting two fields from 'test', got %d. [%d] %s\n", $num, mysql_errno($link), mysql_error($link));
+@@ -63,18 +68,7 @@
+ 
+ mysql_close($link);
+ ?>
++--XFAIL--
++Support for mysql_list_fields() was removed from mysqlnd in PHP 7.1
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-[006] [%d] %s
+-bool(false)
+-Field Offset 0
+-mysql_field_flags()%s
+-mysql_field_len(): 11
+-mysql_field_name(): id
+-mysql_field_type(): int
+-Field Offset 1
+-mysql_field_flags()%s
+-mysql_field_len(): %s
+-mysql_field_name(): label
+-mysql_field_type(): string
+-done!
++Warning: mysql_list_fields(): Unable to save MySQL query result in %s on line %d
+diff -urN ext/mysql.orig/tests/mysql_list_processes.phpt ext/mysql/tests/mysql_list_processes.phpt
+--- ext/mysql.orig/tests/mysql_list_processes.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_list_processes.phpt	2022-07-30 13:43:38.000000000 +0200
+@@ -53,5 +53,4 @@
+ print "done!\n";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_list_tables.phpt ext/mysql/tests/mysql_list_tables.phpt
+--- ext/mysql.orig/tests/mysql_list_tables.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_list_tables.phpt	2022-07-30 13:43:56.000000000 +0200
+@@ -82,5 +82,4 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_max_links.phpt ext/mysql/tests/mysql_max_links.phpt
+--- ext/mysql.orig/tests/mysql_max_links.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_max_links.phpt	2022-07-30 13:45:16.000000000 +0200
+@@ -54,19 +54,9 @@
+ print "done!\n";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_connect(): Too many open links (2) in %s on line %s
+ [030] Cannot connect using host '%s', user '%s', password '****', [0] 0
+ 
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_connect(): Too many open links (2) in %s on line %s
+ [060] Cannot connect using host '%s', user '%s', password '****', [0] 0
+ array(3) {
+diff -urN ext/mysql.orig/tests/mysql_max_persistent.phpt ext/mysql/tests/mysql_max_persistent.phpt
+--- ext/mysql.orig/tests/mysql_max_persistent.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_max_persistent.phpt	2022-07-30 13:46:07.000000000 +0200
+@@ -90,14 +90,8 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_pconnect(): Too many open persistent links (1) in %s on line %d
+ [020] Cannot connect using host '%s', user '%s', password '****', [0] 0
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(1) {
+   [0]=>
+   resource(%d) of type (mysql link persistent)
+diff -urN ext/mysql.orig/tests/mysql_mysqlnd_read_timeout_long.phpt ext/mysql/tests/mysql_mysqlnd_read_timeout_long.phpt
+--- ext/mysql.orig/tests/mysql_mysqlnd_read_timeout_long.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_mysqlnd_read_timeout_long.phpt	2022-07-30 14:20:31.000000000 +0200
+@@ -30,7 +30,6 @@
+ 	print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(1) {
+   ["SLEEP(6)"]=>
+   string(1) "0"
+diff -urN ext/mysql.orig/tests/mysql_num_fields.phpt ext/mysql/tests/mysql_num_fields.phpt
+--- ext/mysql.orig/tests/mysql_num_fields.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_num_fields.phpt	2022-07-30 13:46:42.000000000 +0200
+@@ -52,7 +52,5 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_num_fields(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_num_rows.phpt ext/mysql/tests/mysql_num_rows.phpt
+--- ext/mysql.orig/tests/mysql_num_rows.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_num_rows.phpt	2022-07-31 18:52:58.000000000 +0200
+@@ -79,11 +79,10 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ 
+-Warning: mysql_num_rows() expects parameter 1 to be resource, boolean given in %s on line %d
++Warning: mysql_num_rows() expects parameter 1 to be resource, bool%r(ean)?%r given in %s on line %d
+ 
+-Warning: mysql_free_result() expects parameter 1 to be resource, boolean given in %s on line %d
++Warning: mysql_free_result() expects parameter 1 to be resource, bool%r(ean)?%r given in %s on line %d
+ 
+ Warning: mysql_num_rows(): supplied resource is not a valid MySQL result resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_pconn_disable.phpt ext/mysql/tests/mysql_pconn_disable.phpt
+--- ext/mysql.orig/tests/mysql_pconn_disable.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_pconn_disable.phpt	2022-07-30 13:50:02.000000000 +0200
+@@ -49,13 +49,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [001] Can connect to the server.
+ [002] Can fetch data using persistent connection! Data = '1'
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_pconnect.phpt ext/mysql/tests/mysql_pconnect.phpt
+--- ext/mysql.orig/tests/mysql_pconnect.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_pconnect.phpt	2022-07-31 18:10:05.000000000 +0200
+@@ -81,17 +81,5 @@
+ 	print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Warning: mysql_pconnect(): Access denied for user '%s'@'%s' (using password: YES) in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
++Warning: %s: Access denied for user '%s'@'%s'%r( \([^)]+\))?%r in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_pconn_kill.phpt ext/mysql/tests/mysql_pconn_kill.phpt
+--- ext/mysql.orig/tests/mysql_pconn_kill.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_pconn_kill.phpt	2022-07-30 13:52:59.000000000 +0200
+@@ -70,13 +70,15 @@
+ 
+ 	if (!($res = mysql_query("SELECT 1", $plink)))
+ 		printf("[010] Cannot run query on new persistent connection, [%d] %s\n", @mysql_errno($plink), @mysql_error($plink));
+-	mysql_free_result($res);
++	else
++	    mysql_free_result($res);
+ 
+ 	var_dump(mysql_ping($plink));
+ 
+ 	if (!($res = mysql_query("SELECT 1", $plink)))
+ 		printf("[011] Cannot run query on new persistent connection, [%d] %s\n", @mysql_errno($plink), @mysql_error($plink));
+-	mysql_free_result($res);
++	else
++	    mysql_free_result($res);
+ 
+ 	if (!($link2 = mysql_connect($myhost, $user, $passwd, true)))
+ 		printf("[012] Cannot connect to the server using host=%s/%s, user=%s, passwd=***, dbname=%s, port=%s, socket=%s\n",
+@@ -106,12 +108,5 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ bool(true)
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_pconn_max_links.phpt ext/mysql/tests/mysql_pconn_max_links.phpt
+--- ext/mysql.orig/tests/mysql_pconn_max_links.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_pconn_max_links.phpt	2022-07-30 13:55:11.000000000 +0200
+@@ -191,17 +191,12 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(2) {
+   ["id"]=>
+   string(1) "1"
+   ["label"]=>
+   string(1) "a"
+ }
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(2) {
+   ["id"]=>
+   string(1) "1"
+diff -urN ext/mysql.orig/tests/mysql_pconn_reuse.phpt ext/mysql/tests/mysql_pconn_reuse.phpt
+--- ext/mysql.orig/tests/mysql_pconn_reuse.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_pconn_reuse.phpt	2022-07-30 13:56:27.000000000 +0200
+@@ -59,17 +59,8 @@
+ 	print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ [001] Can connect to the server.
+ [002] Can fetch data using persistent connection! Data = '1'
+ 
+-Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_connect(): Too many open links (2) in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_ping.phpt ext/mysql/tests/mysql_ping.phpt
+--- ext/mysql.orig/tests/mysql_ping.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_ping.phpt	2022-07-30 14:03:25.000000000 +0200
+@@ -42,7 +42,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ bool(true)
+ bool(true)
+ bool(true)
+diff -urN ext/mysql.orig/tests/mysql_query_load_data_openbasedir.phpt ext/mysql/tests/mysql_query_load_data_openbasedir.phpt
+--- ext/mysql.orig/tests/mysql_query_load_data_openbasedir.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_query_load_data_openbasedir.phpt	2022-07-31 16:02:37.000000000 +0200
+@@ -111,11 +111,5 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-[006] [1148] %s
+-[007] [0] ''
+-[008] LOAD DATA not run?
+-[010] [1148] %s
++[010] [2000] %s
+ done!
+diff -urN ext/mysql.orig/tests/mysql_query.phpt ext/mysql/tests/mysql_query.phpt
+--- ext/mysql.orig/tests/mysql_query.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_query.phpt	2022-07-30 14:03:45.000000000 +0200
+@@ -117,7 +117,6 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(1) {
+   ["valid"]=>
+   string(30) "this is sql but with semicolon"
+diff -urN ext/mysql.orig/tests/mysql_real_escape_string.phpt ext/mysql/tests/mysql_real_escape_string.phpt
+--- ext/mysql.orig/tests/mysql_real_escape_string.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_real_escape_string.phpt	2022-07-30 14:14:49.000000000 +0200
+@@ -33,7 +33,6 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ string(31) "Am I a unicode string in PHP 6?"
+ string(2) "\\"
+ string(2) "\""
+diff -urN ext/mysql.orig/tests/mysql_result.phpt ext/mysql/tests/mysql_result.phpt
+--- ext/mysql.orig/tests/mysql_result.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_result.phpt	2022-07-30 14:15:39.000000000 +0200
+@@ -65,8 +65,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_result(): Unable to jump to row -1 on MySQL result index %d in %s on line %d
+ bool(false)
+ 
+diff -urN ext/mysql.orig/tests/mysql_select_db.phpt ext/mysql/tests/mysql_select_db.phpt
+--- ext/mysql.orig/tests/mysql_select_db.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_select_db.phpt	2022-07-30 14:15:56.000000000 +0200
+@@ -66,7 +66,6 @@
+ print "done!\n";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ string(%d) "%s"
+ bool(false)
+ 
+diff -urN ext/mysql.orig/tests/mysql_set_charset.phpt ext/mysql/tests/mysql_set_charset.phpt
+--- ext/mysql.orig/tests/mysql_set_charset.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_set_charset.phpt	2022-07-31 14:13:15.000000000 +0200
+@@ -58,5 +58,4 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_sql_safe_mode.phpt ext/mysql/tests/mysql_sql_safe_mode.phpt
+--- ext/mysql.orig/tests/mysql_sql_safe_mode.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_sql_safe_mode.phpt	2022-07-31 18:09:37.000000000 +0200
+@@ -37,9 +37,9 @@
+ --EXPECTF--
+ Notice: mysql_connect(): SQL safe mode in effect - ignoring host/user/password information in %s on line %d
+ 
+-Warning: mysql_connect(): Access denied for user '%s'@'%s' (using password: NO) in %s on line %d
++Warning: mysql_connect(): Access denied for user '%s'@'%s'%s in %s on line %d
+ 
+ Notice: mysql_pconnect(): SQL safe mode in effect - ignoring host/user/password information in %s on line %d
+ 
+-Warning: mysql_pconnect(): Access denied for user '%s'@'%s' (using password: NO) in %s on line %d
++Warning: mysql_pconnect(): Access denied for user '%s'@'%s'%s in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_stat.phpt ext/mysql/tests/mysql_stat.phpt
+--- ext/mysql.orig/tests/mysql_stat.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_stat.phpt	2022-07-30 14:16:31.000000000 +0200
+@@ -46,7 +46,5 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_stat(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_tablename.phpt ext/mysql/tests/mysql_tablename.phpt
+--- ext/mysql.orig/tests/mysql_tablename.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_tablename.phpt	2022-07-30 14:17:13.000000000 +0200
+@@ -42,8 +42,6 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_tablename() expects at least 2 parameters, 1 given in %s on line %d
+ 
+ Warning: mysql_tablename(): Unable to jump to row -1 on MySQL result index %d in %s on line %d
+diff -urN ext/mysql.orig/tests/mysql_thread_id.phpt ext/mysql/tests/mysql_thread_id.phpt
+--- ext/mysql.orig/tests/mysql_thread_id.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_thread_id.phpt	2022-07-30 14:17:31.000000000 +0200
+@@ -35,7 +35,5 @@
+ print "done!";
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+-
+ Warning: mysql_thread_id(): supplied resource is not a valid MySQL-Link resource in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_trace_mode.phpt ext/mysql/tests/mysql_trace_mode.phpt
+--- ext/mysql.orig/tests/mysql_trace_mode.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_trace_mode.phpt	2022-07-30 14:18:12.000000000 +0200
+@@ -29,7 +29,6 @@
+ require_once("clean_table.inc");
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ I don\'t mind character sets, do I?\n
+ Warning: mysql_query(): You have an error in your SQL syntax; check the manual that corresponds to your %s server version for the right syntax to use near 'BOGUS_SQL' at line 1 in %s on line %d
+ done!
+diff -urN ext/mysql.orig/tests/mysql_unbuffered_query.phpt ext/mysql/tests/mysql_unbuffered_query.phpt
+--- ext/mysql.orig/tests/mysql_unbuffered_query.phpt	2018-02-26 17:48:07.000000000 +0100
++++ ext/mysql/tests/mysql_unbuffered_query.phpt	2022-07-30 14:18:49.000000000 +0200
+@@ -111,7 +111,6 @@
+ mysql_close($link);
+ ?>
+ --EXPECTF--
+-Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
+ array(1) {
+   ["valid"]=>
+   string(30) "this is sql but with semicolon"

@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+#	latest - Find largest/latest files in target directory
+#
+test "`echo -e`" || alias echo='echo -e'
+
+Usage()
+{
+    echo "Find $Prg file(s) in target directory" >&2
+    echo "Usage:\t$Prg [-x exclude,exclude,...] [-n number-of-files] [<directory> ...]" >&2
+    exit $1
+}
+
+Prg=`basename $0`
+case $Prg in
+    largest)	Fld='s'; Opt=Sr;;
+    latest)	Fld='Y'; Opt=tr;;
+    *)		echo "$Prg: can only be called as 'largest' or 'latest'" >&2; exit 1;;
+esac
+Nb=10
+while getopts 'hln:x:' opt
+do
+    case $opt in
+	l)  Lnk=" -links 1";;
+	n)  Nb=$OPTARG;;
+	x)  Excl=" | egrep -av '^(`echo $OPTARG | sed 's/,/|/g'`)'";;
+	h)  Usage 0;;	# help
+	\?) Usage 1;;	# error
+    esac
+done
+shift `expr $OPTIND - 1`
+
+Dirs=
+while test "$1"
+do
+    Dirs="$Dirs\"$1\" "
+    shift
+done
+test "$Dirs" || Dirs=". "
+
+eval "find $Dirs-type f$Lnk | sed 's;^\./;;'$Excl" 2>/dev/null | LANG=C sed 's/^\(.*\)$/"\1"/' | LANG=C xargs stat -c "%$Fld %n" | LANG=C sort -n | tail -n $Nb | LANG=C sed -r 's/[0-9]+ (.*)/"\1"/' | LANG=C xargs ls --quoting-style=literal --time-style='+%Y-%m-%d %H:%M:%S' -l$Opt

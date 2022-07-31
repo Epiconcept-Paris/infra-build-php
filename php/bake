@@ -217,7 +217,8 @@ BUILD_NAME=$BUILD_BASE-${PhpVer}_$DebVer
 BLDCOPY="$BLDCOPY
 COPY $PhpSrc $BUILD_TOP/files
 COPY ${PhpTop}pkgs $BUILD_TOP/pkgs
-COPY ${PhpTop}run/build $BUILD_TOP"
+COPY ${PhpTop}run/build $BUILD_TOP
+COPY ${PhpTop}run/bin /usr/local/bin"
 test -f ${TopDir}.debug && BLDCOPY="$BLDCOPY
 RUN >$BUILD_TOP/.debug"
 test -f ${PhpTop}.notest && BLDCOPY="$BLDCOPY

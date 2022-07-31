@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+#	dbini - Setup database for tests
+#
+Prg=$(basename $0)
+Sock='/var/run/mysqld/mysqld.sock'
+sock='/tmp/mysql.sock'
+
+test -x /etc/init.d/mysql && Init='mysql' || Init='mariadb'
+test -x /etc/init.d/$Init || { echo "$Prg: no executable start-script" >&2; exit 1; }
+test -S $sock && { echo "$Prg: database is already initialized" >&2; exit 2; }
+
+/etc/init.d/$Init start
+ln -s $Sock $sock
+if [ "$(mysql -NBe "SELECT Password FROM mysql.user WHERE User = 'root'")" = 'invalid' ]; then
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY ''"
+fi
+mysql -e "CREATE USER '$USER'@'localhost'"
+mysql -e "GRANT ALL ON *.* TO '$USER'@'localhost' WITH GRANT OPTION"
+mysql -e "FLUSH PRIVILEGES"
+mysql -e "CREATE DATABASE test"
+test "$1" && echo "export $1='$Sock'"
+exit 0

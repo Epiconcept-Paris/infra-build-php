@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+#	xt - Set icon and window title in an xterm (and PuTTY)
+#
+test "`echo -e`" || alias echo='echo -e'
+
+#
+# ===== Main =====
+#
+Prg=`basename $0`
+if [ -z "$1" ]; then
+    echo "Usage: $Prg window-title" >&2
+    exit 1
+fi
+#  0 icon AND window title
+#  1 icon title
+#  2 window title
+# 50 font name
+echo "\033]0;$1\007\c"

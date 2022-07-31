@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+#	l - Our custom ls
+#
+Bin=$(command -v ls)
+LC_ALL=C exec $Bin -al --time-style='+%Y-%m-%d %H:%M:%S' --color='auto' --quoting-style='literal' "$@"
