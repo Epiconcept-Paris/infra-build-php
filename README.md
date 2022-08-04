@@ -1,5 +1,5 @@
 # infra-build-php
-Fournil à paquets PHP spécifiques Epiconcept sur Debian jessie/stretch
+Fournil à paquets PHP spécifiques Epiconcept sur Debian 8 à 11 (jessie/stretch/buster/bullseye)
 
 ## Installation
 
@@ -85,7 +85,7 @@ affiche l'aide résumée de `bake`.
 ## Mise au point
 
 Elle se fait en créant un fichier `.norun` (vide) dans le répertoire principal (où se trouve le répertoire `debian`) : `>.norun` ou `touch .norun`\
-Les scripts affichent alors les commandes `docker` à lancer au lieu de démarrer les containers. Un containers `docker` une fois démarré, la  commande bash à lancer pour le build ou les tests est affichée au lieu d'être exécutée.
+Les scripts affichent alors les commandes `docker` à lancer au lieu de démarrer les containers. Un container `docker` une fois démarré, la  commande bash à lancer pour le build ou les tests est affichée au lieu d'être exécutée.
 
 Il est possible de sauter le "make test" du build PHP en créant de même un fichier (vide) `php/.notest`.
 
