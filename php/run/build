@@ -173,7 +173,6 @@ test "$Dbg" && echo "HookOpts=\"$HookOpts\""
 
 /usr/local/bin/mkenv $Dbg
 
-test -d /var/run/apache2 || mkdir /var/run/apache2	# For apache2 -V in configure
 eval `grep '^export APACHE_' /etc/apache2/envvars`	# For apache2 -V in configure
 #
 #   Variables MM (Majeur/Mineur)
