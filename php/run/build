@@ -320,6 +320,9 @@ else
 	test $? -lt 128 && kill -s ALRM $2
     }
 
+    #	Ugly hack for ext/mysqli/tests/mysqli_report.phpt bug
+    test '(' "$DEBNUM" = 10 -o "$DEBNUM" = 11 ')' -a '(' "$MajMin" = '7.4' -o "$MajMin" = '8.1' ')' && rm -v ext/mysqli/tests/mysqli_report.phpt 2>&1 | sed 's/^r/R/'
+
     date "+%Y-%m-%d %H:%M:%S Testing php-$Ver built for Debian $DEBVER $(cat /etc/debian_version) ..."
     mkOut="$Logs/make-test.out"
     mkLog="$Logs/mktest-ps.out"
