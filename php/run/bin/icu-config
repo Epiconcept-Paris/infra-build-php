@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+#	icu-config - Replacement for removed icu-config on Debian 10 / 11
+#
+#	This is part of an abandonned attempt to compile php-intl in 5.6 for
+#	Debian 10 / 11. It was left there mostly for the --version arg
+#
+Prg=$(basename $0)
+Lib='/usr/lib/x86_64-linux-gnu'
+while :
+do
+    case "$1" in
+	--version)
+	    expr "$(readlink $Lib/libicui18n.so)" : '[^.]*\.so\.\(.*\)$'
+	    exit 0
+	    ;;
+	--prefix)
+	    echo '/usr'
+	    exit 0
+	    ;;
+	--cppflags-searchpath)
+	    echo '-I/usr/include'
+	    exit 0
+	    ;;
+	--ldflags)
+	    ldf='y'
+	    ;;
+	--ldflags-icuio)
+	    fio='y'
+	    ;;
+	'')
+	    break
+	    ;;
+	*)
+	    echo "$Prg: unknown flag \"$1\"" >&2
+	    exit 1
+	    ;;
+    esac
+    shift
+done
+test "$ldf$fio" = 'yy' && echo " -L$Lib -licui18n -licuuc -licudata -licuio" || { echo "$Prg: missing option" >&2; exit 1; }
+exit 0

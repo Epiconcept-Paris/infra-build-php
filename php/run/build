@@ -87,6 +87,7 @@ ConfigHelp=$Logs/config-help.out
 #   Handle options not present in every PHP version
 #
 PearDir='usr/share/php'
+test "$DEBNUM" -lt 10 -o "$Maj" -gt 5 && EnaIntl='--enable-intl' || EnaIntl=
 for Opt in  --with-mysql --with-mcrypt --with-ttf --enable-gd-native-ttf \
 	    --enable-phpdbg --enable-phpdbg-readline --enable-phpdbg-webhelper \
 	    --enable-fpm --with-fpm-systemd \
@@ -99,6 +100,7 @@ for Opt in  --with-mysql --with-mcrypt --with-ttf --enable-gd-native-ttf \
 	    --with-readline=/usr \
 	    --with-pcre-regex \
 	    --with-zip \
+	    $EnaIntl \
 	    --enable-json \
 	    --enable-hash \
 	    --enable-libxml \
