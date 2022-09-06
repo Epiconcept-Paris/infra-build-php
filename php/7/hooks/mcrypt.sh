@@ -9,5 +9,5 @@ echo "$ExtOpts" | grep -- '--with-mcrypt ' >/dev/null || {
     Opt="--with-mcrypt"
     Show="MCrypt"
 }
-#   Apply patch even if extension is native to 7.x
-su -c "patch -p0 <$Bld/files/mcrypt.patch" $USER | sed 's/^p/P/'	# sed for cosmetics
+#   Apply patch even though extension is native to 7.x
+Patch 0 "$Bld/files/mcrypt.patch"

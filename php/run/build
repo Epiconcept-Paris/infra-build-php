@@ -8,6 +8,23 @@ Bld=`dirname $0`
 Own="$USER:`id -gn $USER`"
 umask 022					# Needed for lintian
 
+Patch()
+{
+    # global Dbg Logs
+    local l f pP
+
+    l="$1"	# Patch level (-p<n>)
+    f="$2"	# Patch file
+    pP='s/^p/P/'	# pretty Print: change leading p to P with sed
+    echo "Applying `basename $f`"
+    echo "----- $(basename $f) -----" >>$Logs/patch.out
+    if [ "$Dbg" ]; then
+	su -c "patch -p$l <$f 2>&1 | sed "$pP" | tee -a $Logs/patch.out" $USER
+    else
+	su -c "patch -p$l <$f 2>&1 | sed "$pP" >>$Logs/patch.out" $USER
+    fi
+}
+
 #=============================================================================
 #
 # 	Check and setup environment
@@ -124,6 +141,7 @@ do
 	echo "Using option found in 'configure --help': $Cfg"
 	ExtOpts="$ExtOpts$Sep$Opt"
 	Sep=' '
+	test "$Opt" = "$EnaIntl" && HookShow=' with intl'
     fi
 done
 
@@ -135,11 +153,10 @@ echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`ls -d $Bld/pkgs/*-fpm`
 echo "$ExtOpts" | grep -- '--enable-phpdbg ' >/dev/null || >`ls -d $Bld/pkgs/*-phpdbg`/skip
 # Skip *-mysql package generation if --with-mysql known (5.x)
 echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`ls -d $Bld/pkgs/*-mysql`/skip
-# Also skip *-mysql package if hooks/mysql.sh is absent (8.x)
-test -s $Bld/hooks/mysql.sh || >`ls -d $Bld/pkgs/*-mysql`/skip
 #
 #   Handle build-time hooks (mostly for PHP extensions)
 #
+su -c ">$Logs/patch.out" $USER
 if [ -d $Bld/hooks ]; then
     Sep=
     for hook in $Bld/hooks/*
