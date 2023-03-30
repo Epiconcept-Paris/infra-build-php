@@ -169,6 +169,8 @@ do
 	test "$Opt" = "$EnaIntl" && HookShow=' with intl'
     fi
 done
+PdoMysql='=/usr'
+MysqlI='=/usr/bin/mysql_config'
 
 # Skip *-pear package generation if --with-pear unknown
 echo "$ExtOpts" | grep -- '--with-pear=' >/dev/null || >`echo $Bld/pkgs/*-pear`/skip
