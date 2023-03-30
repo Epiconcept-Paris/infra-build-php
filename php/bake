@@ -25,7 +25,6 @@ IniPwd=$PWD
 TopDir=../
 DebTop=${TopDir}debian
 PhpTop=
-PhpGit=php/
 
 Path() { realpath --relative-to=$IniPwd $1; }
 test "$Dir" || Dir=`dirname \`realpath $0\``
@@ -110,7 +109,7 @@ DebDir=$DebTop/$DebNum
 #
 #   Fetch PHP source
 #
-date '+===== %Y-%m-%d %H:%M:%S %Z =================='
+test -f '.fetch' || date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 Now=`date '+%s'`
 mk=
 dl=
@@ -161,6 +160,26 @@ else
     fi
 fi
 #
+#   Determine build number and build date
+#
+Num=$PhpDir/BUILD_NUM
+Cmt=`git log -n1 --format='%H' -- $Num 2>/dev/null`
+if [ "$Cmt" ]; then
+    Log=`git show "$Cmt:./$Num"`	# $Num is in git's log
+    if [ -f $Num ]; then	# If $Num exists and is $Log, set it's mtime to $Cmt's
+	test "`cat $Num`" = "$Log" && mt=y
+    elif [ "$mk" ]; then	# If $PhpDir was just created, restore $Log and set mtime
+	echo "$Log" >$Num; mt=y
+    else			# If $Num missing in existing $PhpDir, set $Num = $Log + 1
+	echo `expr "$Log" + 1` >$Num
+    fi
+    test "$mt" && touch -d "`git show -s --format=%ci $Cmt`" $Num
+else				# No log yet: keep $Num or create it if needed
+    test -f $Num || echo 1 >$Num
+fi
+test -f '.fetch' && exit 0
+
+#
 #   Source debian and PHP hooks (in that order)
 #
 BUILD_TOP=/opt/php-mk
@@ -180,20 +199,8 @@ else
 fi
 
 #
-#   Determine build number and build date
+#   Setup build
 #
-Num=$PhpDir/BUILD_NUM
-Cmt=`git log -n1 --format=%H -- $PhpGit$Num 2>/dev/null`
-if [ "$Cmt" ]; then
-    Log=`git show $Cmt:$Num`
-    if [ -f $Num ]; then	# If $Num exists and is $Log, set it's mtime to $Cmt's
-	test "`cat $Num`" = "$Log" && touch -d "`git show -s --format=%ci $Cmt`" $Num
-    else			# else set $Num = $Log + 1
-	echo `expr $Log + 1` >$Num
-    fi
-else				# No log yet: keep $Num or create it if needed
-    test -f $Num || echo 1 >$Num
-fi
 Bld=`cat $Num`			# For package names
 Dist=$DebDir/dist/$PhpVer-$Bld
 test -d $Dist || mkdir -p $Dist
