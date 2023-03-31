@@ -171,12 +171,15 @@ if [ "$1" = 'ver' -o "$1" = 'latest' -o "$1" = 'fetch' ]; then
 	    cleanup() { rm -f "$PhpTop/.fetch"; }
 	    trap cleanup 0 2
 	    >"$PhpTop/.fetch"
+	    rc=1
 	    for v in $Fetch
 	    do
-		$PhpTop/bake $v && echo "Created $PhpTop/$M/$v/BUILD_NUM = 1"
+		$PhpTop/bake $v && echo "Created $PhpTop/$M/$v/BUILD_NUM = 1" && rc=0
 	    done
+	    exit $rc
 	else
 	    echo "Nothing (more) to fetch" >&2
+	    exit 1
 	fi
     fi
     exit 0
