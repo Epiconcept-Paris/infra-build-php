@@ -1,12 +1,13 @@
 #!/bin/sh
 
+dist=../php-debs
 tmp=/space/tmp/sendphp
 user=epiconcept_build
 server=files.epiconcept.fr
+test -d $dist || { echo "$0: cannot find '$dist'" >&2; exit 1; }
 rm -fr $tmp
 mkdir $tmp
-#cp $(find -name 'epi*.deb' | grep -v '/dist/') $tmp/
-for i in debian/*/dist/*/*.deb; do
+for i in $dist/*/*/*.deb; do
 	cp -p $i $tmp/
 done
 rsync -rltuv $tmp/ $user@$server:/space/applisdata/php/
