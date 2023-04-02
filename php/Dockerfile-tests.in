@@ -9,6 +9,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm\nalias l='ls -Al'\necho \"Use:\n    $TESTS_TOP/tests\\nto start the tests\"" >>/root/.bashrc
 
 # Update/upgrade, install tools and tests deps
+$APT_SRC
 RUN apt-get update && apt-get upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $TESTS_REQ
 
 RUN mkdir -p $TESTS_TOP/dist
