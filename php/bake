@@ -215,6 +215,38 @@ test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir $Dist/.logs
 User=`id -un`
 test "$User" = 'php' && Type='epi' || Type='dev'
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
+if [ "$APT_SRC" ]; then
+    if [ -s $DebDir/repo-arch.txz -a -s $DebDir/repo-secu.txz ]; then
+	test -d $DebDir/repo || {
+	    echo "Extracting archives repo-arch.txz and repo-secu.txz in $debDir..."
+	    (cd $DebDir; tar xf repo-arch.txz; tar xf repo-secu.txz)
+	}
+	cp -lpr $DebDir/repo $Dist
+	(cd $Dist/repo; exec python3 -m http.server 2>../.logs/http.log) & hPid=$!
+	echo "Starting http.server for container-build packages on $dist/repo (PID=$hPid)"
+    else
+	echo "$Prg: cannot find archives $debDir/repo-arch.txz and $debDir/repo-secu.txz" >&2
+	exit 1
+    fi
+    sleep 1
+    test "$(netstat -lnt | grep ':8000 ')" || {
+	echo "$Prg: nothing listening on port 8000 ??" >&2
+	test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
+	exit 1
+    }
+    if nCat=$(command -v nc); then
+	Rep="$(echo "GET / HTTP/1.0\r\n\r" | $nCat localhost 8000)"
+	echo "$Rep" | grep 'debian' >/dev/null || {
+	    echo "$Prg:  $dist/repo does not contain the string 'debian'" >&2
+	    if [ "$Rep" ]; then
+		echo "$Rep" >"$Dist/.logs/http-rep"
+		echo "Server reply has been saved in $Dist/.logs/http-rep" >&2
+	    fi
+	    test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
+	    exit 1
+	}
+    fi
+fi
 
 #
 #   Make build image and start container
@@ -270,12 +302,14 @@ if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
 	    echo "Made PHP $PhpVer-$Bld packages for Debian $DebVer."
 	else
 	    echo "$ColRed\aFAILED to make PHP $PhpVer-$Bld packages for Debian $DebVer!$ColStd"
+	    test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
 	    exit 3
 	fi
     fi
 else
     echo "$ColRed\aFAILED to build the $BUILD_IMG image!$ColStd"
     echo "Examine $dist/.logs/docker-build.out for details."
+    test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
     exit 2
 fi
 echo "------------------------------------------------"
@@ -311,6 +345,7 @@ fi
 echo "Building the '$TESTS_IMG' image..."
 #   Variables come in order of their appearance in Dockerfile-tests.in
 DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$Dist/.logs/docker-tests.out 2>&1
+test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
 
 if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
     Cmd="docker run $Opt-v `realpath $PWD/$Dist`:$TESTS_TOP/dist --name $TESTS_NAME --rm $TESTS_IMG"
