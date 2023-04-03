@@ -24,6 +24,7 @@ Dir=`dirname $0`
 IniPwd=$PWD
 TopDir=../
 DebTop=${TopDir}debian
+debTop=debian	# For messages
 PhpTop=
 
 Path() { realpath --relative-to=$IniPwd $1; }
@@ -31,7 +32,7 @@ test "$Dir" || Dir=`dirname \`realpath $0\``
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
 test "$Dir" = '.' || cd "$Dir"
 #   Script's CWD is where it is located, but all messages assume PWD is top-level
-test -d $DebTop || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
+test -d $DebTop || { echo "$Prg: missing '$debTop' directory." >&2; exit 1; }
 
 #
 # Get existing PHP 5.x and 7.x versions
@@ -104,6 +105,7 @@ if [ "$2" ]; then
 fi
 DebVer=`cat $DebTop/$DebNum/name`
 DebDir=$DebTop/$DebNum
+debDir=$debTop/$DebNum	# For messages
 #echo "DebVer=$DebVer PhpVer=$PhpVer Maj=$Maj Min=$Min Rel=$Rel"
 
 #
@@ -188,7 +190,7 @@ TESTS_TOP=/opt/php-mk
 if [ -f $DebDir/Dockervars.sh ]; then
     . $DebDir/Dockervars.sh
 else
-    echo "$Prg: missing debian/$DebNum/Dockervars.sh" >&2
+    echo "$Prg: missing $debDir/$DebNum/Dockervars.sh" >&2
     exit 1
 fi
 if [ -f $PhpTop$Maj/Dockervars.sh ]; then
@@ -203,6 +205,7 @@ fi
 #
 Bld=`cat $Num`			# For package names
 Dist=$DebDir/dist/$PhpVer-$Bld
+dist=$debDir/dist/$PhpVer-$Bld	# For messages
 test -d $Dist || mkdir -p $Dist
 touch -r $Num $Dist/.date	# For package dates in changelog.Debian
 
@@ -250,8 +253,11 @@ fi
 
 echo "Building the '$BUILD_IMG' image..."
 echo y | docker buildx prune >$Dist/.logs/docker-build.out
+if [ "$http_proxy" -a "$https_proxy" ]; then
+    test "$APT_SRC" && unset http_proxy https_proxy || BldArgs="--build-arg http_proxy=\"$http_proxy\" --build-arg https_proxy=\"$https_proxy\""
+fi
 #   Variables come in order of their appearance in Dockerfile-build.in
-DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $DEBNUM $CLI_DEPS $BUILD_NUM $USER $ADDUSER $APT_SRC $BUILD_TOP $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG . >>$Dist/.logs/docker-build.out 2>&1
+DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $DEBNUM $CLI_DEPS $BUILD_NUM $USER $ADDUSER $APT_SRC $BUILD_TOP $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG $BldArgs . >>$Dist/.logs/docker-build.out 2>&1
 
 test -f ${TopDir}.norun && Opt='-ti '
 if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
@@ -269,7 +275,7 @@ if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
     fi
 else
     echo "$ColRed\aFAILED to build the $BUILD_IMG image!$ColStd"
-    echo "Examine $Dist/.logs/docker-build.out for details."
+    echo "Examine $dist/.logs/docker-build.out for details."
     exit 2
 fi
 echo "------------------------------------------------"
@@ -304,7 +310,7 @@ fi
 
 echo "Building the '$TESTS_IMG' image..."
 #   Variables come in order of their appearance in Dockerfile-tests.in
-DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG . >$Dist/.logs/docker-tests.out 2>&1
+DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$Dist/.logs/docker-tests.out 2>&1
 
 if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
     Cmd="docker run $Opt-v `realpath $PWD/$Dist`:$TESTS_TOP/dist --name $TESTS_NAME --rm $TESTS_IMG"
@@ -321,7 +327,7 @@ if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
     fi
 else
     echo "$ColRed\aFAILED to build the $TESTS_IMG image!$ColStd"
-    echo "Examine $Dist/.logs/docker-tests.out for details."
+    echo "Examine $dist/.logs/docker-tests.out for details."
     exit 2
 fi
 
