@@ -17,6 +17,7 @@ $APT_SRC
 RUN apt-get update && apt-get upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $BUILD_REQ
 
 RUN mkdir -p $BUILD_TOP/dist $BUILD_TOP/files
+COPY files/debinfo /usr/local/bin
 $BLDCOPY
 
 CMD [ "$BUILD_TOP/build" ]

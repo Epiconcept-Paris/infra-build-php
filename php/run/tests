@@ -36,6 +36,8 @@ if [ ! -x /sbin/runlevel ]; then	# Needed by invoke-rc.d
     chmod +x /sbin/runlevel
 fi
 test -x /usr/sbin/policy-rc.d && grep 'exit 101' /usr/sbin/policy-rc.d >/dev/null && sed -i 's/exit 101/exit 104/' /usr/sbin/policy-rc.d
+debinfo -a >$Logs/debinfo-a_tests
+chown $Own "$Logs/debinfo-a_tests"
 
 echo "Setting Apache 2 to prefork mode..."
 sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf

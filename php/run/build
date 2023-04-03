@@ -68,6 +68,8 @@ if [ -f $Bld/.debug -o "$2" = 'debug' ]; then
     test -d $Debug || su -c "mkdir -p $Debug" $USER
     Dbg=y					# Debug option
 fi
+debinfo -a >$Logs/debinfo-a_build
+chown $Own "$Logs/debinfo-a_build"
 
 # Get version of latest PHP source
 SupVer="5.2 5.6 7.1 7.4 8.1 8.2"		# UPDATE THIS on new PHP version

@@ -13,6 +13,7 @@ $APT_SRC
 RUN apt-get update && apt-get upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $TESTS_REQ
 
 RUN mkdir -p $TESTS_TOP/dist
+COPY files/debinfo /usr/local/bin
 $TSTCOPY
 
 CMD [ "$TESTS_TOP/tests" ]
