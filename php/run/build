@@ -27,27 +27,16 @@ Patch()
 
 NumVer()
 {
-    local IFS fn mul val n
+    local IFS val n
 
     IFS="${2:-.}" val=0
     for n in $1
     do
 	expr "$n" : '[0-9][0-9]*' >/dev/null || { echo "NumVer: '$n' is not a number" >&2; exit 1; }
-	val=$((($val*100)+$n))
+	val=$((($val*${3:-100})+$n))
     done
+    test $val -eq 0 && echo "Numver: args '$*' return 0" >&2
     echo "$val"
-}
-
-VerCmp()
-{
-    local IFS fn lv op rv
-
-    case "$2" in
-	-l[et]|-g[et]|-eq|-ne)	op=$2;;
-	*) echo "VerCmp: invalid op '$op'" >&2; exit 1;;
-    esac
-    test "$(NumVer $1)" $op "$(NumVer $3)"
-    return $?
 }
 
 #=============================================================================
@@ -68,8 +57,9 @@ if [ -f $Bld/.debug -o "$2" = 'debug' ]; then
     test -d $Debug || su -c "mkdir -p $Debug" $USER
     Dbg=y					# Debug option
 fi
-debinfo -a >$Logs/debinfo-a_build
-chown $Own "$Logs/debinfo-a_build"
+debinfo -a >"$Logs/debinfo-a_build"
+echo "$(cat /etc/debian_version | awk -F. '{printf("%2d.%02d",$1,$2)}'): $(mysql --version)" >"$Bld/dist/.sqlver"
+chown $Own "$Logs/debinfo-a_build" "$Bld/dist/.sqlver"
 
 # Get version of latest PHP source
 SupVer="5.2 5.6 7.1 7.4 8.1 8.2"		# UPDATE THIS on new PHP version
@@ -370,7 +360,7 @@ else
     }
 
     #	Ugly hack for ext/mysqli/tests/mysqli_report.phpt bug
-    test "$DEBNUM" -ge 10 && VerCmp $MajMin -ge '7.4' && rm -v ext/mysqli/tests/mysqli_report.phpt 2>&1 | sed 's/^r/R/'
+    test "$DEBNUM" -ge 10 && test "$(NumVer $MajMin)" -ge 704 && rm -v ext/mysqli/tests/mysqli_report.phpt 2>&1 | sed 's/^r/R/'
 
     date "+%Y-%m-%d %H:%M:%S Testing php-$Ver built for Debian $DEBVER $(cat /etc/debian_version) ..."
     mkOut="$Logs/make-test.out"
