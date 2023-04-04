@@ -286,7 +286,7 @@ fi
 echo "Building the '$BUILD_IMG' image..."
 echo y | docker buildx prune >$Dist/.logs/docker-build.out
 if [ "$http_proxy" -a "$https_proxy" ]; then
-    test "$APT_SRC" && unset http_proxy https_proxy || BldArgs="--build-arg http_proxy=\"$http_proxy\" --build-arg https_proxy=\"$https_proxy\""
+    test "$APT_SRC" && unset http_proxy https_proxy || BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
 fi
 #   Variables come in order of their appearance in Dockerfile-build.in
 DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $DEBNUM $CLI_DEPS $BUILD_NUM $USER $ADDUSER $APT_SRC $BUILD_TOP $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG $BldArgs . >>$Dist/.logs/docker-build.out 2>&1
