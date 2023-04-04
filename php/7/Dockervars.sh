@@ -37,7 +37,7 @@ COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
     #
     if [ $Min -ge 2 ]; then
 	BUILD_REQ="$BUILD_REQ $DEV72_"
-	TESTS_REQ="$BUILD_REQ $LIB72_"
+	TESTS_REQ="$TESTS_REQ $LIB72_"
 	CLI_DEPS="$CLI_DEPS, $(echo "$LIB72_" | sed 's/ /, /g')"
     fi
 
@@ -46,7 +46,7 @@ COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
     #
     if [ $Min -ge 4 ]; then
 	BUILD_REQ="$BUILD_REQ $DEV74_"
-	TESTS_REQ="$BUILD_REQ $LIB74_"
+	TESTS_REQ="$TESTS_REQ $LIB74_"
 	CLI_DEPS="$CLI_DEPS, $(echo "$LIB74_" | sed 's/ /, /g')"
 
 	#   ..and the wddx legacy PHP extension

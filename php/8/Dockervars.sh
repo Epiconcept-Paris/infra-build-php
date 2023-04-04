@@ -30,7 +30,7 @@ COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
     #	Add specific dev and lib packages
     #
     BUILD_REQ="$BUILD_REQ $DEV81_"
-    TESTS_REQ="$BUILD_REQ $LIB81_"
+    TESTS_REQ="$TESTS_REQ $LIB81_"
     CLI_DEPS="$CLI_DEPS, $(echo "$LIB81_" | sed 's/ /, /g')"
 
     #	Add patches for Debian 10+
