@@ -7,7 +7,3 @@ Patch 0 "$Bld/files/mysql.patch"
 Patch 0 "$Bld/files/mysqlnd.patch"
 Show="MySQL(shared)"
 Opt="--with-mysql=shared"
-if VerCmp $Ver -ge '8.1.17'; then
-    PdoMysql=
-    MysqlI=
-fi

@@ -27,3 +27,11 @@ if [ -x $Bin/$Cfg ]; then
 	test -f $Inc/$Hdr || ln -s mysql/$Hdr $Inc
     done
 fi
+eval $(mysql --version | sed -nr 's/^.* Distrib ([0-9.]+)(-([^,]+))?, .*$/SQLstr=\1 SQLtag=\3/p')
+test "$SQLtag" || SQLtag='MySQL'	# Be defensive (most probably unused)
+SQLver=$(NumVer $SQLstr)
+if [ '(' $SQLver -ge 100338 -a $SQLver -lt 100500 ')' -o $SQLver -ge 100518 ]; then
+    echo "Using --with-pdo-mysql and --with-mysqli without =<path> for $SQLtag $SQLstr"
+    PdoMysql=
+    MysqlI=
+fi
