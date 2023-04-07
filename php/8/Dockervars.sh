@@ -33,12 +33,14 @@ COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
     TESTS_REQ="$TESTS_REQ $LIB81_"
     CLI_DEPS="$CLI_DEPS, $(echo "$LIB81_" | sed 's/ /, /g')"
 
-    #	Add patches for Debian 10+
-    if [ $DebNum -gt 9 ]; then
-	BUILD_REQ="ed $BUILD_REQ"
+    #	Add patch for Debian 9+
+    if [ $DebNum -ge 9 ]; then
 	BLDCOPY="$BLDCOPY
 COPY ${PhpTop}hooks/mysqli.sh $BUILD_TOP/hooks"
     fi
+
+    #	Add package for Debian 10+
+    test $DebNum -ge 10 && BUILD_REQ="ed $BUILD_REQ"	# For php/pkgs/00-cli/install
 }
 
 #

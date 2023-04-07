@@ -57,11 +57,15 @@ COPY $Php/files/wddx.tar.gz $BUILD_TOP/files
 COPY $Php/hooks/wddx.sh $BUILD_TOP/hooks"
     fi
 
-    #	Add patches for Debian 10+
-    if [ $DebNum -gt 9 ]; then
-	BUILD_REQ="ed $BUILD_REQ"
+    #	Add patch for Debian 9+
+    if [ $DebNum -ge 9 ]; then
 	BLDCOPY="$BLDCOPY
 COPY ${PhpTop}hooks/mysqli.sh $BUILD_TOP/hooks"
+    fi
+
+    #	Add package and possible patch for Debian 10+
+    if [ $DebNum -ge 10 ]; then
+	BUILD_REQ="ed $BUILD_REQ"	# For php/pkgs/00-cli/install
 	# 7.4 seems to not need this patch
 	if [ $Min -lt 4 ]; then
 	    BLDCOPY="$BLDCOPY

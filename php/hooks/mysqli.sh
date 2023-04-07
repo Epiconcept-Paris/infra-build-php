@@ -3,7 +3,7 @@
 #
 Bin=/usr/bin
 Cfg=mariadb_config
-if [ -x $Bin/$Cfg ]; then
+if [ -x $Bin/$Cfg ]; then	# NOTE: does not exist before Debian 10
     test "$Dbg" && echo "Setting up mysql links to mariadb..."
 
     Inc=$(expr "$($Cfg --include)" : '-I\([^ ]*\) .*')
@@ -28,10 +28,10 @@ if [ -x $Bin/$Cfg ]; then
     done
 fi
 eval $(mysql --version | sed -nr 's/^.* Distrib ([0-9.]+)(-([^,]+))?, .*$/SQLstr=\1 SQLtag=\3/p')
-test "$SQLtag" || SQLtag='MySQL'	# Be defensive (most probably unused)
 SQLver=$(NumVer $SQLstr)
-if [ '(' $SQLver -ge 100338 -a $SQLver -lt 100500 ')' -o $SQLver -ge 100518 ]; then
-    echo "Using --with-pdo-mysql and --with-mysqli without =<path> for $SQLtag $SQLstr"
+if [ '(' $SQLver -ge 100338 -a $SQLver -lt 100500 ')' -o $SQLver -ge 100518 -o $(NumVer $Ver) -ge 80204 ]; then
+    test "$SQLtag" || SQLtag='MySQL'	# Be defensive (will not be used)
+    echo "Using --with-pdo-mysql and --with-mysqli without =<path> for $SQLtag $SQLstr with PHP $Ver"
     PdoMysql=
     MysqlI=
 fi

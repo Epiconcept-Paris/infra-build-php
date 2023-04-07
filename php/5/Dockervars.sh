@@ -60,11 +60,16 @@ COPY $off $TESTS_TOP/pkgs"
 COPY ${PhpTop}files/PEAR_Manpages-1.10.0.tgz $BUILD_TOP/files
 COPY ${PhpTop}hooks/pearman.sh $BUILD_TOP/hooks"
 
-    #	Add patches for Debian 10+
-    if [ $DebNum -gt 9 ]; then
-	BUILD_REQ="ed $BUILD_REQ"
+    #	Add patch for Debian 9+
+    if [ $DebNum -ge 9 ]; then
 	BLDCOPY="$BLDCOPY
-COPY ${PhpTop}hooks/mysqli.sh $BUILD_TOP/hooks
+COPY ${PhpTop}hooks/mysqli.sh $BUILD_TOP/hooks"
+    fi
+
+    #	Add package and patch for Debian 10+
+    if [ $DebNum -ge 10 ]; then
+	BUILD_REQ="ed $BUILD_REQ"	# For php/pkgs/00-cli/install
+	BLDCOPY="$BLDCOPY
 COPY ${PhpTop}hooks/freetype.sh $BUILD_TOP/hooks"
     fi
 }
