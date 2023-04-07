@@ -343,12 +343,15 @@ if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
 fi
 
 echo "Building the '$TESTS_IMG' image..."
+if [ "$http_proxy" -a "$https_proxy" ]; then
+    test "$APT_SRC" && unset http_proxy https_proxy || Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
+fi
 #   Variables come in order of their appearance in Dockerfile-tests.in
 DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$Dist/.logs/docker-tests.out 2>&1
 test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
 
 if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
-    Cmd="docker run $Opt-v `realpath $PWD/$Dist`:$TESTS_TOP/dist --name $TESTS_NAME --rm $TESTS_IMG"
+    Cmd="docker run $Opt-v `realpath $PWD/$Dist`:$TESTS_TOP/dist $Env --name $TESTS_NAME --rm $TESTS_IMG"
     if [ -f ${TopDir}.norun ]; then
 	echo "Use:\n    $Cmd bash\nto run the tests container"
     else
