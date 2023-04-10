@@ -58,8 +58,8 @@ if [ -f $Bld/.debug -o "$2" = 'debug' ]; then
     Dbg=y					# Debug option
 fi
 debinfo -a >"$Logs/debinfo-a_build"
-echo "$(cat /etc/debian_version | awk -F. '{printf("%2d.%02d",$1,$2)}'): $(mysql --version)" >"$Bld/dist/.sqlver"
-chown $Own "$Logs/debinfo-a_build" "$Bld/dist/.sqlver"
+chown $Own "$Logs/debinfo-a_build"
+DebRel=$(cat /etc/debian_version)
 
 # Get version of latest PHP source
 SupVer="5.2 5.6 7.1 7.4 8.1 8.2"		# UPDATE THIS on new PHP version
@@ -304,7 +304,7 @@ grep '^EXTRA_LIBS = .* -lssl -lcrypto' Makefile >/dev/null || sed -i 's/-lxml2 -
 #
 #=============================================================================
 #
-date "+%Y-%m-%d %H:%M:%S Building php-$Ver for Debian $DEBVER $(cat /etc/debian_version) ..."
+date "+%Y-%m-%d %H:%M:%S Building php-$Ver for Debian $DEBVER $DebRel ..."
 if ! su -c "make -k >$Logs/make.out 2>&1" $USER; then
     echo "\aBuilding php-$Ver FAILED:"
     grep "error:" $Logs/make.out
@@ -326,6 +326,7 @@ if [ "$debLst" -a -f "$debLst" ]; then
 	DEBIAN_FRONTEND='noninteractive' dpkg -i "$Bld/files/$f.deb" >>$debLog 2>&1
     done
 fi
+MySQL=$(command -v mysql) && echo "$(echo $DebRel | awk -F. '{printf("%2d.%02d",$1,$2)}'): $($MySQL --version)" >"$Bld/dist/.sqlver" && chown $Own "$Bld/dist/.sqlver"
 
 #   Start and configure mysql-server
 if Out="$(/usr/local/bin/dbini MYSQL_TEST_SOCKET)"; then
@@ -362,7 +363,7 @@ else
     #	Ugly hack for ext/mysqli/tests/mysqli_report.phpt bug
     test "$DEBNUM" -ge 10 && test "$(NumVer $MajMin)" -ge 704 && rm -v ext/mysqli/tests/mysqli_report.phpt 2>&1 | sed 's/^r/R/'
 
-    date "+%Y-%m-%d %H:%M:%S Testing php-$Ver built for Debian $DEBVER $(cat /etc/debian_version) ..."
+    date "+%Y-%m-%d %H:%M:%S Testing php-$Ver built for Debian $DEBVER $DebRel ..."
     mkOut="$Logs/make-test.out"
     mkLog="$Logs/mktest-ps.out"
 
