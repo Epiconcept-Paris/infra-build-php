@@ -23,8 +23,8 @@ Prg=php/`basename $0`
 Dir=`dirname $0`
 IniPwd=$PWD
 TopDir=../
-DebTop=${TopDir}debian
-debTop=debian	# For messages
+debTop='debian'		# For messages
+DebTop=$TopDir$debTop
 PhpTop=
 
 Path() { realpath --relative-to=$IniPwd $1; }
@@ -204,14 +204,15 @@ fi
 #   Setup build
 #
 Bld=`cat $Num`			# For package names
-Dist=$DebDir/dist/$PhpVer-$Bld
-dist=$debDir/dist/$PhpVer-$Bld	# For messages
-test -d $Dist || mkdir -p $Dist
-touch -r $Num $Dist/.date	# For package dates in changelog.Debian
+Dist="dist/$PhpVer-$Bld"
+RelDir=$DebDir/$Dist
+relDir=$debDir/$Dist	# For messages
+test -d $RelDir || mkdir -p $RelDir
+touch -r $Num $RelDir/.date	# For package dates in changelog.Debian
 
 echo "Making PHP $PhpVer-$Bld packages for Debian $DebVer..."
-echo "Logs will be in debian/$DebNum/dist/$PhpVer-$Bld/.logs/"
-test -d $Dist/.logs && rm -f $Dist/.logs/*.out || mkdir $Dist/.logs
+echo "Logs will be in $relDir/.logs/"
+test -d $RelDir/.logs && rm -f $RelDir/.logs/*.out || mkdir $RelDir/.logs
 User=`id -un`
 test "$User" = 'php' && Type='epi' || Type='dev'
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
@@ -284,16 +285,16 @@ if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
 fi
 
 echo "Building the '$BUILD_IMG' image..."
-echo y | docker buildx prune >$Dist/.logs/docker-build.out
+echo y | docker buildx prune >$RelDir/.logs/docker-build.out
 if [ "$http_proxy" -a "$https_proxy" ]; then
     test "$APT_SRC" && unset http_proxy https_proxy || BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
 fi
 #   Variables come in order of their appearance in Dockerfile-build.in
-DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $DEBNUM $CLI_DEPS $BUILD_NUM $USER $ADDUSER $APT_SRC $BUILD_TOP $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $Dist/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG $BldArgs . >>$Dist/.logs/docker-build.out 2>&1
+DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $DEBNUM $CLI_DEPS $BUILD_NUM $USER $ADDUSER $APT_SRC $BUILD_TOP $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $RelDir/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG $BldArgs . >>$RelDir/.logs/docker-build.out 2>&1
 
 test -f ${TopDir}.norun && Opt='-ti '
 if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
-    Cmd="docker run $Opt-v `realpath $PWD/$Dist`:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
+    Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
     if [ -f ${TopDir}.norun ]; then
 	echo "Use:\n    $Cmd bash\nto run the build container"
     else
@@ -308,7 +309,7 @@ if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
     fi
 else
     echo "$ColRed\aFAILED to build the $BUILD_IMG image!$ColStd"
-    echo "Examine $dist/.logs/docker-build.out for details."
+    echo "Examine $relDir/.logs/docker-build.out for details."
     test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
     exit 2
 fi
@@ -347,11 +348,11 @@ if [ "$http_proxy" -a "$https_proxy" ]; then
     test "$APT_SRC" && unset http_proxy https_proxy || Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
 fi
 #   Variables come in order of their appearance in Dockerfile-tests.in
-DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $Dist/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$Dist/.logs/docker-tests.out 2>&1
+DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $RelDir/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$RelDir/.logs/docker-tests.out 2>&1
 test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
 
 if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
-    Cmd="docker run $Opt-v `realpath $PWD/$Dist`:$TESTS_TOP/dist $Env --name $TESTS_NAME --rm $TESTS_IMG"
+    Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$TESTS_TOP/dist $Env --name $TESTS_NAME --rm $TESTS_IMG"
     if [ -f ${TopDir}.norun ]; then
 	echo "Use:\n    $Cmd bash\nto run the tests container"
     else
@@ -365,7 +366,7 @@ if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
     fi
 else
     echo "$ColRed\aFAILED to build the $TESTS_IMG image!$ColStd"
-    echo "Examine $dist/.logs/docker-tests.out for details."
+    echo "Examine $relDir/.logs/docker-tests.out for details."
     exit 2
 fi
 
