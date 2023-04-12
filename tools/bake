@@ -8,9 +8,9 @@ Prg=tools/`basename $0`
 Dir=`dirname $0`
 IniPwd=$PWD
 TopDir=../
-DebTop=${TopDir}debian
+debTop='debian'		# For messages
+DebTop=${TopDir}$debTop
 TlsTop=
-tty <&1 >/dev/null && Opt='-ti '
 ColRed=`tput setaf 1`
 ColGrn=`tput setaf 2`
 ColStd=`tput setaf 7`
@@ -20,7 +20,7 @@ test "$Dir" || Dir=`dirname \`realpath $0\``
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
 test "$Dir" = '.' || cd "$Dir"
 #   Script's CWD is where it is located, but all messages assume PWD is top-level
-test -d $DebTop || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
+test -d $DebTop || { echo "$Prg: missing '$debTop' directory." >&2; exit 1; }
 
 SupDeb()
 {
@@ -53,8 +53,10 @@ if [ "$1" ]; then
     fi
 fi
 DebVer=`cat $DebTop/$DebNum/name`
-Tools=$DebTop/$DebNum/dist/tools
-Logs=$Tools/.logs
+DebDir=$DebTop/$DebNum
+debDir=$debTop/$DebNum
+Dist='dist/tools'
+Logs=$DebDir/$Dist/.logs
 User=`id -un`
 test "$User" = 'php' && Type='epi' || Type='dev'
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
@@ -101,7 +103,7 @@ test $? -eq 0 || { echo "$ColRed\aFAILED to build the '$TOOLS_IMG' docker image!
 #   Run the container
 #
 test -f ${TopDir}.norun && Opt='-ti '
-Cmd="docker run $Opt-v `realpath $PWD/$Tools`:$TOOLS_TOP/dist --name $TOOLS_NAME --rm $TOOLS_IMG"
+Cmd="docker run $Opt-v `realpath $PWD/$DebDir/$Dist`:$TOOLS_TOP/dist --name $TOOLS_NAME --rm $TOOLS_IMG"
 if [ -f ${TopDir}.norun ]; then
     echo "Use:\n    $Cmd bash\nto run the tools container"
 else

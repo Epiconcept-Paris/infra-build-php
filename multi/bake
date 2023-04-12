@@ -8,7 +8,8 @@ Prg=multi/`basename $0`
 Dir=`dirname $0`
 IniPwd=$PWD
 TopDir=../
-DebTop=${TopDir}debian
+debTop='debian'		# For messages
+DebTop=$TopDir$debTop
 PhpTop=${TopDir}php
 TlsTop=${TopDir}tools
 MulTop=
@@ -18,7 +19,7 @@ test "$Dir" || Dir=`dirname \`realpath $0\``
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
 test "$Dir" = '.' || cd "$Dir"
 #   Script's CWD is where it is located, but all messages assume PWD is top-level
-test -d $DebTop || { echo "$Prg: missing 'debian' directory." >&2; exit 1; }
+test -d $DebTop || { echo "$Prg: missing '$debTop' directory." >&2; exit 1; }
 test -d $PhpTop || { echo "$Prg: missing 'php' directory." >&2;  exit 1; }
 test -d $TlsTop || { echo "$Prg: missing 'tools' directory." >&2;  exit 1; }
 
@@ -71,6 +72,7 @@ done
 test "$DebNum" || DebNum=$DefDeb
 DebVer=`cat $DebTop/$DebNum/name`
 DebDir=$DebTop/$DebNum
+debDir=$debTop/$DebNum
 PkgDeb="+deb$DebNum"
 
 if [ -f $DebDir/Dockervars.sh ]; then
@@ -79,7 +81,7 @@ if [ -f $DebDir/Dockervars.sh ]; then
     LIBS=`echo -n "$LIBS" | tr '\n' ' '`
     MULTI_REQ="$MULTI_REQ $LIBS"
 else
-    echo "$Prg: missing debian/$DebNum/Dockervars.sh" >&2
+    echo "$Prg: missing $debDir/Dockervars.sh" >&2
     exit 1
 fi
 DistDir=$DebDir/dist
@@ -94,6 +96,7 @@ DistOK()
 {
     # global Base Arch
     local path dist
+
     path="$1"
     test -d "$path" || return 1
     dist=`basename $path`
@@ -115,7 +118,7 @@ if [ "$ds" ]; then
 	    test -s $DistDir/$d/$Base-$Maj.$Min-mysql_$d${PkgDeb}_$Arch.deb && ln $DistDir/$d/$Base-$Maj.$Min-mysql_$d${PkgDeb}_$Arch.deb $Pkgs
 	    nd=`expr $nd + 1`
 	else
-	    echo "$Prg: debian/$DebNum/dist/$d does not contain the necessary $Base cli and fpm packages" >&2
+	    echo "$Prg: $debDir/dist/$d does not contain the necessary $Base cli and fpm packages" >&2
 	    exit 1
 	fi
     done
@@ -213,7 +216,7 @@ if [ "$NoRun" ]; then
 	Cmd="$Cmd bash"
     else
 	Stop=		# will be done by multi/run if needed
-	Cmd="debian/$DebNum/multi/run"
+	Cmd="$debDir/multi/run"
     fi
     echo "Use:\n    $Stop$Cmd\nto run the container"
     exit 0
