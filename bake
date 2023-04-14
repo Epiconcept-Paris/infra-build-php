@@ -12,6 +12,7 @@ PHPSITE='fr.php.net'
 Prg=./`basename $0`
 Dir=`dirname $0`
 IniPwd=$PWD
+BinDir=bin
 DebTop=debian
 PhpTop=php
 TlsTop=tools
@@ -30,6 +31,7 @@ DefTcp=80
 #   If $Do is not-empty, it acts as a prefix command to which all effective
 #     commands are passed as arguments and collected for final (debug) display
 #   So just uncomment the next line to not actually execute commands
+#   Alternatively this script can be called as 'Do=Do ./bake ...'
 #Do=Do
 LF='
 '
@@ -47,7 +49,7 @@ Path() { realpath --relative-to=$IniPwd $1; }
 test "$Dir" || Dir=`dirname \`realpath $0\``
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
 test "$Dir" = '.' || cd "$Dir"
-for dir in $DebTop $PhpTop $TlsTop $MulTop
+for dir in $BinDir $DebTop $PhpTop $TlsTop $MulTop
 do
     test -d $dir || { echo "$Prg: missing '$dir' directory." >&2; exit 2; }
 done
@@ -67,6 +69,22 @@ DebDir()
     test "$2" && echo "$ret}" || echo "$ret"
 }
 
+AptStart()
+{
+    # global AptLst AptDeb BinDir DebTop
+    local deb
+
+    deb=$1
+    echo " $AptLst" | grep " $deb " >/dev/null || return
+    test "$AptDeb" || { $BinDir/aptsrv "$DebTop/$deb" && trap AptStop 0 2 15 && AptDeb=$deb; }
+}
+
+AptStop()
+{
+    # global AptDeb BinDir
+    test "$AptDeb" && $BinDir/aptsrv stop && trap 0 2 15 && AptDeb=
+}
+
 Sep=''
 for f in `cd $DebTop; ls */name | sort -n`
 do
@@ -74,6 +92,7 @@ do
     dir=`dirname $f`
     test -f $dir/mkre || continue
     deb=`basename $dir`
+    test -f $dir/Dockervars.sh && grep '^APT_SRC=.' $dir/Dockervars.sh >/dev/null && AptLst="$AptLst$deb "
     name=`cat $f`
     DebVer="$DebVer$Sep$deb"
     DebLst="$DebLst`printf "%2d ($name)" $deb`$LF"
@@ -81,7 +100,7 @@ do
     Sep=' '
 done
 test "$DebVer" || { echo "$Prg: no valid Debian version in '$DebTop' ??" >&2; exit 3; }
-#echo "DebVer=\"$DebVer\" DebDir=\"$(DebDir $DebVer)\" DebLst=\"$DebLst\" SedArg=\"$SedArg\""
+#echo "DebVer=\"$DebVer\" DebDir=\"$(DebDir $DebVer)\" DebLst=\"$DebLst\" SedArg=\"$SedArg\" AptLst=\"$AptLst\""; exit 0
 ReMajMin='[5-9]\.[0-9]$'
 ReVersion='[5-9]\.[0-9]\.[0-9]\{,2\}$'
 ReDistrib='\([5-9]\.[0-9]\.[0-9]\{,2\}\)-[0-9]\{,2\}$'
@@ -504,6 +523,7 @@ if [ "$isMk" ]; then
 	    deb=`expr "$obj" : '\([0-9]*\):.*'`
 	    key=`expr "$obj" : '[0-9]*:\(.*\)'`
 	    name=`cat $DebTop/$deb/name`
+	    test "$deb" != "$AptDeb" && AptStop
 	    # multi
 	    if [ "$key" = 'multi' ]; then
 		eval "mul=\$MUL$deb"
@@ -513,6 +533,7 @@ if [ "$isMk" ]; then
 		    # Only run multi for Debian $MulDebRun with $MultiRun set
 		    test $deb = $MulDebRun -a "$MultiRun" && run=' and running' || run=
 		    test "$run" && norun= || norun='-'
+		    AptStart $deb
 		    echo "Building$run multi for $name with ${mul}on *.${MultiDomain:-$DefDom}:${MultiPort:-$DefTcp}"
 		    $Do mkdir -p $dir
 		    $Do eval "$MulTop/bake $deb $mul$norun | sed -u 's/$//' | tee $dir/mk.out | sed -u 's/$//'"
@@ -524,6 +545,7 @@ if [ "$isMk" ]; then
 	    elif [ "$key" = 'tools' ]; then
 		dir=$DebTop/$deb/dist/tools
 		test -f $dir/epi-tools-waitpid_*.deb && { echo "tools are already built for $name"; continue; }
+		AptStart $deb
 		echo "Building tools for $name"
 		$Do mkdir -p $dir
 		$Do eval "$TlsTop/bake $deb | sed -u 's/$//' | tee $dir/mk.out | sed -u 's/$//'"
@@ -532,6 +554,7 @@ if [ "$isMk" ]; then
 		ver=`expr "$key" : "$ReDistrib"`
 		dir=$DebTop/$deb/dist/$key
 		test -f $dir/epi-php-*-cli_*.deb && { echo "PHP $key is already built for $name"; continue; }
+		AptStart $deb
 		echo "Building PHP $key for $name in $dir"
 		maj=`expr "$key" : '\([5-9]\)'`
 		bld=`expr "$key" : '[\.0-9]*-\([0-9]\{,2\}\)$'`
