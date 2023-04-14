@@ -10,6 +10,7 @@ IniPwd=$PWD
 TopDir=../
 debTop='debian'		# For messages
 DebTop=$TopDir$debTop
+BinDir=${TopDir}bin
 PhpTop=${TopDir}php
 TlsTop=${TopDir}tools
 MulTop=
@@ -77,6 +78,7 @@ PkgDeb="+deb$DebNum"
 
 if [ -f $DebDir/Dockervars.sh ]; then
     eval `sed -n 's/^TESTS_REQ=/MULTI_REQ=/p' $DebDir/Dockervars.sh`
+    eval `grep '^APT_SRC=' $DebDir/Dockervars.sh`
     LIBS=`sed -nr 's/LIB7[0-9]_="([^"]+)"/\1/p' $DebDir/Dockervars.sh`
     LIBS=`echo -n "$LIBS" | tr '\n' ' '`
     MULTI_REQ="$MULTI_REQ $LIBS"
@@ -86,6 +88,7 @@ else
 fi
 DistDir=$DebDir/dist
 MultDir=$DebDir/multi
+multDir=$debDir/multi
 Logs=$MultDir/logs
 Pkgs=$MultDir/pkgs
 
@@ -183,6 +186,8 @@ if docker images | grep "$MULTI_BASE *$DebVer" >/dev/null; then
     echo "Re-using the existing '$MULTI_IMG' image. Use:\n    docker rmi $MULTI_IMG\nto force a rebuild."
 else
     echo "Building the '$MULTI_IMG' image..."
+    mkdir -p $Logs
+    echo y | docker buildx prune >$Logs/docker-build.out
     #
     #   Find the waitpid package
     #
@@ -200,10 +205,16 @@ else
     MULCOPY="COPY ${MulTop}run/start $MULTI_TOP/start
 COPY ${MulTop}run/$Pkg /tmp
 RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
-    mkdir -p $Logs
-    #   Variables come in order of their appearance in Dockerfile-multi.in
-    DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG . >$Logs/docker-build.out 2>&1
-    test $? -eq 0 || { echo "$ColRed\aFAILED to build the '$MULTI_IMG' docker image!$ColStd" >&2; exit 2; }
+    if [ "$APT_SRC" ]; then
+	$BinDir/aptsrv "$debDir" && AptSrv=y
+    elif [ "$http_proxy" -a "$https_proxy" ]; then
+	BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
+    fi
+    #   Variables come in order of their appearance in multi/Dockerfile.in
+    DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $APT_SRC $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG $BldArgs . >>$Logs/docker-build.out 2>&1
+    xc=$?
+    test "$AptSrv" && $BinDir/aptsrv 'stop'
+    test $xc -eq 0 || { echo "$ColRed\aFAILED to build the '$MULTI_IMG' docker image!$ColStd" >&2; exit 2; }
     rm -f ${MulTop}run/$Pkg
 fi
 MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" envsubst '$MULTI_NAME $MULTI_TOP $MULTI_IMG' <${MulTop}run/run >$MultDir/run
@@ -216,7 +227,7 @@ if [ "$NoRun" ]; then
 	Cmd="$Cmd bash"
     else
 	Stop=		# will be done by multi/run if needed
-	Cmd="$debDir/multi/run"
+	Cmd="$multDir/run"
     fi
     echo "Use:\n    $Stop$Cmd\nto run the container"
     exit 0

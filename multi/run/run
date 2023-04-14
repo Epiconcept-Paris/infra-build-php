@@ -32,8 +32,11 @@ if docker ps | grep $MULTI_NAME >/dev/null; then
     echo "Stopping the '$MULTI_NAME' container..."
     docker stop $MULTI_NAME >/dev/null
 fi
+if [ "$http_proxy" -a "$https_proxy" ]; then
+    Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
+fi
 Opt='-d'	# NOTE: multi/bake expects next line to start with Cmd="
-Cmd="docker run $Opt -p $Port:$Port -v $PWD:$MULTI_TOP/conf -v $DocRoot:$MULTI_TOP/www --name $MULTI_NAME --rm $MULTI_IMG"
+Cmd="docker run $Opt -p $Port:$Port -v $PWD:$MULTI_TOP/conf -v $DocRoot:$MULTI_TOP/www $Env --name $MULTI_NAME --rm $MULTI_IMG"
 echo "Running the '$MULTI_NAME' container in background mode:\n    $Cmd"
 $Cmd >/dev/null || { echo "\aFAILED to run the '$MULTI_NAME' container!"; exit 1; }
 

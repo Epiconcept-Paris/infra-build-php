@@ -10,6 +10,7 @@ IniPwd=$PWD
 TopDir=../
 debTop='debian'		# For messages
 DebTop=${TopDir}$debTop
+BinDir=${TopDir}bin
 TlsTop=
 ColRed=`tput setaf 1`
 ColGrn=`tput setaf 2`
@@ -56,6 +57,12 @@ DebVer=`cat $DebTop/$DebNum/name`
 DebDir=$DebTop/$DebNum
 debDir=$debTop/$DebNum
 Dist='dist/tools'
+if [ -f $DebDir/Dockervars.sh ]; then
+    eval `grep '^APT_SRC=' $DebDir/Dockervars.sh`
+else
+    echo "$Prg: missing $debDir/Dockervars.sh" >&2
+    exit 1
+fi
 Logs=$DebDir/$Dist/.logs
 User=`id -un`
 test "$User" = 'php' && Type='epi' || Type='dev'
@@ -93,17 +100,28 @@ if docker images | grep "$TOOLS_BASE *$DebVer" >/dev/null; then
     docker rmi $TOOLS_IMG >/dev/null
 fi
 
-test -d $Logs || mkdir -p $Logs
 echo "Building the '$TOOLS_IMG' image..."
+mkdir -p $Logs
+echo y | docker buildx prune >$Logs/docker-build.out
+if [ "$APT_SRC" ]; then
+    $BinDir/aptsrv "$debDir" && AptSrv=y
+elif [ "$http_proxy" -a "$https_proxy" ]; then
+    BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
+fi
 #   Variables come in order of their appearance in Dockerfile.in
-DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" TOOLS_TOP="$TOOLS_TOP" TLSCOPY="$TLSCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $TOOLS_TOP $TLSCOPY' <${TlsTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG . >$Logs/docker.out 2>&1
-test $? -eq 0 || { echo "$ColRed\aFAILED to build the '$TOOLS_IMG' docker image!$ColStd" >&2; exit 2; }
+DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TOOLS_TOP="$TOOLS_TOP" TLSCOPY="$TLSCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $APT_SRC $TOOLS_TOP $TLSCOPY' <${TlsTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG $BldArgs . >>$Logs/docker-build.out 2>&1
+xc=$?
+test "$AptSrv" && $BinDir/aptsrv 'stop'
+test $xc -eq 0 || { echo "$ColRed\aFAILED to build the '$TOOLS_IMG' docker image!$ColStd" >&2; exit 2; }
 
 #
 #   Run the container
 #
 test -f ${TopDir}.norun && Opt='-ti '
-Cmd="docker run $Opt-v `realpath $PWD/$DebDir/$Dist`:$TOOLS_TOP/dist --name $TOOLS_NAME --rm $TOOLS_IMG"
+if [ "$http_proxy" -a "$https_proxy" ]; then
+    Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
+fi
+Cmd="docker run $Opt-v `realpath $PWD/$DebDir/$Dist`:$TOOLS_TOP/dist $Env --name $TOOLS_NAME --rm $TOOLS_IMG"
 if [ -f ${TopDir}.norun ]; then
     echo "Use:\n    $Cmd bash\nto run the tools container"
 else

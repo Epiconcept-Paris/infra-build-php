@@ -25,6 +25,7 @@ IniPwd=$PWD
 TopDir=../
 debTop='debian'		# For messages
 DebTop=$TopDir$debTop
+BinDir=${TopDir}bin
 PhpTop=
 
 Path() { realpath --relative-to=$IniPwd $1; }
@@ -216,38 +217,6 @@ test -d $RelDir/.logs && rm -f $RelDir/.logs/*.out || mkdir $RelDir/.logs
 User=`id -un`
 test "$User" = 'php' && Type='epi' || Type='dev'
 AddUser="groupadd -g `id -g` `id -gn`; useradd -u `id -u` -g `id -g` $User"
-if [ "$APT_SRC" ]; then
-    if [ -s $DebDir/repo-arch.txz -a -s $DebDir/repo-secu.txz ]; then
-	test -d $DebDir/repo || {
-	    echo "Extracting archives repo-arch.txz and repo-secu.txz in $debDir..."
-	    (cd $DebDir; tar xf repo-arch.txz; tar xf repo-secu.txz)
-	}
-	cp -lpr $DebDir/repo $Dist
-	(cd $Dist/repo; exec python3 -m http.server 2>../.logs/http.log) & hPid=$!
-	echo "Starting http.server for container-build packages on $dist/repo (PID=$hPid)"
-    else
-	echo "$Prg: cannot find archives $debDir/repo-arch.txz and $debDir/repo-secu.txz" >&2
-	exit 1
-    fi
-    sleep 1
-    test "$(netstat -lnt | grep ':8000 ')" || {
-	echo "$Prg: nothing listening on port 8000 ??" >&2
-	test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
-	exit 1
-    }
-    if nCat=$(command -v nc); then
-	Rep="$(echo "GET / HTTP/1.0\r\n\r" | $nCat localhost 8000)"
-	echo "$Rep" | grep 'debian' >/dev/null || {
-	    echo "$Prg:  $dist/repo does not contain the string 'debian'" >&2
-	    if [ "$Rep" ]; then
-		echo "$Rep" >"$Dist/.logs/http-rep"
-		echo "Server reply has been saved in $Dist/.logs/http-rep" >&2
-	    fi
-	    test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
-	    exit 1
-	}
-    fi
-fi
 
 #
 #   Make build image and start container
@@ -286,15 +255,20 @@ fi
 
 echo "Building the '$BUILD_IMG' image..."
 echo y | docker buildx prune >$RelDir/.logs/docker-build.out
-if [ "$http_proxy" -a "$https_proxy" ]; then
-    test "$APT_SRC" && unset http_proxy https_proxy || BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
+if [ "$APT_SRC" ]; then
+    $BinDir/aptsrv "$debDir" && AptSrv=y
+elif [ "$http_proxy" -a "$https_proxy" ]; then
+    BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
 fi
 #   Variables come in order of their appearance in Dockerfile-build.in
 DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $DEBNUM $CLI_DEPS $BUILD_NUM $USER $ADDUSER $APT_SRC $BUILD_TOP $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $RelDir/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG $BldArgs . >>$RelDir/.logs/docker-build.out 2>&1
 
 test -f ${TopDir}.norun && Opt='-ti '
+if [ "$http_proxy" -a "$https_proxy" ]; then
+    test "$APT_SRC" || Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
+fi
 if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
-    Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$BUILD_TOP/dist --name $BUILD_NAME --rm $BUILD_IMG"
+    Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$BUILD_TOP/dist $Env --name $BUILD_NAME --rm $BUILD_IMG"
     if [ -f ${TopDir}.norun ]; then
 	echo "Use:\n    $Cmd bash\nto run the build container"
     else
@@ -303,14 +277,14 @@ if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
 	    echo "Made PHP $PhpVer-$Bld packages for Debian $DebVer."
 	else
 	    echo "$ColRed\aFAILED to make PHP $PhpVer-$Bld packages for Debian $DebVer!$ColStd"
-	    test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
+	    test "$AptSrv" && $BinDir/aptsrv 'stop'
 	    exit 3
 	fi
     fi
 else
     echo "$ColRed\aFAILED to build the $BUILD_IMG image!$ColStd"
     echo "Examine $relDir/.logs/docker-build.out for details."
-    test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
+    test "$AptSrv" && $BinDir/aptsrv 'stop'
     exit 2
 fi
 echo "------------------------------------------------"
@@ -344,12 +318,9 @@ if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
 fi
 
 echo "Building the '$TESTS_IMG' image..."
-if [ "$http_proxy" -a "$https_proxy" ]; then
-    test "$APT_SRC" && unset http_proxy https_proxy || Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
-fi
 #   Variables come in order of their appearance in Dockerfile-tests.in
 DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $RelDir/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$RelDir/.logs/docker-tests.out 2>&1
-test "$hPid" && kill $hPid && echo "Stopped http.server for container-build packages"
+test "$AptSrv" && $BinDir/aptsrv 'stop'
 
 if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
     Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$TESTS_TOP/dist $Env --name $TESTS_NAME --rm $TESTS_IMG"
