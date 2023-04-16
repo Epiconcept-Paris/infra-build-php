@@ -4,6 +4,12 @@
 #
 #	Usage:	[tools|.]/bake [<Debian-version>]
 #
+# shellcheck disable=SC2003	# expr is antiquated
+# shellcheck disable=SC2006	# Use $(...) notation, not legacy `...`
+# shellcheck disable=SC2086	# Double quote to prevent globbing
+# shellcheck disable=SC2166	# Prefer [ p ] && [ q ] to [ p -a q ]
+# shellcheck disable=SC2028	# echo may not expand escape sequences
+#
 Prg=tools/`basename $0`
 Dir=`dirname $0`
 IniPwd=$PWD
@@ -17,8 +23,9 @@ ColGrn=`tput setaf 2`
 ColStd=`tput setaf 7`
 
 Path() { realpath --relative-to=$IniPwd $1; }
-test "$Dir" || Dir=`dirname \`realpath $0\``
+test "$Dir" || Dir=$(dirname "$(realpath $0)")
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
+# shellcheck disable=SC2164	# Use 'cd ... || exit'
 test "$Dir" = '.' || cd "$Dir"
 #   Script's CWD is where it is located, but all messages assume PWD is top-level
 test -d $DebTop || { echo "$Prg: missing '$debTop' directory." >&2; exit 1; }
@@ -28,7 +35,7 @@ SupDeb()
     # global DebNum
     local v
     echo "Supported Debian versions (default $DebNum):" >&2
-    ls $DebTop | sort -n | while read v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
+    ls $DebTop | sort -n | while read -r v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
 }
 
 #
@@ -58,7 +65,7 @@ DebDir=$DebTop/$DebNum
 debDir=$debTop/$DebNum
 Dist='dist/tools'
 if [ -f $DebDir/Dockervars.sh ]; then
-    eval `grep '^APT_SRC=' $DebDir/Dockervars.sh`
+    eval "`grep '^APT_SRC=' $DebDir/Dockervars.sh`"
 else
     echo "$Prg: missing $debDir/Dockervars.sh" >&2
     exit 1
@@ -103,12 +110,14 @@ fi
 echo "Building the '$TOOLS_IMG' image..."
 mkdir -p $Logs
 echo y | docker buildx prune >$Logs/docker-build.out
+# shellcheck disable=SC2154	# Var referenced but not assigned
 if [ "$APT_SRC" ]; then
     $BinDir/aptsrv "$debDir" && AptSrv=y
 elif [ "$http_proxy" -a "$https_proxy" ]; then
     BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
 fi
 #   Variables come in order of their appearance in Dockerfile.in
+# shellcheck disable=SC2016	# Vars don't expand in single quotes
 DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TOOLS_TOP="$TOOLS_TOP" TLSCOPY="$TLSCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $APT_SRC $TOOLS_TOP $TLSCOPY' <${TlsTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG $BldArgs . >>$Logs/docker-build.out 2>&1
 xc=$?
 test "$AptSrv" && $BinDir/aptsrv 'stop'

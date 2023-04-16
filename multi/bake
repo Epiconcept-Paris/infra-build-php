@@ -4,6 +4,14 @@
 #
 #	Usage:	[multi|.]/bake <PHP-dist-dir> [<PHP-dist-dir> ...] [<Debian-version>]
 #
+# shellcheck disable=SC1090	# Can't follow non-constant source
+# shellcheck disable=SC2003	# expr is antiquated
+# shellcheck disable=SC2006	# Use $(...) notation, not legacy `...`
+# shellcheck disable=SC2046	# Quote this to prevent word splitting
+# shellcheck disable=SC2086	# Double quote to prevent globbing
+# shellcheck disable=SC2196	# egrep is non-standard
+# shellcheck disable=SC2166	# Prefer [ p ] && [ q ] to [ p -a q ]
+#
 Prg=multi/`basename $0`
 Dir=`dirname $0`
 IniPwd=$PWD
@@ -16,8 +24,9 @@ TlsTop=${TopDir}tools
 MulTop=
 
 Path() { realpath --relative-to=$IniPwd $1; }
-test "$Dir" || Dir=`dirname \`realpath $0\``
+test "$Dir" || Dir=$(dirname "$(realpath $0)")
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
+# shellcheck disable=SC2164	# Use 'cd ... || exit'
 test "$Dir" = '.' || cd "$Dir"
 #   Script's CWD is where it is located, but all messages assume PWD is top-level
 test -d $DebTop || { echo "$Prg: missing '$debTop' directory." >&2; exit 1; }
@@ -31,7 +40,6 @@ Arch='amd64'
 LF='
 '
 ColRed=`tput setaf 1`
-ColGrn=`tput setaf 2`
 ColStd=`tput setaf 7`
 
 #
@@ -66,7 +74,7 @@ do
     else
 	echo "$Prg: unsupported Debian version \"$v\"" >&2
 	echo "Supported Debian versions (default $DefDeb):" >&2
-	ls $DebTop | sort -n | egrep "^($re)$" | while read v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
+	ls $DebTop | sort -n | egrep "^($re)$" | while read -r v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
 	exit 1
     fi
 done
@@ -114,6 +122,7 @@ if [ "$ds" ]; then
     for d in $ds
     do
 	eval `echo "$d" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})-([0-9]{,2})$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
+	# shellcheck disable=SC2154	# Var referenced but not assigned
 	if DistOK $DistDir/$d $Maj $Min; then
 	    mkdir -p $Pkgs
 	    ln $DistDir/$d/$Base-$Maj.$Min-cli_$d${PkgDeb}_$Arch.deb $Pkgs
@@ -129,7 +138,7 @@ fi
 if [ $nd -eq 0 ]; then
     echo "Usage: $Prg <PHP-dist-dir> [<PHP-dist-dir> ...] [<Debian-version>]" >&2
     Sep=''
-    for dir in $DistDir/[5-9].[0-9].[0-9]*-[0-9]*
+    for dir in "$DistDir"/[5-9].[0-9].[0-9]*-[0-9]*
     do
 	eval `basename $dir | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})-([0-9]{,2})$/Maj=\1 Min=\2 Rel=\3 Bld=\4/p'`
 	if DistOK $dir $Maj $Min; then
@@ -205,25 +214,31 @@ else
     MULCOPY="COPY ${MulTop}run/start $MULTI_TOP/start
 COPY ${MulTop}run/$Pkg /tmp
 RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
+    # shellcheck disable=SC2154	# Var referenced but not assigned
     if [ "$APT_SRC" ]; then
 	$BinDir/aptsrv "$debDir" && AptSrv=y
     elif [ "$http_proxy" -a "$https_proxy" ]; then
 	BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
     fi
     #   Variables come in order of their appearance in multi/Dockerfile.in
+    # shellcheck disable=SC2016	# Vars don't expand in single quotes
     DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $APT_SRC $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG $BldArgs . >>$Logs/docker-build.out 2>&1
     xc=$?
     test "$AptSrv" && $BinDir/aptsrv 'stop'
     test $xc -eq 0 || { echo "$ColRed\aFAILED to build the '$MULTI_IMG' docker image!$ColStd" >&2; exit 2; }
     rm -f ${MulTop}run/$Pkg
 fi
+# shellcheck disable=SC2016	# Vars don't expand in single quotes
 MULTI_NAME="$MULTI_NAME" MULTI_TOP="$MULTI_TOP" MULTI_IMG="$MULTI_IMG" envsubst '$MULTI_NAME $MULTI_TOP $MULTI_IMG' <${MulTop}run/run >$MultDir/run
 chmod +x $MultDir/run
 
 if [ "$NoRun" ]; then
     if [ -f $TopDir.norun ]; then
 	. $SrvConf
-	Opt='-ti' Port="$Port" Top=`realpath $MultDir` DocRoot="$Top/www" eval `sed -nr "/^Cmd=\\"/s;PWD;Top;p" $MultDir/run`
+	# shellcheck disable=SC2034	# Opt appears unused
+	# shellcheck disable=SC2154	# Var referenced but not assigned
+	Opt='-ti' Port="$Port" Top=`realpath $MultDir`
+	DocRoot="$Top/www" eval `sed -nr "/^Cmd=\\"/s;PWD;Top;p" $MultDir/run`
 	Cmd="$Cmd bash"
     else
 	Stop=		# will be done by multi/run if needed

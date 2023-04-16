@@ -7,6 +7,12 @@
 #		./bake [ls | ver | latest | fetch | help]
 #	<PHP-version> is <Maj>.<Min>, <Maj>.<Min>.<Rel> or <Maj>.<Min>.<Rel>-<Bld>
 #
+# shellcheck disable=SC2003	# expr is antiquated
+# shellcheck disable=SC2006	# Use $(...) notation, not legacy `...`
+# shellcheck disable=SC2086	# Double quote to prevent globbing
+# shellcheck disable=SC2166	# Prefer [ p ] && [ q ] to [ p -a q ]
+# shellcheck disable=SC2196	# egrep is non-standard
+#
 PHPSITE='fr.php.net'
 
 Prg=./`basename $0`
@@ -30,12 +36,14 @@ DefTcp=80
 #   If $Do is empty (normal use), commands are just executed
 #   If $Do is not-empty, it acts as a prefix command to which all effective
 #     commands are passed as arguments and collected for final (debug) display
-#   So just uncomment the next line to not actually execute commands
-#   Alternatively this script can be called as 'Do=Do ./bake ...'
-#Do=Do
+#
+#   So just uncomment the Do= line below to not actually execute commands
+#   Alternatively this script can be called as 'Do=Dry ./bake ...'
+#Do=Dry
 LF='
 '
-Do()
+#   Not 'Do', to silence shellcheck
+Dry()
 {
     # global DoCmds
 
@@ -46,8 +54,9 @@ Do()
 # ----- Check environment --------------------------------------
 #
 Path() { realpath --relative-to=$IniPwd $1; }
-test "$Dir" || Dir=`dirname \`realpath $0\``
+test "$Dir" || Dir=$(dirname "$(realpath $0)")
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
+# shellcheck disable=SC2164	# Use 'cd ... || exit'
 test "$Dir" = '.' || cd "$Dir"
 for dir in $BinDir $DebTop $PhpTop $TlsTop $MulTop
 do
@@ -86,7 +95,8 @@ AptStop()
 }
 
 Sep=''
-for f in `cd $DebTop; ls */name | sort -n`
+# shellcheck disable=SC2164	# Use 'cd ... || exit'
+for f in `cd $DebTop; ls [0-9]*/name | sort -n`
 do
     f="$DebTop/$f"
     dir=`dirname $f`
@@ -117,6 +127,7 @@ Vers()
     local Sup
 
     # Build RE of all *Sup*ported PHP versions, trying to eliminate duplicates
+    # shellcheck disable=SC2046	# Quote to prevent word splitting
     Sup=$(eval cat $DebTop/$(DebDir $DebVer)/mkre | tr '|' '\n' | sort -u)
     Sup=$(echo -n "$Sup" | tr '\n' '|')
 
@@ -170,6 +181,7 @@ if [ "$1" = 'ver' -o "$1" = 'latest' -o "$1" = 'fetch' ]; then
     Vers
     if [ "$1" = 'ver' ]; then
 	echo "Latest supported PHP versions:"
+	# shellcheck disable=SC2001	# Cannot use ${variable//search/replace}
 	echo "$Latest" | sed 's/^/    /'
 	echo "Supported Debian versions:"
 	echo -n "$DebLst" | sed 's/^/    /'
@@ -189,6 +201,7 @@ if [ "$1" = 'ver' -o "$1" = 'latest' -o "$1" = 'fetch' ]; then
 	    echo "--- Fetching $Fetch:"
 	    cleanup() { rm -f "$PhpTop/.fetch"; }
 	    trap cleanup 0 2
+	    # shellcheck disable=SC2188	# Redirection without a command
 	    >"$PhpTop/.fetch"
 	    rc=1
 	    for v in $Fetch
@@ -208,6 +221,7 @@ if [ "$1" = 'ver' -o "$1" = 'latest' -o "$1" = 'fetch' ]; then
 elif [ "$1" = 'ls' ]; then
     Red='!'
     tty <&1 >/dev/null && { Red=`tput setaf 1`; Grn=`tput setaf 2`; Std=`tput setaf 7`; }
+    # shellcheck disable=SC2046	# Quote to prevent word splitting
     dirs=`eval ls -dv $DebTop/$(DebDir $DebVer)/{dist/{[5-9].*,tools},multi} 2>/dev/null`
     test "$dirs" && echo "Current distributions:"
     for dir in $dirs
@@ -294,7 +308,7 @@ do
     done
 done
 test "$isMk" -o "$isRm" || { echo "$Prg: no mode [mk|rm] specified" >&2; Usage; }
-#echo "nbarg=$nbarg Do=\"$Do\" Mode=$Mode AllDeb=\"$AllDeb\" DebVer=\"$DebVer\" isMk=\"$isMk\" isRm=\"$isRm\" toMk=\"$toMk\" toRm=\"$toRm\""
+test "$Do" && echo "nbarg=$nbarg Do=\"$Do\" Mode=$Mode AllDeb=\"$AllDeb\" DebVer=\"$DebVer\" AptLst=\"$AptLst\" isMk=\"$isMk\" isRm=\"$isRm\" toMk=\"$toMk\" toRm=\"$toRm\""
 
 #
 # ----- Remove builds ------------------------------------------
@@ -360,7 +374,8 @@ if [ "$isRm" ]; then
 		test "$dir" -o "$imgs" && Objs="$Objs$dir+$imgs$what$LF"
 	    # Maj.min or version
 	    else
-		test -d $DebTop/$deb/dist && vers=`(cd $DebTop/$deb/dist; ls -d $key* 2>/dev/null | sed -r "s/^([\.0-9]+)-[0-9]+$/\1/"; echo "$DockImgs" | sed -nr "s/^($Type-(build|tests)-php)  *$name-($key[\.0-9]*) .*$/\3/p") | sort -u`
+		# shellcheck disable=SC2164	# Use 'cd ... || exit'
+		test -d $DebTop/$deb/dist && vers=`(cd $DebTop/$deb/dist; ls -d $key* 2>/dev/null | sed -r "s/^([\.0-9]+)-[0-9]+$/\1/"; echo "$DockImgs" | sed -nr "s/^($Type-(build|tests)-php)  *$name-(${key}[\.0-9]*) .*$/\3/p") | sort -u`
 		#echo "vers=\"$vers\""
 		for ver in $vers
 		do
@@ -393,7 +408,7 @@ if [ "$isRm" ]; then
 	echo -n "$Objs" | tr '_' ' ' | sed -r -e 's/^([^+]+)\+?$/    \1/' -e 's/^([^+]+)\+[^#]+#(.*)$/    \1 and docker image\2/' -e 's/^\+[^#]+#(.*)$/    docker image\1/' | sort -n -t/ -k2,2
 	test "$dockRm" && echo "    and some unnamed docker image(s)"
 	echo -n "will be REMOVED. Proceed ? "
-	read a
+	read -r a
 	if [ "$a" = 'y' -o "$a" = 'yes' ]; then
 	    #
 	    #   Let's do it !
@@ -485,9 +500,12 @@ if [ "$isMk" ]; then
 		ver=$key
 	    else
 		expr "$key" : "$ReMajMin" >/dev/null || { echo "$Prg: cannot parse '$key'" >&2; continue; }
+		# shellcheck disable=SC2046	# Quote to prevent word splitting
 		eval `echo "$key" | sed -nr 's/^([5-9])\.([0-9])$/maj=\1 min=\2/p'`
+		# shellcheck disable=SC2154	# Var referenced but not assigned
 		ver=`echo "$Latest" | grep "^$key\."` || { Inex $maj $min 'n'; continue; }
 	    fi
+	    # shellcheck disable=SC2046	# Quote to prevent word splitting
 	    eval `echo "$ver" | sed -nr 's/^([5-9])\.([0-9])\.([0-9]{,2})$/maj=\1 min=\2 rel=\3/p'`
 	    echo "$Versions" | grep "^$ver$" >/dev/null || { Inex $maj $min $rel; continue; }
 	    echo $ver | egrep "^(`cat $DebTop/$deb/mkre`)\." >/dev/null || { echo "$Prg: build of PHP $ver is not supported on $name" >&2; continue; }
@@ -517,6 +535,7 @@ if [ "$isMk" ]; then
     #	Let's do it !
     #
     if [ "$Objs" ]; then
+	# shellcheck disable=SC2188	# Redirection without a command
 	test "$Do" && >.debug
 	for obj in $Objs
 	do
@@ -528,6 +547,7 @@ if [ "$isMk" ]; then
 	    if [ "$key" = 'multi' ]; then
 		eval "mul=\$MUL$deb"
 		#echo "deb=$deb mul=\"$mul\""
+		# shellcheck disable=SC2154	# Var referenced but not assigned
 		if [ "$mul" ]; then
 		    dir=$DebTop/$deb/multi
 		    # Only run multi for Debian $MulDebRun with $MultiRun set

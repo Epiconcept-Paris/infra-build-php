@@ -8,8 +8,16 @@
 #	Supported PHP versions are defined in debian/<Debian-version>/mkre
 #	Debian-version is checked to be supported and defaults to latest version
 #
+# shellcheck disable=SC1090	# Can't follow non-constant source
+# shellcheck disable=SC2003	# expr is antiquated
+# shellcheck disable=SC2006	# Use $(...) notation, not legacy `...`
+# shellcheck disable=SC2086	# Double quote to prevent globbing
+# shellcheck disable=SC2166	# Prefer [ p ] && [ q ] to [ p -a q ]
+# shellcheck disable=SC2028	# echo may not expand escape sequences
+#
 PHPSITE='fr.php.net'
 PHPARCH="museum.php.net/php5"
+# shellcheck disable=SC2034	# Var appears unused
 PECLGET="pecl.php.net/get"
 Ext=.tar.bz2
 LF='
@@ -29,8 +37,9 @@ BinDir=${TopDir}bin
 PhpTop=
 
 Path() { realpath --relative-to=$IniPwd $1; }
-test "$Dir" || Dir=`dirname \`realpath $0\``
+test "$Dir" || Dir=$(dirname "$(realpath $0)")
 expr "$Dir" : / >/dev/null && Dir=`Path $Dir`
+# shellcheck disable=SC2164	# Use 'cd ... || exit'
 test "$Dir" = '.' || cd "$Dir"
 #   Script's CWD is where it is located, but all messages assume PWD is top-level
 test -d $DebTop || { echo "$Prg: missing '$debTop' directory." >&2; exit 1; }
@@ -40,7 +49,7 @@ test -d $DebTop || { echo "$Prg: missing '$debTop' directory." >&2; exit 1; }
 #
 Versions=`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" "http://$PHPSITE/ChangeLog-8.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`
 test "$Versions" || echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
-Versions="$Versions$LF`ls -d $PhpTop[5-9]/[5-9].* | sed "s;^$PhpTop./;;"`"
+Versions="$Versions$LF`ls -d ${PhpTop}[5-9]/[5-9].* | sed "s;^$PhpTop./;;"`"
 Versions=`echo "$Versions" | sort -nru -t. -k 1,1 -k 2,2 -k 3,3`
 if [ -z "$Versions" ]; then
     echo "$Prg: empty list of known PHP versions ??" >&2
@@ -81,6 +90,7 @@ if [ -z "$split" ]; then
     exit 1
 fi
 eval "$split"
+# shellcheck disable=SC2154	# Var referenced but not assigned
 if echo "$Versions" | grep "^$Maj\.$Min\.$Rel$" >/dev/null; then
     PhpVer="$1"
     PhpDir=$PhpTop$Maj/$PhpVer
@@ -100,7 +110,7 @@ if [ "$2" ]; then
     else
 	echo "$Prg: unsupported Debian version \"$2\"" >&2
 	echo "Supported Debian versions (default $DebNum):" >&2
-	ls $DebTop | sort -n | while read v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
+	ls $DebTop | sort -n | while read -r v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
 	exit 1
     fi
 fi
@@ -174,7 +184,7 @@ if [ "$Cmt" ]; then
     elif [ "$mk" ]; then	# If $PhpDir was just created, restore $Log and set mtime
 	echo "$Log" >$Num; mt=y
     else			# If $Num missing in existing $PhpDir, set $Num = $Log + 1
-	echo `expr "$Log" + 1` >$Num
+	expr "$Log" + 1 >$Num
     fi
     test "$mt" && touch -d "`git show -s --format=%ci $Cmt`" $Num
 else				# No log yet: keep $Num or create it if needed
@@ -255,12 +265,14 @@ fi
 
 echo "Building the '$BUILD_IMG' image..."
 echo y | docker buildx prune >$RelDir/.logs/docker-build.out
+# shellcheck disable=SC2154	# Var referenced but not assigned
 if [ "$APT_SRC" ]; then
     $BinDir/aptsrv "$debDir" && AptSrv=y
 elif [ "$http_proxy" -a "$https_proxy" ]; then
     BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
 fi
 #   Variables come in order of their appearance in Dockerfile-build.in
+# shellcheck disable=SC2016	# Vars don't expand in single quotes
 DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $DEBNUM $CLI_DEPS $BUILD_NUM $USER $ADDUSER $APT_SRC $BUILD_TOP $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $RelDir/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG $BldArgs . >>$RelDir/.logs/docker-build.out 2>&1
 
 test -f ${TopDir}.norun && Opt='-ti '
@@ -319,6 +331,7 @@ fi
 
 echo "Building the '$TESTS_IMG' image..."
 #   Variables come in order of their appearance in Dockerfile-tests.in
+# shellcheck disable=SC2016	# Vars don't expand in single quotes
 DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $RelDir/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$RelDir/.logs/docker-tests.out 2>&1
 test "$AptSrv" && $BinDir/aptsrv 'stop'
 
