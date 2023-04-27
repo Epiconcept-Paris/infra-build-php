@@ -9,6 +9,26 @@ Php=${PhpTop}$Maj
 AddExtra()
 {
     # global Php Min BLDCOPY BUILD_TOP
+    local dir file mk
+
+    #   Handle specific patch files
+    dir="$Php/files/$Maj.$Min"
+    if [ -d $dir ]; then
+	mk=
+	for file in $dir/deb/*.patch
+	do
+	    test -f "$file" || continue	# *.patch pattern may not match
+	    test "$mk" || {
+		BLDCOPY="$BLDCOPY
+RUN mkdir $BUILD_TOP/files/deb"
+		mk=y
+	    }
+	    BLDCOPY="$BLDCOPY
+COPY $file $BUILD_TOP/files/deb"
+	done
+	test "$mk" && BLDCOPY="$BLDCOPY
+COPY $Php/hooks/files.sh $BUILD_TOP/hooks"
+    fi
 
     #	ereg legacy PHP extension
     #	From https://github.com/php/pecl-text-ereg
@@ -86,5 +106,5 @@ AddPECL APCu apcu APCu apcu
 #AddPECL APCu_bc apcu_bc APCu_bc apcu_bc
 AddPECL oauth oauth OAuth oauth
 AddPECL mcrypt mcrypt MCrypt mcrypt
-AddPECL ssh2 ssh2 SSH2 ssh2
+AddPECL ssh2 ssh2 SSH2 ssh2 1.3.1
 AddExtra
