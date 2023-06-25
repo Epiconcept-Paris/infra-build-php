@@ -1,0 +1,97 @@
+#!/bin/sh
+#
+#	chkdebs - Check packages for a given PHP build on a given Debian version
+#
+#	If no arg is given, check all visible builds
+#	If output to a TTY, green/red colors are used
+#	If output to a pipe or file, only missing tags are output, or non if OK
+#	Exit code is 0 if (last) dist OK, 1 otherwise
+#	The 'file' package is required
+#
+Prg=$(basename "$0")
+Dir=$(dirname "$0")
+cd "$Dir/.."
+
+#   Convert version string x.y.z to integer xxyyzz (0 padded)
+numver()
+{
+    local IFS val n
+
+    IFS="${2:-.}" val=0
+    for n in $1
+    do
+	expr "$n" : '[0-9][0-9]*' >/dev/null || { echo "numver: '$n' is not a number" >&2; exit 1; }
+	val=$((($val*${3:-100})+$n))
+    done
+    test $val -eq 0 && echo "numver: args '$*' return 0" >&2
+    echo "$val"
+}
+
+#   Check Debian $1 packages of PHP version $2 build $3
+chk_debs()
+{
+    #global Tty Red Grn Std
+    local ver dir tags tag mis n s
+
+    ver=$(numver $2)
+    dir="debian/$1/dist/$2-$3"
+    tags='cli pear mod'
+    test $ver -ge 50600 && tags="$tags fpm phpdbg"
+    test $ver -ge 70000 && tags="$tags mysql"
+    for tag in $tags
+    do
+	test "$tag" = 'pear' && g=$dir/epi-php-${tag}_*_all.deb || g=$dir/epi-php-*-${tag}_$2-$3+deb$1_*.deb
+	for f in $g; do
+	    test -s "$f" && file "$f" 2>&1 | grep "^$f:  *Debian binary package " >/dev/null && continue 2
+	done
+	test "$mis" && mis="$mis, $tag" || mis="$tag"
+    done
+    if [ "$Tty" ]; then
+	n=$(echo $tags | wc -w)
+	test "$mis" = '' && { echo "${Grn}$dir: all $n packages are OK$Std"; return 0; }
+	n=$(echo $mis | wc -w)
+	test $n -gt 1 && s='s'
+	echo "$Red$dir: $n package$s missing or invalid ($mis)$Std" >&2
+    else
+	test "$mis" != '' && echo "$mis"
+    fi
+    test "$mis" = ''
+}
+
+#   Main
+#
+#	Check env
+command -v file >/dev/null || { echo "$Prg: cannot find the 'file' command" >&2; exit 1; }
+test "$(LANG=C tty <&2)" = 'not a tty' || Tty=y
+
+#	Color
+if [ "$Tty" ]; then
+    Red="$(tput setaf 1)"
+    Grn="$(tput setaf 2)"
+    Std="$(tput setaf 7)"
+fi
+
+#	Check args
+if [ $# -eq 2 -o $# -eq 3 ]; then
+    #	Single dist
+    b="${3:-1}"	# Default build is 1 if only version given
+    d="$2-$b"	# Dist
+    test -f "debian/$1/name" || { echo "$Prg: cannot find 'debian/$1/name' in '$PWD'" >&2; exit 2; }
+    test -d "debian/$1/dist/$d" || { echo "$Prg: cannot find 'debian/$1/dist/$d' in '$PWD'" >&2; exit 2; }
+    chk_debs $1 $2 $b
+elif [ $# -eq 0 ]; then
+    #	All dists
+    for dv in $(cd 'debian'; echo [0-9] [0-9][0-9])
+    do
+	test -f "debian/$dv/mkre" || continue
+	for pd in debian/$dv/dist/[0-9].[0-9].*
+	do
+	    eval $(echo "$pd" | sed -r 's;debian/([0-9]+)/dist/([.0-9]+)-([0-9]+);d=\1 p=\2 b=\3;')
+	    chk_debs $d $p $b
+	done
+    done
+else
+    #	Invalid arguments (not 0 or 2 or 3)
+    echo "Usage: $Prg <debian-version> <php-version> [ <php-build ]" >&2
+    exit 1
+fi
