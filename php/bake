@@ -45,7 +45,7 @@ test "$Dir" = '.' || cd "$Dir"
 test -d $DebTop || { echo "$Prg: missing '$debTop' directory." >&2; exit 1; }
 
 #
-# Get existing PHP 5.x and 7.x versions
+# Get existing PHP 5.x, 7.x and 8.x versions
 #
 Versions=`curl -sSL "http://$PHPSITE/ChangeLog-5.php" "http://$PHPSITE/ChangeLog-7.php" "http://$PHPSITE/ChangeLog-8.php" | sed -nr 's;^.*<h[1-4]>Version +([^ ]+) *</h[1-4]>;\1;p'`
 test "$Versions" || echo "$Prg: unable to fetch the latest lists of PHP versions from \"$PHPSITE\"\n$Prg: using only the list of versions already known" >&2
@@ -96,7 +96,7 @@ if echo "$Versions" | grep "^$Maj\.$Min\.$Rel$" >/dev/null; then
     PhpDir=$PhpTop$Maj/$PhpVer
 else
     echo "$Prg: unknown PHP version \"$1\"" >&2
-    echo "Latest PHP 5/7 versions:" >&2
+    echo "Latest PHP 5,7,8 versions:" >&2
     echo "$Latest" | sed 's/^/    /' >&2
     exit 1
 fi
@@ -266,7 +266,7 @@ fi
 echo "Building the '$BUILD_IMG' image..."
 echo y | docker buildx prune >$RelDir/.logs/docker-build.out
 # shellcheck disable=SC2154	# Var referenced but not assigned
-if [ "$APT_SRC" ]; then
+if echo "$APT_SRC" | grep 'http://' >/dev/null; then
     $BinDir/aptsrv "$debDir" && AptSrv=y
 elif [ "$http_proxy" -a "$https_proxy" ]; then
     BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
@@ -277,7 +277,7 @@ DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$U
 
 test -f ${TopDir}.norun && Opt='-ti '
 if [ "$http_proxy" -a "$https_proxy" ]; then
-    test "$APT_SRC" || Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
+    echo "$APT_SRC" | grep 'http://' >/dev/null || Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
 fi
 if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
     Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$BUILD_TOP/dist $Env --name $BUILD_NAME --rm $BUILD_IMG"

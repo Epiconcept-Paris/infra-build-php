@@ -111,7 +111,7 @@ echo "Building the '$TOOLS_IMG' image..."
 mkdir -p $Logs
 echo y | docker buildx prune >$Logs/docker-build.out
 # shellcheck disable=SC2154	# Var referenced but not assigned
-if [ "$APT_SRC" ]; then
+if echo "$APT_SRC" | grep 'http://' >/dev/null; then
     $BinDir/aptsrv "$debDir" && AptSrv=y
 elif [ "$http_proxy" -a "$https_proxy" ]; then
     BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"

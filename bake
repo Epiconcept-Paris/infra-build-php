@@ -102,7 +102,7 @@ do
     dir=`dirname $f`
     test -f $dir/mkre || continue
     deb=`basename $dir`
-    test -f $dir/Dockervars.sh && grep '^APT_SRC=.' $dir/Dockervars.sh >/dev/null && AptLst="$AptLst$deb "
+    test -f $dir/Dockervars.sh && grep '^APT_SRC=.*http://' $dir/Dockervars.sh >/dev/null && AptLst="$AptLst$deb "
     name=`cat $f`
     DebVer="$DebVer$Sep$deb"
     DebLst="$DebLst`printf "%2d ($name)" $deb`$LF"
