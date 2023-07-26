@@ -4,7 +4,7 @@
 #
 #	If no arg is given, check all visible builds
 #	If output to a TTY, green/red colors are used
-#	If output to a pipe or file, only missing tags are output, or non if OK
+#	If output to a pipe or file, only missing tags are output, or none if OK
 #	Exit code is 0 if (last) dist OK, 1 otherwise
 #	The 'file' package is required
 #
@@ -44,7 +44,8 @@ chk_debs()
 	for f in $g; do
 	    test -s "$f" && file "$f" 2>&1 | grep "^$f:  *Debian binary package " >/dev/null && continue 2
 	done
-	test "$mis" && mis="$mis, $tag" || mis="$tag"
+	test "$mis" && { mis="$mis,"; test "$Tty" && mis="$mis "; }
+	mis="$mis$tag"
     done
     if [ "$Tty" ]; then
 	n=$(echo $tags | wc -w)
@@ -62,9 +63,9 @@ chk_debs()
 #
 #	Check env
 command -v file >/dev/null || { echo "$Prg: cannot find the 'file' command" >&2; exit 1; }
-test "$(LANG=C tty <&2)" = 'not a tty' || Tty=y
+tty <&2 >/dev/null && Tty=y
 
-#	Color
+#   Color if stderr is a TTY
 if [ "$Tty" ]; then
     Red="$(tput setaf 1)"
     Grn="$(tput setaf 2)"
