@@ -39,8 +39,10 @@ Base='epi-php'
 Arch='amd64'
 LF='
 '
-ColRed=`tput setaf 1`
-ColStd=`tput setaf 7`
+tty <&2 >/dev/null && {
+    ColRed=`tput setaf 1`
+    ColStd=`tput setaf 7`
+}
 
 #
 #    Parse args

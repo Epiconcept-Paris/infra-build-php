@@ -22,10 +22,12 @@ PECLGET="pecl.php.net/get"
 Ext=.tar.bz2
 LF='
 '
-tty <&1 >/dev/null && Opt='-ti '
-ColRed=`tput setaf 1`
-ColGrn=`tput setaf 2`
-ColStd=`tput setaf 7`
+tty <&2 >/dev/null && {
+    Opt='-ti '
+    ColRed=`tput setaf 1`
+    ColGrn=`tput setaf 2`
+    ColStd=`tput setaf 7`
+}
 
 Prg=php/`basename $0`
 Dir=`dirname $0`

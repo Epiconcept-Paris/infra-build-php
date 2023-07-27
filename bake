@@ -62,7 +62,7 @@ for dir in $BinDir $DebTop $PhpTop $TlsTop $MulTop
 do
     test -d $dir || { echo "$Prg: missing '$dir' directory." >&2; exit 2; }
 done
-tty <&1 >/dev/null && trap '' HUP
+tty <&2 >/dev/null && trap '' HUP
 
 DebDir()
 {
@@ -220,7 +220,7 @@ if [ "$1" = 'ver' -o "$1" = 'latest' -o "$1" = 'fetch' ]; then
 #
 elif [ "$1" = 'ls' ]; then
     Red='!'
-    tty <&1 >/dev/null && { Red=`tput setaf 1`; Grn=`tput setaf 2`; Std=`tput setaf 7`; }
+    tty <&2 >/dev/null && { Red=`tput setaf 1`; Grn=`tput setaf 2`; Std=`tput setaf 7`; }
     # shellcheck disable=SC2046	# Quote to prevent word splitting
     dirs=`eval ls -dv $DebTop/$(DebDir $DebVer)/{dist/{[5-9].*,tools},multi} 2>/dev/null`
     test "$dirs" && echo "Current distributions:"
