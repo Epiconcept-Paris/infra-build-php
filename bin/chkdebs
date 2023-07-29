@@ -31,8 +31,9 @@ numver()
 chk_debs()
 {
     #global Tty Red Grn Std
-    local ver dir tags tag mis n s
+    local ver dir tags tag mis g f p n s
 
+    pfx='epi-php'
     ver=$(numver $2)
     dir="debian/$1/dist/$2-$3"
     tags='cli pear mod'
@@ -40,10 +41,17 @@ chk_debs()
     test $ver -ge 70000 && tags="$tags mysql"
     for tag in $tags
     do
-	test "$tag" = 'pear' && g=$dir/epi-php-${tag}_*_all.deb || g=$dir/epi-php-*-${tag}_$2-$3+deb$1_*.deb
+	test "$tag" = 'pear' && g=$dir/$pfx-pear_*_all.deb || g=$dir/$pfx-*-${tag}_$2-$3+deb$1_amd64.deb
+	p=0
 	for f in $g; do
-	    test -s "$f" && file "$f" 2>&1 | grep "^$f:  *Debian binary package " >/dev/null && continue 2
+	    test -s "$f" || continue
+	    file "$f" 2>&1 | grep "^$f:  *Debian binary package " >/dev/null && p=$((p+1))
 	done
+	if [ "$p" -gt 1 ]; then
+	    echo -n "$Prg WARNING: more than 1 match:"
+	    echo '' $g | sed "s; ;\n    ;g" >&2
+	fi
+	test "$p" -gt 0 && continue
 	test "$mis" && { mis="$mis,"; test "$Tty" && mis="$mis "; }
 	mis="$mis$tag"
     done
