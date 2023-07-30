@@ -73,7 +73,7 @@ do
 	    done
 	    if [ "$diff" ]; then
 		echo "Dist $d differs from $DebDir/$dv/$pv - rename/delete that if needed"
-		test $XC -eq 0 && XC=1
+		#test $XC -eq 0 && XC=1
 	    else
 		echo "Dist $d is already saved"
 		test "$pv" != 'multi' -a "$pv" != 'tools' && rmdkim "$dv" "$pv"
@@ -89,7 +89,7 @@ do
 	    if [ $xc -eq 0 ]; then
 		test "$pv" != 'multi' -a "$pv" != 'tools' && rmdkim "$dv" "$pv"
 	    else
-		xc=1
+		test $XC -eq 0 && XC=$xc
 	    fi
 	fi
     done

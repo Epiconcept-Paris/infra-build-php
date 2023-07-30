@@ -11,7 +11,7 @@
 #	    MAILTO='c.girard@epiconcept.fr'
 #	    MAILFROM='cty1@epiconcept.fr'
 #
-#	    20 1 * * * cdt infra-build-php/update.sh 3>&1 | mail -Es \
+#	    20 1 * * * cdt infra-build-php/update.sh | mail -Es \
 #		"$(hostname) PHP build(s) of new version(s)" -a "From: $MAILFROM" $MAILTO
 #
 #	It checks for new PHP versions.
@@ -51,21 +51,18 @@ odate()
 #   Build $1 (dev/prod) PHP version $2 for Debian $3 (1st and 2nd instances)
 build()
 {
-    #global Bake
-    local dir pipe ff xc mis
+    #global Bake Fifo
+    local dir ff xc mis
 
     echo "Building $1 PHP version $2 for Debian $3...$CR"
     #	We use a fifo to get $Bake's exit code even though we process it's stdout
     dir="debian/$3/dist/$2-1"
-    pipe="$dir/.pipe"
     ff="$dir/.fail"
     mkdir -p $dir
     rm -f "$ff"
-    mkfifo $pipe
-    <$pipe sed -u 's/$//' | tee "$dir/mk.out" | sed -u 's/$//' &
-    $Bake $2 $3 >$pipe 2>&1
+    <$Fifo sed -u 's/$//' | tee "$dir/mk.out" | sed -u 's/$//' &
+    $Bake $2 $3 >$Fifo 2>&1
     xc=$?
-    rm -f $pipe
     if [ $xc -eq 0 ]; then
 	mis=$(bin/chkdebs $3 $2)
 	test "$mis" && {
@@ -101,7 +98,7 @@ bldnum()
     echo "php/$(echo "$1" | awk -F. '{print $1}')/$1/BUILD_NUM"
 }
 
-#   Instance 1 (ran as dev (non-'php') user)
+#   Phase 1 - Build 'dev' packages (ran as (non-'php') user)
 phase1()
 {
     local debs phps blds res fail prod xc dv pv bf bn dd
@@ -184,49 +181,56 @@ phase1()
     #	There MUST be a symlink $PhpDir to the actual 'prod' git repo
     #
     test "$prod" && res="$res $(sudo -iu 'php' "$PhpDir/$Prg" $prod)"
-    echo "res=\"$res\""
+    echo "Res=\"$res\"$CR"
     report $res >&3
 }
 
-#   Phase 2 (run as 'php' user)
-#   All stdout redirected to stderr as stdout is for res return
+#   Phase 2 - Build 'prod' packages (ran as 'php' user)
+#   Final res return is done on fd:3
 phase2()
 {
     local arg pv dv res
 
     test "$#" -eq 0 && { echo "$Prg: missing php:deb arg(s)" >&3; exit 1; }
-    git pull | sed 's/$//' >&2
+    res="plog:$Log"
+    git pull 2>&1 | sed 's/$//'
 
-    res=
     #	Build PHP versions
     for arg in "$@"
     do
 	eval $(echo $arg | awk -F: '{printf("pv=%s dv=%s", $1, $2)}')
-	#echo "arg=$arg pv=$pv dv=$dv" >&2
-	build 'prod' $pv $dv >&2
+	#echo "arg=$arg pv=$pv dv=$dv$CR"
+	build 'prod' $pv $dv
 	xc=$?
-	test "$res" && res="$res "
-	res="${res}prod:$pv:$dv:$xc"
+	res="$res prod:$pv:$dv:$xc"
     done
+
     #	Save dists (with possible errors)
-    ./savedist.sh >&2
+    <$Fifo sed -u 's/$//' &
+    ./savedist.sh >$Fifo 2>&1
     res="$res save:$?"
+
     #	Send packages to files.epiconcept.fr
-    ./send.sh >&2
+    <$Fifo sed -u 's/$//' &
+    ./send.sh >$Fifo 2>&1
     res="$res send:$?"
-    echo "$res"
+
+    echo "$res" >&3
 }
 
 #   Generate the report email text (all stdout goes to fd:3)
 report()
 {
-    #global Log
-    local pvs res bt pv dv xc bd ff mP mB mS mF mL mis
+    #global Dir Log Prg PhpDir
+    local dir pvs res bt pv dv xc bd ff mE mP mB mS mF mL mis
+
+    dir="$(basename "$Dir")"
+    mE="===== See %s for output and errors of %s"
+    printf "$mE\n" "$dir/$Log" "$dir/$Prg"
 
     #	Arguments are <php-vers>[,<php-vers>] | '-' <result>[ result]...
     if [ "$1" != '-' ]; then
 	pvs="$1"
-	echo "See $Log for output and errors of $Prg"
 	if echo "$pvs" | grep ',' >/dev/null; then
 	    echo "New PHP versions $(echo $pvs | sed 's/,/, /g') were found !"	# Multiple
 	else
@@ -241,6 +245,7 @@ report()
     #   res format:
     #
     #	dev:$pv:$dv:$xc
+    #	plog:$lf
     #	prod:$pv:$dv:$xc
     #	fail:$pv:$dv
     #	save:$xc
@@ -275,6 +280,9 @@ report()
 		    echo "File '$ff' disappeared ?" >&2
 		fi
 		;;
+
+	    plog)   printf "\n$mE\n" "$PhpDir/$xc" "$PhpDir/$Prg";;
+
 	    dev|prod)
 		if [ "$xc" -eq 0 ]; then
 		    ff="$bd/.fail"
@@ -293,7 +301,7 @@ report()
 		;;
 
 	    save|send)
-		test "$bt" = 'save' && echo -n "$mD" || echo -n "$mR"
+		test "$bt" = 'save' && echo -n "\n$mD" || echo -n "$mR"
 		if [ "$xc" -ne 0 ]; then
 		    echo " $mF (xc=$xc)"
 		else
@@ -322,9 +330,12 @@ xmp=42	# exit-code for missing packages
 #   Setup Log and fds
 LogDir="$(basename $Prg .sh).log"
 Log="$LogDir/$(date '+%Y-%m-%d')"
+Fifo="$LogDir/.fifo"
 mkdir -p $LogDir
+test -p "$Fifo" || mkfifo "$Fifo"
 #   All script stdout and stderr will go to $Log
 #   To put message in the final email, output to fd:3
+exec 3>&1	# Save stdout
 exec >$Log 2>&1
 date "+===== %Y-%m-%d %H:%M:%S ===== User: $Usr =====$CR"
 #date "+===== %Y-%m-%d %H:%M:%S =====" >&3	# DBG

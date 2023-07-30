@@ -10,6 +10,7 @@ php/[5-9]/[5-9].*/php-*.tar.bz2
 php/[5-9]/[5-9].*/php-*.files
 tests/*/dist
 archive/
+update.log/
 work/
 log
 debs

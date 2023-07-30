@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+#	route - Add/del default route
+#
+#	Usage:
+#		sudo bin/defroute add
+#		sudo bin/defroute del
+#		bin/defroute
+#
+#	Config: put the following 'php' file in /etc/sudoers.d:
+#		# Allow 'php' to run bin/defroute without password
+#		php ALL = (root) NOPASSWD: /home/php/php-prod/bin/defroute
+#
+Prg=$(basename "$0")
+Dir=$(dirname "$0")
+cd "$Dir/.."
+
+must_su()
+{
+    #global Prg
+    test $(id -u) -eq 0 || { echo "$Prg: must be called as 'sudo $0'" >&2; exit 1; }
+}
+
+GwIP=$(host -N 2 vgw.admin2 | awk '{print $4}')
+Curr=$(ip route list | awk '$1 == "default" {print $3}')
+case "$1" in
+    add)    must_su; test "$Curr" || ip route add default via $GwIP ;;
+    del)    must_su; test "$Curr" && ip route del default via $GwIP ;;
+    '')	    test "$Curr" && echo "$Curr" || exit 1 ;;
+    *)	    echo "Usage: $Prg [ add | del ]" >&2; exit 1 ;;
+esac

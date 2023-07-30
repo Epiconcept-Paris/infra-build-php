@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+#	run - Check SSH command and forward authorized ones
+#
+#	This script must be copied to epiconcept_build@files.epiconcept.fr:.ssh
+#
+#	A passphrase-less RSA key-pair must be generated on php@cty1 by
+#	the command:    cd .ssh; ssh-keygen -b 2048 -t rsa -f id_rsa
+#
+#	The public key id_rsa.pub shoud be appended to .ssh/authorized_keys 
+#	on epiconcept_build@files.epiconcept.fr, with the string
+#		'command=".ssh/run" '
+#	in front of the text of the public-key, like this:
+#		command=".ssh/run" ssh-rsa AAAAB3N...(rest of the key)
+#	See 'man authorized_keys' for details
+#
+Log='ssh-cmds'
+date '+===== %Y-%m-%d %H:%M:%S =====' >>$Log
+set | grep SSH_ >>$Log
+case "$SSH_ORIGINAL_COMMAND" in
+    date|'rsync '*|/usr/local/bin/apt_deploy.sh) exec $SSH_ORIGINAL_COMMAND ;;
+    #'scp '*)	exec $SSH_ORIGINAL_COMMAND ;;
+esac
+echo "Command '$SSH_ORIGINAL_COMMAND' is not authorized"
