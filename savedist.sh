@@ -25,6 +25,8 @@ test -d "$DebDir" || { echo "$NoDir '$(basename "$DebDir")' in '$(dirname "$PWD"
 #   Return deb-name given deb-num
 debname()
 {
+    local n
+
     case $1 in
 	 8) n='jessie';;
 	 9) n='stretch';;
@@ -39,12 +41,13 @@ debname()
 #   Remove docker images for Debian $1, PHP $2
 rmdkim()
 {
-    local dn
+    #global DkIms
+    local tag type img
 
-    dn="$(debname "$1")-$(expr "$2" : '\([^-]*\)')"
+    tag="$(debname "$1")-$(expr "$2" : '\([^-]*\)')"
     for type in 'build' 'tests'
     do
-	img="epi-$type-php:$dn"
+	img="epi-$type-php:$tag"
 	echo "$DkIms" | grep "^$img$" >/dev/null && docker rmi "$img" >/dev/null 2>&1 && echo "Removed docker image $img"
     done
 }
@@ -72,7 +75,7 @@ do
 		cmp "$d/$f" "$DebDir/$dv/$pv/$f" >/dev/null 2>&1 || { diff='y'; break; }
 	    done
 	    if [ "$diff" ]; then
-		echo "Dist $d differs from $DebDir/$dv/$pv - rename/delete that if needed"
+		echo "Dist $d differs from $DebDir/$dv/$pv - mv/rm the latter as needed"
 		#test $XC -eq 0 && XC=1
 	    else
 		echo "Dist $d is already saved"
