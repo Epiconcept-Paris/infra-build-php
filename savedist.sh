@@ -11,11 +11,21 @@ Dir="$(dirname "$0")"
 cd "$Dir"
 
 DebDir='../php-debs'
+command -v docker >/dev/null && DkIms="$(docker images | awk '$1 ~ /^epi-[^-]+-php$/ {print $1 ":" $2}')"
 NoDir="$Prg: cannot find directory"
-DkIms="$(docker images | awk '$1 ~ /^epi-(build|tests)-php$/ {print $1 ":" $2}')"
 #echo "$DkIms"; exit 0	# DBG
 
-test "$*" && echo "NOTE: arguments '$*' to $Prg will be ignored" >&2
+toMv=
+toRm=
+Cmt="# Pipe this to /bin/sh (after editing if needed)\n"
+for opt in "$@"
+do
+    case "$opt" in
+	mv)	toMv="$Cmt" ;;
+	rm)	toRm="$Cmt" ;;
+	*)	echo "Usage: $Prg [ rm | mv ]" >&2; exit 1;;
+    esac
+done
 test "$Usr" = 'php' || { echo "$Prg: for the 'php' user only" >&2; exit 1; }
 test -d 'debian' || { echo "$NoDir 'debian' in '$PWD'" >&2; exit 1; }
 
@@ -44,12 +54,28 @@ rmdkim()
     #global DkIms
     local tag type img
 
+    test "$DkIms" || return
     tag="$(debname "$1")-$(expr "$2" : '\([^-]*\)')"
     for type in 'build' 'tests'
     do
 	img="epi-$type-php:$tag"
 	echo "$DkIms" | grep "^$img$" >/dev/null && docker rmi "$img" >/dev/null 2>&1 && echo "Removed docker image $img"
     done
+}
+
+#   Find an archive name for dir $1
+arch()
+{
+    local d n
+
+    n=0
+    while [ "$n" -lt 100 ]
+    do
+	d="$1:$(printf '%02d' $n)"
+	test -d "$d" || { echo "$d"; return; }
+	n=$((n + 1))
+    done
+    echo "$1:--"
 }
 
 XC=0
@@ -62,7 +88,7 @@ do
 	bad=
 	case "$pv" in
 	    [5-9].*)	eval "$(echo "$pv" | sed -r 's/^([.0-9]+)-([0-9]+)$/phpver=\1 bldnum=\2/')"
-			bin/chkdebs $dv "$phpver" "$bldnum" >/dev/null 2>&1 || bad=y
+			bin/chkdebs "$dv" "$phpver" "$bldnum" >/dev/null 2>&1 || bad=y
 			;;
 	    tools)	test -f "$d"/epi-tools-waitpid_*.deb || bad=y;;
 	    multi)	test -d "$d"/pkgs -a -d "$d"/logs || bad=y;;
@@ -75,8 +101,19 @@ do
 		cmp "$d/$f" "$DebDir/$dv/$pv/$f" >/dev/null 2>&1 || { diff='y'; break; }
 	    done
 	    if [ "$diff" ]; then
-		echo "Dist $d differs from $DebDir/$dv/$pv - mv/rm the latter as needed"
-		#test $XC -eq 0 && XC=1
+		if [ "$toMv" ]; then
+		    new="$(arch "$DebDir/$dv/$pv")"
+		    if [ "$new" != "$DebDir/$dv/$pv:--" ]; then
+			toMv="${toMv}mv -v \"$DebDir/$dv/$pv\" \"$new\"\n"
+		    else
+			echo "Cannot create 101st archive of '$DebDir/$dv/$pv'" >&2
+		    fi
+		elif [ "$toRm" ]; then
+		    toRm="${toRm}rm -rf \"$DebDir/$dv/$pv\"\n"
+		else
+		    echo "Dist $d differs from $DebDir/$dv/$pv - mv/rm the latter as needed"
+		    #test $XC -eq 0 && XC=1
+		fi
 	    else
 		echo "Dist $d is already saved"
 		test "$pv" != 'multi' -a "$pv" != 'tools' && rmdkim "$dv" "$pv"
