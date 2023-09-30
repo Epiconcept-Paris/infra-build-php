@@ -224,6 +224,7 @@ phase1()
     do
 	test -f "debian/$dv/name" || { echo "$Prg: no 'name' in 'debian/$dv' ?$CR" >&2; continue; }
 	test -f "debian/$dv/mkre" || { echo "$Prg: no 'mkre' in 'debian/$dv' ?$CR" >&2; continue; }
+	test -f "debian/$dv/.noupd" && continue
 	test "$debs" && debs="$debs $dv" || debs="$dv"
     done
 
@@ -331,6 +332,8 @@ phase2()
     ./send.sh >$Fifo 2>&1
     res="$res send:$?"
 
+    #   Remember that we saved initial stdout as fd=3
+    #	If we did not >&3, the output would go to $Log
     echo "$res" >&3
 }
 

@@ -1,6 +1,7 @@
 .debug
 .norun
 php/.notest
+debian/*/.noupd
 debian/*/dist
 debian/*/multi
 debian/*/repo
