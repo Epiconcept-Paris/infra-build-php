@@ -45,6 +45,11 @@ COPY $Php/files/mysql.tar.gz $BUILD_TOP/files
 COPY $Php/files/mysql.patch $BUILD_TOP/files
 COPY $Php/hooks/mysql.sh $BUILD_TOP/hooks"
 
+    #	OpenSSL PHP extension (RSA_SSLV23_PADDING not #defined)
+    BLDCOPY="$BLDCOPY
+COPY $Php/files/openssl.patch $BUILD_TOP/files
+COPY $Php/hooks/openssl.sh $BUILD_TOP/hooks"
+
     #	PEAR man pages
     #	From http://pear.php.net/package/PEAR_Manpages/download (see Download link)
     #	Latest: http://download.pear.php.net/package/PEAR_Manpages-1.10.0.tgz
