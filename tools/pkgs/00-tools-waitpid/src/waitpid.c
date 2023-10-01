@@ -9,6 +9,18 @@ static void term(int sig)
     printf("Received signal %d\n", sig);
 }
 
+static void sig_intr(int sig, int flag)
+{
+    struct sigaction act;
+
+    sigaction(sig, NULL, &act);
+    if (flag)
+        act.sa_flags &= ~SA_RESTART;
+    else
+        act.sa_flags |= SA_RESTART;
+    sigaction(sig, &act, NULL);
+}
+
 int main()
 {
     pid_t   pid;
@@ -17,7 +29,7 @@ int main()
     puts("Waiting for container stop...");
     fflush(stdout);
     signal(SIGTERM, term);
-    siginterrupt(SIGTERM, 1);
+    sig_intr(SIGTERM, 1);
     while ((pid = waitpid(-1, &status, 0)) > 0)
     {
 	printf("Process with PID=%d ", pid);
