@@ -1,5 +1,5 @@
 # infra-build-php
-Fournil à paquets PHP spécifiques Epiconcept sur Debian 8 à 11 (jessie/stretch/buster/bullseye)
+Fournil à paquets PHP spécifiques Epiconcept sur Debian 8 à 12 (jessie/stretch/buster/bullseye/bookworm)
 
 ## Installation
 
@@ -99,7 +99,7 @@ Une fois qu'au moins deux versions de PHP (>= 5.6) ont été compilées, différ
 ```
 ./bake [ <version-Debian> ] multi <version-PHP> [ <version-PHP> ...]
 ```
-_\<version-Debian>_ est sous la forme numérique _n_, par défaut toutes les versions depuis `stretch` (Debian 9) jusqu'à la plus récente gérée (pour l'instant, la version 11 `bullseye`).
+_\<version-Debian>_ est sous la forme numérique _n_, par défaut toutes les versions depuis `stretch` (Debian 9) jusqu'à la plus récente gérée (pour l'instant, la version 12 `bookworm`).
 
 _\<version-PHP>_ est sous une des trois formes _Maj_**.**_Min_, _Maj_**.**_Min_**.**_Rel_ ou  _Maj_**.**_Min_**.**_Rel_**-**_Bld_, où _Bld_ est le numéro du build de la version PHP, qui sera lancé s'il n'existe pas.\
 Exemple :

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#	icu-config - Replacement for removed icu-config on Debian 10 / 11
+#	icu-config - Replacement for removed icu-config on Debian 10 / 11 / 12
 #
 #	This is part of an abandonned attempt to compile php-intl in 5.6 for
 #	Debian 10 / 11. It was left there mostly for the --version arg
