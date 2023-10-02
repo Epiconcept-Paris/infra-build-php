@@ -194,7 +194,8 @@ if [ -d $Bld/hooks ]; then
 	test -f build/buildcheck.sh && grep ' need autoconf version 2.13 or' build/buildcheck.sh >/dev/null && export PHP_AUTOCONF='/usr/bin/autoconf2.13'
 	mv configure configure0
 	test "$Dbg" && cp -p configure0 $Debug
-	su -c "./buildconf --force >$Logs/buildconf.out" $USER
+	test -f configure.ac.orig && su -c 'echo -n "Running autoupdate... " && autoupdate && echo "Done."' $USER
+	su -c "./buildconf --force >$Logs/buildconf.out 2>&1" $USER
 	test "$Dbg" && cp -p configure $Debug
 	mv $ConfigHelp $Logs/config0-help.out
 	./configure --help >$ConfigHelp
