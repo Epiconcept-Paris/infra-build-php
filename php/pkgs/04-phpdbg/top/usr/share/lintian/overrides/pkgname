@@ -1,2 +1,2 @@
-#   E: Our phpdbg may include libgd/file/sqlite on purpose
-%NAME%: embedded-library usr/bin/phpdbg%MM%: *
+#   E: Our phpdbg may include file/libgd/sqlite on purpose
+%NAME%: embedded-library *usr/bin/phpdbg%MM%*

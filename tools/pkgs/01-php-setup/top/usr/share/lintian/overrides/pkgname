@@ -1,5 +1,8 @@
 #   E: We want space/ as toplevel-dir
-%NAME%: non-standard-toplevel-dir space/
+%NAME%: non-standard-toplevel-dir *space/*
 
 #   W: As our files are in /space
-%NAME%: file-in-unusual-dir space/*
+%NAME%: file-in-unusual-dir *space/*
+
+#   W: No systemd-timer for us (yet)
+%NAME%: missing-systemd-timer-for-cron-script *

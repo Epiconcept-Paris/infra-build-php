@@ -1,2 +1,5 @@
-#   E: Our PHP fpm may include libgd/file/sqlite on purpose
-%NAME%: embedded-library usr/sbin/php%MM%-fpm: *
+#   E: Our PHP fpm may include file/libgd/sqlite on purpose
+%NAME%: embedded-library *usr/sbin/php%MM%-fpm*
+
+#   E: Should this be corrected ?
+%NAME%: depends-on-obsolete-package Depends: lsb-base*

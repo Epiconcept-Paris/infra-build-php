@@ -1,8 +1,8 @@
-#   E: Our PHP module may include libgd/file/pcre3/sqlite on purpose
-%NAME%: embedded-library usr/lib/apache2/modules/libphp%MMJ%.so: *
+#   E: Our PHP module may include file/libgd/pcre3/sqlite on purpose
+%NAME%: embedded-library *usr/lib/apache2/modules/libphp%MMJ%.so*
 
 #   E: This is due to our custom module naming
-%NAME%: apache2-module-does-not-ship-load-file libphp%MMJ%
+%NAME%: apache2-module-does-not-ship-load-file *libphp%MMJ%*
 
 #   W: We want our custom package naming style
-%NAME%: non-standard-apache2-module-package-name %NAME% != libapache2-libphp%MMJ%
+%NAME%: non-standard-apache2-module-package-name %NAME% != libapache2-libphp%MMJ%*
