@@ -109,17 +109,17 @@ do
 			echo "Cannot create 101st archive of '$DebDir/$dv/$pv'" >&2
 		    fi
 		elif [ "$toRm" ]; then
-		    toRm="${toRm}rm -rf \"$DebDir/$dv/$pv\"\n"
+		    toRm="${toRm}rm -r \"$DebDir/$dv/$pv\"\n"
 		else
-		    echo "Dist $d differs from $DebDir/$dv/$pv - mv/rm the latter as needed"
+		    echo "Dist $d differs from $DebDir/$dv/$pv - mv/rm the latter as needed" >&2
 		    #test $XC -eq 0 && XC=1
 		fi
 	    else
-		echo "Dist $d is already saved"
+		echo "Dist $d is already saved" >&2
 		test "$pv" != 'multi' -a "$pv" != 'tools' && rmdkim "$dv" "$pv"
 	    fi
 	else
-	    echo "Saving $d"
+	    echo "Saving $d" >&2
 	    if [ "$pv" = 'multi' ]; then
 		tar Ccf "debian/$dv" - "$pv" | tar Cxf "$DebDir/$dv" -
 	    else
@@ -134,4 +134,6 @@ do
 	fi
     done
 done
+test "$toRm" && echo "$toRm"
+test "$toMv" && echo "$toMv"
 exit $XC
