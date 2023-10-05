@@ -94,6 +94,7 @@ do
 	    multi)	test -d "$d"/pkgs -a -d "$d"/logs || bad=y;;
 	esac
 	test "$bad" && { echo "Skipping $d (incomplete build)" >&2; continue; }
+	test -d "$DebDir/$dv" || mkdir "$DebDir/$dv"
 	if [ -d "$DebDir/$dv/$pv" ]; then
 	    diff=
 	    for f in $(find "$d" -type f | sed "s;^$d/;;")
