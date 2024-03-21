@@ -16,7 +16,8 @@
 # shellcheck disable=SC2028	# echo may not expand escape sequences
 #
 PHPSITE='fr.php.net'
-PHPARCH="museum.php.net/php5"
+PHPARCH5="museum.php.net/php5"
+PHPARCH7="museum.php.net/php7"
 # shellcheck disable=SC2034	# Var appears unused
 PECLGET="pecl.php.net/get"
 Ext=.tar.bz2
@@ -155,7 +156,7 @@ if [ -s $PhpSrc ]; then		# $PhpSrc exists: check it
     ChkSrc $PhpSrc $PhpLst $PhpVer || exit 1
 else
     echo "Fetching $Tbz..."
-    Urls="http://$PHPSITE/get/$Tbz/from/this/mirror http://$PHPARCH/$Tbz"
+    Urls="http://$PHPSITE/get/$Tbz/from/this/mirror http://$PHPARCH7/$Tbz http://$PHPARCH5/$Tbz"
     for Url in $Urls
     do
 	echo "Trying from \"$Url\"..."
@@ -266,7 +267,7 @@ if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
 fi
 
 echo "Building the '$BUILD_IMG' image..."
-echo y | docker buildx prune >$RelDir/.logs/docker-build.out
+man docker | grep buildx >/dev/null && echo y | docker buildx prune >$RelDir/.logs/docker-build.out
 # shellcheck disable=SC2154	# Var referenced but not assigned
 if echo "$APT_SRC" | grep 'http://' >/dev/null; then
     $BinDir/aptsrv "$debDir" && AptSrv=y
