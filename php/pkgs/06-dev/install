@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+#	06-dev/install - Install php-dev files to $Top
+#
+Tgts=	# Re-init after 00-cli use
+for tgt in install-build install-programs install-headers install-pdo-headers
+do
+    grep "^install_targets = .* $tgt" Makefile >/dev/null && Tgts="$Tgts $tgt"
+done
+test "$Dbg" && echo "Tgts=\"$Tgts\""
+INSTALL_ROOT=$Top make$Tgts >$Logs/make-install_$Pkg.out 2>&1
+
+find $Top -type d -empty -delete -print | sed 's/^/find: removing empty directory /' >$Logs/rmed_$Pkg.out
+find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
+chmod +x $Top/usr/lib/php/build/run-tests.php
+
+if [ "$MM" ]; then
+    (cd $Top/usr/bin
+     mv php-config php-config$MM
+     mv phpize phpize$MM
+     cd $Top/$ManDir/man1
+     mv php-config.1.gz php-config$MM.1.gz
+     mv phpize.1.gz phpize$MM.1.gz
+    )
+    sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;g" -e "s/%PRI%/`echo $MM | tr -d .`/" $Top/DEBIAN/postinst
+    sed -i "s/%MM%/$MM/g" $Top/DEBIAN/prerm
+else
+    #   Declare as Conflicts all other supported versions
+    for v in $SupVer
+    do
+	test "$v" != "$MajMin" && Cfl="$Cfl, $Base-$v-$Pkg"
+    done
+    rm -v $Top/DEBIAN/p* >>$Logs/rmed_$Pkg.out
+fi
+sed -i "s/%CFL%/$Cfl/" $Top/DEBIAN/control
+test "$Dbg" && cp $Top/DEBIAN/control $Debug/control_$Pkg

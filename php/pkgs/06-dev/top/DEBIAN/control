@@ -1,0 +1,11 @@
+Package: %NAME%
+Version: %VERSION%
+Architecture: amd64
+Maintainer: Cedric <c.girard@epiconcept.fr>
+Depends: php-cli, %DEPS%
+Provides: php-dev
+Conflicts: php5-dev, php7.0-dev, php7.1-dev, php7.2-dev, php7.3-dev, php7.4-dev, php8.1-dev, php8.2-dev%CFL%
+Section: admin
+Priority: optional
+Description: PHP module development files by Epiconcept
+ This package provides the PHP include headers and build utilities & scripts

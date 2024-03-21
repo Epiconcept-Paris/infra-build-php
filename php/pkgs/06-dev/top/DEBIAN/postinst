@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "configure" ]; then
+    update-alternatives --install /usr/bin/php-config php-config /usr/bin/php-config%MM% %PRI% --slave /usr/share/man/man1/php-config.1.gz php-config.1.gz /usr/share/man/man1/php-config%MM%.1.gz
+    update-alternatives --install /usr/bin/phpize phpize /usr/bin/phpize%MM% %PRI% --slave /usr/share/man/man1/phpize.1.gz phpize.1.gz /usr/share/man/man1/phpize%MM%.1.gz
+fi
