@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+#	ext - Compile PHP extensions
+#
+Prg=$(basename "$0")
+Etc='/usr/local/etc'
+Cnf="$Etc/$Prg.conf"
+tty <&2 >/dev/null && {
+    Bold=$(tput bold)
+    Norm=$(tput sgr0)
+}
+
+#   Checks
+command -v php >/dev/null || { echo "$Prg: no PHP version installed; run 'setup <Maj>.<min>'" >&2; exit 2; }
+PhpVer=$(expr $(readlink /etc/alternatives/php) : '/usr/bin/php\(.*\)')
+test -s "$Cnf" || { echo "$Prg: cannot find '$Cnf'" >&2; exit 1; }
+
+test "$1" || {
+    echo "Usage: $Prg <PECL-extension>\nKnown extensions:" >&2
+    awk -F'\t' '$1 !~ "^#"{print $1}' $Cnf | sed 's/^/    /'
+    exit 1
+}
+Ext="$1"
+
+eval "$(awk -F'\t' "\$1 == \"$Ext\"{printf(\"Chk=%s Inp=\\\"%s\\\" Pkgs=\\\"%s\\\"\n\",\$1,\$2,\$3)}" $Cnf)"
+#echo "Cnf=$Cnf Ext=$Ext Chk=$Chk Inp=$Inp Pkgs=$Pkgs"
+test "$Chk" || { echo "$Prg: extension '$Ext' is unknown, add it to $Cnf" >&2; exit 3; }
+
+set -e
+
+#   Install required packages
+LogDir='/var/log/extdev'
+Log="$LogDir/install.out"
+echo "${Bold}Installing package(s) $Pkgs$Norm (log to $Log)"
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $Pkgs >>$Log 2>&1
+chown $USER: $Log
+
+#   Compile the extension
+test -d $Etc/ext || { mkdir $Etc/ext; chown $USER: $Etc/ext; }
+Dir="ext/$Ext/$DEBVER-$PhpVer"
+mkdir -p "$Etc/$Dir"
+chown -R $USER: "$Etc/ext/$Ext"
+
+Log="$Etc/$Dir/compile.out"
+echo "${Bold}Compiling the $Ext PHP extension$Norm (log to $Log)"
+echo -n "$Inp" | pecl install $Ext >$Log
+
+#   Configure and save the extension
+echo "${Bold}Configuring the $Ext extension$Norm"
+Ini=$(php --ini | sed -n 's/^.* Path: //p')
+echo "extension=$Ext.so" >$Ini/conf.d/$Ext.ini
+cp -p /usr/lib/php/extensions/$Ext.so $Ini/conf.d/$Ext.ini "$Etc/$Dir"
+pecl list | grep "^$Ext " >"$Etc/$Dir/.version"
+chown -R $USER: "$Etc/$Dir"
+echo "${Bold}Extension $Ext saved to 'etc/$Dir'$Norm"
+
+#   Check
+echo "${Bold}Checking the $Ext extension$Norm:"
+php -i | grep $Ext | egrep -v "$Ext[a-z]|[a-z]$Ext$"
+pecl list

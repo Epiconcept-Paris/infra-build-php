@@ -1,0 +1,82 @@
+#!/bin/sh
+#
+#	debrun - Run a Debian docker container for PHP module development
+#
+Prg=$(basename "$0")
+Dir=$(dirname "$0")
+Dfi='Dockerfile.in'
+OST='debian'
+Proj='extdev'
+tty <&2 >/dev/null && {
+    ColRed=$(tput setaf 1)
+    ColStd=$(tput setaf 7)
+}
+
+test "$Dir" = '.' -o "$Dir" = "$PWD" || cd "$Dir"
+command -v docker >/dev/null || { echo "$Prg: cannot find the 'docker' command" >&2; exit 1; }
+test -f $Dfi || { echo "$Prg: cannot find the '$Dfi' file in '$PWD'" >&2; exit 1; }
+test "$1" || { echo "Usage: $Prg <$OST-version-name>" >&2; exit 1; }
+
+DebVer=$(docker run --name deb-chk --rm "$OST:$1" cat /etc/debian_version 2>/dev/null)
+xc=$?
+if [ $xc -ne 0 ]; then
+    echo "$Prg: docker error $xc when trying to load the '$OST:$1' docker image" >&2
+    exit 2
+fi
+DebNum=$(expr "$DebVer" : '\([0-9]*\)')
+if [ "0$DebNum" -lt 11 ]; then
+    echo "$Prg: only Debian versions 11 and above are supported, not '$DebNum'" >&2
+    docker rmi "$OST:$1"
+    exit 2
+fi
+Tag="$1"
+DckImg=$Proj:$Tag	# Keep all tests images separate
+CntName=$Proj-$Tag
+
+if docker ps | grep $CntName >/dev/null; then
+    echo "Stopping the running '$CntName' container..."
+    docker stop -t 5 $CntName >/dev/null
+    while docker ps | grep $CntName >/dev/null
+    do
+	sleep 1
+    done
+fi
+if docker ps -a | grep $CntName >/dev/null; then
+    echo "Deleting the existing '$CntName' container"
+    docker rm $CntName >/dev/null
+fi
+if docker images | grep "$Proj *$Tag" >/dev/null; then
+    echo "Re-using the existing '$DckImg' image ('docker rmi $DckImg' to remove it)"
+else
+    echo "Building the '$DckImg' image..."
+
+    if [ "$http_proxy" -a "$https_proxy" ]; then
+	BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
+    fi
+    User=$(id -un)
+    AddUser="groupadd -g $(id -g) $(id -gn); useradd -u $(id -u) -g $(id -g) $User"
+    Log='log/docker-build.out'
+    DEBVER="$Tag" USER="$User" ADDUSER="$AddUser" envsubst '$DEBVER $USER $ADDUSER' <$Dfi | tee log/Dockerfile | docker build -f - -t $DckImg $BldArgs . >$Log 2>&1
+
+    docker images | grep "$Proj *$Tag" >/dev/null || {
+	echo "$ColRed\aFAILED to build the $DckImg image!$ColStd"
+	echo "Examine $Log for details."
+	exit 3
+    }
+fi
+
+if [ "$http_proxy" -a "$https_proxy" ]; then
+    Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy "
+fi
+Cmd="docker run -ti -v $(realpath $PWD/etc):/usr/local/etc -v $(realpath $PWD/log):/var/log/$Proj $Env--name $CntName --rm $DckImg"
+Bin="run-$Tag.sh"
+test -x "$Bin" || {
+    echo "Creating a '$Bin' to run the container later"
+    echo "#!/bin/sh\n#\n$Cmd" >$Bin
+    chmod +x $Bin
+}
+
+echo "Running the '$CntName' container"
+$Cmd
+xc=$?
+test $xc -eq 0 || echo "$ColRed\aContainer exit-code=$xc!$ColStd"

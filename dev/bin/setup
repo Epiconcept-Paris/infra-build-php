@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+#	setup - Install epi-php packages
+#
+Prg=$(basename "$0")
+test "$1" || { echo "Usage: $Prg <PHP-Major.minor>" >&2; exit 1; }
+expr "$1" : '[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null || { echo "$Prg: invalid PHP version" >&2; exit 1; }
+test "$1" = '7.4' -o "$1" = '8.2' || { echo "$Prg: unsupported PHP version" >&2; exit 1; }
+PhpVer=$1
+
+set -e
+
+echo "Adding Epiconcept's APT repository"
+DebNum=$(awk -F. '{print $1}' /etc/debian_version)
+Repo='https://apt.epiconcept.fr/prep'
+Key='/etc/apt/trusted.gpg.d/epiconcept.asc'
+if [ $DebNum -lt 12 ]; then
+    echo "deb [arch=amd64,all] $Repo/ $DEBVER main" >/etc/apt/sources.list.d/epiconcept.list
+else
+    echo "Types: deb\nURIs: $Repo/\nSuites: $DEBVER\nComponents: main\nSigned-By: $Key" >/etc/apt/sources.list.d/epiconcept.sources
+fi
+echo "Fetching Epiconcept's APT key"
+curl -sS "$Repo/key.gpg" >$Key
+
+Log='/var/log/extdev/install.out'
+echo "Installing epi-php development packages for PHP $PhpVer (log to $Log)"
+apt-get update >$Log 2>&1
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends epi-php-$PhpVer-mod epi-php-pear epi-php-$PhpVer-dev >>$Log 2>&1
+chown $USER: $Log
+echo "Ready to compile PHP extensions"
