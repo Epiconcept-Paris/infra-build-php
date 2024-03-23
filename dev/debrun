@@ -56,6 +56,7 @@ else
     User=$(id -un)
     AddUser="groupadd -g $(id -g) $(id -gn); useradd -u $(id -u) -g $(id -g) $User"
     Log='log/docker-build.out'
+    mkdir -p log
     DEBVER="$Tag" USER="$User" ADDUSER="$AddUser" envsubst '$DEBVER $USER $ADDUSER' <$Dfi | tee log/Dockerfile | docker build -f - -t $DckImg $BldArgs . >$Log 2>&1
 
     docker images | grep "$Proj *$Tag" >/dev/null || {
