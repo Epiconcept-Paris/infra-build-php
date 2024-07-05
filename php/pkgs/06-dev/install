@@ -12,7 +12,8 @@ INSTALL_ROOT=$Top make$Tgts >$Logs/make-install_$Pkg.out 2>&1
 
 find $Top -type d -empty -delete -print | sed 's/^/find: removing empty directory /' >$Logs/rmed_$Pkg.out
 find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
-chmod +x $Top/usr/lib/php/build/run-tests.php
+AddX=$(find $Top -type f | xargs grep -n '^#!/usr/bin/env php' | sed -n 's;:1:#!/usr/bin/env php$;;p')
+test "$AddX" && echo "$AddX" | xargs chmod +x
 
 if [ "$MM" ]; then
     (cd $Top/usr/bin
