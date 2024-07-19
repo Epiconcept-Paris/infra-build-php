@@ -15,7 +15,7 @@ AddExtra()
     dir="$Php/files/$Maj.$Min"
     if [ -d $dir ]; then
 	mk=
-	for file in $dir/deb/*.patch
+	for file in $dir/deb-CVE/*.patch
 	do
 	    test -f "$file" || continue	# *.patch pattern may not match
 	    test "$mk" || {
