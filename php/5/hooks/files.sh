@@ -13,3 +13,8 @@ do
     test -s "$f" || break	# No patch file (f='*.patch')
     Patch 1 $f
 done
+for f in $Bld/files/*.phar
+do
+    test -s "$f" || break	# No phar file (f='*.phar')
+    cp -p $f ext/phar/tests
+done

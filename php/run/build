@@ -342,7 +342,8 @@ fi
 
 set +e	# Continue on errors
 if [ -f $Bld/.notest ]; then
-    echo "Skiping php-$Ver tests."
+    echo "Skipping php-$Ver tests."
+    sleep 3	# Make sure DB shutdown does not happen too quickly
 else
     #
     #	Make PHP tests with timeout, as 5.6.40 & 7.1.33 on buster hang
@@ -462,11 +463,13 @@ else
     else
 	date "+%Y-%m-%d %H:%M:%S Tests of php-$Ver completed."
     fi
-fi
+fi	# -f $Bld/.notest
 test "$Dbg" && { find . ! -user $USER >$Debug/not-$USER; chown $Own $Debug/not-$USER; }
 
 #   Stop mysql-server
 test -x /etc/init.d/mysql && Init='mysql' || Init='mariadb'
+#   Prevent MYADMIN's ping error message (expected after shutdown). Valid in Debian 8-12
+sed -i 's;MYADMIN ping 2>&1;MYADMIN ping 2>/dev/null;' /etc/init.d/$Init
 test -x /etc/init.d/$Init && /etc/init.d/$Init stop
 
 #   Uninstall mysql-server if needed (PHP 5.2.17)

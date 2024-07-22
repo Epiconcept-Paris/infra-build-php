@@ -1,0 +1,2 @@
+#   E: Pointless as there IS a php-cli dep
+%NAME%: php-script-but-no-phpX-cli-dep *usr/lib/php/build/run-tests.php*

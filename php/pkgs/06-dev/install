@@ -35,3 +35,8 @@ else
 fi
 sed -i "s/%CFL%/$Cfl/" $Top/DEBIAN/control
 test "$Dbg" && cp $Top/DEBIAN/control $Debug/control_$Pkg
+
+#   Adapt lintian/overrides to lintian (i.e. Debian) version
+if [ $DEBNUM -gt 11 ]; then
+    rm -r $Top/usr/share/lintian
+fi

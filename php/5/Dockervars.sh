@@ -26,9 +26,9 @@ AddExtra()
 	    BLDCOPY="$BLDCOPY
 COPY $dir/lenny-debs $BUILD_TOP/files"
 	fi
-	for file in $dir/*.patch $dir/deb-CVE/*.patch $dir/*.deb $dir/srv/*.deb
+	for file in $dir/*.patch $dir/deb-CVE/*.patch $dir/deb-CVE/*.phar $dir/*.deb $dir/srv/*.deb
 	do
-	    test -f "$file" || continue	# *.patch or *.deb patterns may not match
+	    test -f "$file" || continue	# *.patch, *.deb or *.phar patterns may not match
 	    case $file in
 		*mysql*off_*.deb)	off=$file; lib=`basename "$file" | awk -F_ '{print $1}'`;;
 		*mysql-common_*.deb)	cmn=$file;;
