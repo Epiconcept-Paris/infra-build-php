@@ -1,12 +1,39 @@
 # infra-build-php
-Fournil à paquets PHP spécifiques Epiconcept sur Debian 8 à 12 (jessie/stretch/buster/bullseye/bookworm)
 
-## Installation
+Fournil à paquets PHP spécifiques Epiconcept pour les versions suivantes de Debian Linux:
+* 8 `jessie`
+* 9 `stretch`
+* 10 `buster`
+* 11 `bullseye`
+* 12 `bookworm`
 
-* nécessite : `docker` fonctionnel
+Sont gérées :
+* deux versions des paquets : développement et production
+* la mise à jour d'un dépot APT avec les paquets de production
+* la fabrication automatique des builds à parution des nouvelles releases des versions Majeur.mineur de PHP connues
+
+Table des matières
+* [Installation](#setup)
+* [Build et tests d'une nouvelle version](#bld)
+* [Le script `bake`](#bakes)
+* [Mise au point](#map)
+* [Test de multiples versions](#multv)
+* [Versions de développement et de production](#devprod)
+* [Builds automatiques](#autob)
+* [Les scripts auxiliaires (`bin/`)](#bins)
+* [Ajout d'une version de PHP](#phpadd)
+* [Ajout d'une version de Debian](#debadd)
+* [Compilations d'extensions](#ecomp)
+* [Containers `docker` auxiliaires](#xdock)
+* [Notes](#hnote)
+
+## <a name="setup">Installation
+
+Le fonctionnement du fournil nécessite :
+* `docker` fonctionnel
 * `sudo apt install curl`
 
-## Build et tests d'une nouvelle version
+## <a name="bld">Build et tests d'une nouvelle version
 
 Ils se font en exécutant le script `bake` situé dans le répertoire principal (au même niveau que les répertoires `debian`, `php`, `tools` et `multi`) :
 ```
@@ -14,7 +41,7 @@ Ils se font en exécutant le script `bake` situé dans le répertoire principal 
 ```
 builde et teste la version _\<version-PHP>_ pour _\<version-Debian>_
 
-_\<version-PHP>_ est sous la forme _Maj_**.**_Min_, _Maj_**.**_Min_**.**_Rel_, ou _Maj_**.**_Min_**.**_Rel_**-**_Bld_ (voir ci-dessous pour le numéro de build _Bld_), par défaut toutes les dernières versions _Maj_**.**_Min_ gérées pour _\<version-Debian>_. Actuellement, _Maj_ = 5 ou 7, le fournil étant prévu jusqu'à _Maj_ = 9.
+_\<version-PHP>_ est sous la forme _Maj_**.**_Min_, _Maj_**.**_Min_**.**_Rel_, ou _Maj_**.**_Min_**.**_Rel_**-**_Bld_ (voir ci-dessous pour le numéro de build _Bld_), par défaut toutes les dernières versions _Maj_**.**_Min_ gérées pour _\<version-Debian>_. Actuellement, _Maj_ = 5, 7 ou 8, le fournil étant prévu jusqu'à _Maj_ = 9 inclus.
 
 _\<version-Debian>_ est sous la forme numérique _n_, par défaut toutes les versions gérées.
 
@@ -25,9 +52,9 @@ _\<version-Debian>_ est sous la forme numérique _n_, par défaut toutes les ver
 builde et teste la version 5.2.17 pour Debian jessie.
 
 ```
-./bake 7.2
+./bake 7.4
 ```
-builde et teste la dernière version disponible de PHP 7.2 pour toutes les _\<version-Debian>_ gérées.
+builde et teste la dernière version disponible de PHP 7.4 pour toutes les _\<version-Debian>_ gérées.
 ```
 ./bake mk
 ```
@@ -38,11 +65,11 @@ Les logs du build et des tests sont dans le répertoire `debian/<version-Debian>
 
 Le nom des packages produits comporte un numéro de build après la _\<version-PHP>_. Ce numéro de build est contenu dans le fichier `php/<version-majeure-PHP>/<version-PHP>/BUILD_NUM`, qui peut être facilement modifié en passant un build complet à `bake`:
 ```
-./bake 7.2.9-2
+./bake 7.4.33-2
 ```
 `bake` signale une différence inattendue (autre qu'un incrément de 1) entre le contenu de `php/<version-majeure-PHP>/<version-PHP>/BUILD_NUM` à son lancement et la nouveau numéro de build passé dans l'argument.
 
-## Le script `bake`
+## <a name="bakes">Le script `bake`
 Le script bake admet un nombre quelconque d'arguments:
 - des cibles : des _\<version-PHP>_ ou les cibles spéciales `tools` ou `multi`. Les _\<version-PHP>_ sont admises sous trois formes : _Maj_**.**_Min_, _Maj_**.**_Min_**.**_Rel_, ou _Maj_**.**_Min_**.**_Rel_**-**_Bld_, par exemple : `7.2`, `7.2.9` ou `7.2.9-2`. Pour la forme _Maj_**.**_Min_, `bake` recherche la dernière release connue (sur Internet ou en local). La forme _Maj_**.**_Min_**.**_Rel_**-**_Bld_ permet de préciser un numéro de build à créer (ce qui permet de changer aisément le numéro de build d'une release PHP) ou à supprimer (pour limiter la suppression à ce build précis)
 - un mode : `mk` ou `rm`, par défaut `mk` si le mode n'est pas spécifié avant la première cible
@@ -79,10 +106,14 @@ affiche seulement la liste des dernières versions PHP coonues.
 ./bake help
 ```
 affiche l'aide résumée de `bake`.
+```
+./bake fetch
+```
+(À écrire)
 
 
 
-## Mise au point
+## <a name="map">Mise au point
 
 Elle se fait en créant un fichier `.norun` (vide) dans le répertoire principal (où se trouve le répertoire `debian`) : `>.norun` ou `touch .norun`\
 Les scripts affichent alors les commandes `docker` à lancer au lieu de démarrer les containers. Un container `docker` une fois démarré, la  commande bash à lancer pour le build ou les tests est affichée au lieu d'être exécutée.
@@ -91,7 +122,7 @@ Il est possible de sauter le "make test" du build PHP en créant de même un fic
 
 Enfin, on peut également créer un fichier `.debug` (vide), qui active des traces supplémentaires dans le container de build et des logs (et sauvegardes de fichiers) supplémentaires dans le répertoire `debian/<version-Debian>/dist/<version-PHP>-<BUILD_NUM>/.debug`
 
-## Test de multiples versions
+## <a name="multv">Test de multiples versions
 
 ### Préparation (build) d'une image `docker`
 
@@ -217,12 +248,39 @@ Pour déployer sur un serveur un container `docker` de test FPM, il faut :
   ```
   C'est prêt ! Bon tests :-)
 
-## Notes
+## <a name="devprod"> Versions de développement et de production
+
+(À écrire)
+
+## <a name="autob"> Builds automatiques
+
+(À écrire)
+
+## <a name="bins"> Les scripts auxiliaires (`bin/`)
+
+(À écrire)
+
+## <a name="phpadd"> Ajout d'une version de PHP
+
+(À écrire)
+
+## <a name="debadd"> Ajout d'une version de Debian
+
+(À écrire)
+
+## <a name="ecomp"> Compilations d'extensions
+
+(À écrire)
+
+## <a name="xdock"> Containers `docker` auxiliaires
+
+(À écrire)
+
+## <a name="hnote"> Notes
 
 * voir s'il faut gérer le rotate/reopen des logs de PHP-FPM
 * voir les FAILED tests des make test ?
 * correction des warnings du make install de PEAR 1.10 ?
 * voir si on peut optimiser la phase de build en fonction du nombre de cores CPU
 * voir s'il faut builder pour autre chose que amd64 (arm par ex)
-* déployer sur prephp7a1 et tester
 * déployer sur (https://github.com/Epiconcept-Paris/infra-packages-check)
