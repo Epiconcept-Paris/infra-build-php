@@ -1,13 +1,47 @@
-# Patches to PHP 7.4.33 from debian as of March 2023
+# Patches to PHP 7.4.33 from Debian
+
+Some of these patches are included in our builds because PHP 7.4 support expired with release 7.4.33 on 2022-11-28.
+
+
+## Patch level `deb11u5` as of July 2024 (build 7.4.33-3)
+
+### Source
+
+The latest (2024-04-12) `debian-security` `deb11u5` patches for PHP 7.4.33 can be found on [ftp.debian.org](http://security.debian.org/debian-security/pool/main/p/php7.4/php7.4_7.4.33-1+deb11u5.debian.tar.xz).
+
+### Choice of patches
+
+Since the previous `deb11u3` patch level below, 13 new CVE patches have been added
+    (of which 5 affect only the `NEWS` file).
+Two of them are obviously for an MS Windows environment (`cmd.exe`) and have been discarded.
+The 11 others are all included in the 7.4.33-3 build, but patches `CVE-2024-2756` and `CVE-2024-3096`
+    are probably the most important security-wise.
+All the `deb11u3` patches selected for the 7.4.33-2 build have othewise been retained.
+
+### Unused patches
+
+The following patches have been discarded because they are useful only in an MS-Windows environment:
+
+```
+patches/0079-Add-proc_open-escaping-for-cmd-file-execution-Backpo.patch
+patches/0080-NEWS.patch
+```
+
+
+## Patch level `deb11u3` as of March 2023 (build 7.4.33-2)
 
 ## Source
-The latest debian-security patches to the standard PHP 7.4.33 distribution are on [ftp.debian.org](http://ftp.debian.org/debian/pool/main/p/php7.4/php7.4_7.4.33-1+deb11u3.debian.tar.xz) (2023-02-22).
 
-## Choice of patches
+The latest (2023-02-22) `debian-security` `deb11u3` patches to the standard PHP 7.4.33 distribution were on [ftp.debian.org](http://ftp.debian.org/debian/pool/main/p/php7.4/php7.4_7.4.33-1+deb11u3.debian.tar.xz).
 
-The patches have been reviewed and only some of then have been selected and put in `deb/`.
+But this `deb11u3` version is no longer available as of July 2024, as it has been superseded by the `deb11u5` version.
 
-## Unused patches
+### Choice of patches
+
+The patches have been reviewed and only some of then have been selected and put in `deb-CVE/`.
+Patches that have not been selected fall under two categories: `unused` and `configuration`.
+
+### Unused patches
 
 The following patches have been discarded because they target parts of PHP that Epiconcept does not use:
 
@@ -26,7 +60,7 @@ unused/0045-Don-t-use-hrtimers-on-GNU-Hurd.patch
 unused/0050-Fix-GH-10187-Segfault-in-stripslashes-with-arm64.patch
 ```
 
-## Configuration patches
+### Configuration patches
 
 The following patches have been discarded because they bring config changes that might break existing setup or use:
 

@@ -1,15 +1,40 @@
-# Patches to PHP 5.6.40 from debian and freexian as of March 2023
+# Patches to PHP 5.6.40 from Debian and Freexian
 
-## Source
-The latest debian-security patches to the standard PHP 5.6.40 distribution are on [archive.debian.org](http://archive.debian.org/debian-security/pool/updates/main/p/php5/php5_5.6.40+dfsg-0+deb8u12.debian.tar.xz) (2020-06-28).
+Some of these patches are included in our builds because PHP 5.6 support expired with release 5.6.40 on 2018-12-31.
 
-This tarball has been upgraded by Freexian to this [new version](http://deb.freexian.com/extended-lts/pool/main/p/php5/php5_5.6.40+dfsg-0+deb8u16.debian.tar.xz) (2023-01-24).
 
-## Choice of patches
+## Patch level `deb8u20` as of July 2024 (build 5.6.40-7)
 
-The patches have been reviewed and only some of then have been selected and put in `deb-CVE/`.
+### Source
 
-## Unused patches
+The latest (2024-06-17) Freexian ELTS `deb8u20` patches for PHP 5.6.40 can be found on [deb.freexian.com](http://deb.freexian.com/extended-lts/pool/main/p/php5/php5_5.6.40+dfsg-0+deb8u20.debian.tar.xz).
+
+### Choice of patches
+
+Since the previous `deb8u16` patch level below, 9 new CVE patches have been added.
+They have all been selected to be included in the 5.6.40-7 build,
+    but patches `CVE-2024-2756` and `CVE-2024-3096` are probably the most important security-wise.
+All the `deb8u16` patches selected for the 5.6.40-6 build have othewise been retained.
+
+
+## Patch level `deb8u16` as of March 2023 (build 5.6.40-6)
+
+### Source
+
+The latest (2020-06-28) `debian-security` `deb8u12` patches to the standard PHP 5.6.40 distribution are on [archive.debian.org](http://archive.debian.org/debian-security/pool/updates/main/p/php5/php5_5.6.40+dfsg-0+deb8u12.debian.tar.xz).
+
+These latest Debian patches had been upgraded to `deb8u16` by Freexian on 2023-01-24 to this [new version](http://deb.freexian.com/extended-lts/pool/main/p/php5/php5_5.6.40+dfsg-0+deb8u16.debian.tar.xz).
+
+But this `deb8u16` version is no longer available as of July 2024, as it has been superseded by the `deb8u20` version.
+
+
+### Choice of patches
+
+The patches have been reviewed and only some of then have been selected and put in `deb-CVE/`
+    to be included in the 5.6.40-6 build.
+Patches that have not been selected fall under two categories: `unused` and `configuration`.
+
+### Unused patches
 
 The following patches have been discarded because they target parts of PHP that Epiconcept does not use:
 
@@ -42,7 +67,7 @@ unused/0046-Fix-ZEND_MM_ALIGNMENT-on-m64k.patch
 unused/CVE-2022-31625.patch
 ```
 
-## Configuration patches
+### Configuration patches
 
 The following patches have been discarded because they bring config changes that might break existing setup or use:
 
