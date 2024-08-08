@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#	route - Add/del default route
+#	defroute - Add/del default route
 #
 #	Usage:
 #		sudo bin/defroute add
