@@ -6,5 +6,5 @@ ubuntu/run
 
 Au prompt du shell dans docker:
 
-cd /opt/debian/11/dist/7.4.29-2 (par exemple)
+cd /opt/debian/11/dist/7.4.33-3 (par exemple)
 /opt/ubuntu/inst

@@ -1,2 +1,2 @@
 #!/bin/sh
-docker run -ti -v /home/cdt/projects/infra-build-php:/opt -e UID=$(id -u) --name epi-ubu --rm ubuntu:focal
+docker run -ti -v $(eval echo ~$(id -un)/build-php):/opt -e UID=$(id -u) -e http_proxy=$http_proxy -e https_proxy=$https_proxy --name epi-ubu --rm ubuntu:focal

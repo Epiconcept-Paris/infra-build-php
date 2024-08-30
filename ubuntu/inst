@@ -22,6 +22,7 @@ apt-get upgrade -y
 apt-get install -y --no-install-recommends vim curl apache2 libpng16-16 libxpm4 libmcrypt4 libxslt1.1 libcurl4 libfreetype6 libmariadb3 libonig5 libreadline8 libssh2-1
 dpkg -i /opt/ubuntu/libjpeg62-turbo_*_amd64.deb
 dpkg -i /opt/ubuntu/libzip4_*_amd64.deb
+dpkg -i /opt/ubuntu/libicu67_*_amd64.deb
 
 if [ ! -x /sbin/runlevel ]; then	# Needed by invoke-rc.d
     echo "#!/bin/sh\necho \"${PREVLEVEL:-N} ${RUNLEVEL:-5}\"" >/sbin/runlevel
@@ -37,6 +38,8 @@ sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf
 a2dismod mpm_event >>$Logs/a2.out 2>&1
 a2enmod mpm_prefork >>$Logs/a2.out 2>&1
 ln -s /opt/ubuntu/info.php /var/www/html
+ln -s /opt/ubuntu/debinfo /usr/local/bin
+ln -s /opt/ubuntu/l /usr/local/bin
 unset HTTP_PROXY http_proxy
 echo "--- init-done -----" >>$Logs/a2.out
 
