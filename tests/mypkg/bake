@@ -27,9 +27,11 @@ Usage()
 #
 #   Check usage
 #
-test $# -gt 1 && echo "$Prg: ignoring arguments '$*'" >&2
+test "$1" = 'clean' || {
+    test $# -gt 0 && { echo "$Prg: ignoring arguments '$*'" >&2; exit 1; }
+}
 
-DebVer=jessie
+DebVer=buster
 Dist=${PkgTop}dist
 Logs=$Dist/.logs
 User=`id -un`
@@ -42,6 +44,13 @@ MYPKG_TOP=/opt/mypkg
 MYPKG_BASE=epi-mypkg
 MYPKG_IMG=$MYPKG_BASE:$DebVer
 MYPKG_NAME=epi_mypkg
+if [ "$1" = 'clean' ]; then
+    docker images | grep "$MYPKG_BASE *$DebVer" >/dev/null && docker rmi $MYPKG_IMG >/dev/null && echo "Removed docker image '$MYPKG_IMG'" && rmed='y'
+    test -d "$Dist" && rm -rf $Dist && echo "Removed '$Dist/'" && rmed='y'
+    test "$rmed" || echo "$Prg: nothing to clean" >&2
+    exit 0
+fi
+
 date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 Now=`date '+%s'`
 
@@ -70,14 +79,20 @@ else
     COPY ${PkgTop}run/build $MYPKG_TOP"
     mkdir -p $Logs
 
+    if [ "$http_proxy" -a "$https_proxy" ]; then
+	BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
+    fi
     #   Variables come in order of their appearance in Dockerfile.in
-    DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" MYPKG_TOP="$MYPKG_TOP" PKGCOPY="$PKGCOPY" envsubst '$DEBVER $USER $ADDUSER $MYPKG_TOP $PKGCOPY' <${PkgTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $MYPKG_IMG . >$Logs/docker.out 2>&1
+    DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" MYPKG_TOP="$MYPKG_TOP" PKGCOPY="$PKGCOPY" envsubst '$DEBVER $USER $ADDUSER $MYPKG_TOP $PKGCOPY' <${PkgTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $MYPKG_IMG $BldArgs . >$Logs/docker.out 2>&1
 fi
 
 #
 #   Run the container
 #
-Cmd="docker run -ti -v `realpath $PWD/$Dist`:$MYPKG_TOP/dist --name $MYPKG_NAME --rm $MYPKG_IMG"
+if [ "$http_proxy" -a "$https_proxy" ]; then
+    Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
+fi
+Cmd="docker run -ti -v `realpath $PWD/$Dist`:$MYPKG_TOP/dist $Env --name $MYPKG_NAME --rm $MYPKG_IMG"
 Spec=$Dist/pkgspecs
 if [ ! -f $Spec ]; then
     echo "No $Spec file: copying file ${PkgTop}pkgspecs to it."
