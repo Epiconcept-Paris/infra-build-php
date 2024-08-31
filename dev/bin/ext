@@ -8,42 +8,122 @@ Cnf="$Etc/$Prg.conf"
 tty <&2 >/dev/null && {
     Bold=$(tput bold)
     Norm=$(tput sgr0)
+    Red=$(tput setaf 1)
+    Std=$(tput setaf 7)
 }
 
 #   Checks
 command -v php >/dev/null || { echo "$Prg: no PHP version installed; run 'setup <Maj>.<min>'" >&2; exit 2; }
 PhpVer=$(expr $(readlink /etc/alternatives/php) : '/usr/bin/php\(.*\)')
-test -s "$Cnf" || { echo "$Prg: cannot find '$Cnf'" >&2; exit 1; }
+test -s "$Cnf" || { echo "$Prg: cannot find '$Cnf'" >&2; exit 3; }
 
 test "$1" || {
     echo "Usage: $Prg <PECL-extension>\nKnown extensions:" >&2
-    awk -F'\t' '$1 !~ "^#"{print $1}' $Cnf | sed 's/^/    /'
+    awk -F'\t' '$1 !~ "^#"{print $1}' $Cnf | sed 's/^/    /' | uniq
     exit 1
 }
 Ext="$1"
 
-eval "$(awk -F'\t' "\$1 == \"$Ext\"{printf(\"Chk=%s Inp=\\\"%s\\\" Pkgs=\\\"%s\\\"\n\",\$1,\$2,\$3)}" $Cnf)"
-#echo "Cnf=$Cnf Ext=$Ext Chk=$Chk Inp=$Inp Pkgs=$Pkgs"
-test "$Chk" || { echo "$Prg: extension '$Ext' is unknown, add it to $Cnf" >&2; exit 3; }
+#   Return version x.y as a number, e.g. 7.4 as 704
+NumVer()
+{
+    local IFS val n
+
+    IFS="${2:-.}" val=0
+    for n in $1
+    do
+	expr "$n" : '[0-9][0-9]*' >/dev/null || { echo "NumVer: '$n' is not a number" >&2; exit 4; }
+	val=$((($val*${3:-100})+$n))
+    done
+    test $val -eq 0 && echo "Numver: args '$*' return 0" >&2
+    echo "$val"
+}
+PhpNum=$(NumVer $PhpVer)
+DebNum=$(awk -F. '{print $1}' /etc/debian_version)
+
+#   Similar version for awk (without checks and extra args)
+numVer='function numver(s,	n,a,i,v) {
+    n = split(s, a, ".")
+    for (i = 1; i <= n; i++)
+	v = (v * 100) + a[i];
+    return v
+}'
+#   Extract extension info from $Cnf
+eval "$(awk -F'\t' "$numVer"'
+{
+    if (NR == 1)
+	Deb = '"$DebNum"'
+    if (NF == 2 && $1 == ("#!" Deb)) {
+	Inst = Inst " " $2
+    } else if (NF >= 5 && $1 == "'"$Ext"'" && ($3 == "" || '"$PhpNum"' <= numver($3))) {
+	printf("Chk=%s Ver=\"%s\" Php=\"%s\" Inp=\"%s\" Pkgs=\"%s\" Inst=\"%s\" Deb=%d Line=%d\n",
+		$1,    $2,	  $3,	     $4,	$5,	    Inst,	Deb,   NR);
+	exit 0
+    } else {
+	Inst = ""
+    }
+}' $Cnf)"
+test "$Dbg" && echo "Cnf=$Cnf:$Line Ext=$Ext Chk=$Chk Ver=\"$Ver\" Php=\"$Php\" Inp=\"$Inp\" Pkgs=\"$Pkgs\" Deb=$Deb Inst=\"$Inst\"" 2>&1
+test "$Chk" || { echo "$Prg: extension '$Ext' is unknown in '$Cnf'" >&2; exit 5; }
 
 set -e
 
+#   Prepare extension dir and pkgs subdir
+test -d $Etc/ext || { mkdir $Etc/ext && chown $USER: $Etc/ext; }
+Dir="$Etc/ext/$Ext"
+test -d $Dir/pkgs || { mkdir -p $Dir/pkgs && chown $USER: $Dir $Dir/pkgs; }
+Dir="$Dir/pkgs"
+
 #   Install required packages
-LogDir='/var/log/extdev'
-Log="$LogDir/install.out"
-echo "${Bold}Installing package(s) $Pkgs$Norm (log to $Log)"
-DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $Pkgs >>$Log 2>&1
-chown $USER: $Log
+DebTag="deb$DebNum"
+Log="/var/log/extdev/install-$DebTag-$PhpVer.out"
+if [ "$Inst" ]; then
+    for url in $Inst; do
+	deb=$(basename "$url")
+	pkg=$(expr "$deb" : '\([^_]*\)_.*$')
+	debinfo | grep "^$pkg\t" >/dev/null || {
+	    echo "${Bold}Installing package $pkg$Norm (log to $Log)"
+	    test -s "$Dir/$deb" || {
+		echo "======= fetch $url" >>$Log
+		(cd "$Dir"; curl -sSO "$url" >>$Log) || {
+		    echo "${Red}FAILED to fetch $url !$Std"
+		    exit 6
+		}
+		chown $USER: "$Dir/$deb"
+	    }
+	    echo "======= dpkg -i $deb =======" >>$Log
+	    dpkg -i "$Dir/$deb" >>$Log 2>&1 || {
+		echo "${Red}FAILED to install $Dir/$deb !$Std"
+		exit 7
+	    }
+	}
+	for p in $Pkgs; do
+	    test "$p" = "$pkg" && { Pkgs=; break; }
+	done
+    done
+fi
+if [ "$Pkgs" ]; then
+    echo "${Bold}Installing package(s) $Pkgs$Norm (log to $Log)"
+    echo "======= apt-get install $Pkgs =======" >>$Log
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $Pkgs >>$Log 2>&1 || {
+	echo "${Red}FAILED to install $Pkgs !$Std"
+	exit 7
+    }
+fi
 
 #   Compile the extension
-test -d $Etc/ext || { mkdir $Etc/ext; chown $USER: $Etc/ext; }
 Dir="ext/$Ext/$DEBVER-$PhpVer"
 mkdir -p "$Etc/$Dir"
 chown -R $USER: "$Etc/ext/$Ext"
 
 Log="$Etc/$Dir/compile.out"
-echo "${Bold}Compiling the $Ext PHP extension$Norm (log to $Log)"
-echo -n "$Inp" | pecl install $Ext >$Log
+Tgt=$Ext
+test "$Ver" && Tgt="$Ext-$Ver"
+echo "${Bold}Compiling the $Tgt PHP extension$Norm (log to $Log)"
+echo -n "$Inp" | pecl install $Tgt >$Log || {
+    echo "${Red}FAILED to compile $Tgt !$Std"
+    exit 8
+}
 
 #   Configure and save the extension
 echo "${Bold}Configuring the $Ext extension$Norm"

@@ -10,11 +10,12 @@ php/[5-9]/files/*.tgz
 php/[5-9]/[5-9].*/php-*.tar.bz2
 php/[5-9]/[5-9].*/php-*.files
 tests/*/dist
-archive/
-dev/log/
+dev/bin/debinfo
+dev/bin/l
 dev/etc/ext/
-dev/run-*.sh
+dev/log/
 update.log/
+archive/
 work/
 log
 debs

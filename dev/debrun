@@ -29,6 +29,7 @@ if [ "0$DebNum" -lt 11 ]; then
     docker rmi "$OST:$1"
     exit 2
 fi
+DebTag="deb$DebNum"
 Tag="$1"
 DckImg=$Proj:$Tag	# Keep all tests images separate
 CntName=$Proj-$Tag
@@ -50,14 +51,16 @@ if docker images | grep "$Proj *$Tag" >/dev/null; then
 else
     echo "Building the '$DckImg' image..."
 
+    test -f bin/debinfo || { test -f ../php/files/debinfo && ln ../php/files/debinfo bin; }
+    test -f bin/l       || { test -f ../php/run/bin/l     && ln ../php/run/bin/l     bin; }
     if [ "$http_proxy" -a "$https_proxy" ]; then
 	BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
     fi
     User=$(id -un)
     AddUser="groupadd -g $(id -g) $(id -gn); useradd -u $(id -u) -g $(id -g) $User"
-    Log='log/docker-build.out'
+    Log="log/docker-build-$DebTag.out"
     mkdir -p log
-    DEBVER="$Tag" USER="$User" ADDUSER="$AddUser" envsubst '$DEBVER $USER $ADDUSER' <$Dfi | tee log/Dockerfile | docker build -f - -t $DckImg $BldArgs . >$Log 2>&1
+    DEBVER="$Tag" USER="$User" ADDUSER="$AddUser" envsubst '$DEBVER $USER $ADDUSER' <$Dfi | tee "log/Dockerfile-$DebTag" | docker build -f - -t $DckImg $BldArgs . >$Log 2>&1
 
     docker images | grep "$Proj *$Tag" >/dev/null || {
 	echo "$ColRed\aFAILED to build the $DckImg image!$ColStd"
@@ -70,12 +73,6 @@ if [ "$http_proxy" -a "$https_proxy" ]; then
     Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy "
 fi
 Cmd="docker run -ti -v $(realpath $PWD/etc):/usr/local/etc -v $(realpath $PWD/log):/var/log/$Proj $Env--name $CntName --rm $DckImg"
-Bin="run-$Tag.sh"
-test -x "$Bin" || {
-    echo "Creating a '$Bin' to run the container later"
-    echo "#!/bin/sh\n#\n$Cmd" >$Bin
-    chmod +x $Bin
-}
 
 echo "Running the '$CntName' container"
 $Cmd
