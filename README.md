@@ -439,6 +439,7 @@ Ce script vérifie tous les paquets Debian se trouvant dans `debian/*/dists/*/` 
 
 Ce travail est difficile à automatiser et ne l'a pas été.
 Il varie évidemment selon qu'il s'agit d'une nouvelle version-majeure de PHP (par exemple PHP 8) ou d'une nouvelle version-mineure (par exemple la 8.2 après la 8.1).  
+
 ### Ajout d'une version-majeure
 Il part évidemment des fichiers similaires de la version-majeure précédente.
 A titre d'exemple, voici les fichiers concernés par l'ajout (commit 09edf266) de la version-majeure PHP 8 (pour PHP 8.1.5) :
@@ -466,7 +467,7 @@ php/bake
 ```
 
 ### Ajout d'une version-mineure
-Le travail est en partie plus simple : il y a en général peu ou pas de fichier à créer (un patch par exemple).
+Le travail est en partie plus simple : en dehors du fichier `BUILD_NUM` de la nouvelle version, il n'y a en général que peu ou pas de fichiers à créer (un patch, par exemple).
 A titre d'exemple, voici les fichiers concernés par l'ajout (commit 75223fe0) de la version-mineure PHP 8.2 (pour PHP 8.2.4) :
 ```
 debian/9/mkre
@@ -670,7 +671,7 @@ Il présente l'intérêt de montrer la mécanique minimale de la fabrication bas
 │   │   └── dist/	# Répertoires de builds des paquets Debian 11
 │   └── 12/
 │       ├── name	# Nom de la version (ici: bookworm)
-│       ├── mkre	# Expression régulièr de filtre des version PHP
+│       ├── mkre	# Expression régulière de filtre des version PHP
 │       ├── dist/	# Répertoires de builds des paquets Debian 12
 │       └── .noupd	# Optionnel: update.sh ne prendra pas en compte la version
 │
