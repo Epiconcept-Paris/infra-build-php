@@ -108,14 +108,14 @@ pmm_dis()
 #	$@ is a list of (new) PHP version(s)
 rm_odis()
 {
-    #global MaxRodi
+    #global MaxRold
     local DkIms pv mj mn rl cr nr ni ii rel deb tag rm nd img out
 
-    #	We keep only dev-*-php repos
-    #	Prod's epi-*-php repos are handled by savedist.sh
+    #	We keep only dev-*-php docker images and .debug/php/ trees
+    #	Prod's epi-*-php docker images are handled by savedist.sh
     DkIms="$(docker images | grep 'dev-[^- ]*-php')"
 
-    #   For all new version(s) mn.mn.rl
+    #   For all new version(s) mj.mn.rl
     for pv in "$@"
     do
 	eval "$(echo $pv | sed -r 's/^([0-9]+)\.([0-9]+)\.([0-9]+)$/mj=\1 mn=\2 rl=\3/')"
@@ -139,7 +139,7 @@ rm_odis()
 		ni=$((ni + 1))
 	    fi
 	    #echo "cr=$cr deb=$deb tag=$tag ni=$ni" >&2	# DBG
-	    test "$nr" -le "$MaxRodi" && continue
+	    test "$nr" -le "$MaxRold" && continue
 	    test "$rm" && rm="$rm "
 	    rm="${rm}dev-$tag-php:$(debname $deb)-$mj.$mn.$rel"
 	done
@@ -159,6 +159,14 @@ rm_odis()
 	#    echo "last cr=$cr ni=$ni nr=$nr" >&2	# DBG
 	fi
     done
+}
+
+#   Remove old .debug/php/ trees
+#	$@ is a list of (new) PHP version(s)
+rm_ophp()
+{
+    :
+    # TODO: write this code
 }
 
 #   Build $1 (dev/prod) PHP version $2 for Debian $3 (1st and 2nd instances)
@@ -300,6 +308,7 @@ phase1()
     echo "Res=\"$res\"$CR"
     report $res >&3
     rm_odis $phps >&3	# Remove old docker images
+    rm_ophp $phps >&3	# Remove old .debug/php/ trees
 }
 
 #   Phase 2 - Build 'prod' packages (ran as 'php' user)
@@ -344,7 +353,7 @@ report()
     local dir pvs res bt pv dv xc bd ff mE mP mB mS mF mL mis
 
     dir="$(basename "$Dir")"
-    mE="===== See %s for output and errors of %s"
+    mE="===== See %s for output and possible errors of %s"
     printf "$mE\n" "$dir/$Log" "$dir/$Prg"
 
     #	Arguments are <php-vers>[,<php-vers>] | '-' <result>[ result]...
@@ -459,7 +468,7 @@ save_diffs()
 grep '^php:' /etc/passwd >/dev/null || { echo "$Prg: no 'php' user (required) on $(hostname)" >&2; exit 1; }
 
 #   Setup Globals
-MaxRodi=3	# Max PHP releases (per maj.min) we preserve old docker images for
+MaxRold=3	# Max PHP releases (per maj.min) we preserve old docker-images & .debug/php/ for
 PhpHome=~php
 PhpDir='php-prod'
 PhpTop="$PhpHome/$PhpDir"
@@ -481,6 +490,12 @@ exec 3>&1	# Save stdout
 exec >$Log 2>&1
 date "+===== %Y-%m-%d %H:%M:%S ===== User: $Usr =====$CR"
 #date "+===== %Y-%m-%d %H:%M:%S =====" >&3	# DBG
+
+test "$LANG" || { LANG='C.UTF-8'; echo "Set LANG=\"$LANG\"$CR"; }
+if [ "$LC_ALL" -a "$LC_ALL" != "$LANG" ]; then
+    echo "Unset LC_ALL=\"$LC_ALL\" (!= LANG=\"$LANG\")$CR"
+    unset LC_ALL
+fi
 
 #   Find out if another instance is running
 #	We filter out $2 (PPID) as well as $1 (PID) to eliminate the $() subshell
