@@ -1,27 +1,29 @@
 #!/bin/sh
 #
-#	defroute - Add/del default route
+#	defroute - Add/del/get default route
+#
+#	Install:
+#		put this script in /usr/local/bin
 #
 #	Usage:
-#		sudo bin/defroute add
-#		sudo bin/defroute del
-#		bin/defroute
+#		sudo defroute add
+#		sudo defroute del
+#		defroute
 #
-#	Config: put the following 'php' file in /etc/sudoers.d:
-#		# Allow 'php' to run bin/defroute without password
-#		php ALL = (root) NOPASSWD: /home/php/php-prod/bin/defroute
+#	Config: put the following 'defroute' file in /etc/sudoers.d:
+#		# Allow 'dev' and 'php' users to run defroute without pw
+#		dev,php ALL = (root) NOPASSWD: /usr/local/bin/defroute
 #
 Prg=$(basename "$0")
-Dir=$(dirname "$0")
-cd "$Dir/.."
+Gw='vgw.admin2'
 
 must_su()
 {
     #global Prg
-    test $(id -u) -eq 0 || { echo "$Prg: must be called as 'sudo $0'" >&2; exit 1; }
+    test $(id -u) -eq 0 || { echo "$Prg: must be called as 'sudo $Prg'" >&2; exit 1; }
 }
 
-GwIP=$(host -N 2 vgw.admin2 | awk '{print $4}')
+GwIP=$(host -N 2 $Gw | awk '{print $4}')
 Curr=$(ip route list | awk '$1 == "default" {print $3}')
 case "$1" in
     add)    must_su; test "$Curr" || ip route add default via $GwIP ;;

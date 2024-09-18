@@ -8,11 +8,13 @@ Prg=$(basename "$0")
 Dir="$(dirname "$0")"
 cd "$Dir"
 
+Bin=/usr/local/bin
 dist=../php-debs
 tmp=/space/tmp/sendphp
 usr=epiconcept_build
 srv=files.epiconcept.fr
 
+test -x $Bin/defroute || { echo "$Prg: cannot find the 'defroute' script in '$Bin'" >&2; exit 1; }
 test -d $dist || { echo "$Prg: cannot find '$(realpath $dist)'" >&2; exit 1; }
 test "$(id -un)" = 'php' || { echo "$Prg: must run as 'php' user" >&2; exit 1; }
 
@@ -21,18 +23,18 @@ cleanup()
     #global Del
     echo "Removing $tmp/"
     rm -rf $tmp
-    test "$Del" && sudo bin/defroute del && echo "Deleted default route"
+    test "$Del" && sudo defroute del && echo "Deleted default route"
 }
 
 trap cleanup 0
 
 #   Setup default route
-bin/defroute >/dev/null || {
-    sudo -l | grep $PWD/bin/defroute >/dev/null || {
-	echo "$Prg: 'sudo bin/defroute' is not configured" >&2
+defroute >/dev/null || {
+    sudo -l | grep $Bin/defroute >/dev/null || {
+	echo "$Prg: 'sudo defroute' is not configured" >&2
 	exit 2;
     }
-    sudo bin/defroute add
+    sudo defroute add
     echo "Added default route"
     Del=y	# Delete route at exit
 }

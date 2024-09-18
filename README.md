@@ -73,11 +73,11 @@ Le fonctionnement du fournil nécessite :
   php:~$ ln -s work/infra-build-php php-prod	# lien symbolique utilisé par update.sh
   php:~$ mkdir php-debs	# Répertoire collatéral à php-prod, requis par le script savedist.sh
   ```
-* le droit pour `php` d'exécuter la commande `bin/defroute` :
+* le droit pour `dev` et `php` d'exécuter la commande `defroute` avec `sudo` sans mot de passe :
   ```console
-  dev:~$ sudo cat /etc/sudoers/dev-php
-  # Allow 'php' to run bin/defroute without password
-  php ALL = (root) NOPASSWD: /home/php/php-prod/bin/defroute
+  dev:~$ sudo cat /etc/sudoers/defroute
+  # Allow 'dev' and 'php' to run defroute without password
+  dev,php ALL = (root) NOPASSWD: /usr/local/bin/defroute
   dev:~$ 
   ```
 * d'avoir installé une `crontab` similaire à celle signalée à la section [Builds automatiques](#update) pour que le script `update.sh` soit exécuté.
@@ -414,7 +414,7 @@ Il utilise le module `http.server` de `python3` pour gérer un dépôt APT local
 Le script est automatiquement lancé et arrêté par `bake` et ne dépend en principe pas de la version Debian.
 
 ### `defroute`: Ajout et supprime la route réseau de sortie
-Ce script est utilisé par le script `send.sh` pour ouvrir et fermer la route réseau (`GwIP` dans `bin/defroute`) pour l'envoi des fichiers au serveur APT externe (`Srv` dans le script `send.sh,` qui utilise `rsync` et `ssh`).
+Ce script est utilisé par le script `send.sh` pour ouvrir et fermer la route réseau (`GwIP` dans `defroute`) pour l'envoi des fichiers au serveur APT externe (`Srv` dans le script `send.sh,` qui utilise `rsync` et `ssh`). Il **doit** être copié dans `/usr/local/bin` s'il n'y est pas déjà et le fichier crontab `defroute` doit étre similaire (aux adaptations locales près) à celui indiqué dans l'[Installation](#setup).
 
 ### `run`: Script de filtre SSH sur le serveur Web de dépôt apt
 Ce script est destiné à être installé sur le serveur APT externe pour filtrer les commandes reçues par `rsync` ou `ssh`.
