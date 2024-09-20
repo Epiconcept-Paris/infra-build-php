@@ -473,9 +473,12 @@ PhpHome=~php
 PhpDir='php-prod'
 PhpTop="$PhpHome/$PhpDir"
 Bake='php/bake'
-eval "$(grep 'http_proxy' ~/.bash_profile)"
 Usr=$(id -un)
 CR=''
+DefProxy='http://proxy:3128'
+test -f ~/.bash_profile && eval "$(grep 'http_proxy' ~/.bash_profile)"
+test "$http_proxy" || export http_proxy="$DefProxy"
+test "$https_proxy" || export https_proxy="$DefProxy"
 
 #   Setup Log and fds
 LogDir="$(basename $Prg .sh).log"
