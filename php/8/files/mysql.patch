@@ -1,6 +1,6 @@
 diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
 --- ext/mysql.orig/php_mysql.c	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/php_mysql.c	2022-07-03 23:16:54.000000000 +0200
++++ ext/mysql/php_mysql.c	2024-09-27 20:08:20.784681605 +0200
 @@ -1,6 +1,6 @@
  /*
     +----------------------------------------------------------------------+
@@ -822,7 +822,21 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  
  			if (ctor_params && Z_TYPE_P(ctor_params) != IS_NULL) {
  				if (zend_fcall_info_args(&fci, ctor_params) == FAILURE) {
-@@ -2361,16 +2411,18 @@
+@@ -2313,6 +2363,13 @@
+ 			zend_throw_exception_ex(zend_exception_get_default(), 0, "Class %s does not have a constructor hence you cannot use ctor_params", ZSTR_VAL(ce->name));
+ 		}
+ 	}
++	/* We invert mysqli_fetch_assoc logig: FALSE on end, NULL on error */
++	else if (!into_object && Z_TYPE_P(return_value) == IS_NULL) {
++		RETURN_FALSE;
++	}
++	else if (!into_object && Z_TYPE_P(return_value) == IS_FALSE) {
++		RETURN_NULL();
++	}
+ 
+ }
+ /* }}} */
+@@ -2361,16 +2418,18 @@
  	zend_long offset;
  	MYSQL_RES *mysql_result;
  
@@ -845,7 +859,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  		RETURN_FALSE;
  	}
  	mysql_data_seek(mysql_result, offset);
-@@ -2388,9 +2440,10 @@
+@@ -2388,9 +2447,10 @@
  	int num_fields;
  	int i;
  
@@ -859,7 +873,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  
  	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
  		RETURN_FALSE;
-@@ -2493,9 +2546,12 @@
+@@ -2493,9 +2553,12 @@
  	MYSQL_RES *mysql_result;
  	const MYSQL_FIELD *mysql_field;
  
@@ -875,7 +889,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  
  	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
  		RETURN_FALSE;
-@@ -2520,7 +2576,7 @@
+@@ -2520,7 +2583,7 @@
  #endif
  	add_property_stringl(return_value, "table", (mysql_field->table?mysql_field->table:""), mysql_field->table_length);
  	add_property_stringl(return_value, "def", (mysql_field->def?mysql_field->def:""), mysql_field->def_length);
@@ -884,7 +898,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  	add_property_long(return_value, "not_null", IS_NOT_NULL(mysql_field->flags)?1:0);
  	add_property_long(return_value, "primary_key", IS_PRI_KEY(mysql_field->flags)?1:0);
  	add_property_long(return_value, "multiple_key", (mysql_field->flags&MULTIPLE_KEY_FLAG?1:0));
-@@ -2541,16 +2597,18 @@
+@@ -2541,16 +2604,18 @@
  	zend_long offset;
  	MYSQL_RES *mysql_result;
  
@@ -907,7 +921,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  		RETURN_FALSE;
  	}
  	mysql_field_seek(mysql_result, offset);
-@@ -2575,16 +2633,18 @@
+@@ -2575,16 +2640,18 @@
  	char buf[512];
  	int  len;
  
@@ -930,7 +944,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  		RETURN_FALSE;
  	}
  	mysql_field_seek(mysql_result, field);
-@@ -2734,9 +2794,10 @@
+@@ -2734,9 +2801,10 @@
  	zval *result;
  	MYSQL_RES *mysql_result;
  
@@ -944,7 +958,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  
  	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
  		RETURN_FALSE;
-@@ -2754,9 +2815,11 @@
+@@ -2754,9 +2822,11 @@
  	php_mysql_conn *mysql;
  	zval *mysql_link = NULL;
  
@@ -961,7 +975,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  		zend_resource *res = php_mysql_get_default_link(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 diff -urN ext/mysql.orig/tests/001.phpt ext/mysql/tests/001.phpt
 --- ext/mysql.orig/tests/001.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/001.phpt	2022-06-27 13:45:22.000000000 +0200
++++ ext/mysql/tests/001.phpt	2024-09-19 02:51:16.105310011 +0200
 @@ -29,8 +29,5 @@
  print "done!";
  ?>
@@ -973,7 +987,7 @@ diff -urN ext/mysql.orig/tests/001.phpt ext/mysql/tests/001.phpt
  done!
 diff -urN ext/mysql.orig/tests/002.phpt ext/mysql/tests/002.phpt
 --- ext/mysql.orig/tests/002.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/002.phpt	2022-06-27 13:19:29.000000000 +0200
++++ ext/mysql/tests/002.phpt	2024-09-19 02:51:16.105310011 +0200
 @@ -37,7 +37,6 @@
  require_once("clean_table.inc");
  ?>
@@ -984,7 +998,7 @@ diff -urN ext/mysql.orig/tests/002.phpt ext/mysql/tests/002.phpt
  bool(true)
 diff -urN ext/mysql.orig/tests/003.phpt ext/mysql/tests/003.phpt
 --- ext/mysql.orig/tests/003.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/003.phpt	2022-06-27 13:19:35.000000000 +0200
++++ ext/mysql/tests/003.phpt	2024-09-19 02:51:16.105310011 +0200
 @@ -57,7 +57,6 @@
  require_once("clean_table.inc");
  ?>
@@ -995,7 +1009,7 @@ diff -urN ext/mysql.orig/tests/003.phpt ext/mysql/tests/003.phpt
    ["a"]=>
 diff -urN ext/mysql.orig/tests/bug47438.phpt ext/mysql/tests/bug47438.phpt
 --- ext/mysql.orig/tests/bug47438.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/bug47438.phpt	2022-06-27 13:19:41.000000000 +0200
++++ ext/mysql/tests/bug47438.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -47,7 +47,6 @@
  mysql_close($link);
  ?>
@@ -1006,7 +1020,7 @@ diff -urN ext/mysql.orig/tests/bug47438.phpt ext/mysql/tests/bug47438.phpt
  2.c
 diff -urN ext/mysql.orig/tests/bug48754.phpt ext/mysql/tests/bug48754.phpt
 --- ext/mysql.orig/tests/bug48754.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/bug48754.phpt	2022-07-01 16:37:18.000000000 +0200
++++ ext/mysql/tests/bug48754.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -35,7 +35,9 @@
  var_dump($link);
  
@@ -1075,7 +1089,7 @@ diff -urN ext/mysql.orig/tests/bug48754.phpt ext/mysql/tests/bug48754.phpt
  resource(%d) of type (Unknown)
 diff -urN ext/mysql.orig/tests/bug51242.phpt ext/mysql/tests/bug51242.phpt
 --- ext/mysql.orig/tests/bug51242.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/bug51242.phpt	2022-06-27 13:20:05.000000000 +0200
++++ ext/mysql/tests/bug51242.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -35,5 +35,4 @@
  }
  ?>
@@ -1084,26 +1098,26 @@ diff -urN ext/mysql.orig/tests/bug51242.phpt ext/mysql/tests/bug51242.phpt
  resource(%d) of type (mysql link)
 diff -urN ext/mysql.orig/tests/bug53649.phpt ext/mysql/tests/bug53649.phpt
 --- ext/mysql.orig/tests/bug53649.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/bug53649.phpt	2022-07-03 19:49:00.000000000 +0200
-@@ -18,7 +18,8 @@
++++ ext/mysql/tests/bug53649.phpt	2024-09-27 15:24:38.491141190 +0200
+@@ -18,7 +18,7 @@
  
  if (!mysql_query("LOAD DATA LOCAL INFILE 'bug53649.data' INTO TABLE test", $link) &&
  	1148 == mysql_errno($link))
 -		die("skip LOAD DATA LOAD INFILE not allowed\n");
 +		die("skip LOAD DATA LOCAL INFILE not allowed\n");
-+unlink('bug53649.data');
  ?>
  --FILE--
  <?php
-@@ -49,6 +50,7 @@
- 		echo "done";
- 	}
- 	mysql_close($link);
-+	unlink('bug53649.data');
- ?>
- --CLEAN--
- <?php
-@@ -68,5 +70,4 @@
+@@ -59,7 +59,7 @@
+ 		$host, $user, $db, $port, $socket);
+ }
+ 
+-if (!mysql_query($link, 'DROP TABLE IF EXISTS test', $link)) {
++if (!mysql_query('DROP TABLE IF EXISTS test', $link)) {
+ 	printf("[clean] Failed to drop old test table: [%d] %s\n", mysqli_errno($link), mysqli_error($link));
+ }
+ 
+@@ -68,5 +68,4 @@
  unlink('bug53649.data');
  ?>
  --EXPECTF--
@@ -1111,7 +1125,7 @@ diff -urN ext/mysql.orig/tests/bug53649.phpt ext/mysql/tests/bug53649.phpt
  done
 diff -urN ext/mysql.orig/tests/bug55473.phpt ext/mysql/tests/bug55473.phpt
 --- ext/mysql.orig/tests/bug55473.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/bug55473.phpt	2022-07-04 19:15:24.000000000 +0200
++++ ext/mysql/tests/bug55473.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -1,5 +1,5 @@
  --TEST--
 -Bug #5547 (mysql_pconnect leaks file descriptors on reconnect)
@@ -1185,7 +1199,7 @@ diff -urN ext/mysql.orig/tests/bug55473.phpt ext/mysql/tests/bug55473.phpt
  done!
 diff -urN ext/mysql.orig/tests/connect.inc ext/mysql/tests/connect.inc
 --- ext/mysql.orig/tests/connect.inc	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/connect.inc	2022-07-01 16:19:53.000000000 +0200
++++ ext/mysql/tests/connect.inc	2024-09-19 02:51:16.109310381 +0200
 @@ -55,17 +55,30 @@
  	printf("skip Eeeek/BUG/FIXME - connect.inc included twice! skipif bug?\n");
  }
@@ -1223,7 +1237,7 @@ diff -urN ext/mysql.orig/tests/connect.inc ext/mysql/tests/connect.inc
  $skip_on_connect_failure  = getenv("MYSQL_TEST_SKIP_CONNECT_FAILURE") ? getenv("MYSQL_TEST_SKIP_CONNECT_FAILURE") : true;
 diff -urN ext/mysql.orig/tests/mysql_affected_rows.phpt ext/mysql/tests/mysql_affected_rows.phpt
 --- ext/mysql.orig/tests/mysql_affected_rows.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_affected_rows.phpt	2022-07-02 22:11:31.000000000 +0200
++++ ext/mysql/tests/mysql_affected_rows.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -13,14 +13,20 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -1267,7 +1281,7 @@ diff -urN ext/mysql.orig/tests/mysql_affected_rows.phpt ext/mysql/tests/mysql_af
  done!
 diff -urN ext/mysql.orig/tests/mysql_client_encoding.phpt ext/mysql/tests/mysql_client_encoding.phpt
 --- ext/mysql.orig/tests/mysql_client_encoding.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_client_encoding.phpt	2022-07-02 22:27:18.000000000 +0200
++++ ext/mysql/tests/mysql_client_encoding.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -63,11 +63,13 @@
  
  mysql_close($link);
@@ -1285,7 +1299,7 @@ diff -urN ext/mysql.orig/tests/mysql_client_encoding.phpt ext/mysql/tests/mysql_
  done!
 diff -urN ext/mysql.orig/tests/mysql_close.phpt ext/mysql/tests/mysql_close.phpt
 --- ext/mysql.orig/tests/mysql_close.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_close.phpt	2022-07-02 22:37:04.000000000 +0200
++++ ext/mysql/tests/mysql_close.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -12,17 +12,23 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -1330,7 +1344,7 @@ diff -urN ext/mysql.orig/tests/mysql_close.phpt ext/mysql/tests/mysql_close.phpt
  done!
 diff -urN ext/mysql.orig/tests/mysql_connect.phpt ext/mysql/tests/mysql_connect.phpt
 --- ext/mysql.orig/tests/mysql_connect.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_connect.phpt	2022-07-31 20:30:10.000000000 +0200
++++ ext/mysql/tests/mysql_connect.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -13,8 +13,10 @@
  $link   = NULL;
  
@@ -1372,7 +1386,7 @@ diff -urN ext/mysql.orig/tests/mysql_connect.phpt ext/mysql/tests/mysql_connect.
  done!
 diff -urN ext/mysql.orig/tests/mysql_constants.phpt ext/mysql/tests/mysql_constants.phpt
 --- ext/mysql.orig/tests/mysql_constants.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_constants.phpt	2022-06-27 13:23:08.000000000 +0200
++++ ext/mysql/tests/mysql_constants.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -62,5 +62,4 @@
  print "done!";
  ?>
@@ -1381,7 +1395,7 @@ diff -urN ext/mysql.orig/tests/mysql_constants.phpt ext/mysql/tests/mysql_consta
  done!
 diff -urN ext/mysql.orig/tests/mysql_create_db.phpt ext/mysql/tests/mysql_create_db.phpt
 --- ext/mysql.orig/tests/mysql_create_db.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_create_db.phpt	2022-06-27 13:23:16.000000000 +0200
++++ ext/mysql/tests/mysql_create_db.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -53,7 +53,4 @@
  mysql_close($link);
  ?>
@@ -1392,7 +1406,7 @@ diff -urN ext/mysql.orig/tests/mysql_create_db.phpt ext/mysql/tests/mysql_create
  done!
 diff -urN ext/mysql.orig/tests/mysql_data_seek.phpt ext/mysql/tests/mysql_data_seek.phpt
 --- ext/mysql.orig/tests/mysql_data_seek.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_data_seek.phpt	2022-07-02 22:58:22.000000000 +0200
++++ ext/mysql/tests/mysql_data_seek.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -12,14 +12,20 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -1445,7 +1459,7 @@ diff -urN ext/mysql.orig/tests/mysql_data_seek.phpt ext/mysql/tests/mysql_data_s
  done!
 diff -urN ext/mysql.orig/tests/mysql_db_name.phpt ext/mysql/tests/mysql_db_name.phpt
 --- ext/mysql.orig/tests/mysql_db_name.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_db_name.phpt	2022-07-02 23:05:52.000000000 +0200
++++ ext/mysql/tests/mysql_db_name.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -12,11 +12,15 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -1490,7 +1504,7 @@ diff -urN ext/mysql.orig/tests/mysql_db_name.phpt ext/mysql/tests/mysql_db_name.
  done!
 diff -urN ext/mysql.orig/tests/mysql_db_query.phpt ext/mysql/tests/mysql_db_query.phpt
 --- ext/mysql.orig/tests/mysql_db_query.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_db_query.phpt	2022-07-02 23:15:46.000000000 +0200
++++ ext/mysql/tests/mysql_db_query.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -15,14 +15,20 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -1523,7 +1537,7 @@ diff -urN ext/mysql.orig/tests/mysql_db_query.phpt ext/mysql/tests/mysql_db_quer
  done!
 diff -urN ext/mysql.orig/tests/mysql_deprecated_api.phpt ext/mysql/tests/mysql_deprecated_api.phpt
 --- ext/mysql.orig/tests/mysql_deprecated_api.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_deprecated_api.phpt	2022-06-27 13:24:08.000000000 +0200
++++ ext/mysql/tests/mysql_deprecated_api.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -75,5 +75,4 @@
  require_once("clean_table.inc");
  ?>
@@ -1532,7 +1546,7 @@ diff -urN ext/mysql.orig/tests/mysql_deprecated_api.phpt ext/mysql/tests/mysql_d
  done!
 diff -urN ext/mysql.orig/tests/mysql_drop_db.phpt ext/mysql/tests/mysql_drop_db.phpt
 --- ext/mysql.orig/tests/mysql_drop_db.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_drop_db.phpt	2022-06-27 13:24:14.000000000 +0200
++++ ext/mysql/tests/mysql_drop_db.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -52,5 +52,4 @@
  mysql_close($link);
  ?>
@@ -1541,7 +1555,7 @@ diff -urN ext/mysql.orig/tests/mysql_drop_db.phpt ext/mysql/tests/mysql_drop_db.
  done!
 diff -urN ext/mysql.orig/tests/mysql_errno.phpt ext/mysql/tests/mysql_errno.phpt
 --- ext/mysql.orig/tests/mysql_errno.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_errno.phpt	2022-07-02 23:23:28.000000000 +0200
++++ ext/mysql/tests/mysql_errno.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -15,11 +15,15 @@
  if (false !== ($tmp = @mysql_errno()))
  	printf("[001] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
@@ -1584,7 +1598,7 @@ diff -urN ext/mysql.orig/tests/mysql_errno.phpt ext/mysql/tests/mysql_errno.phpt
  done!
 diff -urN ext/mysql.orig/tests/mysql_error.phpt ext/mysql/tests/mysql_error.phpt
 --- ext/mysql.orig/tests/mysql_error.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_error.phpt	2022-07-02 23:43:10.000000000 +0200
++++ ext/mysql/tests/mysql_error.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -15,11 +15,15 @@
  if (false !== ($tmp = @mysql_error()))
  	printf("[001] Expecting boolean/false, got %s/%s\n", gettype($tmp), $tmp);
@@ -1625,7 +1639,7 @@ diff -urN ext/mysql.orig/tests/mysql_error.phpt ext/mysql/tests/mysql_error.phpt
  done!
 diff -urN ext/mysql.orig/tests/mysql_escape_string.phpt ext/mysql/tests/mysql_escape_string.phpt
 --- ext/mysql.orig/tests/mysql_escape_string.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_escape_string.phpt	2022-07-03 00:05:26.000000000 +0200
++++ ext/mysql/tests/mysql_escape_string.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -9,8 +9,10 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -1647,7 +1661,7 @@ diff -urN ext/mysql.orig/tests/mysql_escape_string.phpt ext/mysql/tests/mysql_es
  string(2) "\""
 diff -urN ext/mysql.orig/tests/mysql_fetch_array.phpt ext/mysql/tests/mysql_fetch_array.phpt
 --- ext/mysql.orig/tests/mysql_fetch_array.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_fetch_array.phpt	2022-07-03 00:33:23.000000000 +0200
++++ ext/mysql/tests/mysql_fetch_array.phpt	2024-09-27 14:19:31.960639474 +0200
 @@ -12,11 +12,15 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -1670,8 +1684,8 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_array.phpt ext/mysql/tests/mysql_fetc
  $tmp = @mysql_fetch_array($res, $illegal_mode);
 -if (false !== $tmp)
 -	printf("[014] Expecting boolean/false, got %s/%s. [%d] %s\n",
-+if (!is_null($tmp))
-+	printf("[014] Expecting NULL, got %s/%s. [%d] %s\n",
++if (!($tmp === false))
++	printf("[014] Expecting false, got %s/%s. [%d] %s\n",
  		gettype($tmp), $tmp, mysql_errno($link), mysql_error($link));
  
  mysql_free_result($res);
@@ -1707,7 +1721,7 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_array.phpt ext/mysql/tests/mysql_fetc
  done!
 diff -urN ext/mysql.orig/tests/mysql_fetch_assoc.phpt ext/mysql/tests/mysql_fetch_assoc.phpt
 --- ext/mysql.orig/tests/mysql_fetch_assoc.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_fetch_assoc.phpt	2022-07-03 01:20:43.000000000 +0200
++++ ext/mysql/tests/mysql_fetch_assoc.phpt	2024-09-27 14:04:13.308007574 +0200
 @@ -14,11 +14,15 @@
  
  // Note: no SQL type tests, internally the same function gets used as for mysql_fetch_array() which does a lot of SQL type test
@@ -1745,15 +1759,6 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_assoc.phpt ext/mysql/tests/mysql_fetc
  [005]
  array(2) {
    ["id"]=>
-@@ -72,7 +79,7 @@
-   string(1) "a"
- }
- [006]
--bool(false)
-+NULL
- [008]
- array(5) {
-   ["a"]=>
 @@ -86,10 +93,7 @@
    ["e"]=>
    string(1) "1"
@@ -1768,7 +1773,7 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_assoc.phpt ext/mysql/tests/mysql_fetc
    ["id"]=>
 diff -urN ext/mysql.orig/tests/mysql_fetch_field.phpt ext/mysql/tests/mysql_fetch_field.phpt
 --- ext/mysql.orig/tests/mysql_fetch_field.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_fetch_field.phpt	2022-07-03 20:58:22.000000000 +0200
++++ ext/mysql/tests/mysql_fetch_field.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -13,11 +13,15 @@
  	$link   = NULL;
  
@@ -1931,7 +1936,7 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_field.phpt ext/mysql/tests/mysql_fetc
  done!
 diff -urN ext/mysql.orig/tests/mysql_fetch_lengths.phpt ext/mysql/tests/mysql_fetch_lengths.phpt
 --- ext/mysql.orig/tests/mysql_fetch_lengths.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_fetch_lengths.phpt	2022-07-03 21:03:20.000000000 +0200
++++ ext/mysql/tests/mysql_fetch_lengths.phpt	2024-09-19 02:51:16.109310381 +0200
 @@ -12,11 +12,15 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -1979,7 +1984,7 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_lengths.phpt ext/mysql/tests/mysql_fe
  done!
 diff -urN ext/mysql.orig/tests/mysql_fetch_object.phpt ext/mysql/tests/mysql_fetch_object.phpt
 --- ext/mysql.orig/tests/mysql_fetch_object.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_fetch_object.phpt	2022-07-04 16:50:18.000000000 +0200
++++ ext/mysql/tests/mysql_fetch_object.phpt	2024-09-27 14:34:11.648965019 +0200
 @@ -12,11 +12,15 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2027,7 +2032,7 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_object.phpt ext/mysql/tests/mysql_fet
  
  mysql_close($link);
  print "done!";
-@@ -82,7 +93,8 @@
+@@ -82,13 +93,18 @@
  require_once("clean_table.inc");
  ?>
  --EXPECTF--
@@ -2037,17 +2042,30 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_object.phpt ext/mysql/tests/mysql_fet
  object(stdClass)#%d (2) {
    ["ID"]=>
    string(1) "1"
-@@ -99,38 +111,8 @@
    ["label"]=>
+   string(1) "a"
+ }
++
++Deprecated: Creation of dynamic property mysql_fetch_object_test::$ID is deprecated in /opt/php-mk/dist/.debug/php/ext/mysql/tests/mysql_fetch_object.php on line 34
++
++Deprecated: Creation of dynamic property mysql_fetch_object_test::$label is deprecated in /opt/php-mk/dist/.debug/php/ext/mysql/tests/mysql_fetch_object.php on line 34
+ object(mysql_fetch_object_test)#%d (4) {
+   ["a"]=>
+   NULL
+@@ -100,37 +116,19 @@
    string(1) "b"
  }
--
+ 
 -Warning: Missing argument 1 for mysql_fetch_object_construct::__construct() in %s on line %d
--
++Deprecated: Creation of dynamic property mysql_fetch_object_construct::$ID is deprecated in /opt/php-mk/dist/.debug/php/ext/mysql/tests/mysql_fetch_object.php on line 45
+ 
 -Warning: Missing argument 2 for mysql_fetch_object_construct::__construct() in %s on line %d
--
++Deprecated: Creation of dynamic property mysql_fetch_object_construct::$label is deprecated in /opt/php-mk/dist/.debug/php/ext/mysql/tests/mysql_fetch_object.php on line 45
++ArgumentCountError: Too few arguments to function mysql_fetch_object_construct::__construct(), 0 passed and exactly 2 expected in %s on line %d
+ 
 -Notice: Undefined variable: a in %s on line %d
--
++Deprecated: Creation of dynamic property mysql_fetch_object_construct::$ID is deprecated in /opt/php-mk/dist/.debug/php/ext/mysql/tests/mysql_fetch_object.php on line 48
+ 
 -Notice: Undefined variable: b in %s on line %d
 -object(mysql_fetch_object_construct)#%d (4) {
 -  ["a"]=>
@@ -2059,9 +2077,12 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_object.phpt ext/mysql/tests/mysql_fet
 -  ["label"]=>
 -  string(1) "c"
 -}
--
++Deprecated: Creation of dynamic property mysql_fetch_object_construct::$label is deprecated in /opt/php-mk/dist/.debug/php/ext/mysql/tests/mysql_fetch_object.php on line 48
++ArgumentCountError: Too few arguments to function mysql_fetch_object_construct::__construct(), 1 passed and exactly 2 expected in %s on line %d
+ 
 -Warning: Missing argument 2 for mysql_fetch_object_construct::__construct() in %s on line %d
--
++Deprecated: Creation of dynamic property mysql_fetch_object_construct::$ID is deprecated in /opt/php-mk/dist/.debug/php/ext/mysql/tests/mysql_fetch_object.php on line 50
+ 
 -Notice: Undefined variable: b in %s on line %d
 -object(mysql_fetch_object_construct)#%d (4) {
 -  ["a"]=>
@@ -2073,12 +2094,11 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_object.phpt ext/mysql/tests/mysql_fet
 -  ["label"]=>
 -  string(1) "d"
 -}
-+ArgumentCountError: Too few arguments to function mysql_fetch_object_construct::__construct(), 0 passed and exactly 2 expected in %s on line %d
-+ArgumentCountError: Too few arguments to function mysql_fetch_object_construct::__construct(), 1 passed and exactly 2 expected in %s on line %d
++Deprecated: Creation of dynamic property mysql_fetch_object_construct::$label is deprecated in /opt/php-mk/dist/.debug/php/ext/mysql/tests/mysql_fetch_object.php on line 50
  object(mysql_fetch_object_construct)#%d (4) {
    ["a"]=>
    string(1) "a"
-@@ -141,13 +123,11 @@
+@@ -141,13 +139,11 @@
    ["label"]=>
    string(1) "e"
  }
@@ -2101,7 +2121,7 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_object.phpt ext/mysql/tests/mysql_fet
 +Fatal error: Class "this_class_does_not_exist" not found in %s on line %d
 diff -urN ext/mysql.orig/tests/mysql_fetch_row.phpt ext/mysql/tests/mysql_fetch_row.phpt
 --- ext/mysql.orig/tests/mysql_fetch_row.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_fetch_row.phpt	2022-07-03 22:16:35.000000000 +0200
++++ ext/mysql/tests/mysql_fetch_row.phpt	2024-09-27 14:23:30.238284120 +0200
 @@ -12,11 +12,15 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2138,20 +2158,18 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_row.phpt ext/mysql/tests/mysql_fetch_
  [004]
  array(2) {
    [0]=>
-@@ -50,8 +57,6 @@
-   string(1) "a"
+@@ -51,7 +58,5 @@
  }
  [005]
--bool(false)
+ bool(false)
 -
 -Warning: mysql_fetch_row(): supplied resource is not a valid MySQL result resource in %s on line %d
 -bool(false)
-+NULL
 +TypeError: mysql_fetch_row(): supplied resource is not a valid MySQL result resource in %s on line %d
  done!
 diff -urN ext/mysql.orig/tests/mysql_field_flags.phpt ext/mysql/tests/mysql_field_flags.phpt
 --- ext/mysql.orig/tests/mysql_field_flags.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_field_flags.phpt	2022-07-04 00:05:43.000000000 +0200
++++ ext/mysql/tests/mysql_field_flags.phpt	2024-09-27 14:36:29.193589155 +0200
 @@ -12,19 +12,25 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2225,7 +2243,7 @@ diff -urN ext/mysql.orig/tests/mysql_field_flags.phpt ext/mysql/tests/mysql_fiel
  
  mysql_close($link);
  print "done!";
-@@ -149,14 +159,12 @@
+@@ -149,14 +159,14 @@
  require_once("clean_table.inc");
  ?>
  --EXPECTF--
@@ -2242,11 +2260,13 @@ diff -urN ext/mysql.orig/tests/mysql_field_flags.phpt ext/mysql/tests/mysql_fiel
 -
 -Warning: mysql_field_flags(): supplied resource is not a valid MySQL result resource in %s on line %d
 -bool(false)
++[013/label1 TIMESTAMP] Field 'label1', flag 'timestamp' not found, [0] 
++[013/label1 TIMESTAMP] Field 'label1', flag 'not_null' not found, [0] 
 +TypeError: mysql_field_flags(): supplied resource is not a valid MySQL result resource in %s on line %d
  done!
 diff -urN ext/mysql.orig/tests/mysql_field_len.phpt ext/mysql/tests/mysql_field_len.phpt
 --- ext/mysql.orig/tests/mysql_field_len.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_field_len.phpt	2022-07-04 00:09:36.000000000 +0200
++++ ext/mysql/tests/mysql_field_len.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,19 +12,25 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2305,7 +2325,7 @@ diff -urN ext/mysql.orig/tests/mysql_field_len.phpt ext/mysql/tests/mysql_field_
  done!
 diff -urN ext/mysql.orig/tests/mysql_field_name.phpt ext/mysql/tests/mysql_field_name.phpt
 --- ext/mysql.orig/tests/mysql_field_name.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_field_name.phpt	2022-07-04 00:13:48.000000000 +0200
++++ ext/mysql/tests/mysql_field_name.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,19 +12,25 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2364,7 +2384,7 @@ diff -urN ext/mysql.orig/tests/mysql_field_name.phpt ext/mysql/tests/mysql_field
  done!
 diff -urN ext/mysql.orig/tests/mysql_field_seek.phpt ext/mysql/tests/mysql_field_seek.phpt
 --- ext/mysql.orig/tests/mysql_field_seek.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_field_seek.phpt	2022-07-04 00:18:30.000000000 +0200
++++ ext/mysql/tests/mysql_field_seek.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,11 +12,15 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2439,7 +2459,7 @@ diff -urN ext/mysql.orig/tests/mysql_field_seek.phpt ext/mysql/tests/mysql_field
  done!
 diff -urN ext/mysql.orig/tests/mysql_field_table.phpt ext/mysql/tests/mysql_field_table.phpt
 --- ext/mysql.orig/tests/mysql_field_table.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_field_table.phpt	2022-07-04 00:21:25.000000000 +0200
++++ ext/mysql/tests/mysql_field_table.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,19 +12,25 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2498,7 +2518,7 @@ diff -urN ext/mysql.orig/tests/mysql_field_table.phpt ext/mysql/tests/mysql_fiel
  done!
 diff -urN ext/mysql.orig/tests/mysql_field_type.phpt ext/mysql/tests/mysql_field_type.phpt
 --- ext/mysql.orig/tests/mysql_field_type.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_field_type.phpt	2022-07-04 00:24:16.000000000 +0200
++++ ext/mysql/tests/mysql_field_type.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,19 +12,25 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2557,7 +2577,7 @@ diff -urN ext/mysql.orig/tests/mysql_field_type.phpt ext/mysql/tests/mysql_field
  done!
 diff -urN ext/mysql.orig/tests/mysql_free_result.phpt ext/mysql/tests/mysql_free_result.phpt
 --- ext/mysql.orig/tests/mysql_free_result.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_free_result.phpt	2022-07-31 13:44:22.000000000 +0200
++++ ext/mysql/tests/mysql_free_result.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,11 +12,15 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2608,7 +2628,7 @@ diff -urN ext/mysql.orig/tests/mysql_free_result.phpt ext/mysql/tests/mysql_free
  done!
 diff -urN ext/mysql.orig/tests/mysql_get_client_info.phpt ext/mysql/tests/mysql_get_client_info.phpt
 --- ext/mysql.orig/tests/mysql_get_client_info.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_get_client_info.phpt	2022-07-04 00:30:31.000000000 +0200
++++ ext/mysql/tests/mysql_get_client_info.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -15,11 +15,14 @@
  	var_inspect($info);
  }
@@ -2628,7 +2648,7 @@ diff -urN ext/mysql.orig/tests/mysql_get_client_info.phpt ext/mysql/tests/mysql_
 +done!
 diff -urN ext/mysql.orig/tests/mysql_get_host_info.phpt ext/mysql/tests/mysql_get_host_info.phpt
 --- ext/mysql.orig/tests/mysql_get_host_info.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_get_host_info.phpt	2022-07-04 00:31:18.000000000 +0200
++++ ext/mysql/tests/mysql_get_host_info.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -9,8 +9,10 @@
  <?php
  include_once "connect.inc";
@@ -2662,7 +2682,7 @@ diff -urN ext/mysql.orig/tests/mysql_get_host_info.phpt ext/mysql/tests/mysql_ge
  done!
 diff -urN ext/mysql.orig/tests/mysql_get_proto_info.phpt ext/mysql/tests/mysql_get_proto_info.phpt
 --- ext/mysql.orig/tests/mysql_get_proto_info.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_get_proto_info.phpt	2022-07-04 00:31:58.000000000 +0200
++++ ext/mysql/tests/mysql_get_proto_info.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -9,8 +9,10 @@
  <?php
  include_once "connect.inc";
@@ -2695,7 +2715,7 @@ diff -urN ext/mysql.orig/tests/mysql_get_proto_info.phpt ext/mysql/tests/mysql_g
  done!
 diff -urN ext/mysql.orig/tests/mysql_get_server_info.phpt ext/mysql/tests/mysql_get_server_info.phpt
 --- ext/mysql.orig/tests/mysql_get_server_info.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_get_server_info.phpt	2022-07-04 00:32:32.000000000 +0200
++++ ext/mysql/tests/mysql_get_server_info.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -9,8 +9,10 @@
  <?php
  include "connect.inc";
@@ -2725,7 +2745,7 @@ diff -urN ext/mysql.orig/tests/mysql_get_server_info.phpt ext/mysql/tests/mysql_
  done!
 diff -urN ext/mysql.orig/tests/mysql_info.phpt ext/mysql/tests/mysql_info.phpt
 --- ext/mysql.orig/tests/mysql_info.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_info.phpt	2022-07-04 00:43:11.000000000 +0200
++++ ext/mysql/tests/mysql_info.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -9,11 +9,15 @@
  <?php
  include "connect.inc";
@@ -2751,7 +2771,7 @@ diff -urN ext/mysql.orig/tests/mysql_info.phpt ext/mysql/tests/mysql_info.phpt
  done!
 diff -urN ext/mysql.orig/tests/mysql_insert_id.phpt ext/mysql/tests/mysql_insert_id.phpt
 --- ext/mysql.orig/tests/mysql_insert_id.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_insert_id.phpt	2022-07-04 01:00:18.000000000 +0200
++++ ext/mysql/tests/mysql_insert_id.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -13,14 +13,20 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2797,7 +2817,7 @@ diff -urN ext/mysql.orig/tests/mysql_insert_id.phpt ext/mysql/tests/mysql_insert
  done!
 diff -urN ext/mysql.orig/tests/mysql_list_dbs.phpt ext/mysql/tests/mysql_list_dbs.phpt
 --- ext/mysql.orig/tests/mysql_list_dbs.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_list_dbs.phpt	2022-07-04 00:53:11.000000000 +0200
++++ ext/mysql/tests/mysql_list_dbs.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,11 +12,15 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2824,7 +2844,7 @@ diff -urN ext/mysql.orig/tests/mysql_list_dbs.phpt ext/mysql/tests/mysql_list_db
  done!
 diff -urN ext/mysql.orig/tests/mysql_list_fields.phpt ext/mysql/tests/mysql_list_fields.phpt
 --- ext/mysql.orig/tests/mysql_list_fields.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_list_fields.phpt	2022-07-31 16:27:25.000000000 +0200
++++ ext/mysql/tests/mysql_list_fields.phpt	2024-09-27 15:04:05.397759079 +0200
 @@ -1,5 +1,5 @@
  --TEST--
 -mysql_list_fields()
@@ -2845,7 +2865,7 @@ diff -urN ext/mysql.orig/tests/mysql_list_fields.phpt ext/mysql/tests/mysql_list
  
  if (2 !== ($num = mysql_num_fields($res)))
  	printf("[004] Expecting two fields from 'test', got %d. [%d] %s\n", $num, mysql_errno($link), mysql_error($link));
-@@ -63,18 +68,7 @@
+@@ -63,18 +68,6 @@
  
  mysql_close($link);
  ?>
@@ -2866,10 +2886,9 @@ diff -urN ext/mysql.orig/tests/mysql_list_fields.phpt ext/mysql/tests/mysql_list
 -mysql_field_name(): label
 -mysql_field_type(): string
 -done!
-+Warning: mysql_list_fields(): Unable to save MySQL query result in %s on line %d
 diff -urN ext/mysql.orig/tests/mysql_list_processes.phpt ext/mysql/tests/mysql_list_processes.phpt
 --- ext/mysql.orig/tests/mysql_list_processes.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_list_processes.phpt	2022-07-04 00:54:08.000000000 +0200
++++ ext/mysql/tests/mysql_list_processes.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,8 +12,10 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2890,7 +2909,7 @@ diff -urN ext/mysql.orig/tests/mysql_list_processes.phpt ext/mysql/tests/mysql_l
  done!
 diff -urN ext/mysql.orig/tests/mysql_list_tables.phpt ext/mysql/tests/mysql_list_tables.phpt
 --- ext/mysql.orig/tests/mysql_list_tables.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_list_tables.phpt	2022-07-04 00:55:15.000000000 +0200
++++ ext/mysql/tests/mysql_list_tables.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,17 +12,25 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2928,7 +2947,7 @@ diff -urN ext/mysql.orig/tests/mysql_list_tables.phpt ext/mysql/tests/mysql_list
  done!
 diff -urN ext/mysql.orig/tests/mysql_max_links.phpt ext/mysql/tests/mysql_max_links.phpt
 --- ext/mysql.orig/tests/mysql_max_links.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_max_links.phpt	2022-06-27 13:28:20.000000000 +0200
++++ ext/mysql/tests/mysql_max_links.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -54,19 +54,9 @@
  print "done!\n";
  ?>
@@ -2951,7 +2970,7 @@ diff -urN ext/mysql.orig/tests/mysql_max_links.phpt ext/mysql/tests/mysql_max_li
  array(3) {
 diff -urN ext/mysql.orig/tests/mysql_max_persistent.phpt ext/mysql/tests/mysql_max_persistent.phpt
 --- ext/mysql.orig/tests/mysql_max_persistent.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_max_persistent.phpt	2022-07-04 05:22:18.000000000 +0200
++++ ext/mysql/tests/mysql_max_persistent.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -90,14 +90,8 @@
  mysql_close($link);
  ?>
@@ -2969,7 +2988,7 @@ diff -urN ext/mysql.orig/tests/mysql_max_persistent.phpt ext/mysql/tests/mysql_m
    resource(%d) of type (mysql link persistent)
 diff -urN ext/mysql.orig/tests/mysql_mysqlnd_read_timeout_long.phpt ext/mysql/tests/mysql_mysqlnd_read_timeout_long.phpt
 --- ext/mysql.orig/tests/mysql_mysqlnd_read_timeout_long.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_mysqlnd_read_timeout_long.phpt	2022-06-27 13:28:53.000000000 +0200
++++ ext/mysql/tests/mysql_mysqlnd_read_timeout_long.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -30,7 +30,6 @@
  	print "done!";
  ?>
@@ -2980,7 +2999,7 @@ diff -urN ext/mysql.orig/tests/mysql_mysqlnd_read_timeout_long.phpt ext/mysql/te
    string(1) "0"
 diff -urN ext/mysql.orig/tests/mysql_num_fields.phpt ext/mysql/tests/mysql_num_fields.phpt
 --- ext/mysql.orig/tests/mysql_num_fields.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_num_fields.phpt	2022-07-04 01:36:44.000000000 +0200
++++ ext/mysql/tests/mysql_num_fields.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,30 +12,35 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -3045,7 +3064,7 @@ diff -urN ext/mysql.orig/tests/mysql_num_fields.phpt ext/mysql/tests/mysql_num_f
  done!
 diff -urN ext/mysql.orig/tests/mysql_num_rows.phpt ext/mysql/tests/mysql_num_rows.phpt
 --- ext/mysql.orig/tests/mysql_num_rows.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_num_rows.phpt	2022-07-04 02:02:45.000000000 +0200
++++ ext/mysql/tests/mysql_num_rows.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -12,17 +12,21 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -3100,7 +3119,7 @@ diff -urN ext/mysql.orig/tests/mysql_num_rows.phpt ext/mysql/tests/mysql_num_row
  done!
 diff -urN ext/mysql.orig/tests/mysql_pconn_disable.phpt ext/mysql/tests/mysql_pconn_disable.phpt
 --- ext/mysql.orig/tests/mysql_pconn_disable.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_pconn_disable.phpt	2022-07-04 05:11:56.000000000 +0200
++++ ext/mysql/tests/mysql_pconn_disable.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -11,51 +11,44 @@
  mysql.max_links=2
  --FILE--
@@ -3178,7 +3197,7 @@ diff -urN ext/mysql.orig/tests/mysql_pconn_disable.phpt ext/mysql/tests/mysql_pc
  done!
 diff -urN ext/mysql.orig/tests/mysql_pconnect.phpt ext/mysql/tests/mysql_pconnect.phpt
 --- ext/mysql.orig/tests/mysql_pconnect.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_pconnect.phpt	2022-07-31 20:30:41.000000000 +0200
++++ ext/mysql/tests/mysql_pconnect.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -10,88 +10,80 @@
  mysql.allow_persistent=1
  --FILE--
@@ -3324,8 +3343,8 @@ diff -urN ext/mysql.orig/tests/mysql_pconnect.phpt ext/mysql/tests/mysql_pconnec
  done!
 diff -urN ext/mysql.orig/tests/mysql_pconn_kill.phpt ext/mysql/tests/mysql_pconn_kill.phpt
 --- ext/mysql.orig/tests/mysql_pconn_kill.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_pconn_kill.phpt	2022-07-04 05:34:56.000000000 +0200
-@@ -10,108 +10,105 @@
++++ ext/mysql/tests/mysql_pconn_kill.phpt	2024-09-27 14:47:01.587704632 +0200
+@@ -10,108 +10,103 @@
  mysql.max_persistent=2
  --FILE--
  <?php
@@ -3503,18 +3522,15 @@ diff -urN ext/mysql.orig/tests/mysql_pconn_kill.phpt ext/mysql/tests/mysql_pconn
 -Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
 -
 -Deprecated: mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
--bool(true)
+ bool(true)
 -
 -Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
 -
 -Deprecated: mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead in %s on line %d
-+[010] Cannot run query on new persistent connection, [2006] MySQL server has gone away
-+bool(false)
-+[011] Cannot run query on new persistent connection, [2006] MySQL server has gone away
  done!
 diff -urN ext/mysql.orig/tests/mysql_pconn_max_links.phpt ext/mysql/tests/mysql_pconn_max_links.phpt
 --- ext/mysql.orig/tests/mysql_pconn_max_links.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_pconn_max_links.phpt	2022-07-04 05:20:52.000000000 +0200
++++ ext/mysql/tests/mysql_pconn_max_links.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -63,111 +63,111 @@
  mysql.allow_persistent=1
  --FILE--
@@ -3751,7 +3767,7 @@ diff -urN ext/mysql.orig/tests/mysql_pconn_max_links.phpt ext/mysql/tests/mysql_
    string(1) "1"
 diff -urN ext/mysql.orig/tests/mysql_pconn_reuse.phpt ext/mysql/tests/mysql_pconn_reuse.phpt
 --- ext/mysql.orig/tests/mysql_pconn_reuse.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_pconn_reuse.phpt	2022-06-27 13:32:10.000000000 +0200
++++ ext/mysql/tests/mysql_pconn_reuse.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -59,17 +59,8 @@
  	print "done!";
  ?>
@@ -3772,7 +3788,7 @@ diff -urN ext/mysql.orig/tests/mysql_pconn_reuse.phpt ext/mysql/tests/mysql_pcon
  done!
 diff -urN ext/mysql.orig/tests/mysql_phpinfo.phpt ext/mysql/tests/mysql_phpinfo.phpt
 --- ext/mysql.orig/tests/mysql_phpinfo.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_phpinfo.phpt	2022-07-04 11:16:19.000000000 +0200
++++ ext/mysql/tests/mysql_phpinfo.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -1,5 +1,5 @@
  --TEST--
 -phpinfo() mysql section
@@ -3793,7 +3809,7 @@ diff -urN ext/mysql.orig/tests/mysql_phpinfo.phpt ext/mysql/tests/mysql_phpinfo.
  		'bytes_sent', 'bytes_received', 'packets_sent', 'packets_received',
 diff -urN ext/mysql.orig/tests/mysql_ping.phpt ext/mysql/tests/mysql_ping.phpt
 --- ext/mysql.orig/tests/mysql_ping.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_ping.phpt	2022-07-04 05:33:42.000000000 +0200
++++ ext/mysql/tests/mysql_ping.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -14,8 +14,10 @@
  
  require('table.inc');
@@ -3836,7 +3852,7 @@ diff -urN ext/mysql.orig/tests/mysql_ping.phpt ext/mysql/tests/mysql_ping.phpt
  done!
 diff -urN ext/mysql.orig/tests/mysql_query_load_data_openbasedir.phpt ext/mysql/tests/mysql_query_load_data_openbasedir.phpt
 --- ext/mysql.orig/tests/mysql_query_load_data_openbasedir.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_query_load_data_openbasedir.phpt	2022-07-04 11:11:50.000000000 +0200
++++ ext/mysql/tests/mysql_query_load_data_openbasedir.phpt	2024-09-19 02:51:16.113310751 +0200
 @@ -1,22 +1,23 @@
  --TEST--
 -LOAD DATA INFILE - open_basedir
@@ -3926,7 +3942,7 @@ diff -urN ext/mysql.orig/tests/mysql_query_load_data_openbasedir.phpt ext/mysql/
  done!
 diff -urN ext/mysql.orig/tests/mysql_query.phpt ext/mysql/tests/mysql_query.phpt
 --- ext/mysql.orig/tests/mysql_query.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_query.phpt	2022-07-04 05:35:53.000000000 +0200
++++ ext/mysql/tests/mysql_query.phpt	2024-09-19 02:51:16.117311122 +0200
 @@ -12,16 +12,20 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -3977,7 +3993,7 @@ diff -urN ext/mysql.orig/tests/mysql_query.phpt ext/mysql/tests/mysql_query.phpt
  done!
 diff -urN ext/mysql.orig/tests/mysql_real_escape_string.phpt ext/mysql/tests/mysql_real_escape_string.phpt
 --- ext/mysql.orig/tests/mysql_real_escape_string.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_real_escape_string.phpt	2022-07-04 04:52:05.000000000 +0200
++++ ext/mysql/tests/mysql_real_escape_string.phpt	2024-09-19 02:51:16.117311122 +0200
 @@ -12,13 +12,17 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -4008,7 +4024,7 @@ diff -urN ext/mysql.orig/tests/mysql_real_escape_string.phpt ext/mysql/tests/mys
  string(2) "\""
 diff -urN ext/mysql.orig/tests/mysql_reflection_functions.phpt ext/mysql/tests/mysql_reflection_functions.phpt
 --- ext/mysql.orig/tests/mysql_reflection_functions.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_reflection_functions.phpt	2022-06-28 11:20:08.000000000 +0200
++++ ext/mysql/tests/mysql_reflection_functions.phpt	2024-09-19 02:51:16.117311122 +0200
 @@ -37,31 +37,31 @@
      Required parameters: 2
        Parameter #0 [ <required> $database_name ]
@@ -4298,7 +4314,7 @@ diff -urN ext/mysql.orig/tests/mysql_reflection_functions.phpt ext/mysql/tests/m
 +done!
 diff -urN ext/mysql.orig/tests/mysql_result.phpt ext/mysql/tests/mysql_result.phpt
 --- ext/mysql.orig/tests/mysql_result.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_result.phpt	2022-07-04 05:04:59.000000000 +0200
++++ ext/mysql/tests/mysql_result.phpt	2024-09-19 02:51:16.117311122 +0200
 @@ -14,11 +14,15 @@
  
  // string mysql_result ( resource result, int row [, mixed field] )
@@ -4346,7 +4362,7 @@ diff -urN ext/mysql.orig/tests/mysql_result.phpt ext/mysql/tests/mysql_result.ph
  done!
 diff -urN ext/mysql.orig/tests/mysql_select_db.phpt ext/mysql/tests/mysql_select_db.phpt
 --- ext/mysql.orig/tests/mysql_select_db.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_select_db.phpt	2022-07-04 05:37:35.000000000 +0200
++++ ext/mysql/tests/mysql_select_db.phpt	2024-09-19 02:51:16.117311122 +0200
 @@ -12,15 +12,19 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -4388,7 +4404,7 @@ diff -urN ext/mysql.orig/tests/mysql_select_db.phpt ext/mysql/tests/mysql_select
  done!
 diff -urN ext/mysql.orig/tests/mysql_set_charset.phpt ext/mysql/tests/mysql_set_charset.phpt
 --- ext/mysql.orig/tests/mysql_set_charset.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_set_charset.phpt	2022-07-04 05:51:20.000000000 +0200
++++ ext/mysql/tests/mysql_set_charset.phpt	2024-09-19 02:51:16.117311122 +0200
 @@ -6,7 +6,7 @@
  require_once('skipifconnectfailure.inc');
  
@@ -4406,7 +4422,7 @@ diff -urN ext/mysql.orig/tests/mysql_set_charset.phpt ext/mysql/tests/mysql_set_
  done!
 diff -urN ext/mysql.orig/tests/mysql_stat.phpt ext/mysql/tests/mysql_stat.phpt
 --- ext/mysql.orig/tests/mysql_stat.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_stat.phpt	2022-07-31 15:38:07.000000000 +0200
++++ ext/mysql/tests/mysql_stat.phpt	2024-09-19 02:51:16.117311122 +0200
 @@ -13,13 +13,17 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -4445,7 +4461,7 @@ diff -urN ext/mysql.orig/tests/mysql_stat.phpt ext/mysql/tests/mysql_stat.phpt
  done!
 diff -urN ext/mysql.orig/tests/mysql_tablename.phpt ext/mysql/tests/mysql_tablename.phpt
 --- ext/mysql.orig/tests/mysql_tablename.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_tablename.phpt	2022-07-04 04:42:10.000000000 +0200
++++ ext/mysql/tests/mysql_tablename.phpt	2024-09-19 02:51:16.117311122 +0200
 @@ -12,19 +12,25 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -4502,7 +4518,7 @@ diff -urN ext/mysql.orig/tests/mysql_tablename.phpt ext/mysql/tests/mysql_tablen
  done!
 diff -urN ext/mysql.orig/tests/mysql_thread_id.phpt ext/mysql/tests/mysql_thread_id.phpt
 --- ext/mysql.orig/tests/mysql_thread_id.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_thread_id.phpt	2022-07-04 04:29:46.000000000 +0200
++++ ext/mysql/tests/mysql_thread_id.phpt	2024-09-19 02:51:16.117311122 +0200
 @@ -12,8 +12,10 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -4534,8 +4550,8 @@ diff -urN ext/mysql.orig/tests/mysql_thread_id.phpt ext/mysql/tests/mysql_thread
  done!
 diff -urN ext/mysql.orig/tests/mysql_trace_mode.phpt ext/mysql/tests/mysql_trace_mode.phpt
 --- ext/mysql.orig/tests/mysql_trace_mode.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_trace_mode.phpt	2022-06-27 13:34:32.000000000 +0200
-@@ -29,7 +29,6 @@
++++ ext/mysql/tests/mysql_trace_mode.phpt	2024-09-27 18:54:18.736391797 +0200
+@@ -29,9 +29,8 @@
  require_once("clean_table.inc");
  ?>
  --EXPECTF--
@@ -4543,9 +4559,12 @@ diff -urN ext/mysql.orig/tests/mysql_trace_mode.phpt ext/mysql/tests/mysql_trace
  I don\'t mind character sets, do I?\n
  Warning: mysql_query(): You have an error in your SQL syntax; check the manual that corresponds to your %s server version for the right syntax to use near 'BOGUS_SQL' at line 1 in %s on line %d
  done!
+ 
+-Warning: Unknown: 1 result set(s) not freed. Use mysql_free_result to free result sets which were requested using mysql_query() in %s on line %d
++Warning: PHP Request Shutdown: 1 result set(s) not freed. Use mysql_free_result to free result sets which were requested using mysql_query() in %s on line %d
 diff -urN ext/mysql.orig/tests/mysql_unbuffered_query.phpt ext/mysql/tests/mysql_unbuffered_query.phpt
 --- ext/mysql.orig/tests/mysql_unbuffered_query.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_unbuffered_query.phpt	2022-07-04 05:39:21.000000000 +0200
++++ ext/mysql/tests/mysql_unbuffered_query.phpt	2024-09-19 02:51:16.117311122 +0200
 @@ -12,13 +12,17 @@
  $tmp    = NULL;
  $link   = NULL;
