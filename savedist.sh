@@ -21,8 +21,8 @@ Cmt="# Pipe this to /bin/sh (after editing if needed)\n"
 for opt in "$@"
 do
     case "$opt" in
-	mv)	toMv="$Cmt" ;;
-	rm)	toRm="$Cmt" ;;
+	mv)	test "$toRm" && { echo "$Prg: cannot use 'rm' AND 'mv'" >&2; exit 1; } || toMv="$Cmt" ;;
+	rm)	test "$toMv" && { echo "$Prg: cannot use 'mv' AND 'rm'" >&2; exit 1; } || toRm="$Cmt" ;;
 	*)	echo "Usage: $Prg [ rm | mv ]" >&2; exit 1;;
     esac
 done
@@ -78,6 +78,8 @@ arch()
     echo "$1:--"
 }
 
+nbg=0	# Number of good saves
+nbf=0	# Number of failed saves
 XC=0
 for dv in $(cd 'debian'; echo [0-9] [0-9][0-9])
 do
@@ -93,7 +95,7 @@ do
 	    tools)	test -f "$d"/epi-tools-waitpid_*.deb || bad=y;;
 	    multi)	test -d "$d"/pkgs -a -d "$d"/logs || bad=y;;
 	esac
-	test "$bad" && { echo "Skipping $d (incomplete build)" >&2; continue; }
+	test "$bad" && { echo "Skipping $d (incomplete build)" >&2; nbf=$((nbf + 1)); continue; }
 	test -d "$DebDir/$dv" || mkdir "$DebDir/$dv"
 	if [ -d "$DebDir/$dv/$pv" ]; then
 	    diff=
@@ -116,6 +118,7 @@ do
 		    #test $XC -eq 0 && XC=1
 		fi
 	    else
+		nbg=$((nbg + 1))
 		echo "Dist $d is already saved" >&2
 		test "$pv" != 'multi' -a "$pv" != 'tools' && rmdkim "$dv" "$pv"
 	    fi
@@ -128,6 +131,7 @@ do
 	    fi
 	    xc=$?
 	    if [ $xc -eq 0 ]; then
+		nbg=$((nbg + 1))
 		test "$pv" != 'multi' -a "$pv" != 'tools' && rmdkim "$dv" "$pv"
 	    else
 		test $XC -eq 0 && XC=$xc
@@ -137,4 +141,5 @@ do
 done
 test "$toRm" && echo "$toRm"
 test "$toMv" && echo "$toMv"
+test $XC -eq 0 -a $nbg -eq 0 -a $nbf -gt 0 && XC=9
 exit $XC
