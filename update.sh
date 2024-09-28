@@ -5,13 +5,13 @@
 #
 #	This script runs as two separate instances, the first one calling the second
 #
-#	The first instance is started daily by cron as the dev user (cdt@cty1 as of 2023)
-#	Sample of cron file in /etc/cron.d/phpbuild:
+#	The first instance is started daily by cron as the dev user (dev@binbuild*)
+#	Sample of cron file in /etc/cron.d/php-build:
 #
 #	    MAILTO='c.girard@epiconcept.fr'
-#	    MAILFROM='cty1@epiconcept.fr'
+#	    MAILFROM='binbuild@epiconcept.fr'
 #
-#	    20 1 * * * cdt infra-build-php/update.sh | mail -Es \
+#	    20 1 * * * dev infra-build-php/update.sh | mail -Es \
 #		"$(hostname) PHP build(s) of new version(s)" -a "From: $MAILFROM" $MAILTO
 #
 #	It checks for new PHP versions.
@@ -32,7 +32,7 @@
 #	and the place of logs to examine for any error
 #
 # shellcheck disable=SC2086	# Double quote to prevent globbing
-# shellcheck disable=SC2039	# In POSIX sh, 'local' is undefined
+# shellcheck disable=SC3043	# In POSIX sh, 'local' is undefined
 # shellcheck disable=SC2059	# Don't use variables in the printf format string
 # shellcheck disable=SC2164	# Use 'cd ... || exit'
 #
@@ -177,7 +177,7 @@ build()
 
     echo "Building $1 PHP version $2 for Debian $3...$CR"
     #	We use a fifo to get $Bake's exit code even though we process it's stdout
-    dir="debian/$3/dist/$2-1"
+    dir="debian/$3/dist/$2-$(cat "$(bldnum $2)")"
     ff="$dir/.fail"
     mkdir -p $dir
     rm -f "$ff"
@@ -206,7 +206,6 @@ failed()
     do
 	test -f $bf || continue
 	eval "$(echo $bf | sed -r 's;debian/([0-9]+)/dist/([.0-9]+)-([0-9]+)/\.fail;dv=\1 pv=\2 bn=\3;')"
-	test "$bn" -ne 1 && { echo "WARNING: '$bf' on BUILD_NUM '$bn' > 1. Discarded.$CR"; continue; }
 	test "$fail" && fail="$fail "
 	fail="${fail}fail:$pv:$dv"
     done
@@ -222,7 +221,7 @@ bldnum()
 #   Phase 1 - Build 'dev' packages (ran as (non-'php') user)
 phase1()
 {
-    local debs phps blds res fail prod xc dv pv bf bn dd s
+    local debs adds upds blds upvs apvs bres fail prod xc dv pv bf bn dd s
 
     test "$#" -gt 0 && { echo "$Prg: no arguments needed" >&3; exit 1; }
 
@@ -236,32 +235,54 @@ phase1()
 	test "$debs" && debs="$debs $dv" || debs="$dv"
     done
 
-    #   Determine possible new PHP versions
+    #   Determine possible new PHP versions or PHP versions to update
     #	We check the existence of BUILD_NUM files in $(git ls-files)
-    #	to determine if a version is already known
-    phps=
+    #	to determine if a version is not already known or needs an update
+    adds=
+    upds=
     blds=
-    res=
+    upvs=
+    apvs=
     for pv in $(./bake latest)
     do
 	bf="$(bldnum $pv)"
-	git ls-files | grep "^$bf" >/dev/null && continue	# Ignore if exists
-	# Gather PHP versions
-	test "$phps" && phps="$phps $pv" || phps="$pv"
+	git ls-files | grep "^$bf" >/dev/null && {
+	    # Gather PHP versions to update
+	    if git status $bf | grep -E "^${TAB}modified: +$bf$" >/dev/null; then
+		test "$upds" && upds="$upds $pv" || upds="$pv"
+		# Gather report's 2nd arg
+		test "$upvs" && upvs="$upvs,$pv" || upvs="$pv"
+	    fi
+	    continue
+	}
+	# Gather new PHP versions
+	test "$adds" && adds="$adds $pv" || adds="$pv"
 	# Gather BUILD_NUM paths
 	test "$blds" && blds="$blds $bf" || blds="$bf"
-	# Gather result's first arg
-	test "$res" && res="$res,$pv" || res="$pv"
+	# Gather report's 1st arg
+	test "$apvs" && apvs="$apvs,$pv" || apvs="$pv"
     done
 
-    #	No new PHP version, check for previously failed builds
-    if [ -z "$res" ]; then
+    #	No new or to-update PHP version, check for previously failed builds
+    if [ -z "$apvs" -a -z "$upvs" ]; then
 	fail="$(failed)"
-	test "$fail" && report - $fail >&3
+	test "$fail" && report - - $fail >&3
 	exit 0
     fi
     echo "Debian versions: $debs$CR"
-    echo "New PHP version(s): $phps$CR"
+    test "$adds" && echo "New PHP version(s): $adds$CR"
+    test "$upds" && echo "PHP version(s) to update: $upds$CR"
+
+    #	Some PHP versions need update
+    for pv in $upds
+    do
+	bf="$(bldnum $pv)"
+	git add "$bf"
+    done
+    if [ "$upds" ]; then
+	echo "$upvs" | grep ',' >/dev/null && s='s' || s=
+	git commit -m "Update PHP version$s $(echo $upvs | sed 's/,/, /g')" | sed 's/$//'
+    fi
 
     #	New PHP version(s) appeared since last run
     for bf in $blds
@@ -275,20 +296,25 @@ phase1()
 	echo '1' >"$bf"
 	git add "$bf"
     done
-    echo "$res" | grep ',' >/dev/null && s='s' || s=
-    git commit -m "Add new PHP version$s $(echo $res | sed 's/,/, /g')" | sed 's/$//'
+    if [ "$adds" ]; then
+	echo "$apvs" | grep ',' >/dev/null && s='s' || s=
+	git commit -m "Add new PHP version$s $(echo $apvs | sed 's/,/, /g')" | sed 's/$//'
+    fi
 
     #	Bake 'dev' builds
+    bres=
     prod=
-    for pv in $phps
+    tag='upd'
+    for pv in $upds dev $adds
     do
+	test "$pv" = 'dev' && { tag=$pv; continue; }
 	for dv in $debs
 	do
-	    echo $pv | egrep "$(cat "debian/$dv/mkre")" >/dev/null || continue
+	    echo $pv | grep -E "$(cat "debian/$dv/mkre")" >/dev/null || continue
 	    build 'dev' $pv $dv
 	    xc=$?
-	    res="$res dev:$pv:$dv:$xc"
-	    test -s "debian/$dv/dist/$pv-1/.fail" || {
+	    test "$bres" && bres="$bres $tag:$pv:$dv:$xc" || bres="$tag:$pv:$dv:$xc"
+	    test -s "debian/$dv/dist/$pv-$(cat "$(bldnum $pv)")/.fail" || {
 		test "$prod" && prod="$prod $pv:$dv" || prod="$pv:$dv"
 	    }
 	done
@@ -299,16 +325,18 @@ phase1()
     #
     #	sudo below assumes rights to call $PhpDir/$Prg as 'php' without password
     #	Sample sudoers.d entry:
-    #	    # Allow 'cdt' to run php-prod/update.sh as 'php' without password
-    #	    cdt ALL = (php) NOPASSWD: /home/php/php-prod/update.sh
+    #	    # Allow 'dev' to run php-prod/update.sh as 'php' without password
+    #	    dev ALL = (php) NOPASSWD: /home/php/php-prod/update.sh
     #
     #	There MUST be a symlink $PhpDir to the actual 'prod' git repo
     #
-    test "$prod" && res="$res $(sudo -iu 'php' "$PhpDir/$Prg" $prod)"
-    echo "Res=\"$res\"$CR"
-    report $res >&3
-    rm_odis $phps >&3	# Remove old docker images
-    rm_ophp $phps >&3	# Remove old .debug/php/ trees
+    test "$prod" && bres="$bres $(sudo -iu 'php' "$PhpDir/$Prg" $prod)"
+    echo "Res=\"$bres\"$CR"
+    test "$apvs" || apvs='-'
+    test "$upvs" || upvs='-'
+    report $apvs $upvs $bres >&3
+    rm_odis $adds >&3	# Remove old docker images
+    rm_ophp $adds >&3	# Remove old .debug/php/ trees
 }
 
 #   Phase 2 - Build 'prod' packages (ran as 'php' user)
@@ -356,7 +384,10 @@ report()
     mE="===== See %s for output and possible errors of %s"
     printf "$mE\n" "$dir/$Log" "$dir/$Prg"
 
-    #	Arguments are <php-vers>[,<php-vers>] | '-' <result>[ result]...
+    #	Arguments are:
+    #	    <add-vers>[,<add-vers>] | '-'
+    #	    <upd-vers>[,<upd-vers>] | '-'
+    #	    <result>[ result]...
     if [ "$1" != '-' ]; then
 	pvs="$1"
 	if echo "$pvs" | grep ',' >/dev/null; then
@@ -364,14 +395,26 @@ report()
 	else
 	    echo "A new PHP version $pvs was found"	# Just one
 	fi
-    else	# Special case of failures $1 = '-'
+    elif [ "$2" = '-' ]; then	# Special case of failures $1 = '-' && $2 = '-'
 	# For no new version with no remaining failures, report is never called
 	echo "No new PHP version was found, but some build failures remain :"
     fi
     shift
 
+    if [ "$1" != '-' ]; then
+	pvs="$1"
+	if echo "$pvs" | grep ',' >/dev/null; then
+	    echo "PHP versions $(echo $pvs | sed 's/,/, /g') were updated !"	# Multiple
+	else
+	    echo "PHP version $pvs was updated"	# Just one
+	fi
+    fi
+    shift
+
+
     #   res format:
     #
+    #	upd:$pv:$dv:$xc
     #	dev:$pv:$dv:$xc
     #	plog:$lf
     #	prod:$pv:$dv:$xc
@@ -411,7 +454,7 @@ report()
 
 	    plog)   printf "\n$mE\n" "$PhpDir/$xc" "$PhpDir/$Prg";;
 
-	    dev|prod)
+	    upd|dev|prod)
 		if [ "$xc" -eq 0 ]; then
 		    ff="$bd/.fail"
 		    if [ -f "$ff" ]; then
@@ -436,6 +479,9 @@ report()
 		else
 		    echo " $mF (xc=$xc)"
 		fi
+		;;
+
+	    *)  echo "Unknown tag '$bt'"
 		;;
 	esac
     done
@@ -474,7 +520,9 @@ PhpDir='php-prod'
 PhpTop="$PhpHome/$PhpDir"
 Bake='php/bake'
 Usr=$(id -un)
+TAB='	'
 CR=''
+
 DefProxy='http://proxy:3128'
 test -f ~/.bash_profile && eval "$(grep 'http_proxy' ~/.bash_profile)"
 test "$http_proxy" || export http_proxy="$DefProxy"
