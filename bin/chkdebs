@@ -95,6 +95,7 @@ elif [ $# -eq 0 ]; then
 	test -f "debian/$dv/mkre" || continue
 	for pd in debian/$dv/dist/[0-9].[0-9].*
 	do
+	    test -d "$pd" || continue
 	    eval $(echo "$pd" | sed -r 's;debian/([0-9]+)/dist/([.0-9]+)-([0-9]+);d=\1 p=\2 b=\3;')
 	    chk_debs $d $p $b
 	done
