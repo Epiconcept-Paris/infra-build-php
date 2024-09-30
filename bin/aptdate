@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#	aptdate - Check SSH access to the APT-repo
+#	aptdate - Check SSH access to the APT-repo host
 #
 Prg=$(basename "$0")
 cd "$(dirname "$0")/.."
@@ -11,7 +11,8 @@ Bah='bin/apthost'
 test -x $Bin/defroute || { echo "$Prg: cannot find the 'defroute' script in '$Bin'" >&2; exit 1; }
 test -x $Bah || { echo "$Prg: cannot find the '$Bah' script in '$PWD'" >&2; exit 1; }
 
-Srv=$($Bah $Usr) || exit $?
+Srv=$($Bah) || exit $?
+test "$(id -un)" = $Usr || Cmd="sudo -iu $Usr"
 
 cleanup()
 {
@@ -21,6 +22,7 @@ cleanup()
 trap cleanup 0
 
 #   Setup default route
+test "$DBG" && echo "Cmd=\"$Cmd\""
 $Bin/defroute >/dev/null || {
     sudo -l | grep $Bin/defroute >/dev/null || {
 	echo "$Prg: 'sudo defroute' is not configured" >&2
@@ -31,4 +33,4 @@ $Bin/defroute >/dev/null || {
     Del=y	# Delete route at exit
 }
 
-sudo -iu $Usr ssh $Srv date "$@"
+$Cmd ssh $Srv date "$@"

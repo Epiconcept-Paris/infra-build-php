@@ -14,7 +14,7 @@ Bah='bin/apthost'
 test "$(id -un)" = $Usr || { echo "$Prg: must run as the '$Usr' user" >&2; exit 1; }
 test -x $Bin/defroute || { echo "$Prg: cannot find the 'defroute' script in '$Bin'" >&2; exit 1; }
 test -x $Bah || { echo "$Prg: cannot find the '$Bah' script in '$PWD'" >&2; exit 1; }
-Srv=$($Bah $Usr) || exit $?
+Srv=$($Bah) || exit $?
 
 dist=../php-debs
 tmp=/space/tmp/sendphp

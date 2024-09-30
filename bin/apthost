@@ -1,17 +1,19 @@
 #!/bin/sh
 #
-#	apthost - Check the SSH config to access the APT-repo host and return it
+#	apthost - Check the SSH config to access the APT-repo host
+#		  Show that host on stdout
+#
+#	DBG=<x> env variable shows debug-info on stderr
 #
 Prg=$(basename "$0")
 cd "$(dirname "$0")/.."
 
-test "$1" || { echo "Usage: $Prg <system-user>" >&2; exit 1; }
-grep "^$1:" /etc/passwd >/dev/null || { echo "$Prg: user '$1' is unknown" >&2; exit 1; }
-
-Usr="$1"
+Usr='php'
 Cfg='.ssh/config'
-test "$(id -un)" = 'php' && Dir="$HOME/" || {
-    Cmd='sudo -iu php'
+grep "^$Usr:" /etc/passwd >/dev/null || { echo "$Prg: user '$1' is unknown" >&2; exit 1; }
+
+test "$(id -un)" = $Usr && Dir="$HOME/" || {
+    Cmd="sudo -iu $Usr"
     Sudo='s/^ *(\([^)]*\)) *NOPASSWD: *ALL$/\1/p'
     sudo -l | sed -n "$Sudo" | sed 's/, */\n/g' | grep "^$Usr$" >/dev/null || {
 	echo "$Prg: sudo -u $Usr is not properly configured"
@@ -25,11 +27,12 @@ test "$(id -un)" = 'php' && Dir="$HOME/" || {
 #	User epiconcept_build
 #   --------------------------------
 #
+test "$DBG" && echo "Dir=\"$Dir\" Cmd=\"$Cmd\"" >&2
 eval $($Cmd sed -n \
 	-e 's/^[ \t]*Host[ \t][ \t]*/Host=/p' \
 	-e 's/^[ \t]*Hostname[ \t][ \t]*/Name=/p' \
 	-e 's/^[ \t]*User[ \t][ \t]*/User=/p' \
 	$Dir$Cfg 3>/dev/null)
-test "$DBG" && echo "In $Dir$Cfg Host=$Host Name=$Name User=$User" >&2
-test "$Host" -a "$Name" -a "$User" || { echo "$Prg: $Dir$Cfg missing or invalid" >&2; exit 3; }
+test "$DBG" && echo "In ~$Usr/$Cfg Host=$Host Hostname=$Name User=$User" >&2
+test "$Host" -a "$Name" -a "$User" || { echo "$Prg: ~$Usr/$Cfg missing or invalid" >&2; exit 3; }
 echo "$Host"
