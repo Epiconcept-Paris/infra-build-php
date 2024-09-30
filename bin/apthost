@@ -10,7 +10,7 @@ cd "$(dirname "$0")/.."
 
 Usr='php'
 Cfg='.ssh/config'
-grep "^$Usr:" /etc/passwd >/dev/null || { echo "$Prg: user '$1' is unknown" >&2; exit 1; }
+grep "^$Usr:" /etc/passwd >/dev/null || { echo "$Prg: user '$Usr' is unknown" >&2; exit 1; }
 
 test "$(id -un)" = $Usr && Dir="$HOME/" || {
     Cmd="sudo -iu $Usr"
