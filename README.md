@@ -49,7 +49,14 @@ Le fonctionnement du fournil nécessite :
   ```
 * `curl` installé (`sudo apt install curl`)
 * un compte utilisateur-système de développement (par exemple `dev`) avec accès à `docker` et accès sudo à `root`
-* un compte utilisateur-système `php`
+* un compte utilisateur-système `php` avec :
+  * l'appartenance au groupe `docker` pour avoir le droit d'exécuter la commande `docker`
+  * un répertoire SSH (`.ssh`) contenant au minimum la clé privée (par exemple `.ssh/id_rsa`) pour accéder au dépot APT distant des paquets produits et un fichier de configuration SSH (`.ssh/config`) sur le modèle suivant :
+  ```
+  Host apt
+  	Hostname files.epiconcept.fr
+  	User epiconcept_build
+  ```
 * les droits pour `dev` d'exécuter des commandes comme `php` :
   ```console
   dev:~$ sudo cat /etc/sudoers/dev-php
@@ -401,7 +408,9 @@ La deuxième instance (sous l'identité de l'utilisateur-système `php`) effectu
 * lancer le script `savedist.sh` qui va automatiquement détecter les nouveaux paquets Debian générés et les sauver dans le répertoire `../php-debs` collatéral au répertoire `php-prod` (voir [Installation](#setup)).  
   Ce répertoire `php-debs` est la référence (*master*) des paquets PHP (et associés) générés par ce dépôt `git`
 * lancer le script `send.sh` qui va envoyer au dépôt APT les nouveaux paquets Debian sauvegardés par la commande `savedist.sh` en synchronisant (`rsync`) tous les paquets Debian de `php-debs` avec le dépôt APT.
-Toute erreur dans le déroulement de ce processus est rapportée dans le mail envoyé par la `crontab` qui appelle le script `update.sh`
+  Toute erreur dans le déroulement de ce processus est rapportée dans le mail envoyé par la `crontab` qui appelle le script `update.sh`.
+  Il peut en effet arriver que le script `/usr/local/bin/apt_deploy.sh`, lancé sur 'apt' par SSH depuis `send.sh`, retourne le message `Job is already running`, précédant le signalement d'une erreur `(xc=1)`.
+  Il faut dans ce cas patienter jusqu'à la prochaine exécution automatique du script sur `apt` du script.
 
 Si un *build* de PHP a échoué, son répertoire de *build* contiendra un fichier (vide) témoin `.fail`.
 Si le script `update.sh` ne trouve pas de nouvelle version PHP à *build*er, il signalera dans son rapport tous les *build* PHP dont le répertoire de *build* contient ce fichier `.fail`, jusqu'à ce que ce dernier soit supprimé.
