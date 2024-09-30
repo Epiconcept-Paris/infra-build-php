@@ -11,18 +11,20 @@ Dir="$(dirname "$0")"
 cd "$Dir"
 
 DebDir='../php-debs'
-command -v docker >/dev/null && DkIms="$(docker images | awk '$1 ~ /^epi-[^-]+-php$/ {print $1 ":" $2}')"
 NoDir="$Prg: cannot find directory"
+MaxMv=100	# Max backup copies (should be a power of 10)
+command -v docker >/dev/null && DkIms="$(docker images | awk '$1 ~ /^epi-[^-]+-php$/ {print $1 ":" $2}')"
 #echo "$DkIms"; exit 0	# DBG
 
 toMv=
 toRm=
 Cmt="# Pipe this to /bin/sh (after editing if needed)\n"
+NotBoth="$Prg: cannot use both '%s' AND '%s'\n"
 for opt in "$@"
 do
     case "$opt" in
-	mv)	test "$toRm" && { echo "$Prg: cannot use 'rm' AND 'mv'" >&2; exit 1; } || toMv="$Cmt" ;;
-	rm)	test "$toMv" && { echo "$Prg: cannot use 'mv' AND 'rm'" >&2; exit 1; } || toRm="$Cmt" ;;
+	mv)	test "$toRm" && { printf "$NotBoth" rm mv >&2; exit 1; } || toMv="$Cmt" ;;
+	rm)	test "$toMv" && { printf "$NotBoth" mv rm >&2; exit 1; } || toRm="$Cmt" ;;
 	*)	echo "Usage: $Prg [ rm | mv ]" >&2; exit 1;;
     esac
 done
@@ -66,12 +68,13 @@ rmdkim()
 #   Find an archive name for dir $1
 arch()
 {
+    #global MaxMv
     local d n
 
     n=0
-    while [ "$n" -lt 100 ]
+    while [ "$n" -lt $MaxMv ]
     do
-	d="$1:$(printf '%02d' $n)"
+	d="$1:$(printf "%0$(expr $((MaxMv-1)) : '.*')d" $n)"
 	test -d "$d" || { echo "$d"; return; }
 	n=$((n + 1))
     done
