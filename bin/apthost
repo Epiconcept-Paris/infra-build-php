@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+#	apthost - Check the SSH config to access the APT-repo host and return it
+#
+Prg=$(basename "$0")
+cd "$(dirname "$0")/.."
+
+test "$1" || { echo "Usage: $Prg <system-user>" >&2; exit 1; }
+grep "^$1:" /etc/passwd >/dev/null || { echo "$Prg: user '$1' is unknown" >&2; exit 1; }
+
+Usr="$1"
+Cfg='.ssh/config'
+test "$(id -un)" = 'php' && Dir="$HOME/" || {
+    Cmd='sudo -iu php'
+    Sudo='s/^ *(\([^)]*\)) *NOPASSWD: *ALL$/\1/p'
+    sudo -l | sed -n "$Sudo" | sed 's/, */\n/g' | grep "^$Usr$" >/dev/null || {
+	echo "$Prg: sudo -u $Usr is not properly configured"
+	exit 2
+    }
+}
+#   Expected ~php/.ssh/config (for example):
+#   --------------------------------
+#   Host apt
+#	Hostname files.epiconcept.fr
+#	User epiconcept_build
+#   --------------------------------
+#
+eval $($Cmd sed -n \
+	-e 's/^[ \t]*Host[ \t][ \t]*/Host=/p' \
+	-e 's/^[ \t]*Hostname[ \t][ \t]*/Name=/p' \
+	-e 's/^[ \t]*User[ \t][ \t]*/User=/p' \
+	$Dir$Cfg 3>/dev/null)
+test "$DBG" && echo "In $Dir$Cfg Host=$Host Name=$Name User=$User" >&2
+test "$Host" -a "$Name" -a "$User" || { echo "$Prg: $Dir$Cfg missing or invalid" >&2; exit 3; }
+echo "$Host"
