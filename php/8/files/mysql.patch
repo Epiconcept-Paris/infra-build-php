@@ -1,6 +1,6 @@
 diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
 --- ext/mysql.orig/php_mysql.c	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/php_mysql.c	2024-09-27 20:08:20.784681605 +0200
++++ ext/mysql/php_mysql.c	2024-10-01 19:25:32.719671654 +0200
 @@ -1,6 +1,6 @@
  /*
     +----------------------------------------------------------------------+
@@ -822,21 +822,18 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  
  			if (ctor_params && Z_TYPE_P(ctor_params) != IS_NULL) {
  				if (zend_fcall_info_args(&fci, ctor_params) == FAILURE) {
-@@ -2313,6 +2363,13 @@
+@@ -2313,6 +2363,10 @@
  			zend_throw_exception_ex(zend_exception_get_default(), 0, "Class %s does not have a constructor hence you cannot use ctor_params", ZSTR_VAL(ce->name));
  		}
  	}
-+	/* We invert mysqli_fetch_assoc logig: FALSE on end, NULL on error */
-+	else if (!into_object && Z_TYPE_P(return_value) == IS_NULL) {
++	/* We keep mysql_fetch_{row,array,object,assoc} logic: FALSE on end or error */
++	else if (Z_TYPE_P(return_value) == IS_NULL) {
 +		RETURN_FALSE;
-+	}
-+	else if (!into_object && Z_TYPE_P(return_value) == IS_FALSE) {
-+		RETURN_NULL();
 +	}
  
  }
  /* }}} */
-@@ -2361,16 +2418,18 @@
+@@ -2361,16 +2415,18 @@
  	zend_long offset;
  	MYSQL_RES *mysql_result;
  
@@ -859,7 +856,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  		RETURN_FALSE;
  	}
  	mysql_data_seek(mysql_result, offset);
-@@ -2388,9 +2447,10 @@
+@@ -2388,9 +2444,10 @@
  	int num_fields;
  	int i;
  
@@ -873,7 +870,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  
  	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
  		RETURN_FALSE;
-@@ -2493,9 +2553,12 @@
+@@ -2493,9 +2550,12 @@
  	MYSQL_RES *mysql_result;
  	const MYSQL_FIELD *mysql_field;
  
@@ -889,7 +886,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  
  	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
  		RETURN_FALSE;
-@@ -2520,7 +2583,7 @@
+@@ -2520,7 +2580,7 @@
  #endif
  	add_property_stringl(return_value, "table", (mysql_field->table?mysql_field->table:""), mysql_field->table_length);
  	add_property_stringl(return_value, "def", (mysql_field->def?mysql_field->def:""), mysql_field->def_length);
@@ -898,7 +895,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  	add_property_long(return_value, "not_null", IS_NOT_NULL(mysql_field->flags)?1:0);
  	add_property_long(return_value, "primary_key", IS_PRI_KEY(mysql_field->flags)?1:0);
  	add_property_long(return_value, "multiple_key", (mysql_field->flags&MULTIPLE_KEY_FLAG?1:0));
-@@ -2541,16 +2604,18 @@
+@@ -2541,16 +2601,18 @@
  	zend_long offset;
  	MYSQL_RES *mysql_result;
  
@@ -921,7 +918,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  		RETURN_FALSE;
  	}
  	mysql_field_seek(mysql_result, offset);
-@@ -2575,16 +2640,18 @@
+@@ -2575,16 +2637,18 @@
  	char buf[512];
  	int  len;
  
@@ -944,7 +941,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  		RETURN_FALSE;
  	}
  	mysql_field_seek(mysql_result, field);
-@@ -2734,9 +2801,10 @@
+@@ -2734,9 +2798,10 @@
  	zval *result;
  	MYSQL_RES *mysql_result;
  
@@ -958,7 +955,7 @@ diff -urN ext/mysql.orig/php_mysql.c ext/mysql/php_mysql.c
  
  	if ((mysql_result = (MYSQL_RES *)zend_fetch_resource(Z_RES_P(result), "MySQL result", le_result)) == NULL) {
  		RETURN_FALSE;
-@@ -2754,9 +2822,11 @@
+@@ -2754,9 +2819,11 @@
  	php_mysql_conn *mysql;
  	zval *mysql_link = NULL;
  
@@ -1984,7 +1981,7 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_lengths.phpt ext/mysql/tests/mysql_fe
  done!
 diff -urN ext/mysql.orig/tests/mysql_fetch_object.phpt ext/mysql/tests/mysql_fetch_object.phpt
 --- ext/mysql.orig/tests/mysql_fetch_object.phpt	2018-02-26 17:48:07.000000000 +0100
-+++ ext/mysql/tests/mysql_fetch_object.phpt	2024-09-27 14:34:11.648965019 +0200
++++ ext/mysql/tests/mysql_fetch_object.phpt	2024-10-01 22:02:16.808092722 +0200
 @@ -12,11 +12,15 @@
  $tmp    = NULL;
  $link   = NULL;
@@ -2098,25 +2095,15 @@ diff -urN ext/mysql.orig/tests/mysql_fetch_object.phpt ext/mysql/tests/mysql_fet
  object(mysql_fetch_object_construct)#%d (4) {
    ["a"]=>
    string(1) "a"
-@@ -141,13 +139,11 @@
-   ["label"]=>
-   string(1) "e"
- }
--bool(false)
--bool(false)
--bool(false)
--bool(false)
--bool(false)
--
--Warning: mysql_fetch_object(): supplied resource is not a valid MySQL result resource in %s on line %d
--bool(false)
-+NULL
-+NULL
-+NULL
-+NULL
-+NULL
+@@ -146,8 +144,6 @@
+ bool(false)
+ bool(false)
+ bool(false)
 +TypeError: mysql_fetch_object(): supplied resource is not a valid MySQL result resource in %s on line %d
  
+-Warning: mysql_fetch_object(): supplied resource is not a valid MySQL result resource in %s on line %d
+-bool(false)
+-
 -Fatal error: Class 'this_class_does_not_exist' not found in %s on line %d
 +Fatal error: Class "this_class_does_not_exist" not found in %s on line %d
 diff -urN ext/mysql.orig/tests/mysql_fetch_row.phpt ext/mysql/tests/mysql_fetch_row.phpt
