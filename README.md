@@ -14,7 +14,7 @@ Sont gérées :
 * deux chaines simultanées de *build*s des paquets :
   - développement (avec tests et mise au point) et
   - production
-* la mise à jour d'un dépot APT distant avec les paquets de production
+* la mise à jour d'un dépôt APT distant avec les paquets de production
 * la fabrication automatique des *build*s de PHP à parution des nouvelles *release*s
   des versions Majeur.mineur de PHP connues
 
@@ -51,7 +51,7 @@ Le fonctionnement du fournil nécessite :
 * un compte utilisateur-système de développement (par exemple `dev`) avec accès à `docker` et accès sudo à `root`
 * un compte utilisateur-système `php` avec :
   * l'appartenance au groupe `docker` pour avoir le droit d'exécuter la commande `docker`
-  * un répertoire SSH (`.ssh`) contenant au minimum la clé privée (par exemple `.ssh/id_rsa`) pour accéder au dépot APT distant des paquets produits et un fichier de configuration SSH (`.ssh/config`) sur le modèle suivant :
+  * un répertoire SSH (`.ssh`) contenant au minimum la clé privée (par exemple `.ssh/id_rsa`) pour accéder au dépôt APT distant des paquets produits et un fichier de configuration SSH (`.ssh/config`) sur le modèle suivant :
     ```
     Host apt
     	Hostname files.epiconcept.fr
@@ -362,7 +362,7 @@ Pour déployer sur un serveur un container `docker` de test FPM, il faut :
 
 ## <a name="devprod"> Versions de développement et de production </a>
 
-Depuis juillet 2022, les script bake ont été augmentés pour utiliser des images `docker` différentes selon l'environnement dans lequel a été cloné ce dépot `git` :
+Depuis juillet 2022, les script bake ont été augmentés pour utiliser des images `docker` différentes selon l'environnement dans lequel a été cloné ce dépôt `git` :
 
 * avec l'identité de l'utilisateur-système spécial `php` pour la génération des paquets Debian de `production`
 * avec l'identité d'un autre utilisateur-système quelconque pour la génération de paquets dits de `développement`
@@ -374,7 +374,7 @@ Les paquets Debian générés sont identiques, mais leur génération utilise de
 Cette séparation permet de développer un nouveau *build* pour une *release* donnée `<Maj>.<min>.<rel>` de PHP sans affecter le code source ni les images `docker` de la version de production.
 
 Le dépôt `git` de l'utilisateur-système développeur a pour origine le dépôt `github` [infra-build-php](https://github.com/Epiconcept-Paris/infra-build-php), alors que le dépôt `git` de l'utilisateur `php` a pour origine le répertoire local du dépôt `git` de l'utilisateur développeur.  
-En conséquence, il est inutile (et même déconseillé) de faire des modifications dans le dépot `git` de l'utilisateur-système `php` car il n'est pas possible de faire ensuite un `git push`.  
+En conséquence, il est inutile (et même déconseillé) de faire des modifications dans le dépôt `git` de l'utilisateur-système `php` car il n'est pas possible de faire ensuite un `git push`.  
 En effet, `git` ne permet des `git push` que vers des dépôts `à nu` (`bare`), c'est à dire qui ne soient PAS associés à un répertoire de travail. C'est le cas des dépôts sur `github`.
 Les modification au dépôt `git` de ce fichier `README.md` doivent donc être faites uniquement dans la dépôt local de l'utilisateur-système développeur (`dev` dans nos exemples).
 
@@ -444,6 +444,13 @@ bin/phpcache rm			# Supprime les fichiers
 
 ### `chkdebs`: Verification des *build*s des versions PHP pour chaque version Debian
 Ce script vérifie tous les paquets Debian se trouvant dans `debian/*/dists/*/` et confirme leur bonne reconnaissance par la commande `file` comme `Debian binary package ...` en les affichant en vert sur un terminal (les erreurs étant affichées en rouge).
+
+### `apthost`: Verification de `~php/.ssh/config` et affichage du `Host` configuré
+Ce script vérifie l'existence et le contenu du fichier `~php/.ssh/config` tel qu'indiqué dans l'[installation](#setup) sur l'utilisateur `php`.
+Il affiche la valeur du mot-clé `Host` trouvé dans ce fichier, valeur qui est utilisée par le script `send.sh` pour se connecter au dépôt APT distant d'Epiconcept, ainsi que par le script `aptdate` ci-dessous. Toute erreur est signalée.
+
+### `aptdate`: Verification de la connexion au dépôt APT distant
+Ce script exécute la commande `date` (à laquelle sont transmis les arguments du script) sur le serveur distant gérant le dépôt APT d'Epiconcept. Le script peut être utilisé par l'utilisateur `dev` ou par l'utilisateur `php`, pour faire une vérification manuelle de l'accès au serveur distant.
 
 
 ## <a name="phpadd"> Ajout d'une version de PHP </a>
@@ -669,8 +676,8 @@ Il présente l'intérêt de montrer la mécanique minimale de la fabrication bas
 
 ```
 .
-├── bake*		# script principal
-├── bin/		# Utilitaires
+├── bake*		# Script principal
+├── bin/		# Scripts auxiliaires
 ├── debian/		# Versions Debian
 │   ├── 8/
 │   │   └── dist/	# Répertoires de builds des paquets Debian 8
