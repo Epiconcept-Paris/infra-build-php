@@ -52,11 +52,11 @@ Le fonctionnement du fournil nécessite :
 * un compte utilisateur-système `php` avec :
   * l'appartenance au groupe `docker` pour avoir le droit d'exécuter la commande `docker`
   * un répertoire SSH (`.ssh`) contenant au minimum la clé privée (par exemple `.ssh/id_rsa`) pour accéder au dépot APT distant des paquets produits et un fichier de configuration SSH (`.ssh/config`) sur le modèle suivant :
-  ```
-  Host apt
-  	Hostname files.epiconcept.fr
-  	User epiconcept_build
-  ```
+    ```
+    Host apt
+    	Hostname files.epiconcept.fr
+    	User epiconcept_build
+    ```
 * les droits pour `dev` d'exécuter des commandes comme `php` :
   ```console
   dev:~$ sudo cat /etc/sudoers/dev-php
@@ -414,7 +414,7 @@ La deuxième instance (sous l'identité de l'utilisateur-système `php`) effectu
   Il peut en effet arriver que le script `/usr/local/bin/apt_deploy.sh`, lancé sur 'apt' par SSH depuis `send.sh`, retourne le message `Job is already running`, précédant le signalement d'une erreur `(xc=1)`.
   Il faut dans ce cas patienter jusqu'à la prochaine exécution automatique du script sur `apt` du script.
 
-Si un *build* de PHP a échoué, son répertoire de *build* contiendra un fichier (vide) témoin `.fail`.
+Si un *build* de PHP a échoué, son répertoire de *build* contiendra un fichier témoin `.fail`.
 Si le script `update.sh` ne trouve pas de nouvelle version PHP à *build*er, il signalera dans son rapport tous les *build* PHP dont le répertoire de *build* contient ce fichier `.fail`, jusqu'à ce que ce dernier soit supprimé.
 
 ## <a name="bins"> Les scripts auxiliaires (`bin/`) </a>
