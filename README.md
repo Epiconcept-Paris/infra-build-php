@@ -88,6 +88,7 @@ Le fonctionnement du fournil nécessite :
   dev:~$ 
   ```
 * d'avoir installé une `crontab` similaire à celle signalée à la section [Builds automatiques](#update) pour que le script `update.sh` soit exécuté.
+* d'avoir créé un répertoire `/space/tmp` avec les permissions 1777, pour le script `send.sh`
 
 
 ## <a name="bld">Build et tests d'une nouvelle *release* </a>
@@ -383,7 +384,7 @@ Les modification au dépôt `git` de ce fichier `README.md` doivent donc être f
 Elle se fait avec le script `update.php` lancé par cron, par exemple avec la `crontab` suivante (dans `/etc/cron.d/`, donc avec indication d'un utilisateur système (ici `dev`) :
 ```console
 MAILTO='c.girard@epiconcept.fr'
-MAILFROM='cty1@epiconcept.fr'
+MAILFROM='binbuild@epiconcept.fr'
 
 15 0 * * * dev build-php/update.sh | mail -Es "$(hostname) PHP build(s) of new version(s)" -a "From: $MAILFROM" $MAILTO
 ```
@@ -395,9 +396,10 @@ Le script `update.sh` fonctionne en deux instances, la première appelant la sec
 
 La première instance (sous l'identité de l'utilisateur-système développeur, ici `dev`) effectue les tâches suivantes :
 * obtenir la liste des *release*s PHP plus récentes que celles de notre dépôt `git`
-* s'il n'y a pas de nouvelles *release*s, écrire simplement dans le journal la date et le nom de l'utilisateur, et sortir de `update.sh` sans mail
-* sinon, ajouter au dépôt par un `git commit` les fichiers `BUILD_NUM` de ces *release*s plus récentes
-* *build*er chacune de ces *releases* et l'ajouter dans une liste de production si le *build* s'effectue avec succès
+* obtenir la liste de nouveaux *build*s non-`commit`és de *release*s existantes
+* s'il n'y a pas de nouvelles *release*s ni de nouveaux *build*s, écrire simplement dans le journal la date et le nom de l'utilisateur, et sortir de `update.sh` sans mail
+* sinon, ajouter au dépôt par un `git commit` les fichiers `BUILD_NUM` de ces *release*s ou *build*s plus récents
+* *build*er chacune de ces *releases* ou nouveau(x) *build*(s) et l'ajouter dans une liste de production si le *build* s'effectue avec succès
 * si la liste de production n'est pas vide, appeler la deuxième instance avec l'identité de l'utilisateur-système `php` en lui passant les éléments de la liste en arguments.
   La deuxième instance retourne les *releases* qui lui ont été passées, avec indication de leur succès ou échec
 * envoyer par mail un rapport sur chaque *build* qui vient d'être produit pour les différentes versions Debian supportées par chaque *release*, ainsi que sur la sauvegarde locale et l'envoi au dépôt APT des paquets Debian des *build*s
@@ -406,7 +408,7 @@ La première instance (sous l'identité de l'utilisateur-système développeur, 
 La deuxième instance (sous l'identité de l'utilisateur-système `php`) effectue les tâches suivantes :
 * *build*er chacune des *release*s en retenant leur status de fin (succès ou échec)
 * lancer le script `savedist.sh` qui va automatiquement détecter les nouveaux paquets Debian générés et les sauver dans le répertoire `../php-debs` collatéral au répertoire `php-prod` (voir [Installation](#setup)).  
-  Ce répertoire `php-debs` est la référence (*master*) des paquets PHP (et associés) générés par ce dépôt `git`
+  Ce répertoire `php-debs` est la référence (*master*) des paquets PHP (et associés) générés par ce dépôt `git`, référence qui sert de base à `rsync` dans le script `send.sh` ci-après
 * lancer le script `send.sh` qui va envoyer au dépôt APT les nouveaux paquets Debian sauvegardés par la commande `savedist.sh` en synchronisant (`rsync`) tous les paquets Debian de `php-debs` avec le dépôt APT.
   Toute erreur dans le déroulement de ce processus est rapportée dans le mail envoyé par la `crontab` qui appelle le script `update.sh`.
   Il peut en effet arriver que le script `/usr/local/bin/apt_deploy.sh`, lancé sur 'apt' par SSH depuis `send.sh`, retourne le message `Job is already running`, précédant le signalement d'une erreur `(xc=1)`.
