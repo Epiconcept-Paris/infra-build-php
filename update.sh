@@ -331,7 +331,7 @@ phase1()
     #	There MUST be a symlink $PhpDir to the actual 'prod' git repo
     #
     test "$prod" && bres="$bres $(sudo -iu 'php' "$PhpDir/$Prg" $prod)"
-    echo "Res=\"$bres\"$CR"
+    echo "aPvs=\"$apvs\" uPvs=\"$upvs\" bRes=\"$bres\"$CR"
     test "$apvs" || apvs='-'
     test "$upvs" || upvs='-'
     report $apvs $upvs $bres >&3
@@ -378,11 +378,7 @@ phase2()
 report()
 {
     #global Dir Log Prg PhpDir
-    local dir pvs res bt pv dv xc bd ff mE mP mB mS mF mL mis
-
-    dir="$(basename "$Dir")"
-    mE="===== See %s for output and possible errors of %s"
-    printf "$mE\n" "$dir/$Log" "$dir/$Prg"
+    local dir pvs res bt pv dv xc bd bD ff mE mP mB mS mF mL mis
 
     #	Arguments are:
     #	    <add-vers>[,<add-vers>] | '-'
@@ -411,6 +407,9 @@ report()
     fi
     shift
 
+    dir="$(basename "$Dir")"
+    mE="\n===== See %s for output and possible errors of %s\n"
+    printf "$mE" "$dir/$Log" "$dir/$Prg"
 
     #   res format:
     #
@@ -426,23 +425,23 @@ report()
     do
 	eval "$(echo $res | awk -F: 'NF>2{printf("bt=%s pv=%s dv=%s xc=%s",$1,$2,$3,NF>3?$4:"")}')"
 	eval "$(echo $res | awk -F: 'NF<3{printf("bt=%s xc=%s",$1,$2)}')"
-	test "$pv" -a "$dv" && bd="debian/$dv/dist/$pv-1"
+	test "$pv" -a "$dv" && { bd="$(cat "$(bldnum $pv)")"; bD="debian/$dv/dist/$pv-$bd"; }
 	mP='Previous'
-	mB="%s build of PHP %s for Debian %s"
+	mB="%s build %s of PHP for Debian %s"
 	mS='completed successfully'
 	mF='FAILED'
-	mL="See '$bd/mk.out' and '$bd/.logs/make.out' for details"
+	mL="See '$bD/mk.out' and '$bD/.logs/make.out' for details"
 	mD="Saving dists"
-	mR="Sending packages to APT repo"
+	mR="Sending packages to the APT repo"
 	case $bt in
 	    fail)
-		ff="$bd/.fail"
+		ff="$bD/.fail"
 		if [ -f "$ff" ]; then
 		    read -r xc mis < "$ff"
 		    if [ "$xc" -ne 0 ]; then
-			printf "$mB $mF (xc=%s)\n" "$mP 'dev'" $pv $dv $xc
+			printf "$mB $mF (xc=%s)\n" "$mP 'dev'" "$pv-$bd" $dv $xc
 		    elif [ "$mis" ]; then
-			printf "$mB $mS, but packages %s are missing\n" "$mP 'dev'" $pv $dv $mis
+			printf "$mB $mS, but packages %s are missing\n" "$mP 'dev'" "$pv-$bd" $dv $mis
 		    else
 			echo "$mP '$ff' file contains exit code 0 ?"
 		    fi
@@ -452,21 +451,21 @@ report()
 		fi
 		;;
 
-	    plog)   printf "\n$mE\n" "$PhpDir/$xc" "$PhpDir/$Prg";;
+	    plog)   printf "$mE" "$PhpDir/$xc" "$PhpDir/$Prg";;
 
-	    upd|dev|prod)
+	    dev|upd|prod)
 		if [ "$xc" -eq 0 ]; then
-		    ff="$bd/.fail"
+		    ff="$bD/.fail"
 		    if [ -f "$ff" ]; then
 			read -r xc mis < "$ff"
-			printf "$mB $mS, but a '$ff' file\n" "'$bt'" $pv $dv
+			printf "$mB $mS, but a '$ff' file\n" "'$bt'" "$pv-$bd" $dv
 			echo "    shows that packages $mis are missing."
 			echo "    $mL"
 		    else
-			printf "$mB $mS.\n" "'$bt'" $pv $dv
+			printf "$mB $mS.\n" "'$bt'" "$pv-$bd" $dv
 		    fi
 		else
-		    printf "$mB $mF (xc=%s)\n" "'$bt'" $pv $dv $xc
+		    printf "$mB $mF (xc=%s)\n" "'$bt'" "$pv-$bd" $dv $xc
 		    echo "    $mL"
 		fi
 		;;
