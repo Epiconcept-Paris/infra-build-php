@@ -20,10 +20,10 @@ numver()
     IFS="${2:-.}" val=0
     for n in $1
     do
-	expr "$n" : '[0-9][0-9]*' >/dev/null || { echo "numver: '$n' is not a number" >&2; exit 1; }
+	expr "$n" : '[0-9][0-9]*' >/dev/null || { echo "numver: '$n' is not a number$CR" >&2; exit 1; }
 	val=$((($val*${3:-100})+$n))
     done
-    test $val -eq 0 && echo "numver: args '$*' return 0" >&2
+    test $val -eq 0 && echo "numver: args '$*' return 0$CR" >&2
     echo "$val"
 }
 
@@ -72,12 +72,15 @@ chk_debs()
 #	Check env
 command -v file >/dev/null || { echo "$Prg: cannot find the 'file' command" >&2; exit 1; }
 tty <&2 >/dev/null && Tty=y
+CR=
 
 #   Color if stderr is a TTY
 if [ "$Tty" ]; then
     Red="$(tput setaf 1)"
     Grn="$(tput setaf 2)"
     Std="$(tput setaf 7)"
+else
+    CR=''
 fi
 
 #	Check args
@@ -85,8 +88,8 @@ if [ $# -eq 2 -o $# -eq 3 ]; then
     #	Single dist
     b="${3:-1}"	# Default build is 1 if only version given
     d="$2-$b"	# Dist
-    test -f "debian/$1/name" || { echo "$Prg: cannot find 'debian/$1/name' in '$PWD'" >&2; exit 2; }
-    test -d "debian/$1/dist/$d" || { echo "$Prg: cannot find 'debian/$1/dist/$d' in '$PWD'" >&2; exit 2; }
+    test -f "debian/$1/name" || { echo "$Prg: cannot find 'debian/$1/name' in '$PWD'$CR" >&2; exit 2; }
+    test -d "debian/$1/dist/$d" || { echo "$Prg: cannot find 'debian/$1/dist/$d' in '$PWD'$CR" >&2; exit 2; }
     chk_debs $1 $2 $b
 elif [ $# -eq 0 ]; then
     #	All dists
@@ -102,6 +105,6 @@ elif [ $# -eq 0 ]; then
     done
 else
     #	Invalid arguments (not 0 or 2 or 3)
-    echo "Usage: $Prg <debian-version> <php-version> [ <php-build ]" >&2
+    echo "Usage: $Prg <debian-version> <php-version> [ <php-build ]$CR" >&2
     exit 1
 fi
