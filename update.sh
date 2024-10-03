@@ -173,11 +173,12 @@ rm_ophp()
 build()
 {
     #global Bake Fifo
-    local dir ff xc mis
+    local bd dir ff xc mis
 
+    bd=$(cat "$(bldnum $2)")
     echo "Building $1 PHP version $2 for Debian $3...$CR"
     #	We use a fifo to get $Bake's exit code even though we process it's stdout
-    dir="debian/$3/dist/$2-$(cat "$(bldnum $2)")"
+    dir="debian/$3/dist/$2-$bd"
     ff="$dir/.fail"
     mkdir -p $dir
     rm -f "$ff"
@@ -185,7 +186,7 @@ build()
     $Bake $2 $3 >$Fifo 2>&1
     xc=$?
     if [ $xc -eq 0 ]; then
-	mis=$(bin/chkdebs $3 $2)
+	mis=$(bin/chkdebs $3 $2 $bd)
 	test "$mis" && {
 	    echo "WARNING: missing $mis packages for PHP $1 on Debian $2$CR";
 	    echo "$xc $mis" >$ff
@@ -432,7 +433,7 @@ report()
 	mF='FAILED'
 	mL="See '$bD/mk.out' and '$bD/.logs/make.out' for details"
 	mD="Saving dists"
-	mR="Sending packages to the APT repo"
+	mR="Synchronizing with the APT repo"
 	case $bt in
 	    fail)
 		ff="$bD/.fail"
@@ -473,8 +474,8 @@ report()
 	    save|send)
 		test "$bt" = 'save' && echo -n "\n$mD" || echo -n "$mR"
 		if [ "$xc" -eq 0 ]; then
-		    echo " $mS."
-		    test "$bt" = 'save' && save_diffs
+		    echo -n " $mS"
+		    test "$bt" = 'send' && echo "." || save_diffs
 		else
 		    echo " $mF (xc=$xc)"
 		fi
@@ -494,7 +495,8 @@ save_diffs()
 
     log="$PhpTop/update.log/$(date '+%Y-%m-%d')"
     nbd=$(grep -c 'differs from' "$log")
-    test "$nbd" -eq 0 && return
+    test "$nbd" -eq 0 && { echo '.'; return; }
+    echo ","
     dir="$PhpTop"
     test -L "$dir" && dir="$(readlink "$dir")"
     rep="$(dirname "$dir")/php-debs"
@@ -502,9 +504,17 @@ save_diffs()
     if [ "$nbd" -eq 1 ]; then
 	echo "    but $nbd dist / $nbt total differs from its saved version"
     else
-	echo "    but $nbd dists / $nbt total differ from their saved version(s)"
+	echo "    but $nbd dists / $nbt total differ from their saved versions"
     fi
-    echo "    (see $log for details)"
+    cat <<EOF
+    (see $log for details)
+    The original dists have been kept as reference. If you want
+    to discard them, type as the 'php' user in ~php/php-prod :
+	./savedist.sh mv | sh	OR   ./savedist.sh rm | sh
+    and then   ./savedist.sh   again to save the new dists,
+    followed by a   ./send.sh   to update the APT repo.
+EOF
+
 }
 
 # ===== Main ===================================
