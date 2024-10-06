@@ -11,8 +11,8 @@
 #		defroute
 #
 #	Config: put the following 'defroute' file in /etc/sudoers.d:
-#		# Allow 'dev' and 'php' users to run defroute without pw
-#		dev,php ALL = (root) NOPASSWD: /usr/local/bin/defroute
+#		# Allow 'dev' members and 'php' to run defroute without pw
+#		%dev,php ALL = (root) NOPASSWD: /usr/local/bin/defroute
 #
 Prg=$(basename "$0")
 Gw='vgw.admin2'
