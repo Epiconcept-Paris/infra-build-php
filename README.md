@@ -586,7 +586,7 @@ root@88e944da6b42:/#
 ```
 (lors de la dernière mise à jour de ce fichier `README.md`)
 
-Il suffit pour cela de lancer la commande `ext` suivie du noms de l'extension, par exemple :
+Il suffit pour cela de lancer la commande `ext` suivie du nom de l'extension, par exemple :
 ```console
 root@88e944da6b42:/# ext ev
 Installing package(s) libev-dev (log to /var/log/extdev/install-deb12-7.4.out)
@@ -604,7 +604,7 @@ event   3.1.4   stable
 imagick 3.7.0   stable
 root@88e944da6b42:/#
 ```
-Le résultat se trouve dans le même répertoire que le fichier `compile.out`, sous forme de deux fichiers `ev.so` et `ev.ini` qu'il faudra placer respectivement dans `/usr/lib/php/extensions` et dans `/etc/php/<version-PHP>/conf.d"`.  
+Le résultat se trouve dans le même répertoire que le fichier `compile.out`, sous forme de deux fichiers `ev.so` et `ev.ini` qu'il faudra placer respectivement dans `/usr/lib/php/extensions` et dans `/etc/php/<version-PHP>/conf.d`.  
 Pour l'instant (1er août 2024), aucun paquet Debian n'est généré.
 
 ### Ajout d'une nouvelle extension
@@ -651,9 +651,17 @@ root@88e944da6b42:~#
 
 Ca compile ! Il n'y plus qu'à rajouter l'extension `decimal` au fichier /usr/local/etc/ext.conf :
 ```console
-root@88e944da6b42:/# echo -e "decimal\t\tlibmpdec-dev" >>/usr/local/etc/ext.conf
+root@88e944da6b42:/# echo -e "decimal\t\t\t\tlibmpdec-dev" >>/usr/local/etc/ext.conf
 root@88e944da6b42:/# 
 ```
+
+Dans le cas ou la compilation requiert une version spécifique de l'extension, il est possible de spécifier cette dernière en l'ajoutant après un `-` au nom de l'extension.
+Par exemple, la dernière version de l'extension `uv` compatible avec PHP 7.4 était la 0.2.4. Lors de la mise au point de la prise en charge de cette extension, il a fallu utiliser :
+```console
+root@88e944da6b42:/# pecl install uv-0.2.4
+root@88e944da6b42:/# 
+```
+
 
 ## <a name="xdock"> Containers `docker` auxiliaires </a>
 
