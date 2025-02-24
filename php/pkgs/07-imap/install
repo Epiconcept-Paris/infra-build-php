@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+#	07-imap/install - Install php-imap files to $Top
+#
+# There is no 'make install-..': files were moved to $Top by 00-cli/install
+#
+if [ -d $Top/usr/lib ]; then
+    find $Top/usr/lib -name '*.so' | xargs -r strip -v >>$Logs/striped_$Pkg.out
+    find $Top/usr/lib -name '*.so' | xargs -r chmod -x
+else
+    echo "\aERROR: no $Top/usr/lib directory. Package will be useless."
+fi
+test "$MM" && mv $Top/usr/lib/php/extensions $Top/usr/lib/php/$MM
+sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;" $Top/DEBIAN/postinst
+sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;" $Top/DEBIAN/postrm

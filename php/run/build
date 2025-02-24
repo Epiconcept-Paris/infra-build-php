@@ -132,6 +132,7 @@ for Opt in  --with-mysql --with-mcrypt --with-ttf --enable-gd-native-ttf \
 	    --with-xpm-dir=/usr,/usr/X11R6 --with-xpm \
 	    --with-png-dir=/usr \
 	    --with-readline=/usr \
+	    --with-imap=shared,/usr --with-kerberos --with-imap-ssl \
 	    --with-pcre-regex \
 	    --with-zip \
 	    $EnaIntl \

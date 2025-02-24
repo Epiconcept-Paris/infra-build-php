@@ -53,6 +53,7 @@ InstFile etc/php$MMD	www.conf.default     03-fpm    -
 InstFile usr/bin	phpdbg		     04-phpdbg y
 InstFile $ManDir/man1	phpdbg.1	     04-phpdbg y
 InstFile usr/lib	mysql.so	     05-mysql  y
+InstFile usr/lib	imap.so		     07-imap   y
 
 find $Top -type d -empty -delete -print | sed 's/^/find: removing empty directory /' >$Logs/rmed_$Pkg.out
 find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
