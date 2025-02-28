@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+ini=/etc/php%MMD%/php.ini
+mod=%ext%.so
+
+grep "^%zPfx%extension *= *$mod *$" $ini >/dev/null && sed -i "/^%zPfx%extension *= *$mod *$/d" $ini
+if [ -x /etc/init.d/apache2 -o -f /lib/systemd/system/apache2.service ]; then
+    service apache2 status >/dev/null && service apache2 restart
+fi
+if [ -x /etc/init.d/php%MM%-fpm -o -f /lib/systemd/system/php%MM%-fpm.service ]; then
+    service php%MM%-fpm status >/dev/null && service php%MM%-fpm restart
+fi
+exit 0

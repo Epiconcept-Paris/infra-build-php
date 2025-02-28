@@ -2,28 +2,15 @@
 #
 #	ext - Compile PHP extensions
 #
+# shellcheck disable=SC2039	# In POSIX sh, 'local' is undefined
+# shellcheck disable=SC2028	# echo may not expand escape sequences
+#
 Prg=$(basename "$0")
-Etc='/usr/local/etc'
-Cnf="$Etc/$Prg.conf"
-tty <&2 >/dev/null && {
-    Bold=$(tput bold)
-    Norm=$(tput sgr0)
-    Red=$(tput setaf 1)
-    Std=$(tput setaf 7)
-}
+umask 022
 
-#   Checks
-command -v php >/dev/null || { echo "$Prg: no PHP version installed; run 'setup <Maj>.<min>'" >&2; exit 2; }
-PhpVer=$(expr $(readlink /etc/alternatives/php) : '/usr/bin/php\(.*\)')
-test -s "$Cnf" || { echo "$Prg: cannot find '$Cnf'" >&2; exit 3; }
-
-test "$1" || {
-    echo "Usage: $Prg <PECL-extension>\nKnown extensions:" >&2
-    awk -F'\t' '$1 !~ "^#"{print $1}' $Cnf | sed 's/^/    /' | uniq
-    exit 1
-}
-Ext="$1"
-
+#
+# -----	Declare functions ----------------------------------------------
+#
 #   Return version x.y as a number, e.g. 7.4 as 704
 NumVer()
 {
@@ -33,15 +20,89 @@ NumVer()
     for n in $1
     do
 	expr "$n" : '[0-9][0-9]*' >/dev/null || { echo "NumVer: '$n' is not a number" >&2; exit 4; }
-	val=$((($val*${3:-100})+$n))
+	val=$(((val*${3:-100})+n))
     done
     test $val -eq 0 && echo "Numver: args '$*' return 0" >&2
     echo "$val"
 }
-PhpNum=$(NumVer $PhpVer)
+
+#   Return list of dependencies, expanded if needed (e.g. for 'event')
+DepExp()
+{
+    local pkg exp dep sep
+
+    sep=''
+    for pkg in "$@"
+    do
+        exp=$(echo "$pkg" | sed -r 's/^.*\{([^}]+)\}.*$/\1/' | tr ',' ' ')
+	if [ "$exp" ]; then
+	    for dep in $exp
+	    do
+		echo -n "$sep"
+		echo -n "$pkg" | sed "s/{[^}]*}/$dep/"
+		sep=' '
+	    done
+	else
+	    echo -n "$sep$pkg"
+	    sep=' '
+	fi
+    done
+    echo
+}
+
+#   Remove temporary dir and change ownerships to $USER
+Cleanup()
+{
+    #global Dbg ExtTop LogDir LogTag USER ToRd
+
+    # shellcheck disable=SC2154	# Dbg is referenced but not assigned.
+    test "$Dbg" && {
+	echo "Dbg=$Dbg ExtTop=$ExtTop LogDir=$LogDir LogTag=$LogTag ToRd=$ToRd"
+	l "$LogDir"
+    }
+    echo "${Bold}Cleaning up$Norm..."
+    test "$ExtTop" && chown -R "$USER:" "$ExtTop"
+    test "$LogDir" -a "$LogTag" && chown "$USER:" "$LogDir/"*"_$LogTag"*
+    # shellcheck disable=SC2154	# Dbg is referenced but not assigned.
+    test "$Dbg" || {
+	test "$ToRd" && test "$ToRd" != '/' && rm -fr "$ToRd"
+    }
+    echo "${Bold}Done.$Norm"
+}
+
+#
+# -----	Set globals and check extension argument -----------------------
+#
+Etc='/usr/local/etc'
+Cnf="$Etc/$Prg.conf"
+tty <&2 >/dev/null && {
+    Bold=$(tput bold)
+    Norm=$(tput sgr0)
+    Red=$(tput setaf 1)
+    Std=$(tput setaf 7)
+}
+
+#   Check for PHP and config file
+command -v php >/dev/null || { echo "$Prg: no PHP version installed; run 'setup <Maj>.<min>'" >&2; exit 2; }
+PhpVer=$(expr "$(readlink /etc/alternatives/php)" : '/usr/bin/php\(.*\)')
+test -s "$Cnf" || { echo "$Prg: cannot find '$Cnf'" >&2; exit 3; }
+
+test "$1" || {
+    echo "Usage: $Prg <PECL-extension>\nKnown extensions:" >&2
+    awk -F'\t' '$1 !~ "^#"{print $1}' "$Cnf" | sed 's/^/    /' | uniq
+    exit 1
+}
+Ext="$1"
+grep -q "^$Ext	" "$Cnf" || { echo "$Prg: extension '$Ext' is unknown in current '$Cnf'" >&2; exit 5; }
+test "$Ext" = 'xdebug' && zPfx='zend_'	# SPECIAL CASE (yuk, hard coded values !)
+PhpNum=$(NumVer "$PhpVer")
 DebNum=$(awk -F. '{print $1}' /etc/debian_version)
 
-#   Similar version for awk (without checks and extra args)
+#
+# -----	Parse the config file ------------------------------------------
+#
+#   Awk version of NumVer (without checks and extra args)
+fmt='Chk=%s Ver=\"%s\" Php=\"%s\" Inp=\"%s\" bDep=\"%s\" rDep=\"%s\" Bld=\"%s\" Name=\"%s\" Inst=\"%s\" Line=%d\n'
 numVer='function numver(s,	n,a,i,v) {
     n = split(s, a, ".")
     for (i = 1; i <= n; i++)
@@ -49,92 +110,258 @@ numVer='function numver(s,	n,a,i,v) {
     return v
 }'
 #   Extract extension info from $Cnf
-eval "$(awk -F'\t' "$numVer"'
-{
-    if (NR == 1)
-	Deb = '"$DebNum"'
+eval "$(awk -F'\t' "$numVer
+BEGIN {
+    Deb = $DebNum
+    Php = $PhpNum
+    Ext = \"$Ext\"
+    Fmt = \"$fmt\"
+}
+"'{
     if (NF == 2 && $1 == ("#!" Deb)) {
-	Inst = Inst " " $2
-    } else if (NF >= 5 && $1 == "'"$Ext"'" && ($3 == "" || '"$PhpNum"' <= numver($3))) {
-	printf("Chk=%s Ver=\"%s\" Php=\"%s\" Inp=\"%s\" Pkgs=\"%s\" Inst=\"%s\" Deb=%d Line=%d\n",
-		$1,    $2,	  $3,	     $4,	$5,	    Inst,	Deb,   NR);
+	Inst = Inst Isep "!" $2
+	Isep = " "
+    } else if (NF == 2 && $1 == ("#:" Deb)) {
+	Inst = Inst Isep ":" $2
+	Isep = " "
+    } else if (NF >= 5 && $1 == Ext && ($3 == "" || Php <= numver($3))) {
+	#	    Chk Ver Php Inp bDep rDep Bld Name Inst  Line
+	printf(Fmt, $1, $2, $3, $4, $5,  $6,  $7, $8,  Inst, NR);
 	exit 0
     } else {
 	Inst = ""
     }
-}' $Cnf)"
-test "$Dbg" && echo "Cnf=$Cnf:$Line Ext=$Ext Chk=$Chk Ver=\"$Ver\" Php=\"$Php\" Inp=\"$Inp\" Pkgs=\"$Pkgs\" Deb=$Deb Inst=\"$Inst\"" 2>&1
-test "$Chk" || { echo "$Prg: extension '$Ext' is unknown in '$Cnf'" >&2; exit 5; }
+}' "$Cnf")"
+# Dbg comes from env when running $Prg, e.g.: Dbg=y ext imagick
+# shellcheck disable=SC2154	# Dbg is referenced but not assigned.
+test "$Dbg" && echo "Cnf=$Cnf:$Line Ext=$Ext Chk=$Chk Ver=\"$Ver\" Php=\"$Php\" Inp=\"$Inp\" bDep=\"$bDep\" rDep=\"$rDep\" Bld=\"$Bld\" Name=\"$Name\" Inst=\"$Inst\""
+test "$Chk" || { echo "$Prg ${Red}ERROR$Std: extension '$Ext' is not supported on PHP $PhpVer" >&2; exit 5; }
+test -z "$bDep" -a "$rDep" && echo "${Red}WARNING$Norm: for '$Ext' ($Cnf:$Line), build-deps=\"$bDep\" but run-deps=\"$rDep\" ?"
 
 set -e
+trap Cleanup 0
 
+#
+# -----	Install build-packages -----------------------------------------
+#
 #   Prepare extension dir and pkgs subdir
-test -d $Etc/ext || { mkdir $Etc/ext && chown $USER: $Etc/ext; }
-Dir="$Etc/ext/$Ext"
-test -d $Dir/pkgs || { mkdir -p $Dir/pkgs && chown $USER: $Dir $Dir/pkgs; }
-Dir="$Dir/pkgs"
-
-#   Install required packages
+test -d "$Etc/ext" || { mkdir "$Etc/ext" && chown "$USER:" "$Etc/ext"; }
+ExtTop="$Etc/ext/$Ext"
+test -d "$ExtTop" || mkdir "$ExtTop"
+ExtDir="$ExtTop/$DEBVER-$PhpVer"
+test -d "$ExtDir" || mkdir "$ExtDir"
+ExtPkg="$ExtDir/pkgs"
+# shellcheck disable=SC2154	# Dbg is referenced but not assigned.
 DebTag="deb$DebNum"
-Log="/var/log/extdev/install-$DebTag-$PhpVer.out"
+LogTag="$Ext-$PhpVer-$DebTag"
+LogDir='/var/log/extdev'
+Log="$LogDir/install_$LogTag.out"
+test "$Dbg" && echo "ExtTop=$ExtTop ExtDir=$ExtDir ExtPkg=$ExtPkg LogTag=$LogTag"
+
+#   Special install of packages that are not available via apt
 if [ "$Inst" ]; then
-    for url in $Inst; do
+    for val in $Inst; do
+	#   Inst values are URLs prefixed with '!' (build-dep) or ':' (run-dep)
+	eval "$(echo "$val" | sed -r 's/^(.)(.*)$/typ="\1" url="\2"/')"
+	# shellcheck disable=SC2154	# Dbg is referenced but not assigned.
+	test "$Dbg" && echo "typ=\"$typ\" url=\"$url\""
 	deb=$(basename "$url")
 	pkg=$(expr "$deb" : '\([^_]*\)_.*$')
-	debinfo | grep "^$pkg\t" >/dev/null || {
+	if [ "$typ" = '!' ]; then
+	    test "$bldDep" && sep=' ' || sep=
+	    bldDep="$bldDep$sep$pkg"
+	else
+	    test "$runDep" && sep=' ' || sep=
+	    runDep="$runDep$sep$pkg"
+	fi
+	debinfo -f '%n\n' | grep -q "^$pkg\$" || {
 	    echo "${Bold}Installing package $pkg$Norm (log to $Log)"
-	    test -s "$Dir/$deb" || {
-		echo "======= fetch $url" >>$Log
-		(cd "$Dir"; curl -sSO "$url" >>$Log) || {
+	    test -s "$ExtPkg/$deb" || {
+		echo "======= fetch $url" >>"$Log"
+		test -d "$ExtPkg" || mkdir "$ExtPkg"
+		(cd "$ExtPkg"; curl -sSO "$url" >>"$Log") || {
 		    echo "${Red}FAILED to fetch $url !$Std"
 		    exit 6
 		}
-		chown $USER: "$Dir/$deb"
 	    }
-	    echo "======= dpkg -i $deb =======" >>$Log
-	    dpkg -i "$Dir/$deb" >>$Log 2>&1 || {
-		echo "${Red}FAILED to install $Dir/$deb !$Std"
+	    echo "======= dpkg -i $deb =======" >>"$Log"
+	    dpkg -i "$ExtPkg/$deb" >>"$Log" 2>&1 || {
+		echo "${Red}FAILED to install $ExtPkg/$deb !$Std"
 		exit 7
 	    }
 	}
-	for p in $Pkgs; do
-	    test "$p" = "$pkg" && { Pkgs=; break; }
-	done
     done
+    test "$Dbg" && echo "Ext=$Ext bDep=\"\" bldDep=\"$bldDep\" rDep=\"$rDep\" runDep=\"$runDep\""
+    test "$bDep" -a "$bDep" = "$bldDep" && bDep=
+    test "$rDep" -a "$rDep" = "$runDep" && rDep=$(echo "$rDep" | sed 's/ /, /g')
 fi
-if [ "$Pkgs" ]; then
-    echo "${Bold}Installing package(s) $Pkgs$Norm (log to $Log)"
-    echo "======= apt-get install $Pkgs =======" >>$Log
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $Pkgs >>$Log 2>&1 || {
-	echo "${Red}FAILED to install $Pkgs !$Std"
-	exit 7
-    }
+
+#   Standard install of development packages
+if [ "$bDep" ]; then
+    sep=
+    #	Gather build-packages to actually install
+    for pkg in $bDep
+    do
+	debinfo -f '%n\n' | grep -q "^$pkg\$" || { bDeps="$bDeps$sep$pkg"; sep=' '; }
+    done
+    if [ "$bDeps" ]; then
+	EndDep='y'; EndPkg=''
+	expr "$bDeps" : '[^ ][^ ]* ' >/dev/null && { EndDep='ies'; EndPkg='s'; }
+	echo "${Bold}Installing dependenc$EndDep package$EndPkg $bDeps$Norm (log to $Log)"
+	echo "======= apt-get install $bDeps =======" >>"$Log"
+	# shellcheck disable=SC2086	# Double quote to prevent globbing
+	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $bDeps >>"$Log" 2>&1 || {
+	    echo "${Red}FAILED to install $bDeps !$Std"
+	    exit 7
+	}
+    fi
+    #	Set run-packages (for $Ext-package dependencies)
+    if [ "$rDep" ]; then
+	# shellcheck disable=SC2086	# Double quote to prevent globbing
+	rDep=$(DepExp $rDep | sed 's/ /, /g')
+    else
+	pv=$(apt-cache search php-cli | sed -nr 's/^php([0-9.]+)-cli .*$/\1/p')
+	for pkg in "php-$Ext" "php$pv-$Ext"
+	do
+	    rDep=$(apt show "$pkg" 2>/dev/null | sed -n 's/^Depends: //p' | sed 's/, /\n/g' | grep -Ev '^(php|libc6)' | sed 's/ ([^)]*)$//' | sed ':a; N; $!ba; s/\n/, /g')
+	    test "$rDep" && break
+	done
+	test "$rDep" || echo "${Red}WARNING$Norm: for '$Ext' ($Cnf:$Line), run-deps=\"$rDep\" ?"
+    fi
 fi
+# shellcheck disable=SC2154	# Dbg is referenced but not assigned.
+test "$Dbg" && echo "rDep=\"$rDep\""
+test "$rDep" && rDep="$rDep, "
+
+#
+# -----	Compile and configure the extension ----------------------------
+#
+PhpExt='/usr/lib/php/extensions'
+Dir=$(expr "$ExtDir" : "$Etc/\(.*\)\$")
+Log="$ExtDir/compile.out"
 
 #   Compile the extension
-Dir="ext/$Ext/$DEBVER-$PhpVer"
-mkdir -p "$Etc/$Dir"
-chown -R $USER: "$Etc/ext/$Ext"
-
-Log="$Etc/$Dir/compile.out"
-Tgt=$Ext
-test "$Ver" && Tgt="$Ext-$Ver"
-echo "${Bold}Compiling the $Tgt PHP extension$Norm (log to $Log)"
-echo -n "$Inp" | pecl install $Tgt >$Log || {
-    echo "${Red}FAILED to compile $Tgt !$Std"
-    exit 8
+test -s "$ExtDir/$Ext.so" || {
+    Tgt="$Ext"
+    test "$Ver" && Tgt="$Ext-$Ver"
+    echo "${Bold}Compiling the $Tgt PHP extension$Norm (log to $Log)"
+    echo -n "$Inp" | pecl install "$Tgt" >"$Log" || {
+	echo "${Red}FAILED to compile $Tgt !$Std"
+	exit 8
+    }
+    pecl list 2>/dev/null | awk -v Ext="$Ext" '$1 == Ext {
+	print $2 ($3 == "beta" ? "~beta" : "")
+    }' >"$ExtDir/.version"
 }
 
 #   Configure and save the extension
-echo "${Bold}Configuring the $Ext extension$Norm"
 Ini=$(php --ini | sed -n 's/^.* Path: //p')
-echo "extension=$Ext.so" >$Ini/conf.d/$Ext.ini
-cp -p /usr/lib/php/extensions/$Ext.so $Ini/conf.d/$Ext.ini "$Etc/$Dir"
-pecl list | grep "^$Ext " >"$Etc/$Dir/.version"
-chown -R $USER: "$Etc/$Dir"
-echo "${Bold}Extension $Ext saved to 'etc/$Dir'$Norm"
+# shellcheck disable=SC2154	# Dbg is referenced but not assigned.
+test "$Dbg" && echo "Ini=$Ini"
+if [ -s "$ExtDir/$Ext.so" ]; then
+    cp -p "$ExtDir/$Ext.so" "$PhpExt"
+    cp -p "$ExtDir/$Ext.ini" "$Ini/conf.d"
+else
+    echo "${Bold}Configuring the $Ext extension$Norm"
+    echo "${zPfx}extension=$Ext.so" >"$Ini/conf.d/$Ext.ini"
+    cp -p "$PhpExt/$Ext.so" "$Ini/conf.d/$Ext.ini" "$ExtDir"
+    echo "${Bold}Extension $Ext saved to 'etc/$Dir'$Norm"
+fi
 
 #   Check
 echo "${Bold}Checking the $Ext extension$Norm:"
-php -i | grep $Ext | egrep -v "$Ext[a-z]|[a-z]$Ext$"
-pecl list
+php -i | grep "$Ext" | grep -Ev "$Ext[a-z]|[a-z]$Ext\$"
+pecl list 2>/dev/null
+
+#
+# -----	Prepare the package tree (from pkg/ template) ------------------
+#
+Base='epi-php'
+pName="$Base-$PhpVer-$Ext"
+Deb=$(cd "$ExtDir"; echo "${pName}_"*.deb)
+test "$Dbg" && echo "pName=$pName Deb=$Deb"
+
+#   Build package
+if [ -s "$ExtDir/$Deb" ]; then
+    echo "Package $Deb is already in $ExtDir."
+    echo "Remove it to rebuild"
+    exit 0
+fi
+echo "${Bold}Preparing the $pName package$Norm..."
+CliPkg="$Base-$PhpVer-cli"
+CliDoc="/usr/share/doc/$CliPkg"
+PkgVer=$(cat "$ExtDir/.version")
+PkgDate=$(zcat "$CliDoc/changelog.Debian.gz" | sed -nr "s/^ -- [^<]+<[^>]+> +(.*)$/\1/p")
+Year=$(echo "$PkgDate" | sed -r 's/^..., .. ... (....) .*$/\1/')
+for pkg in $(apt-cache search "php-$Ext" | sed -n "/^php[^-]*-$Ext /s/ .*$//p")
+do
+    test "$Confl" && sep=', ' || sep=
+    Confl="$Confl$sep$pkg"
+done
+MM=''	# Suffixe des binaires, pages de man, fichiers de config. Vide sur jessie
+MMD=''	# Sous-répertoire de version PHP de /etc/php. Vide sur jessie
+if [ "$DEBVER" != 'jessie' ]; then
+    MM="$PhpVer"
+    MMD="/$PhpVer"
+fi
+if [ "$Name" ]; then
+    EXT="$Name"
+else
+    # shellcheck disable=SC2021	# Don't use [] around classes in tr
+    EXT=$(echo "$Ext" | tr '[a-z]' '[A-Z]')
+fi
+# shellcheck disable=SC2154	# Dbg is referenced but not assigned.
+test "$Dbg" && echo "CliPkg=$CliPkg pName=$pName PkgVer=$PkgVer PkgDate=\"$PkgDate\" Year=$Year MM=\"$MM\" MMD=\"$MMD\" EXT=$EXT"
+
+Top=$(mktemp -d)
+ToRd="$Top"
+(cd /opt/pkg; tar cf - -- *) | tar xCf "$Top" -
+
+ExtDoc='/usr/share/doc/extname'
+# $ExtDoc directory
+sed -i "s/%YEAR%/$Year/" "$Top$ExtDoc/copyright"
+sed -i -e "s/%NAME%/$pName/g" -e "s/%VERSION%/$PkgVer/" -e "s/%DEBVER%/$DEBVER/" -e "s/%EXT%/$EXT/" -e "s/%DATE%/$PkgDate/" "$Top$ExtDoc/changelog.Debian"
+gzip -n9 "$Top$ExtDoc/changelog"*
+mv "$Top$ExtDoc" "$Top$(dirname $ExtDoc)/$pName"
+
+LinOvr='/usr/share/lintian/overrides/extname'
+if echo "$Ext" | grep -Eq '^(svn|decimal)$'; then	# ANOTHER SPECIAL CASE (re-Yuk!)
+    sed -i -e "s/%NAME%/$pName/g" -e "s/%MM%/$MM/" -e "s/%ext%/$Ext/" "$Top$LinOvr"
+    mv "$Top$LinOvr" "$Top$(dirname $LinOvr)/$pName"
+else
+    rm "$Top/$LinOvr"
+fi
+
+mkdir -p "$Top$PhpExt"
+cp -p "$PhpExt/$Ext.so" "$Top$PhpExt"
+strip -v "$Top$PhpExt/$Ext.so" >"$LogDir/striped_$LogTag.out"
+chmod -x "$Top$PhpExt/$Ext.so"
+test "$MM" && mv "$Top$PhpExt" "$Top/usr/lib/php/$MM"
+
+# DEBIAN directory
+sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;" -e "s;%ext%;$Ext;" -e "s;%zPfx%;$zPfx;" "$Top/DEBIAN/postinst"
+sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;" -e "s;%ext%;$Ext;" -e "s;%zPfx%;$zPfx;" "$Top/DEBIAN/postrm"
+sed -i -e "s/%VERSION%/$PkgVer-$Bld+$DebTag/" -e "s/%NAME%/$pName/" -e "s/%DEPS%/$rDep/" -e "s/%CLI%/$CliPkg/" -e "s/%CONFL%/$Confl/" -e "s/%EXT%/$EXT/" "$Top/DEBIAN/control"
+test "$Confl" || sed -i '/^Conflicts: /d' "$Top/DEBIAN/control"
+
+#
+# -----	Assemble and check the package ---------------------------------
+#
+echo "${Bold}Assembling the $pName package$Norm..."
+out=$(fakeroot dpkg-deb -Zgzip --build "$Top" "$ExtDir")
+deb=$(echo "$out" | sed "s/^.*building package ['\`][^']*' in ['\`]\([^']*\)'\.$/\1/")
+
+if [ -s "$deb" ]; then
+    echo "Checking package '$Ext': $(basename "$deb")..."
+    lintian --allow-root "$deb" >"$LogDir/lintian_$LogTag.out" || true
+else
+    echo "out=\"$out\" deb=\"$deb\""
+fi
+# shellcheck disable=SC2154	# Dbg is referenced but not assigned.
+if [ "$Dbg" ]; then
+    (cd "$Top"
+     find . -type f | sed 's/^..//' | sort >"$LogDir/files_$LogTag"
+     find . -type l | sed 's/^..//' | sort >"$LogDir/links_$LogTag")
+    test -s "$LogDir/links_$LogTag" || rm "$LogDir/links_$LogTag"
+fi
+echo "${Bold}Package $(basename "$deb") ready$Norm in $(dirname "$deb" | sed 's;^/usr/local/;;')"

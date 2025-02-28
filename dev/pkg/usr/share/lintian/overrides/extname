@@ -1,0 +1,2 @@
+#   E: Could not find how to correct this
+%NAME%: custom-library-search-path *usr/lib/php/%MM%/%ext%.so*

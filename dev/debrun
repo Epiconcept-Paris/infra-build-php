@@ -60,7 +60,8 @@ else
     AddUser="groupadd -g $(id -g) $(id -gn); useradd -u $(id -u) -g $(id -g) $User"
     Log="log/docker-build-$DebTag.out"
     mkdir -p log
-    DEBVER="$Tag" USER="$User" ADDUSER="$AddUser" envsubst '$DEBVER $USER $ADDUSER' <$Dfi | tee "log/Dockerfile-$DebTag" | docker build -f - -t $DckImg $BldArgs . >$Log 2>&1
+    echo y | docker buildx prune >$Log
+    DEBVER="$Tag" USER="$User" ADDUSER="$AddUser" envsubst '$DEBVER $USER $ADDUSER' <$Dfi | tee "log/Dockerfile-$DebTag" | docker build -f - -t $DckImg $BldArgs . >>$Log 2>&1
 
     docker images | grep "$Proj *$Tag" >/dev/null || {
 	echo "$ColRed\aFAILED to build the $DckImg image!$ColStd"
@@ -72,7 +73,8 @@ fi
 if [ "$http_proxy" -a "$https_proxy" ]; then
     Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy "
 fi
-Cmd="docker run -ti -v $(realpath $PWD/etc):/usr/local/etc -v $(realpath $PWD/log):/var/log/$Proj $Env--name $CntName --rm $DckImg"
+Top=$(realpath "$PWD")
+Cmd="docker run -ti -v $Top/etc:/usr/local/etc -v $Top/log:/var/log/$Proj -v $Top/pkg:/opt/pkg $Env--name $CntName --rm $DckImg"
 
 echo "Running the '$CntName' container"
 $Cmd

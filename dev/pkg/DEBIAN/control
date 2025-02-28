@@ -1,0 +1,10 @@
+Package: %NAME%
+Version: %VERSION%
+Architecture: amd64
+Maintainer: Cedric <c.girard@epiconcept.fr>
+Depends: %CLI%, %DEPS%libc6
+Conflicts: %CONFL%
+Section: admin
+Priority: optional
+Description: PHP %EXT% extension build by Epiconcept
+ This package provides the PHP %EXT% shared extension

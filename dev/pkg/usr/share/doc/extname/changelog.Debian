@@ -1,0 +1,4 @@
+%NAME% (%VERSION%) %DEBVER%; urgency=low
+  * PHP %EXT% shared extension
+    Specific version for Epiconcept use
+ -- Cedric <c.girard@epiconcept.fr>  %DATE%

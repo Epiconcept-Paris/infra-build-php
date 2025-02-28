@@ -580,32 +580,48 @@ root@88e944da6b42:/# ext
 Usage: ext <PECL-extension>
 Known extensions:
     imagick
-    event
+    amqp
+    svn
+    xdebug
+    yaml
     ev
+    uv
+    event
+    decimal
 root@88e944da6b42:/#
 ```
 (lors de la dernière mise à jour de ce fichier `README.md`)
 
 Il suffit pour cela de lancer la commande `ext` suivie du nom de l'extension, par exemple :
 ```console
-root@88e944da6b42:/# ext ev
-Installing package(s) libev-dev (log to /var/log/extdev/install-deb12-7.4.out)
-Compiling the ev PHP extension (log to /usr/local/etc/ext/ev/bookworm-7.4/compile.out)
-Configuring the ev extension
-Extension ev saved to 'etc/ext/ev/bookworm-7.4'
-Checking the ev extension:
-Additional .ini files parsed => /etc/php/7.4/conf.d/ev.ini,
-ev
+root@88e944da6b42:/# ext yaml
+Installing dependency package libyaml-dev (log to /var/log/extdev/install_yaml-7.4-deb12.out)
+Compiling the yaml PHP extension (log to /usr/local/etc/ext/yaml/bookworm-7.4/compile.out)
+Configuring the yaml extension
+Extension yaml saved to 'etc/ext/yaml/bookworm-7.4'
+Checking the yaml extension:
+Additional .ini files parsed => /etc/php/7.4/conf.d/yaml.ini
+yaml
+yaml.decode_binary => 0 => 0
+yaml.decode_php => 0 => 0
+yaml.decode_timestamp => 0 => 0
+yaml.output_canonical => 0 => 0
+yaml.output_indent => 2 => 2
+yaml.output_width => 80 => 80
 Installed packages, channel pecl.php.net:
 =========================================
 Package Version State
-ev      1.1.5   stable
-event   3.1.4   stable
-imagick 3.7.0   stable
+yaml    2.2.4   stable
+Preparing the epi-php-7.4-yaml package...
+Assembling the epi-php-7.4-yaml package...
+Checking package 'yaml': epi-php-7.4-yaml_2.2.4-1+deb12_amd64.deb...
+Package epi-php-7.4-yaml_2.2.4-1+deb12_amd64.deb ready in etc/ext/yaml/bookworm-7.4
+Cleaning up...
+Done.
 root@88e944da6b42:/#
 ```
-Le résultat se trouve dans le même répertoire que le fichier `compile.out`, sous forme de deux fichiers `ev.so` et `ev.ini` qu'il faudra placer respectivement dans `/usr/lib/php/extensions` et dans `/etc/php/<version-PHP>/conf.d`.  
-Pour l'instant (1er août 2024), aucun paquet Debian n'est généré.
+Le résultat se trouve dans le même répertoire que le fichier `compile.out`, sous forme d'un paquet Debian qui peut s'installer sur les systèmes de mêmes versions Debian et PHP.
+Les dépendances du paquet sont gérées ainsi que les conflits avec les versions standard Debian du ou des paquets pour la même extension PHP.
 
 ### Ajout d'une nouvelle extension
 Comme pour les ajouts de version PHP ou de version Debian, le travail est évidemment variable, mais le point de départ est l'utilisation de la commande `pecl install` (disponible après avoir exécuté le script `setup`). Par exemple :
@@ -646,6 +662,7 @@ Installed packages, channel pecl.php.net:
 =========================================
 Package Version State
 decimal 1.5.0   stable
+...
 root@88e944da6b42:~# 
 ```
 
@@ -661,6 +678,63 @@ Par exemple, la dernière version de l'extension `uv` compatible avec PHP 7.4 é
 root@88e944da6b42:/# pecl install uv-0.2.4
 root@88e944da6b42:/# 
 ```
+Le travail de configuration de l'extension est facilité si l'extension est présente dans les paquets standard de la distribution `Debian`, ce qui l'on peut voir avec les commandes `apt-cache search` et `apt show`.
+Par exemple, pour l'extension `php-yaml`:
+```console
+root@88e944da6b42:/# apt-cache search php-yaml
+php-yaml - YAML-1.1 parser and emitter for PHP
+php-yaml-all-dev - YAML-1.1 parser and emitter for PHP
+php8.2-yaml - YAML-1.1 parser and emitter for PHP
+root@88e944da6b42:/# apt show php-yaml
+Package: php-yaml
+Version: 2.2.2+2.1.0+2.0.4+1.3.2-6
+Priority: optional
+Section: php
+Maintainer: Debian PHP PECL Maintainers <team+php-pecl@tracker.debian.org>
+Installed-Size: 10.2 kB
+Pre-Depends: php-common (>= 2:69~)
+Depends: php8.2-yaml
+Homepage: http://pecl.php.net/package/Yaml
+Download-Size: 3096 B
+APT-Sources: http://deb.debian.org/debian bookworm/main amd64 Packages
+Description: YAML-1.1 parser and emitter for PHP
+
+root@88e944da6b42:/# apt show php8.2-yaml
+Package: php8.2-yaml
+Version: 2.2.2+2.1.0+2.0.4+1.3.2-6
+Priority: optional
+Section: php
+Source: php-yaml
+Maintainer: Debian PHP PECL Maintainers <team+php-pecl@tracker.debian.org>
+Installed-Size: 75.8 kB
+Provides: php-yaml
+Pre-Depends: php-common (>= 2:69~)
+Depends: php8.2-common, phpapi-20220829, libc6 (>= 2.14), libyaml-0-2
+Breaks: php-yaml (<< 2.2.2+2.1.0+2.0.4+1.3.2-6~)
+Replaces: php-yaml (<< 2.2.2+2.1.0+2.0.4+1.3.2-6~)
+Homepage: http://pecl.php.net/package/Yaml
+Download-Size: 20.8 kB
+APT-Sources: http://deb.debian.org/debian bookworm/main amd64 Packages
+Description: YAML-1.1 parser and emitter for PHP
+
+```
+
+### Le fichier de configutation `/usr/local/etc/ext.conf`
+
+Il s'agit essentiellement d'un fichier TSV (champs séparés par des caractères `TAB` ASCII).
+Initialement composés de 5 champs plus commentaires (en août 2024) il est passé en février 2025 à 8 champs, qui sont les suivants :  
+1. le nom de l'extension, en minuscules, dérivé du nom de la librairie ou du protocole implémenté.e par l'extension
+2. la version spécifique nécessaire pour compiler l'extension, par défaut la plus récente.
+3. la version maximale de PHP avec laquelle la version en `2.` compile
+4. une chaîne de caractères à fournir à l'entrée standard de la commande `ext`
+5. la liste de packages nécessaires pour compiler l'extension
+6. la liste des paquets nécessaires pour éxécuter l'extension
+7. le numéro de build du paquet (pour permettre des corrections sans changement de version en amont)
+8. le nom de l'extension dans les `changelog*` et `copyright` (par défaut `1.` en majuscules)
+9. (et au delà) commentaires
+
+Le script de compilation `ext` reconnait également deux types particuliers de commentaires de début de ligne, qui sont `#:<DebNum> TAB URL d'un paquet '.deb'` et `#!<DebNum> TAB URL d'un paquet '.deb'`, pour indiquer respectivement une URL de paquet (dépendance) nécessaire à l'exécution et celle d'un paquet nécessaire à la compilation.  
+Les différentes extensions à partir de `yaml` n'ont été ajoutées que pour tester la *mécanique* du script `ext`.
 
 
 ## <a name="xdock"> Containers `docker` auxiliaires </a>
