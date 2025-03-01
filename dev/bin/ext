@@ -332,7 +332,7 @@ if echo "$Ext" | grep -Eq '^(svn|decimal)$'; then	# ANOTHER SPECIAL CASE (re-Yuk
     sed -i -e "s/%NAME%/$pName/g" -e "s/%MM%/$MM/" -e "s/%ext%/$Ext/" "$Top$LinOvr"
     mv "$Top$LinOvr" "$Top$(dirname $LinOvr)/$pName"
 else
-    rm "$Top/$LinOvr"
+    rm -r "$Top$(dirname "$(dirname "$LinOvr")")"
 fi
 
 mkdir -p "$Top$PhpExt"
@@ -342,8 +342,8 @@ chmod -x "$Top$PhpExt/$Ext.so"
 test "$MM" && mv "$Top$PhpExt" "$Top/usr/lib/php/$MM"
 
 # DEBIAN directory
-sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;" -e "s;%ext%;$Ext;" -e "s;%zPfx%;$zPfx;" "$Top/DEBIAN/postinst"
-sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;" -e "s;%ext%;$Ext;" -e "s;%zPfx%;$zPfx;" "$Top/DEBIAN/postrm"
+sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;" -e "s;%ext%;$Ext;" -e "s;%zPfx%;$zPfx;g" "$Top/DEBIAN/postinst"
+sed -i -e "s/%MM%/$MM/g" -e "s;%MMD%;$MMD;" -e "s;%ext%;$Ext;" -e "s;%zPfx%;$zPfx;g" "$Top/DEBIAN/postrm"
 sed -i -e "s/%VERSION%/$PkgVer-$Bld+$DebTag/" -e "s/%NAME%/$pName/" -e "s/%DEPS%/$rDep/" -e "s/%CLI%/$CliPkg/" -e "s/%CONFL%/$Confl/" -e "s/%EXT%/$EXT/" "$Top/DEBIAN/control"
 test "$Confl" || sed -i '/^Conflicts: /d' "$Top/DEBIAN/control"
 

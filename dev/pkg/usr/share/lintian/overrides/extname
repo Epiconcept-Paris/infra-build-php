@@ -1,2 +1,2 @@
-#   E: Could not find how to correct this
+#   E: Compensate for what looks like a bug in lintian v2.104.0 (on bullseye)
 %NAME%: custom-library-search-path *usr/lib/php/%MM%/%ext%.so*
