@@ -3,7 +3,9 @@
 #	ext - Compile PHP extensions
 #
 # shellcheck disable=SC2039	# In POSIX sh, 'local' is undefined
+# shellcheck disable=SC3043	# In POSIX sh, 'local' is undefined
 # shellcheck disable=SC2028	# echo may not expand escape sequences
+# shellcheck disable=SC3037	# In POSIX sh, echo flags are undefined
 #
 Prg=$(basename "$0")
 umask 022
@@ -316,6 +318,7 @@ test "$Dbg" && echo "CliPkg=$CliPkg pName=$pName PkgVer=$PkgVer PkgDate=\"$PkgDa
 Top=$(mktemp -d)
 ToRd="$Top"
 (cd /opt/pkg; tar cf - -- *) | tar xCf "$Top" -
+chmod -R g-w "$Top"
 
 ExtDoc='/usr/share/doc/extname'
 # $ExtDoc directory
