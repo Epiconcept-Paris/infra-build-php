@@ -243,7 +243,9 @@ Dir=$(expr "$ExtDir" : "$Etc/\(.*\)\$")
 Log="$ExtDir/compile.out"
 
 #   Compile the extension
-test -s "$ExtDir/$Ext.so" || {
+if [ -s "$ExtDir/$Ext.so" ]; then
+    echo "File $Ext.so is already in $ExtDir."
+else
     Tgt="$Ext"
     test "$Ver" && Tgt="$Ext-$Ver"
     echo "${Bold}Compiling the $Tgt PHP extension$Norm (log to $Log)"
@@ -254,7 +256,7 @@ test -s "$ExtDir/$Ext.so" || {
     pecl list 2>/dev/null | awk -v Ext="$Ext" '$1 == Ext {
 	print $2 ($3 == "beta" ? "~beta" : "")
     }' >"$ExtDir/.version"
-}
+fi
 
 #   Configure and save the extension
 Ini=$(php --ini | sed -n 's/^.* Path: //p')
