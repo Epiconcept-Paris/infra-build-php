@@ -8,7 +8,7 @@ ENV TZ=Europe/Paris
 RUN $ADDUSER
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 RUN echo "export TERM=xterm\necho \"Run:\n    setup <Maj>.<min>\\t# to install epi-php packages for PHP version <Maj>.<min>\\n    ext <ext-tag>\\t# to compile and install a PECL PHP extension\"" >>/root/.bashrc
-
-RUN apt-get update && apt-get upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends vim file tree lsof bsdmainutils curl apt-transport-https gnupg2 ca-certificates apache2 autoconf gcc libc-dev lintian fakeroot pkg-config man less
+$APT_SRC
+RUN apt-get update && apt-get upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends vim file tree lsof bsdmainutils curl apt-transport-https gnupg2 ca-certificates apache2 autoconf gcc libc-dev lintian fakeroot make pkg-config man less
 
 COPY bin/* /usr/local/bin/

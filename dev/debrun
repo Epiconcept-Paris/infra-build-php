@@ -24,8 +24,8 @@ if [ $xc -ne 0 ]; then
     exit 2
 fi
 DebNum=$(expr "$DebVer" : '\([0-9]*\)')
-if [ "0$DebNum" -lt 11 ]; then
-    echo "$Prg: only Debian versions 11 and above are supported, not '$DebNum'" >&2
+if [ "0$DebNum" -lt 9 ]; then
+    echo "$Prg: only Debian versions 9 and above are supported, not '$DebNum'" >&2
     docker rmi "$OST:$1"
     exit 2
 fi
@@ -34,19 +34,19 @@ Tag="$1"
 DckImg=$Proj:$Tag	# Keep all tests images separate
 CntName=$Proj-$Tag
 
-if docker ps | grep $CntName >/dev/null; then
+if docker ps | grep -q "$CntName"; then
     echo "Stopping the running '$CntName' container..."
-    docker stop -t 5 $CntName >/dev/null
-    while docker ps | grep $CntName >/dev/null
+    docker stop -t 5 "$CntName" >/dev/null
+    while docker ps | grep -q "$CntName"
     do
 	sleep 1
     done
 fi
-if docker ps -a | grep $CntName >/dev/null; then
+if docker ps -a | grep -q "$CntName"; then
     echo "Deleting the existing '$CntName' container"
-    docker rm $CntName >/dev/null
+    docker rm "$CntName" >/dev/null
 fi
-if docker images | grep "$Proj *$Tag" >/dev/null; then
+if docker images | grep -q "$Proj *$Tag"; then
     echo "Re-using the existing '$DckImg' image ('docker rmi $DckImg' to remove it)"
 else
     echo "Building the '$DckImg' image..."
@@ -58,12 +58,13 @@ else
     fi
     User=$(id -un)
     AddUser="groupadd -g $(id -g) $(id -gn); useradd -u $(id -u) -g $(id -g) $User"
+    test "$DebNum" -eq 9 && AptSrc="RUN sed -i -r -e 's/(deb|security)\.debian/archive.debian/' -e 's/stretch-updates/stretch-proposed-updates/' /etc/apt/sources.list"
     Log="log/docker-build-$DebTag.out"
     mkdir -p log
-    echo y | docker buildx prune >$Log
-    DEBVER="$Tag" USER="$User" ADDUSER="$AddUser" envsubst '$DEBVER $USER $ADDUSER' <$Dfi | tee "log/Dockerfile-$DebTag" | docker build -f - -t $DckImg $BldArgs . >>$Log 2>&1
+    echo y | docker buildx prune >"$Log"
+    DEBVER="$Tag" USER="$User" ADDUSER="$AddUser" APT_SRC="$AptSrc" envsubst '$DEBVER $USER $ADDUSER $APT_SRC' <$Dfi | tee "log/Dockerfile-$DebTag" | docker build -f - -t "$DckImg" $BldArgs . >>"$Log" 2>&1
 
-    docker images | grep "$Proj *$Tag" >/dev/null || {
+    docker images | grep -q "$Proj *$Tag" || {
 	echo "$ColRed\aFAILED to build the $DckImg image!$ColStd"
 	echo "Examine $Log for details."
 	exit 3
