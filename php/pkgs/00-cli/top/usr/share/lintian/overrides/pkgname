@@ -1,5 +1,5 @@
 #   E: Our PHP cli may include libgd/file/pcre3/sqlite on purpose
-%NAME%: embedded-library *usr/bin/php%MM%*
+%NAME%: embedded-library *usr/bin/php*
 
 #   E: Pointless as phar is included in this cli package
 %NAME%: php-script-but-no-phpX-cli-dep *usr/bin/phar.phar*

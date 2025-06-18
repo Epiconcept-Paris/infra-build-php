@@ -3,7 +3,7 @@
 #	setup - Install epi-php packages
 #
 Prg=$(basename "$0")
-SupVer='7.4 8.2'	# Supported PHP versions
+SupVer='7.4 8.2 8.4'	# Supported PHP versions
 
 test "$1" || { echo "Usage: $Prg <PHP-Major.minor> | 'epi'" >&2; exit 1; }
 if [ "$1" != 'epi' ]; then

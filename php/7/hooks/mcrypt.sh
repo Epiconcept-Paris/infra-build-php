@@ -6,6 +6,8 @@ echo "$ExtOpts" | grep -- '--with-mcrypt ' >/dev/null || {
     su -c "tar xf `echo $Bld/files/mcrypt-*.tgz` -C ext" $USER
     mv ext/mcrypt-* ext/mcrypt
     mv ext/package.xml ext/mcrypt
+    Rnd=ext/standard/php_rand.h
+    test -s $Rnd || echo '#include "ext/random/php_random.h"\n\n#define php_rand() php_mt_rand()' >$Rnd
     Opt="--with-mcrypt"
     Show="MCrypt"
 }

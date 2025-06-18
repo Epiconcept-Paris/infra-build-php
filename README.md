@@ -8,7 +8,7 @@ Fournil à paquets PHP spécifiques à Epiconcept pour les versions suivantes de
 * 12 `bookworm`
 
 Sont gérées :
-* Les versions 5.2, 5.6, 7.1, 7.4, 8.1, 8.2 de PHP (au 1er août 2024) mais,
+* Les versions 5.2, 5.6, 7.1, 7.4, 8.1, 8.2, 8.4 de PHP (au 18 juin 2025) mais,
   pour certaines versions de PHP, pas sur toutes les versions de Debian Linux
 * l'ancienne extension `mysql` sur les versions 7 et 8 de PHP
 * deux chaines simultanées de *build*s des paquets :

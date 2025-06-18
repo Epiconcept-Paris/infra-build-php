@@ -62,7 +62,7 @@ chown $Own "$Logs/debinfo-a_build"
 DebRel=$(cat /etc/debian_version)
 
 # Get version of latest PHP source
-SupVer="5.2 5.6 7.1 7.4 8.1 8.2"		# UPDATE THIS on new PHP version
+SupVer="5.2 5.6 7.1 7.4 8.1 8.2 8.4"		# UPDATE THIS on new PHP version
 Ext=.tar.bz2
 Ver=$(expr "$(ls $Bld/files/php-*$Ext 2>/dev/null)" : ".*/php-\([0-9\.]*\)$Ext")
 if [ "$Ver" ]; then
@@ -171,6 +171,8 @@ echo "$ExtOpts" | grep -- '--with-pear=' >/dev/null || >`echo $Bld/pkgs/*-pear`/
 echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`echo $Bld/pkgs/*-fpm`/skip
 # Skip *-phpdbg package generation if --enable-phpdbg unknown
 echo "$ExtOpts" | grep -- '--enable-phpdbg ' >/dev/null || >`echo $Bld/pkgs/*-phpdbg`/skip
+# Skip *-imap package generation if --with-imap unknown
+echo "$ExtOpts" | grep -- '--with-imap=' >/dev/null || >`echo $Bld/pkgs/*-imap`/skip
 # Skip *-mysql package generation if --with-mysql is known before hooks (5.x)
 echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`echo $Bld/pkgs/*-mysql`/skip
 
@@ -375,7 +377,8 @@ else
     exec 2>>$mkErr	# Mostly to capture "Terminated" messages from shell
     chown $Own $mkErr
 
-    echo "s" | su -c "make test >$mkOut 2>&1" $USER &
+    test "$(NumVer $MajMin)" -lt 804 && Ans='s' || Ans='y'
+    echo "$Ans" | su -c "make test >$mkOut 2>&1" $USER &
     mkPid=$!
 
     mkOld=0		# Previous mkOut's size
