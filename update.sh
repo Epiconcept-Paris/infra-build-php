@@ -232,7 +232,7 @@ phase1()
     do
 	test -f "debian/$dv/name" || { echo "$Prg: no 'name' in 'debian/$dv' ?$CR" >&2; continue; }
 	test -f "debian/$dv/mkre" || { echo "$Prg: no 'mkre' in 'debian/$dv' ?$CR" >&2; continue; }
-	test -f "debian/$dv/.noupd" && continue
+	test -f "debian/$dv/.noupd" && continue	# Used when adding a new Debian version
 	test "$debs" && debs="$debs $dv" || debs="$dv"
     done
 
@@ -249,7 +249,7 @@ phase1()
 	bf="$(bldnum $pv)"
 	git ls-files | grep "^$bf" >/dev/null && {
 	    # Gather PHP versions to update
-	    if git status $bf | grep -E "^${TAB}modified: +$bf$" >/dev/null; then
+	    if git status $bf | grep -Eq "^${TAB}modified: +$bf$"; then
 		test "$upds" && upds="$upds $pv" || upds="$pv"
 		# Gather report's 2nd arg
 		test "$upvs" && upvs="$upvs,$pv" || upvs="$pv"
