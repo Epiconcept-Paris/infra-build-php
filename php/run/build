@@ -166,15 +166,17 @@ PdoMysql='=/usr'
 MysqlI='=/usr/bin/mysql_config'
 
 # Skip *-pear package generation if --with-pear unknown
-echo "$ExtOpts" | grep -- '--with-pear=' >/dev/null || >`echo $Bld/pkgs/*-pear`/skip
+echo "$ExtOpts" | grep -q -- '--with-pear=' || >$(echo $Bld/pkgs/*-pear)/skip
 # Skip *-fpm package generation if --enable-fpm unknown
-echo "$ExtOpts" | grep -- '--enable-fpm ' >/dev/null || >`echo $Bld/pkgs/*-fpm`/skip
+echo "$ExtOpts" | grep -q -- '--enable-fpm ' || >$(echo $Bld/pkgs/*-fpm)/skip
 # Skip *-phpdbg package generation if --enable-phpdbg unknown
-echo "$ExtOpts" | grep -- '--enable-phpdbg ' >/dev/null || >`echo $Bld/pkgs/*-phpdbg`/skip
+echo "$ExtOpts" | grep -q -- '--enable-phpdbg ' || {
+    grep -q -- '--disable-phpdbg ' $ConfigHelp || >$(echo $Bld/pkgs/*-phpdbg)/skip
+}
 # Skip *-imap package generation if --with-imap unknown
-echo "$ExtOpts" | grep -- '--with-imap=' >/dev/null || >`echo $Bld/pkgs/*-imap`/skip
+echo "$ExtOpts" | grep -q -- '--with-imap=' || >$(echo $Bld/pkgs/*-imap)/skip
 # Skip *-mysql package generation if --with-mysql is known before hooks (5.x)
-echo "$ExtOpts" | grep -- '--with-mysql ' >/dev/null && >`echo $Bld/pkgs/*-mysql`/skip
+echo "$ExtOpts" | grep -q -- '--with-mysql ' && >$(echo $Bld/pkgs/*-mysql)/skip
 
 #
 #   Handle build-time hooks (mostly for PHP extensions)
