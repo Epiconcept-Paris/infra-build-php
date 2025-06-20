@@ -32,13 +32,23 @@
 #	and the place of logs to examine for any error
 #
 # shellcheck disable=SC2086	# Double quote to prevent globbing
-# shellcheck disable=SC3043	# In POSIX sh, 'local' is undefined
 # shellcheck disable=SC2059	# Don't use variables in the printf format string
 # shellcheck disable=SC2164	# Use 'cd ... || exit'
+# shellcheck disable=SC3043	# In POSIX sh, 'local' is undefined
+# shellcheck disable=SC3037	# In POSIX sh, echo flags are undefined
 #
 Prg=$(basename "$0")
 Dir=$(dirname "$0")
 cd "$Dir"
+
+#   Return current time as '+%Y-%m-%d %H:%M:%S'
+now()
+{
+    local sep
+
+    test "$1" && sep="$1" || sep=' '
+    date "+%Y-%m-%d$sep%H:%M:%S"
+}
 
 #   Convert elapsed time (in s) of process to YYYY-DD-MM hh:mm:ss (Main code)
 odate()
@@ -517,6 +527,18 @@ EOF
 
 }
 
+#   On exit, gather empty log in $LogDir/.idle
+cleanup()
+{
+    #global LogDir Log
+
+    if [ $(wc -l <$Log) -eq 1 ]; then
+	cat "$Log" >>"$LogDir/.idle"
+	rm "$Log"
+    fi
+    return 0
+}
+
 # ===== Main ===================================
 
 #   Check that a 'php' user exists
@@ -543,13 +565,13 @@ Log="$LogDir/$(date '+%Y-%m-%d')"
 Fifo="$LogDir/.fifo"
 mkdir -p $LogDir
 test -p "$Fifo" || mkfifo "$Fifo"
-find $LogDir -type f -mtime +90 | xargs rm -f
 #   All script stdout and stderr will go to $Log
 #   To put message in the final email, output to fd:3
 exec 3>&1	# Save stdout
 exec >$Log 2>&1
-date "+===== %Y-%m-%d %H:%M:%S ===== User: $Usr =====$CR"
-#date "+===== %Y-%m-%d %H:%M:%S =====" >&3	# DBG
+trap cleanup 0
+date "===== $(now) ===== User: $Usr =====$CR"
+#date "===== $(now) =====" >&3	# DBG
 
 test "$LANG" || { LANG='C.UTF-8'; echo "Set LANG=\"$LANG\"$CR"; }
 if [ "$LC_ALL" -a "$LC_ALL" != "$LANG" ]; then
@@ -560,9 +582,11 @@ fi
 #   Find out if another instance is running
 #	We filter out $2 (PPID) as well as $1 (PID) to eliminate the $() subshell
 #ps -eo pid,ppid,etimes,cmd | grep "$(echo "$Dir/$Prg" | sed -r 's/^(.)/[\1]/')"	# DBG
-eval "$(ps -eo pid,ppid,etimes,cmd | awk "\$5==\"$Dir/$Prg\" && \$1!=$$ && \$2!=$$ {printf(\"Old=%d Et=%d\",\$1,\$3)}")"
+PsLog="update.log/ps_$(now _).txt"
+eval "$(ps -eHo pid,ppid,etimes,cmd | awk ' != 2' | tee $PsLog | awk "\$5==\"$Dir/$Prg\" && \$1!=$$ && \$2!=$$ {printf(\"Old=%d Et=%d\",\$1,\$3)}")"
 #echo "Dir=$Dir Prg=$Prg PID=$$ Old=\"$Old\""	# DBG
 test "$Old" && { echo "$Prg: another instance (PID=$Old) is running since $(odate $Et)" >&3; exit 1; }
+rm -f $PsLog
 
 #   Check for environment (scripts and working dir)
 Cant="$Prg: cannot find the"
