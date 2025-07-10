@@ -1,6 +1,34 @@
-# Patches to PHP 7.4.33 from Debian
+# Security patches to PHP 7.4.33 from Debian
 
 Some of these patches are included in our builds because PHP 7.4 support expired with release 7.4.33 on 2022-11-28.
+
+
+## Patch level `deb11u8` as of July 2025 (build 7.4.33-5)
+
+### Source
+
+The latest (2025-03-20) `debian-security` `deb11u8` patches for PHP 7.4.33 have been found on [security.debian.org](http://security.debian.org/debian-security/pool/main/p/php7.4/php7.4_7.4.33-1+deb11u8.debian.tar.xz).
+
+### Choice of patches
+
+Since the previous `deb11u5` patch level below, 25 new CVE patches have been added.  
+Three of them are obviously of no use in Epiconcept's environment and have been discarded.  
+The 22 others are all included in the 7.4.33-3 build.  
+All the `deb11u3` and `deb11u5` patches selected for the 7.4.33-3 build have otherwise been retained.
+
+### Unused patches
+
+The following patches have been discarded because they are not useful to Epiconcept:
+```
+CVE-2024-11236/01-7742f79.patch		# pdo_dblib
+CVE-2024-11236/02-2dbe142.patch		# pdo_firebird`
+CVE-2024-8932.patch			# ldap`
+```
+
+### Sub-directories
+
+The `debian/patches/` directory in the `deb11u5` patch-level was a flat directory, but in `deb11u8` it contains sub-directories, so the patches now come as a `deb-CVE.tgz` tarball, with a pack/unpack `mktgz` utility script.  
+In addition, a `deb-CVE/series` file has been added that lists the patch files in the order they should be applied.
 
 
 ## Patch level `deb11u5` as of July 2024 (build 7.4.33-3)
@@ -16,7 +44,7 @@ Since the previous `deb11u3` patch level below, 13 new CVE patches have been add
 Two of them are obviously for an MS Windows environment (`cmd.exe`) and have been discarded.
 The 11 others are all included in the 7.4.33-3 build, but patches `CVE-2024-2756` and `CVE-2024-3096`
     are probably the most important security-wise.
-All the `deb11u3` patches selected for the 7.4.33-2 build have othewise been retained.
+All the `deb11u3` patches selected for the 7.4.33-2 build have otherwise been retained.
 
 ### Unused patches
 

@@ -9,24 +9,14 @@ Php=${PhpTop}$Maj
 AddExtra()
 {
     # global Php Min BLDCOPY BUILD_TOP
-    local dir file mk
+    local dir tgz
 
     #   Handle specific patch files
     dir="$Php/files/$Maj.$Min"
-    if [ -d $dir ]; then
-	mk=
-	for file in $dir/deb-CVE/*.patch
-	do
-	    test -f "$file" || continue	# *.patch pattern may not match
-	    test "$mk" || {
-		BLDCOPY="$BLDCOPY
-RUN mkdir $BUILD_TOP/files/deb"
-		mk=y
-	    }
-	    BLDCOPY="$BLDCOPY
-COPY $file $BUILD_TOP/files/deb"
-	done
-	test "$mk" && BLDCOPY="$BLDCOPY
+    tgz="$dir/deb-CVE.tgz"
+    if [ -s $tgz ]; then
+	BLDCOPY="$BLDCOPY
+COPY $tgz $BUILD_TOP/files
 COPY $Php/hooks/files.sh $BUILD_TOP/hooks"
     fi
 

@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+#	mktgz - Make deb-CVE.tgz from deb-CVE/series and deb-CVE/ contents
+#
+Prg=$(basename "$0")
+cd "$(dirname "$0")"
+
+Dir='deb-CVE'
+Tgz="$Dir.tgz"
+Ser="$Dir/series"
+
+if [ -s "$Ser" ]; then 
+    test -s $Tgz && { echo "$Prg: $Tgz already exists. Remove it first" >&2; exit 1; }
+    # cd deb-CVE && tar xf ../deb-CVE.tgz; find deb-CVE -type f | while read f; do cmp $f ../$f && rm $f ../$f; done; cd ..; find deb-CVE -depth | xargs rmdir
+    (cat $Dir/series; echo series) | sed "s;^;$Dir/;" | tar czfT $Tgz -
+else
+    test -s $Tgz || { echo "$Prg: neither '$Ser' nor '$Tgz' exist in '$PWD'? Aborting" >&2; exit 2; }
+    tar xf $Tgz && echo "$Prg: '$Tgz' has been extracted" >&2
+fi
