@@ -3,26 +3,48 @@
 Some of these patches are included in our builds because PHP 7.4 support expired with release 7.4.33 on 2022-11-28.
 
 
+## Patch level `deb11u9` as of August 2025 (build 7.4.33-6)
+
+### Source
+
+The latest (2025-07-27) `debian-security` `deb11u9` patches for PHP 7.4.33 have been found on [security.debian.org](http://security.debian.org/debian-security/pool/main/p/php7.4/php7.4_7.4.33-1+deb11u9.debian.tar.xz).
+
+### Choice of patches
+
+Since the previous `deb11u8` patch level below, only 3 new CVE patches have been added.  
+One of them is obviously of no use in Epiconcept's environment and has been discarded.  
+The 2 others are included in the 7.4.33-6 build.  
+All the `deb11u[358]` patches selected for the 7.4.33-5 build have otherwise been retained.
+
+### Unused patches
+
+The following patch has been discarded because it is not useful to Epiconcept:
+```
+CVE-2025-1735.patch			# pdo_pgsql
+```
+
 ## Patch level `deb11u8` as of July 2025 (build 7.4.33-5)
 
 ### Source
 
-The latest (2025-03-20) `debian-security` `deb11u8` patches for PHP 7.4.33 have been found on [security.debian.org](http://security.debian.org/debian-security/pool/main/p/php7.4/php7.4_7.4.33-1+deb11u8.debian.tar.xz).
+The latest (2025-03-20) `debian-security` `deb11u8` patches to the standard PHP 7.4.33 distribution were on [security.debian.org](http://security.debian.org/debian-security/pool/main/p/php7.4/php7.4_7.4.33-1+deb11u8.debian.tar.xz).
+
+But this `deb11u8` version is no longer available as of August 2025, as it has been superseded by the `deb11u9` version.
 
 ### Choice of patches
 
 Since the previous `deb11u5` patch level below, 25 new CVE patches have been added.  
 Three of them are obviously of no use in Epiconcept's environment and have been discarded.  
-The 22 others are all included in the 7.4.33-3 build.  
-All the `deb11u3` and `deb11u5` patches selected for the 7.4.33-3 build have otherwise been retained.
+The 22 others are all included in the 7.4.33-5 build.  
+All the `deb11u[35]` patches selected for the 7.4.33-3 build have otherwise been retained.
 
 ### Unused patches
 
 The following patches have been discarded because they are not useful to Epiconcept:
 ```
 CVE-2024-11236/01-7742f79.patch		# pdo_dblib
-CVE-2024-11236/02-2dbe142.patch		# pdo_firebird`
-CVE-2024-8932.patch			# ldap`
+CVE-2024-11236/02-2dbe142.patch		# pdo_firebird
+CVE-2024-8932.patch			# ldap
 ```
 
 ### Sub-directories
@@ -35,7 +57,9 @@ In addition, a `deb-CVE/series` file has been added that lists the patch files i
 
 ### Source
 
-The latest (2024-04-12) `debian-security` `deb11u5` patches for PHP 7.4.33 can be found on [ftp.debian.org](http://security.debian.org/debian-security/pool/main/p/php7.4/php7.4_7.4.33-1+deb11u5.debian.tar.xz).
+The latest (2024-04-12) `debian-security` `deb11u5` patches to the standard PHP 7.4.33 distribution were on [ftp.debian.org](http://security.debian.org/debian-security/pool/main/p/php7.4/php7.4_7.4.33-1+deb11u5.debian.tar.xz).
+
+But this `deb11u5` version is no longer available as of July 2024, as it has been superseded by more recent versions.
 
 ### Choice of patches
 
@@ -62,7 +86,7 @@ patches/0080-NEWS.patch
 
 The latest (2023-02-22) `debian-security` `deb11u3` patches to the standard PHP 7.4.33 distribution were on [ftp.debian.org](http://ftp.debian.org/debian/pool/main/p/php7.4/php7.4_7.4.33-1+deb11u3.debian.tar.xz).
 
-But this `deb11u3` version is no longer available as of July 2024, as it has been superseded by the `deb11u5` version.
+But this `deb11u3` version is no longer available as of July 2024, as it has been superseded by more recent versions.
 
 ### Choice of patches
 
