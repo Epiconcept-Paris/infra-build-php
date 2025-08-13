@@ -1,5 +1,5 @@
 FROM debian:$DEBVER
-MAINTAINER Epiconcept
+LABEL org.opencontainers.image.authors="Epiconcept"
 
 ENV DEBNUM=$DEBNUM
 ENV USER=$USER
