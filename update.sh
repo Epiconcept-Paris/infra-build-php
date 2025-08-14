@@ -34,6 +34,7 @@
 # shellcheck disable=SC2086	# Double quote to prevent globbing
 # shellcheck disable=SC2059	# Don't use variables in the printf format string
 # shellcheck disable=SC2164	# Use 'cd ... || exit'
+# shellcheck disable=SC2039	# In POSIX sh, 'local' & echo flags are undefined
 # shellcheck disable=SC3043	# In POSIX sh, 'local' is undefined
 # shellcheck disable=SC3037	# In POSIX sh, echo flags are undefined
 #
@@ -542,7 +543,7 @@ cleanup()
 # ===== Main ===================================
 
 #   Check that a 'php' user exists
-grep -q '^php:' /etc/passwd || { echo "$Prg: no 'php' user (required) on $(hostname)" >&2; exit 1; }
+grep -q '^php:' /etc/passwd || { echo "$Prg: no (required) 'php' user on $(hostname)" >&2; exit 1; }
 
 #   Setup Globals
 MaxRold=3	# Max PHP releases (per maj.min) we preserve old docker-images & .debug/php/ for
@@ -581,12 +582,14 @@ fi
 
 #   Find out if another instance is running
 #	We filter out $2 (PPID) as well as $1 (PID) to eliminate the $() subshell
-#ps -eo pid,ppid,etimes,cmd | grep "$(echo "$Dir/$Prg" | sed -r 's/^(.)/[\1]/')"	# DBG
-PsLog="update.log/ps_$(now _).txt"
-eval "$(ps -eHo pid,ppid,etimes,cmd | awk '$2 != 2' | tee $PsLog | awk "\$5==\"$Dir/$Prg\" && \$1!=$$ && \$2!=$$ {printf(\"Old=%d Et=%d\",\$1,\$3)}")"
-#echo "Dir=$Dir Prg=$Prg PID=$$ Old=\"$Old\""	# DBG
-test "$Old" && { echo "$Prg: another instance (PID=$Old) is running since $(odate $Et)" >&3; exit 1; }
-rm -f $PsLog
+test "$Usr" = 'php' || {
+    #ps -eo pid,ppid,etimes,cmd | grep "$(echo "$Dir/$Prg" | sed -r 's/^(.)/[\1]/')"	# DBG
+    PsLog="update.log/ps_$(now _).txt"
+    eval "$(ps -eHo pid,ppid,etimes,cmd | awk '$2 != 2' | tee $PsLog | awk "\$5==\"$Dir/$Prg\" && \$1!=$$ && \$2!=$$ {printf(\"Old=%d Et=%d\",\$1,\$3)}")"
+    #echo "Dir=$Dir Prg=$Prg PID=$$ Old=\"$Old\""	# DBG
+    test "$Old" && { echo "$Prg: another instance (PID=$Old) is running since $(odate $Et)" >&3; exit 1; }
+    rm -f $PsLog
+}
 
 #   Check for environment (scripts and working dir)
 Cant="$Prg: cannot find the"
