@@ -1,5 +1,9 @@
 #!/bin/sh
-
+#
+#	apt-lib.sh - APT functions gathered from APT code in apt-mods.diff
+#
+#	UNTESTED !!! For reference only
+#
 DebTop='debian'
 AptLst=
 AptDeb=

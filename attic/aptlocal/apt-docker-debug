@@ -1,5 +1,5 @@
 COPY netcat-traditional_1.10-41_amd64.deb /tmp
 RUN dpkg -i /tmp/netcat-traditional_1.10-41_amd64.deb
-RUN echo "GET /debian/ HTTP/1.0\r\n\r" | nc 172.17.0.1 8000
 RUN echo "Debug::Acquire::http \"true\";\nDebug::Acquire::gpgv \"true\";\nDebug::pkgAcquire \"true\";\nDebug::pkgAcquire::Auth \"true\";\nDebug::pkgAcquire::Worker \"true\";" >/etc/apt/apt.conf
 RUN cat /etc/apt/apt.conf
+RUN echo "GET /debian/ HTTP/1.0\r\n\r" | nc 172.17.0.1 8000

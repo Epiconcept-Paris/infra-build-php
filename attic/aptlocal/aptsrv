@@ -1,113 +1,243 @@
 #!/bin/sh
 #
-#	aptsrv - Start and stop APT web-server on 'repo' subdir
+#	aptsrv - Start and stop an APT web-server on a subdir
 #
-Prg=$(basename $0)
-Top=$(realpath $(dirname $(dirname $0)))
-NUL='/dev/null'
+# shellcheck disable=SC2039	# In POSIX sh, 'local' & echo flags are undefined
+# shellcheck disable=SC3043	# In POSIX sh, 'local' is undefined
+# shellcheck disable=SC3037	# In POSIX sh, echo flags are undefined
+#
+Prg=$(basename "$0")
+
+SrvList()
+{
+    #global Top Cmd Srv Port DBg
+    local fn top usr pid tcp cwd lfd log
+
+    fn='SrvList'
+    top="${1:-$Top}"
+    ps -eo user,pid,cmd | sed -nr "s/^([^ ]+) +([0-9]+) +$Cmd( ([0-9]+))?$/\\1\t\\2\t\\3/p" |
+      while read -r usr pid tcp
+    do
+	test "$tcp" || tcp="($Port)"
+	cwd=$(realpath "$(readlink "/proc/$pid/cwd")" --relative-to="$top")
+	lfd="/proc/$pid/fd/2"
+	log=; test -f "$lfd" && log=$(realpath "$(readlink "$lfd")" --relative-to="$top")
+	test "$Dbg" && echo "$fn: usr=$usr pid=$pid tcp=$tcp cwd=\"$cwd\" log=\"$log\"" >&2
+	echo "$usr\t$pid\t$tcp\t$cwd\t$log"
+    done
+}
 
 #
-#   StopChkSrv <port> [ <qualifier> [ <relative-repo-path> ]]
+#   StopChkSrv [ <qualifier> [ <relative-repo-path> ]]
 #
 StopChkSrv()
 {
-    # global Top s0 s1 s2
-    local port out adj chk usr pid cwd log add
+    # global Port Srv mDir
+    local fn out adj repo user fmt usr pid cwd log add
 
-    port=$1
-    test $# -gt 1 && { out='y'; test "$2" && adj=" $2"; }
-    test $# -gt 2 && chk="$3"
-    usr=$(id -un)
-    # ps -f columns: UID PID PPID CPU STIME TTY TIME CMD [ARGS]
-    #                 1   2   3    4    5    6   7    8    ...
-    pid=$(ps -ef | awk "\$1==\"$usr\" && \$8==\"$s0\" && \$9==\"$s1\" && \$10==\"$s2\" && \$11==$port{print \$2}")
+    fn='StopChkSrv'
+    test $# -gt 0 && { out='y'; test "$1" && adj=" $1"; }
+    repo="$2"
+    user=$(id -un)
+    fmt='"usr=%s pid=%d cwd=\"%s\" log=\"%s\"\n"';
+    # Filter SrvList with $Port, allowing default value (8000)
+    eval "$(SrvList . | awk -F'\t' "\$3 ~ \"^[^0-9]?$Port[^0-9]?\$\" {printf($fmt,\$1,\$2,\$4,\$5)}")"
     if [ "$pid" ]; then
-	cwd=$(realpath $(readlink "/proc/$pid/cwd") --relative-to=$Top)
-	test -f "/proc/$pid/fd/2" && log=$(realpath $(readlink "/proc/$pid/fd/2") --relative-to=$Top 2>$NUL)
-	#echo "Top=$Top out=$out adj=$adj chk=$chk pid=$pid cwd=$cwd log=$log"
-	if [ "$chk" -a "$chk" = "$cwd" ]; then
-	    test "$log" && add=" with log to $log"
-	    echo "Found $s2 already on '$chk'$add" >&2
+	test "$Dbg" && echo "$fn: out=$out adj=$adj repo=$repo usr=$usr pid=$pid cwd=\"$cwd\" log=\"$log\"" >&2
+	if [ "$repo" ]; then
+	    test "$log" && add=" with log to $pDir$log"
+	    if [ "$cwd" = "$repo" ]; then
+		echo "Found $Srv (PID=$pid) already for $pDir$cwd/$add" >&2
+	    else
+		echo "Found $Srv (PID=$pid) on port $Port for $pDir$cwd/$add" >&2
+	    fi
 	    return 1
 	fi
-	kill $pid && test "$out" && {
-	    test "$cwd" && add=" on '$cwd'"
-	    test "$log" && date "+%Y-%m-%d %H:%M:%S -- Stopped $s2$add (PID=$pid)" >>$log
-	    echo "Stopped$adj $s2$add (PID=$pid)" >&2
-	    return 0
-	}
+	if [ "$user" = 'root' -o "$usr" = "$user" ]; then
+	    if kill "$pid"; then
+		if [ "$out" ]; then
+		    test "$cwd" && add=" for $cwd/"
+		    test "$log" && date "+%Y-%m-%d %H:%M:%S -- Stopped $Srv$add (PID=$pid)" >>"$log"
+		    test "$cwd" && add=" for $pDir$cwd/"
+		    echo "Stopped$adj $Prg (PID=$pid)$add" >&2
+		fi
+		return 0
+	    else
+		echo "$Prg: could not kill process with PID=$pid (xc=$?)" >&2
+		return 3
+	    fi
+	else
+	    echo "$Prg: you ($user) do not own the process with PID=$pid" >&2
+	    return 4
+	fi
     fi
     return 2
+}
+
+ChkPort()
+{
+    netstat -lnt | grep -q ":$1 "
+}
+
+UpDir()
+{
+    local dir up
+
+    dir=$(dirname "$1")
+    up='..'
+    while [ "$dir" != '.' ]
+    do
+	up="$up/.."
+	dir=$(dirname "$dir")
+    done
+    echo "$up"
+}
+
+Match()
+{
+    local pat sep ret path
+
+    pat="$1"
+    sep=
+    ret=
+    for path in $pat
+    do
+	test "$path" = "$pat" && return 1
+	ret="$ret$sep$path"
+	sep=${2:- }
+    done
+    echo "$ret"
 }
 
 Usage()
 {
     # global Prg
-    echo "Usage: $Prg [ <debDir> | stop | stat (default) ]" >&2
+
+    echo "Usage: $Prg [-p <tcp-port>] [-r <run-dir>] [-t <top-dir>] <repo> | stop | stat (default)" >&2
+    # Do not exit on $1 = '-', otherwise exit $1 (default 1)
     test "$1" = '-' || exit ${1:-1}
 }
 
 #
 #   Main
 #
-s0='python3'
-s1='-m'
-s2='http.server'
-Port=8000
+test "$(echo -e)" = '-e' || alias echo='echo -e'
 
+Dir=$(dirname "$0")
+test "$Dir" = '.' || cd "$Dir"
+
+Port=8000	# http.server default port
+Run='run'	# in "$Dir"
+Top=$(UpDir "$Dir")	# In initial project ?
+test -x "$Top/savedist.sh" || Top='.'	# No.
+
+NUL='/dev/null'
+Srv='http.server'
+Cmd="python3 -m $Srv"
+
+while getopts 'hp:r:t:' opt
+do
+    case $opt in
+	p)  Port=$OPTARG;;
+	r)  Run=$OPTARG;;
+	t)  Top="$OPTARG";;
+	h)  Usage 0;;	# help
+	\?) Usage;;	# error
+    esac
+done
+shift $((OPTIND - 1))
+expr "$Port" : '[0-9][0-9]*$' >$NUL || { echo "$Prg: invalid TCP port '$Port'" >&2; exit 1; }
+echo "$Top" | grep -Eq '^(\.|(\.\.(/\.\.)*))$' || {
+    echo "$Prg: invalid Top-directory '$Top'. Use '.' or '..' [ '/..' ['/..'] ...]" >&2
+    exit 1
+}
+if [ "$Top" = '.' ]; then
+    pDir=
+    mDir="$(basename $(realpath "$PWD"))/"
+else
+    mDir="$(realpath "$PWD" --relative-to="$Top")/"
+    pDir="$mDir"
+fi
+
+#
+#   stop - Stop a running server
+#
 if [ "$1" = 'stop' ]; then
-    #	Returns: 0 if killed, 1 if kept running, 2 if no pid match or kill failed
-    StopChkSrv $Port ''
+    #	Returns: 0 if killed, 1 if kept running, >= 2 if no pid match or kill failed
+    StopChkSrv ''	# stop with output/log ('')
     xc=$?
     test $xc -eq 2 && echo "Nothing to stop." >&2
     exit $xc
+#
+#   stat - Show running server(s)
+#
 elif [ "$1" = 'stat' -o -z "$1" ]; then
-    test "$1" || Usage -
-    netstat -lnpt 2>$NUL | grep ":$Port "
-    xc=$?
-    test $xc -eq 0 || echo "No process listening on port $Port" >&2
-    exit $xc
+    ret=$(SrvList)
+    if [ "$ret" ]; then
+	echo "User\tPID\tPort\tRepo" >&2
+	echo "$ret" | awk -F'\t' 'BEGIN{OFS="\t"}{printf("%s\t%s\t%s\t%s\n",$1,$2,$3,$4)}'
+    else
+	echo "No [$Cmd] process seems to be running" >&2
+	test "$1" || Usage -
+	exit 1
+    fi
+    exit 0
 fi
 
-test $# -eq 1 || Usage
-test -d "$Top/$1" || { echo "$Prg: '$1' is not a directory" >&2; exit 2; }
+#
+#   <repo> - Start a Python http.server on <repo>
+#
+Run=$(realpath "$Run" --relative-to="$PWD")
+expr "$Run" : '.*/' >$NUL && mRun=$Run || mRun="$pDir$Run"
 
-cd $Top
-debDir="$1"		# e.g. debian/8
-logDir="dist/$Prg"
-LogDir="$debDir/$logDir"
-Repo="$debDir/repo"
+test $# -eq 1 && Repo=$(realpath "$1" --relative-to="$PWD") || Usage
+test "$Dir" = '.' && mRepo=$Repo || mRepo="$mDir$Repo"
+Log="http.log"
+Ret="http.ret"
 
-test -d "$Repo" || {
-    for a in $debDir/repo-*.txz
-    do
-        f=$(basename $a)
-	test "$f" = 'repo-*.txz' && { echo "$Prg: cannot find any repo archive in $debDir" >&2; exit 2; }
-	echo "Extracting archive $f in $debDir..."
-	(cd $debDir; tar xf $f)
-    done
+PkgPat="$Repo-*.t[gbx]z"
+RelPat="$Repo/debian/dists/*/Release"
+Match "$RelPat" >$NUL || {
+    test -d "$Repo" || {
+	if pkgs=$(Match "$PkgPat"); then
+	    for pkg in $pkgs
+	    do
+		echo "Extracting archive $pkg in $mDir ..." >&2
+		tar xf "$pkg"
+	    done
+	else
+	    echo "$Prg: cannot find any $PkgPat archive in $mDir" >&2
+	    exit 3
+	fi
+    }
+    Match "$RelPat" >$NUL || {
+	test -d "$Repo" &&
+	    { echo "$Prg: '$Repo/' exists but doesn't contain '$RelPat'" >&2; } ||
+	    { echo "$Prg: '$Repo/' not found in '$mDir'" >&2; }
+        exit 3
+    }
 }
-test -d "$Repo/debian" || { echo "$Prg: cannot find directory '$Repo/debian'" >&2; exit 2; }
 
-StopChkSrv $Port 'previous' "$Repo"
-test $? -eq 1 && exit 1	# $s2 already serves $Repo
+test -d "$Run" || {
+    mkdir -p "$Run"
+    test -d "$Run" && echo "Created directory '$Run'" || { echo "$Prg: cannot create directory '$Run' in $mDir" >&2; exit 3; }
+}
+StopChkSrv '' "$Repo"	# Already serving on port $Port ?
+test $? -eq 1 && exit 1	# Yes
 
-if [ "$(netstat -lnt | grep ":$Port ")" ]; then
-    echo "$Prg: some program (see 'sudo netstat -lnpt') already listens on port $Port. Aborting" >&2
+if ChkPort "$Port"; then
+    echo "$Prg: port $Port is already in use (see 'sudo netstat -lnpt' or '$Prg stat'). Aborting" >&2
     exit 3
 fi
 
-test -d "$LogDir" || { mkdir -p "$LogDir" && echo "Created directory '$LogDir'"; }
-cd "$Repo"
-Log="$logDir/http.log"
-$s0 $s1 $s2 $Port <$NUL 2>>"../$Log" >&2 &
-pid=$!
-date "+%Y-%m-%d %H:%M:%S -- Started $s2 on '$Repo' (PID=$pid)" >>"../$Log"
-echo "Started $Prg on '$Repo' (PID=$pid)"
-echo "Log is on $debDir/$Log"
+# All checks done, start the server
+pid=$(cd "$Repo"; exec $Cmd "$Port" <$NUL 2>>"$(UpDir "$Repo")/$Run/$Log" >&2 & echo $!)
+date "+%Y-%m-%d %H:%M:%S -- Started $Srv for $Repo/ (PID=$pid)" >>"$Run/$Log"
+echo "Started $Prg (PID=$pid) for $mRepo/" >&2
+echo "Log is on $mRun/$Log" >&2
 sleep 1
 
-test "$(netstat -lnpt 2>$NUL | grep ":$Port ")" || {
+ChkPort "$Port" || {
     echo "ERROR: nothing listening on port $Port ??" >&2
     exit 4
 }
@@ -117,19 +247,19 @@ nCat=$(command -v nc) || {
     exit 0
 }
 
-Rep="$(echo "GET / HTTP/1.0\r\n\r" | $nCat localhost $Port)"
+Rep="$(echo "GET / HTTP/1.0\r\n\r" | $nCat localhost "$Port")"
 xc=$?
-test "$xc" -eq 0 && echo "$Rep" | grep 'debian' >$NUL && exit 0	# All OK
+test "$xc" -eq 0 && echo "$Rep" | grep -q 'debian' && exit 0	# All OK
 
 #   Errors
-echo "ERROR: response to GET query on '$Repo' does not contain 'debian'" >&2
+echo "$Prg ERROR: response to GET query of '$Repo' does not contain 'debian'" >&2
 if [ "$Rep" ]; then
-    echo "$Rep" >"../$logDir/http-rep"
-    echo "Server reply has been saved in $debDir/$logDir/http-rep" >&2
-    StopChkSrv $Port 'useless'
+    echo "$Rep" >"$Run/$Ret"
+    echo "$Prg: Server reply has been saved in $mRun/$Ret" >&2
+    StopChkSrv 'useless'	# bad-repo
     exit 5
 else
-    echo "Server response to GET HTTP from 'localhost:$Port' is EMPTY ?" >&2
-    StopChkSrv $Port 'ill'
+    echo "$Prg: Server response to GET query on 'localhost:$Port' is EMPTY ?" >&2
+    StopChkSrv 'broken'		# broken http.server ?
     exit 6
 fi

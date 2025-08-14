@@ -10,12 +10,13 @@ php/[5-9]/[5-9].*/php-*.tar.bz2
 php/[5-9]/[5-9].*/php-*.files
 tests/*/dist
 attic/aptlocal/repo
+attic/aptlocal/run
+attic/aptlocal/work
 dev/bin/debinfo
 dev/bin/l
 dev/etc/ext/
 dev/log/
 update.log/
-archive/
-work/
-log
-debs
+/work/
+/log
+/debs

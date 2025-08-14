@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+#	apttest - Show commands for - and start - jessie container
+#
+Prg=$(basename "$0")
+Dir=$(dirname "$0")
+test "$Dir" = '.' || cd "$Dir"
+
+Deb='jessie'
+# We assume that inside a docker container, 172.17.0.1 is the standard IP of the docker server
+AptHost='172.17.0.1:8000'
+
+if [ -x localget ]; then
+    Out=$(./localget 2>&1) || {
+	echo "$Out" | grep -q ' Connection refused$' && {
+	    test -x aptsrv && ./aptsrv repo && Stop=y
+	}
+    }
+fi
+echo "Paste the following lines at the bash prompt in the docker container:"
+echo
+cat <<-EOF
+	echo "deb [trusted=yes] http://$AptHost/debian $Deb main
+	deb [trusted=yes] http://$AptHost/debian-security $Deb/updates main" >/etc/apt/sources.list
+	unset http_proxy https_proxy
+	apt update
+	# If apt update fails, try:
+	#   apt -oDebug::Acquire::http=1 update
+EOF
+echo
+docker run -ti -v $PWD:/opt --name $Deb --rm debian:$Deb bash
+test "$Stop" && ./aptsrv stop

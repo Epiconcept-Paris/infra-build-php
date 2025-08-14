@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+#	localget - Send HTTP request to local server
+#
+Prg=$(basename "$0")
+Port=8000
+
+Usage()
+{
+    # global Prg
+
+    echo "Usage: $Prg [-p <tcp-port>] <path> (default '/')" >&2
+    # Do not exit on $1 = '-', otherwise exit $1 (default 1)
+    test "$1" = '-' || exit ${1:-1}
+}
+
+#
+#   Main
+#
+test "$(echo -e)" = '-e' || alias echo='echo -e'
+
+while getopts 'hp:' opt
+do
+    case $opt in
+	p)  Port=$OPTARG;;
+	h)  Usage 0;;	# help
+	\?) Usage;;	# error
+    esac
+done
+shift $((OPTIND - 1))
+
+expr "$Port" : '[0-9][0-9]*$' >/dev/null || { echo "$Prg: invalid TCP port '$Port'" >&2; exit 1; }
+
+nCat=$(command -v nc) || { echo "$Prg: cannot find command 'nc'" >&2; exit 1; }
+
+path=${1:-/}
+echo "GET $path HTTP/1.0\r\n\r" | $nCat -v localhost $Port
