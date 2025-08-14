@@ -269,9 +269,7 @@ fi
 echo "Building the '$BUILD_IMG' image..."
 man docker | grep -q buildx && echo y | docker buildx prune >$RelDir/.logs/docker-build.out
 # shellcheck disable=SC2154	# Var referenced but not assigned
-if echo "$APT_SRC" | grep -q 'http://'; then
-    $BinDir/aptsrv "$debDir" && AptSrv=y
-elif [ "$http_proxy" -a "$https_proxy" ]; then
+if [ "$http_proxy" -a "$https_proxy" ]; then
     BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
 fi
 #   Variables come in order of their appearance in Dockerfile-build.in
@@ -280,7 +278,7 @@ DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$U
 
 test -f ${TopDir}.norun && Opt='-ti '
 if [ "$http_proxy" -a "$https_proxy" ]; then
-    echo "$APT_SRC" | grep -q 'http://' || Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
+    Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
 fi
 if docker images | grep -q "$BUILD_BASE *$Tag"; then
     Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$BUILD_TOP/dist $Env --name $BUILD_NAME --rm $BUILD_IMG"
@@ -292,14 +290,12 @@ if docker images | grep -q "$BUILD_BASE *$Tag"; then
 	    echo "Made PHP $PhpVer-$Bld packages for Debian $DebVer."
 	else
 	    echo "$ColRed\aFAILED to make PHP $PhpVer-$Bld packages for Debian $DebVer!$ColStd"
-	    test "$AptSrv" && $BinDir/aptsrv 'stop'
 	    exit 3
 	fi
     fi
 else
     echo "$ColRed\aFAILED to build the $BUILD_IMG image!$ColStd"
     echo "Examine $relDir/.logs/docker-build.out for details."
-    test "$AptSrv" && $BinDir/aptsrv 'stop'
     exit 2
 fi
 echo "------------------------------------------------"
@@ -336,7 +332,6 @@ echo "Building the '$TESTS_IMG' image..."
 #   Variables come in order of their appearance in Dockerfile-tests.in
 # shellcheck disable=SC2016	# Vars don't expand in single quotes
 DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $RelDir/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$RelDir/.logs/docker-tests.out 2>&1
-test "$AptSrv" && $BinDir/aptsrv 'stop'
 
 if docker images | grep -q "$TESTS_BASE *$Tag"; then
     Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$TESTS_TOP/dist $Env --name $TESTS_NAME --rm $TESTS_IMG"

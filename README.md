@@ -419,11 +419,6 @@ Si le script `update.sh` ne trouve pas de nouvelle version PHP à *build*er, il 
 
 ## <a name="bins"> Les scripts auxiliaires (`bin/`) </a>
 
-### `aptsrv`: Démarrage et arrêt d'un serveur de dépôt APT local
-Ce script a été conçu pour pouvoir continuer à faire des *build*s pour Debian 8 (`jessie`) bien que les clés GPG standard dans cette version de Debian aient expiré en 2023.  
-Il utilise le module `http.server` de `python3` pour gérer un dépôt APT local (ici `debian/8/repo`) à partir des fichiers `repo-*.txz` se trouvant dans la répertoire de la version Debian (ici `debian/8`).  
-Le script est automatiquement lancé et arrêté par `bake` et ne dépend en principe pas de la version Debian.
-
 ### `defroute`: Ajout et supprime la route réseau de sortie
 Ce script est utilisé par le script `send.sh` pour ouvrir et fermer la route réseau (`GwIP` dans `defroute`) pour l'envoi des fichiers au serveur APT externe (`Srv` dans le script `send.sh,` qui utilise `rsync` et `ssh`). Il **doit** être copié dans `/usr/local/bin` s'il n'y est pas déjà et le fichier crontab `defroute` doit étre similaire (aux adaptations locales près) à celui indiqué dans l'[Installation](#setup).
 

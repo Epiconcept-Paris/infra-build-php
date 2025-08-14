@@ -113,16 +113,13 @@ echo "Building the '$TOOLS_IMG' image..."
 mkdir -p $Logs
 echo y | docker buildx prune >$Logs/docker-build.out
 # shellcheck disable=SC2154	# Var referenced but not assigned
-if echo "$APT_SRC" | grep -q 'http://'; then
-    $BinDir/aptsrv "$debDir" && AptSrv=y
-elif [ "$http_proxy" -a "$https_proxy" ]; then
+if [ "$http_proxy" -a "$https_proxy" ]; then
     BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
 fi
 #   Variables come in order of their appearance in Dockerfile.in
 # shellcheck disable=SC2016	# Vars don't expand in single quotes
 DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TOOLS_TOP="$TOOLS_TOP" TLSCOPY="$TLSCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $APT_SRC $TOOLS_TOP $TLSCOPY' <${TlsTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG $BldArgs . >>$Logs/docker-build.out 2>&1
 xc=$?
-test "$AptSrv" && $BinDir/aptsrv 'stop'
 test $xc -eq 0 || { echo "$ColRed\aFAILED to build the '$TOOLS_IMG' docker image!$ColStd" >&2; exit 2; }
 
 #

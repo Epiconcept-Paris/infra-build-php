@@ -216,16 +216,13 @@ else
 COPY ${MulTop}run/$Pkg /tmp
 RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
     # shellcheck disable=SC2154	# Var referenced but not assigned
-    if echo "$APT_SRC" | grep -q 'http://'; then
-	$BinDir/aptsrv "$debDir" && AptSrv=y
-    elif [ "$http_proxy" -a "$https_proxy" ]; then
+    if [ "$http_proxy" -a "$https_proxy" ]; then
 	BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
     fi
     #   Variables come in order of their appearance in multi/Dockerfile.in
     # shellcheck disable=SC2016	# Vars don't expand in single quotes
     DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $APT_SRC $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG $BldArgs . >>$Logs/docker-build.out 2>&1
     xc=$?
-    test "$AptSrv" && $BinDir/aptsrv 'stop'
     test $xc -eq 0 || { echo "$ColRed\aFAILED to build the '$MULTI_IMG' docker image!$ColStd" >&2; exit 2; }
     rm -f ${MulTop}run/$Pkg
 fi

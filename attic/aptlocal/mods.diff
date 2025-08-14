@@ -1,0 +1,205 @@
+diff --git a/bake b/bake
+index e5f3ba6..2691495 100755
+--- a/bake
++++ b/bake
+@@ -77,22 +77,6 @@ DebDir()
+     test "$2" && echo "$ret}" || echo "$ret"
+ }
+ 
+-AptStart()
+-{
+-    # global AptLst AptDeb BinDir DebTop
+-    local deb
+-
+-    deb=$1
+-    echo " $AptLst" | grep -q " $deb " || return
+-    test "$AptDeb" || { $BinDir/aptsrv "$DebTop/$deb" && trap AptStop 0 2 15 && AptDeb=$deb; }
+-}
+-
+-AptStop()
+-{
+-    # global AptDeb BinDir
+-    test "$AptDeb" && $BinDir/aptsrv stop && trap 0 2 15 && AptDeb=
+-}
+-
+ Sep=''
+ # shellcheck disable=SC2164	# Use 'cd ... || exit'
+ for f in `cd $DebTop; ls [0-9]*/name | sort -n`
+@@ -101,7 +85,6 @@ do
+     dir=`dirname $f`
+     test -f $dir/mkre || continue
+     deb=`basename $dir`
+-    test -f $dir/Dockervars.sh && grep -q '^APT_SRC=.*http://' $dir/Dockervars.sh && AptLst="$AptLst$deb "
+     name=`cat $f`
+     DebVer="$DebVer$Sep$deb"
+     DebLst="$DebLst`printf "%2d ($name)" $deb`$LF"
+@@ -109,7 +92,7 @@ do
+     Sep=' '
+ done
+ test "$DebVer" || { echo "$Prg: no valid Debian version in '$DebTop' ??" >&2; exit 3; }
+-#echo "DebVer=\"$DebVer\" DebDir=\"$(DebDir $DebVer)\" DebLst=\"$DebLst\" SedArg=\"$SedArg\" AptLst=\"$AptLst\""; exit 0
++#echo "DebVer=\"$DebVer\" DebDir=\"$(DebDir $DebVer)\" DebLst=\"$DebLst\" SedArg=\"$SedArg\""; exit 0
+ ReMajMin='[5-9]\.[0-9]$'
+ ReVersion='[5-9]\.[0-9]\.[0-9]\{,2\}$'
+ ReDistrib='\([5-9]\.[0-9]\.[0-9]\{,2\}\)-[0-9]\{,2\}$'
+@@ -307,7 +290,7 @@ do
+     done
+ done
+ test "$isMk" -o "$isRm" || { echo "$Prg: no mode [mk|rm] specified" >&2; Usage; }
+-test "$Do" && echo "nbarg=$nbarg Do=\"$Do\" Mode=$Mode AllDeb=\"$AllDeb\" DebVer=\"$DebVer\" AptLst=\"$AptLst\" isMk=\"$isMk\" isRm=\"$isRm\" toMk=\"$toMk\" toRm=\"$toRm\""
++test "$Do" && echo "nbarg=$nbarg Do=\"$Do\" Mode=$Mode AllDeb=\"$AllDeb\" DebVer=\"$DebVer\" isMk=\"$isMk\" isRm=\"$isRm\" toMk=\"$toMk\" toRm=\"$toRm\""
+ 
+ #
+ # ----- Remove builds ------------------------------------------
+@@ -541,7 +524,6 @@ if [ "$isMk" ]; then
+ 	    deb=`expr "$obj" : '\([0-9]*\):.*'`
+ 	    key=`expr "$obj" : '[0-9]*:\(.*\)'`
+ 	    name=`cat $DebTop/$deb/name`
+-	    test "$deb" != "$AptDeb" && AptStop
+ 	    # multi
+ 	    if [ "$key" = 'multi' ]; then
+ 		eval "mul=\$MUL$deb"
+@@ -552,7 +534,6 @@ if [ "$isMk" ]; then
+ 		    # Only run multi for Debian $MulDebRun with $MultiRun set
+ 		    test $deb = $MulDebRun -a "$MultiRun" && run=' and running' || run=
+ 		    test "$run" && norun= || norun='-'
+-		    AptStart $deb
+ 		    echo "Building$run multi for $name with ${mul}on *.${MultiDomain:-$DefDom}:${MultiPort:-$DefTcp}"
+ 		    $Do mkdir -p $dir
+ 		    $Do eval "$MulTop/bake $deb $mul$norun | sed -u 's/$//' | tee $dir/mk.out | sed -u 's/$//'"
+@@ -564,7 +545,6 @@ if [ "$isMk" ]; then
+ 	    elif [ "$key" = 'tools' ]; then
+ 		dir=$DebTop/$deb/dist/tools
+ 		test -f $dir/epi-tools-waitpid_*.deb && { echo "tools are already built for $name"; continue; }
+-		AptStart $deb
+ 		echo "Building tools for $name"
+ 		$Do mkdir -p $dir
+ 		$Do eval "$TlsTop/bake $deb | sed -u 's/$//' | tee $dir/mk.out | sed -u 's/$//'"
+@@ -573,7 +553,6 @@ if [ "$isMk" ]; then
+ 		ver=`expr "$key" : "$ReDistrib"`
+ 		dir=$DebTop/$deb/dist/$key
+ 		test -f $dir/epi-php-*-cli_*.deb && { echo "PHP $key is already built for $name"; continue; }
+-		AptStart $deb
+ 		echo "Building PHP $key for $name in $dir"
+ 		maj=`expr "$key" : '\([5-9]\)'`
+ 		bld=`expr "$key" : '[\.0-9]*-\([0-9]\{,2\}\)$'`
+diff --git a/php/bake b/php/bake
+index c9ed400..4817525 100755
+--- a/php/bake
++++ b/php/bake
+@@ -269,18 +269,16 @@ fi
+ echo "Building the '$BUILD_IMG' image..."
+ man docker | grep -q buildx && echo y | docker buildx prune >$RelDir/.logs/docker-build.out
+ # shellcheck disable=SC2154	# Var referenced but not assigned
+-if echo "$APT_SRC" | grep -q 'http://'; then
+-    $BinDir/aptsrv "$debDir" && AptSrv=y
+-elif [ "$http_proxy" -a "$https_proxy" ]; then
++if [ "$http_proxy" -a "$https_proxy" ]; then
+     BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
+ fi
+ #   Variables come in order of their appearance in Dockerfile-build.in
+ # shellcheck disable=SC2016	# Vars don't expand in single quotes
+-DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $DEBNUM $CLI_DEPS $BUILD_NUM $USER $ADDUSER $APT_SRC $BUILD_TOP $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $RelDir/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG $BldArgs . >>$RelDir/.logs/docker-build.out 2>&1
++DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$User" ADDUSER="$AddUser" BUILD_TOP="$BUILD_TOP" BUILD_REQ="$BUILD_REQ" BLDCOPY="$BLDCOPY" envsubst '$DEBVER $DEBNUM $CLI_DEPS $BUILD_NUM $USER $ADDUSER $BUILD_TOP $BUILD_REQ $BLDCOPY' <${PhpTop}Dockerfile-build.in | tee $RelDir/.logs/Dockerfile-build | docker build -f - -t $BUILD_IMG $BldArgs . >>$RelDir/.logs/docker-build.out 2>&1
+ 
+ test -f ${TopDir}.norun && Opt='-ti '
+ if [ "$http_proxy" -a "$https_proxy" ]; then
+-    echo "$APT_SRC" | grep -q 'http://' || Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
++    Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
+ fi
+ if docker images | grep -q "$BUILD_BASE *$Tag"; then
+     Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$BUILD_TOP/dist $Env --name $BUILD_NAME --rm $BUILD_IMG"
+@@ -292,14 +290,12 @@ if docker images | grep -q "$BUILD_BASE *$Tag"; then
+ 	    echo "Made PHP $PhpVer-$Bld packages for Debian $DebVer."
+ 	else
+ 	    echo "$ColRed\aFAILED to make PHP $PhpVer-$Bld packages for Debian $DebVer!$ColStd"
+-	    test "$AptSrv" && $BinDir/aptsrv 'stop'
+ 	    exit 3
+ 	fi
+     fi
+ else
+     echo "$ColRed\aFAILED to build the $BUILD_IMG image!$ColStd"
+     echo "Examine $relDir/.logs/docker-build.out for details."
+-    test "$AptSrv" && $BinDir/aptsrv 'stop'
+     exit 2
+ fi
+ echo "------------------------------------------------"
+@@ -335,8 +331,7 @@ fi
+ echo "Building the '$TESTS_IMG' image..."
+ #   Variables come in order of their appearance in Dockerfile-tests.in
+ # shellcheck disable=SC2016	# Vars don't expand in single quotes
+-DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $RelDir/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$RelDir/.logs/docker-tests.out 2>&1
+-test "$AptSrv" && $BinDir/aptsrv 'stop'
++DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $RelDir/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$RelDir/.logs/docker-tests.out 2>&1
+ 
+ if docker images | grep -q "$TESTS_BASE *$Tag"; then
+     Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$TESTS_TOP/dist $Env --name $TESTS_NAME --rm $TESTS_IMG"
+diff --git a/tools/bake b/tools/bake
+index 2d1fb16..27a15ff 100755
+--- a/tools/bake
++++ b/tools/bake
+@@ -66,12 +66,10 @@ DebVer=`cat $DebTop/$DebNum/name`
+ DebDir=$DebTop/$DebNum
+ debDir=$debTop/$DebNum
+ Dist='dist/tools'
+-if [ -f $DebDir/Dockervars.sh ]; then
+-    eval "`grep '^APT_SRC=' $DebDir/Dockervars.sh`"
+-else
++test -f $DebDir/Dockervars.sh || {
+     echo "$Prg: missing $debDir/Dockervars.sh" >&2
+     exit 1
+-fi
++}
+ Logs=$DebDir/$Dist/.logs
+ User=`id -un`
+ test "$User" = 'php' && Type='epi' || Type='dev'
+@@ -113,16 +111,13 @@ echo "Building the '$TOOLS_IMG' image..."
+ mkdir -p $Logs
+ echo y | docker buildx prune >$Logs/docker-build.out
+ # shellcheck disable=SC2154	# Var referenced but not assigned
+-if echo "$APT_SRC" | grep -q 'http://'; then
+-    $BinDir/aptsrv "$debDir" && AptSrv=y
+-elif [ "$http_proxy" -a "$https_proxy" ]; then
++if [ "$http_proxy" -a "$https_proxy" ]; then
+     BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
+ fi
+ #   Variables come in order of their appearance in Dockerfile.in
+ # shellcheck disable=SC2016	# Vars don't expand in single quotes
+-DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TOOLS_TOP="$TOOLS_TOP" TLSCOPY="$TLSCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $APT_SRC $TOOLS_TOP $TLSCOPY' <${TlsTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG $BldArgs . >>$Logs/docker-build.out 2>&1
++DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" TOOLS_TOP="$TOOLS_TOP" TLSCOPY="$TLSCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $TOOLS_TOP $TLSCOPY' <${TlsTop}Dockerfile.in | tee $Logs/Dockerfile | docker build -f - -t $TOOLS_IMG $BldArgs . >>$Logs/docker-build.out 2>&1
+ xc=$?
+-test "$AptSrv" && $BinDir/aptsrv 'stop'
+ test $xc -eq 0 || { echo "$ColRed\aFAILED to build the '$TOOLS_IMG' docker image!$ColStd" >&2; exit 2; }
+ 
+ #
+diff --git a/multi/bake b/multi/bake
+index 92f040f..3681dc7 100755
+--- a/multi/bake
++++ b/multi/bake
+@@ -87,7 +87,6 @@ PkgDeb="+deb$DebNum"
+ 
+ if [ -f $DebDir/Dockervars.sh ]; then
+     eval `sed -n 's/^TESTS_REQ=/MULTI_REQ=/p' $DebDir/Dockervars.sh`
+-    eval `grep '^APT_SRC=' $DebDir/Dockervars.sh`
+     LIBS=`sed -nr 's/LIB7[0-9]_="([^"]+)"/\1/p' $DebDir/Dockervars.sh`
+     LIBS=`echo -n "$LIBS" | tr '\n' ' '`
+     MULTI_REQ="$MULTI_REQ $LIBS"
+@@ -216,16 +215,13 @@ else
+ COPY ${MulTop}run/$Pkg /tmp
+ RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
+     # shellcheck disable=SC2154	# Var referenced but not assigned
+-    if echo "$APT_SRC" | grep -q 'http://'; then
+-	$BinDir/aptsrv "$debDir" && AptSrv=y
+-    elif [ "$http_proxy" -a "$https_proxy" ]; then
++    if [ "$http_proxy" -a "$https_proxy" ]; then
+ 	BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
+     fi
+     #   Variables come in order of their appearance in multi/Dockerfile.in
+     # shellcheck disable=SC2016	# Vars don't expand in single quotes
+-    DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $APT_SRC $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG $BldArgs . >>$Logs/docker-build.out 2>&1
++    DEBVER="$DebVer" DEBNUM="$DebNum" USER="$User" ADDUSER="$AddUser" MULTI_TOP="$MULTI_TOP" MULTI_REQ="$MULTI_REQ" MULCOPY="$MULCOPY" envsubst '$DEBVER $DEBNUM $USER $ADDUSER $MULTI_TOP $MULTI_REQ $MULCOPY' <${MulTop}Dockerfile.in | tee $Logs/Dockerfile-multi | docker build -f - -t $MULTI_IMG $BldArgs . >>$Logs/docker-build.out 2>&1
+     xc=$?
+-    test "$AptSrv" && $BinDir/aptsrv 'stop'
+     test $xc -eq 0 || { echo "$ColRed\aFAILED to build the '$MULTI_IMG' docker image!$ColStd" >&2; exit 2; }
+     rm -f ${MulTop}run/$Pkg
+ fi

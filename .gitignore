@@ -4,12 +4,12 @@ php/.notest
 debian/*/.noupd
 debian/*/dist
 debian/*/multi
-debian/*/repo
 php/5/files/5.2/srv
 php/[5-9]/files/*.tgz
 php/[5-9]/[5-9].*/php-*.tar.bz2
 php/[5-9]/[5-9].*/php-*.files
 tests/*/dist
+attic/aptlocal/repo
 dev/bin/debinfo
 dev/bin/l
 dev/etc/ext/
