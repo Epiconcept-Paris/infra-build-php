@@ -2,7 +2,7 @@
 #	mcrypt.sh - Install MCrypt static extension (if needed)
 #		    Apply mcrypt.patch to remove DEPRECATED warnings
 #
-echo "$ExtOpts" | grep -- '--with-mcrypt ' >/dev/null || {
+echo "$ExtOpts" | grep -q -- '--with-mcrypt ' || {
     su -c "tar xf `echo $Bld/files/mcrypt-*.tgz` -C ext" $USER
     mv ext/mcrypt-* ext/mcrypt
     mv ext/package.xml ext/mcrypt

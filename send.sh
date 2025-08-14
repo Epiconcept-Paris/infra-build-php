@@ -33,7 +33,7 @@ trap cleanup 0
 
 #   Setup default route
 $Bin/defroute >/dev/null || {
-    sudo -l | grep $Bin/defroute >/dev/null || {
+    sudo -l | grep -q $Bin/defroute || {
 	echo "$Prg: 'sudo $Bin/defroute' is not configured" >&2
 	exit 2;
     }

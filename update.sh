@@ -257,7 +257,7 @@ phase1()
     for pv in $(./bake latest)
     do
 	bf="$(bldnum $pv)"
-	git ls-files | grep "^$bf" >/dev/null && {
+	git ls-files | grep -q "^$bf" && {
 	    # Gather PHP versions to update
 	    if git status $bf | grep -Eq "^${TAB}modified: +$bf$"; then
 		test "$upds" && upds="$upds $pv" || upds="$pv"
@@ -291,7 +291,7 @@ phase1()
 	git add "$bf"
     done
     if [ "$upds" ]; then
-	echo "$upvs" | grep ',' >/dev/null && s='s' || s=
+	echo "$upvs" | grep -q ',' && s='s' || s=
 	git commit -m "Update PHP version$s $(echo $upvs | sed 's/,/, /g')" | sed 's/$//'
     fi
 
@@ -308,7 +308,7 @@ phase1()
 	git add "$bf"
     done
     if [ "$adds" ]; then
-	echo "$apvs" | grep ',' >/dev/null && s='s' || s=
+	echo "$apvs" | grep -q ',' && s='s' || s=
 	git commit -m "Add new PHP version$s $(echo $apvs | sed 's/,/, /g')" | sed 's/$//'
     fi
 
@@ -321,7 +321,7 @@ phase1()
 	test "$pv" = 'dev' && { tag=$pv; continue; }
 	for dv in $debs
 	do
-	    echo $pv | grep -E "$(cat "debian/$dv/mkre")" >/dev/null || continue
+	    echo $pv | grep -Eq "$(cat "debian/$dv/mkre")" || continue
 	    build 'dev' $pv $dv
 	    xc=$?
 	    test "$bres" && bres="$bres $tag:$pv:$dv:$xc" || bres="$tag:$pv:$dv:$xc"
@@ -397,7 +397,7 @@ report()
     #	    <result>[ result]...
     if [ "$1" != '-' ]; then
 	pvs="$1"
-	if echo "$pvs" | grep ',' >/dev/null; then
+	if echo "$pvs" | grep -q ','; then
 	    echo "New PHP versions $(echo $pvs | sed 's/,/, /g') were found !"	# Multiple
 	else
 	    echo "A new PHP version $pvs was found"	# Just one
@@ -410,7 +410,7 @@ report()
 
     if [ "$1" != '-' ]; then
 	pvs="$1"
-	if echo "$pvs" | grep ',' >/dev/null; then
+	if echo "$pvs" | grep -q ','; then
 	    echo "PHP versions $(echo $pvs | sed 's/,/, /g') were updated !"	# Multiple
 	else
 	    echo "PHP version $pvs was updated"	# Just one
@@ -542,7 +542,7 @@ cleanup()
 # ===== Main ===================================
 
 #   Check that a 'php' user exists
-grep '^php:' /etc/passwd >/dev/null || { echo "$Prg: no 'php' user (required) on $(hostname)" >&2; exit 1; }
+grep -q '^php:' /etc/passwd || { echo "$Prg: no 'php' user (required) on $(hostname)" >&2; exit 1; }
 
 #   Setup Globals
 MaxRold=3	# Max PHP releases (per maj.min) we preserve old docker-images & .debug/php/ for

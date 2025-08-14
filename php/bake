@@ -94,7 +94,7 @@ if [ -z "$split" ]; then
 fi
 eval "$split"
 # shellcheck disable=SC2154	# Var referenced but not assigned
-if echo "$Versions" | grep "^$Maj\.$Min\.$Rel$" >/dev/null; then
+if echo "$Versions" | grep -q "^$Maj\.$Min\.$Rel$"; then
     PhpVer="$1"
     PhpDir=$PhpTop$Maj/$PhpVer
 else
@@ -145,7 +145,7 @@ ChkSrc()
 	    return 1
 	fi
     fi
-    grep "^php-$3/" $2 >/dev/null && return 0
+    grep -q "^php-$3/" $2 && return 0
     echo "$Prg: $1 is not recognized as a PHP $3 source archive" >&2
     return 1
 }
@@ -249,27 +249,27 @@ RUN >$BUILD_TOP/.debug"
 test -f ${PhpTop}.notest && BLDCOPY="$BLDCOPY
 RUN >$BUILD_TOP/.notest"
 
-if docker ps | grep $BUILD_NAME >/dev/null; then
+if docker ps | grep -q $BUILD_NAME; then
     echo "Stopping the running '$BUILD_NAME' container..."
     docker stop -t 5 $BUILD_NAME >/dev/null
-    while docker ps | grep $BUILD_NAME >/dev/null
+    while docker ps | grep -q $BUILD_NAME
     do
 	sleep 1
     done
 fi
-if docker ps -a | grep $BUILD_NAME >/dev/null; then
+if docker ps -a | grep -q $BUILD_NAME; then
     echo "Deleting the existing '$BUILD_NAME' container..."
     docker rm $BUILD_NAME >/dev/null
 fi
-if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
+if docker images | grep -q "$BUILD_BASE *$Tag"; then
     echo "Deleting the existing '$BUILD_IMG' image..."
     docker rmi $BUILD_IMG >/dev/null
 fi
 
 echo "Building the '$BUILD_IMG' image..."
-man docker | grep buildx >/dev/null && echo y | docker buildx prune >$RelDir/.logs/docker-build.out
+man docker | grep -q buildx && echo y | docker buildx prune >$RelDir/.logs/docker-build.out
 # shellcheck disable=SC2154	# Var referenced but not assigned
-if echo "$APT_SRC" | grep 'http://' >/dev/null; then
+if echo "$APT_SRC" | grep -q 'http://'; then
     $BinDir/aptsrv "$debDir" && AptSrv=y
 elif [ "$http_proxy" -a "$https_proxy" ]; then
     BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"
@@ -280,9 +280,9 @@ DEBVER="$DebVer" DEBNUM="$DebNum" CLI_DEPS="$CLI_DEPS" BUILD_NUM="$Bld" USER="$U
 
 test -f ${TopDir}.norun && Opt='-ti '
 if [ "$http_proxy" -a "$https_proxy" ]; then
-    echo "$APT_SRC" | grep 'http://' >/dev/null || Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
+    echo "$APT_SRC" | grep -q 'http://' || Env="--env http_proxy=$http_proxy --env https_proxy=$https_proxy"
 fi
-if docker images | grep "$BUILD_BASE *$Tag" >/dev/null; then
+if docker images | grep -q "$BUILD_BASE *$Tag"; then
     Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$BUILD_TOP/dist $Env --name $BUILD_NAME --rm $BUILD_IMG"
     if [ -f ${TopDir}.norun ]; then
 	echo "Use:\n    $Cmd bash\nto run the build container"
@@ -315,19 +315,19 @@ TSTCOPY="$TSTCOPY
 COPY ${PhpTop}run/info.php /var/www/html
 COPY ${PhpTop}run/tests $TESTS_TOP"
 
-if docker ps | grep $TESTS_NAME >/dev/null; then
+if docker ps | grep -q $TESTS_NAME; then
     echo "Stopping the running '$TESTS_NAME' container..."
     docker stop -t 5 $TESTS_NAME >/dev/null
-    while docker ps | grep $TESTS_NAME >/dev/null
+    while docker ps | grep -q $TESTS_NAME
     do
 	sleep 1
     done
 fi
-if docker ps -a | grep $TESTS_NAME >/dev/null; then
+if docker ps -a | grep -q $TESTS_NAME; then
     echo "Deleting the existing '$TESTS_NAME' container..."
     docker rm $TESTS_NAME >/dev/null
 fi
-if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
+if docker images | grep -q "$TESTS_BASE *$Tag"; then
     echo "Deleting the existing '$TESTS_IMG' image..."
     docker rmi $TESTS_IMG >/dev/null
 fi
@@ -338,7 +338,7 @@ echo "Building the '$TESTS_IMG' image..."
 DEBVER="$DebVer" USER="$User" ADDUSER="$AddUser" APT_SRC="$APT_SRC" TESTS_TOP="$TESTS_TOP" TESTS_REQ="$TESTS_REQ" TSTCOPY="$TSTCOPY" envsubst '$DEBVER $USER $ADDUSER $APT_SRC $TESTS_TOP $TESTS_REQ $TSTCOPY' <${PhpTop}Dockerfile-tests.in | tee $RelDir/.logs/Dockerfile-tests | docker build -f - -t $TESTS_IMG $BldArgs . >$RelDir/.logs/docker-tests.out 2>&1
 test "$AptSrv" && $BinDir/aptsrv 'stop'
 
-if docker images | grep "$TESTS_BASE *$Tag" >/dev/null; then
+if docker images | grep -q "$TESTS_BASE *$Tag"; then
     Cmd="docker run $Opt-v `realpath $PWD/$RelDir`:$TESTS_TOP/dist $Env --name $TESTS_NAME --rm $TESTS_IMG"
     if [ -f ${TopDir}.norun ]; then
 	echo "Use:\n    $Cmd bash\nto run the tests container"

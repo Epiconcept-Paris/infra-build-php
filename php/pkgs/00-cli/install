@@ -6,7 +6,7 @@
 # Discard install-build install-programs install-headers install-pdo-headers
 for tgt in install-cli install-binaries install-modules install-pharcmd
 do
-    grep "^install_targets = .* $tgt" Makefile >/dev/null && Tgts="$Tgts $tgt"
+    grep -q "^install_targets = .* $tgt" Makefile && Tgts="$Tgts $tgt"
 done
 test "$Dbg" && echo "Tgts=\"$Tgts\""
 INSTALL_ROOT=$Top make$Tgts >$Logs/make-install_$Pkg.out 2>&1

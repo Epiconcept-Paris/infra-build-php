@@ -2,7 +2,7 @@
 #
 #	01-pear/install - Install php-pear files to $Top
 #
-if grep metadata_dir pear/$Phar >/dev/null; then
+if grep -q metadata_dir pear/$Phar; then
     sed -i "s;$Phar -d;$Phar -m /$PearDir -D /$DocDir/$Name -M /$ManDir -d;" Makefile
 fi
 Pear=$Top/$PearDir
@@ -14,7 +14,7 @@ INSTALL_ROOT=$Top PHP_PEAR_SIG_BIN=/usr/bin/gpg PHP_PEAR_SYSCONF_DIR=etc/pear ma
 if [ -d pear/man ]; then
     Man1=pear/man/man1
     #	Correct wrong man macro .PS
-    grep '^\.PS$' $Man1/pear.1 >/dev/null && sed -i -e 's/^\.PS/.RS/' -e '/^pear help /a.RE' $Man1/pear.1
+    grep -q '^\.PS$' $Man1/pear.1 && sed -i -e 's/^\.PS/.RS/' -e '/^pear help /a.RE' $Man1/pear.1
     cp -rp pear/man $Top/usr/share
     find $Top/$ManDir -name '*.[1-9]' | xargs gzip -n9
 else

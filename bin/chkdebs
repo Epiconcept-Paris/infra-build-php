@@ -45,7 +45,7 @@ chk_debs()
 	p=0
 	for f in $g; do
 	    test -s "$f" || continue
-	    file "$f" 2>&1 | grep "^$f:  *Debian binary package " >/dev/null && p=$((p+1))
+	    file "$f" 2>&1 | grep -q "^$f:  *Debian binary package " && p=$((p+1))
 	done
 	if [ "$p" -gt 1 ]; then
 	    echo -n "$Prg WARNING: more than 1 match:"

@@ -61,7 +61,7 @@ rmdkim()
     for type in 'build' 'tests'
     do
 	img="epi-$type-php:$tag"
-	echo "$DkIms" | grep "^$img$" >/dev/null && docker rmi "$img" >/dev/null 2>&1 && echo "Removed docker image $img"
+	echo "$DkIms" | grep -q "^$img$" && docker rmi "$img" >/dev/null 2>&1 && echo "Removed docker image $img"
     done
 }
 

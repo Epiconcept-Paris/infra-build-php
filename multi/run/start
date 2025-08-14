@@ -50,7 +50,7 @@ if [ ! -e /sbin/runlevel ]; then	# Needed by invoke-rc.d
     echo "#!/bin/sh\necho \"${PREVLEVEL:-N} ${RUNLEVEL:-5}\"" >/sbin/runlevel
     chmod +x /sbin/runlevel
 fi
-test -x /usr/sbin/policy-rc.d && grep 'exit 101' /usr/sbin/policy-rc.d >/dev/null && sed -i 's/exit 101/exit 104/' /usr/sbin/policy-rc.d 
+test -x /usr/sbin/policy-rc.d && grep -q 'exit 101' /usr/sbin/policy-rc.d && sed -i 's/exit 101/exit 104/' /usr/sbin/policy-rc.d 
 
 sed -i '1iServername localhost' /etc/apache2/sites-available/000-default.conf
 a2enmod proxy_fcgi >$Logs/a2.out
@@ -105,7 +105,7 @@ do
     SiteConf=`cat $InPath | sed -e "s/%Port%/$Port/g" -e "s/%Maj%/$Maj/g" -e "s/%Min%/$Min/g" -e "s/%Domain%/$Domain/g"`
     Serv=`echo "$SiteConf" | sed -nr 's/^ *ServerName +([^ ]+).*$/\1/p'`
     Hand=`echo "$SiteConf" | sed -nr 's/^ *SetHandler +([^ ]+).*$/\1/p'`
-    if echo " $Srvs" | grep " $Serv " >/dev/null; then
+    if echo " $Srvs" | grep -q " $Serv "; then
 	echo "Discarded ServerName \"$Serv\""
 	echo "    as it was already specified"
 	continue

@@ -45,7 +45,7 @@ MYPKG_BASE=epi-mypkg
 MYPKG_IMG=$MYPKG_BASE:$DebVer
 MYPKG_NAME=epi_mypkg
 if [ "$1" = 'clean' ]; then
-    docker images | grep "$MYPKG_BASE *$DebVer" >/dev/null && docker rmi $MYPKG_IMG >/dev/null && echo "Removed docker image '$MYPKG_IMG'" && rmed='y'
+    docker images | grep -q "$MYPKG_BASE *$DebVer" && docker rmi $MYPKG_IMG >/dev/null && echo "Removed docker image '$MYPKG_IMG'" && rmed='y'
     test -d "$Dist" && rm -rf $Dist && echo "Removed '$Dist/'" && rmed='y'
     test "$rmed" || echo "$Prg: nothing to clean" >&2
     exit 0
@@ -54,24 +54,24 @@ fi
 date '+===== %Y-%m-%d %H:%M:%S %Z =================='
 Now=`date '+%s'`
 
-if docker ps | grep $MYPKG_NAME >/dev/null; then
+if docker ps | grep -q $MYPKG_NAME; then
     if [ -f ${PkgTop}.norun ]; then
 	Stop="docker stop $MYPKG_NAME >/dev/null\n    "
     else
 	echo "Stopping the running '$MYPKG_NAME' container..."
 	docker stop -t 5 $MYPKG_NAME >/dev/null
-	while docker ps | grep $MYPKG_NAME >/dev/null
+	while docker ps | grep -q $MYPKG_NAME
 	do
 	    sleep 1
 	done
     fi
 fi
 #   Safety check, as we always call docker run with --rm
-if docker ps -a | grep $MYPKG_NAME >/dev/null; then
+if docker ps -a | grep -q $MYPKG_NAME; then
     test -f ${PkgTop}.norun || { echo "Deleting the existing '$MYPKG_NAME' container..."; docker rm $MYPKG_NAME >/dev/null; }
 fi
 
-if docker images | grep "$MYPKG_BASE *$DebVer" >/dev/null; then
+if docker images | grep -q "$MYPKG_BASE *$DebVer"; then
     echo "Re-using the existing '$MYPKG_IMG' image. Use:\n    docker rmi $MYPKG_IMG\nto force a rebuild."
 else
     echo "Building the '$MYPKG_IMG' image..."

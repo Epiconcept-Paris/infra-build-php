@@ -28,7 +28,7 @@ fi
 
 test -d logs || mkdir logs
 
-if docker ps | grep $MULTI_NAME >/dev/null; then
+if docker ps | grep -q $MULTI_NAME; then
     echo "Stopping the '$MULTI_NAME' container..."
     docker stop $MULTI_NAME >/dev/null
 fi
@@ -52,7 +52,7 @@ do
 	sed -n "1,`expr $End - 1`p" logs/docker-run.out
 	break
     fi
-    docker ps | grep $MULTI_NAME >/dev/null || { Abort=y; break; }
+    docker ps | grep -q $MULTI_NAME || { Abort=y; break; }
 done
 if [ $Sec -gt 30 ]; then
     echo "Timed-out waiting for 'docker run ...' output" >&2

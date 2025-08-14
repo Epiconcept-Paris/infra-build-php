@@ -23,7 +23,7 @@ do
     case $opt in
 	l)  Lnk=" -links 1";;
 	n)  Nb=$OPTARG;;
-	x)  Excl=" | egrep -av '^(`echo $OPTARG | sed 's/,/|/g'`)'";;
+	x)  Excl=" | grep -Eav '^(`echo $OPTARG | sed 's/,/|/g'`)'";;
 	h)  Usage 0;;	# help
 	\?) Usage 1;;	# error
     esac

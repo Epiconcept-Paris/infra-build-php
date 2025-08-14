@@ -10,12 +10,12 @@ cd "$(dirname "$0")/.."
 
 Usr='php'
 Cfg='.ssh/config'
-grep "^$Usr:" /etc/passwd >/dev/null || { echo "$Prg: user '$Usr' is unknown" >&2; exit 1; }
+grep -q "^$Usr:" /etc/passwd || { echo "$Prg: user '$Usr' is unknown" >&2; exit 1; }
 
 test "$(id -un)" = $Usr && Dir="$HOME/" || {
     Cmd="sudo -iu $Usr"
     Sudo='s/^ *(\([^)]*\)) *NOPASSWD: *ALL$/\1/p'
-    sudo -l | sed -n "$Sudo" | sed 's/, */\n/g' | grep "^$Usr$" >/dev/null || {
+    sudo -l | sed -n "$Sudo" | sed 's/, */\n/g' | grep -q "^$Usr$" || {
 	echo "$Prg: sudo -u $Usr is not properly configured"
 	exit 2
     }

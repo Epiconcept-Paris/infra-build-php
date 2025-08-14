@@ -5,7 +5,7 @@ set -e
 ini=/etc/php%MMD%/php.ini
 mod=%ext%.so
 
-grep "^%zPfx%extension *= *$mod *$" $ini >/dev/null || echo "%zPfx%extension = $mod" >>$ini
+grep -q "^%zPfx%extension *= *$mod *$" $ini || echo "%zPfx%extension = $mod" >>$ini
 if [ -x /etc/init.d/apache2 -o -f /lib/systemd/system/apache2.service ]; then
     service apache2 status >/dev/null && service apache2 restart
 fi

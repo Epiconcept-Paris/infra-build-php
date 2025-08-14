@@ -9,7 +9,6 @@
 # shellcheck disable=SC2006	# Use $(...) notation, not legacy `...`
 # shellcheck disable=SC2046	# Quote this to prevent word splitting
 # shellcheck disable=SC2086	# Double quote to prevent globbing
-# shellcheck disable=SC2196	# egrep is non-standard
 # shellcheck disable=SC2166	# Prefer [ p ] && [ q ] to [ p -a q ]
 #
 Prg=multi/`basename $0`
@@ -33,7 +32,7 @@ test -d $DebTop || { echo "$Prg: missing '$debTop' directory." >&2; exit 1; }
 test -d $PhpTop || { echo "$Prg: missing 'php' directory." >&2;  exit 1; }
 test -d $TlsTop || { echo "$Prg: missing 'tools' directory." >&2;  exit 1; }
 
-eval $(egrep '^Def(Dom|Tcp)=' ${TopDir}bake)
+eval $(grep -E '^Def(Dom|Tcp)=' ${TopDir}bake)
 DefDeb=`ls $DebTop/*/name | sed "s;$DebTop/\([^/]*\)/name;\1;" | sort -n | tail -1`	# Default = latest
 Base='epi-php'
 Arch='amd64'
@@ -70,13 +69,13 @@ test -f $TopDir.norun && NoRun=y
 re=`cat ${MulTop}mkre`
 for v in $vs
 do
-    if echo $v | egrep "^($re)$" >/dev/null && [ -f $DebTop/$v/name ]; then
+    if echo $v | grep -Eq "^($re)$" && [ -f $DebTop/$v/name ]; then
 	test "$DebNum" && echo "$Prg: discarding previously given Debian-version $DebNum (`cat $DebTop/$DebNum/name`)" >&2
 	DebNum="$v"
     else
 	echo "$Prg: unsupported Debian version \"$v\"" >&2
 	echo "Supported Debian versions (default $DefDeb):" >&2
-	ls $DebTop | sort -n | egrep "^($re)$" | while read -r v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
+	ls $DebTop | sort -n | grep -E "^($re)$" | while read -r v; do test -f $DebTop/$v/name && printf "    %2d (`cat $DebTop/$v/name`)\n" $v; done >&2
 	exit 1
     fi
 done
@@ -176,24 +175,24 @@ MULTI_BASE=$Type-multi-php
 MULTI_IMG=$MULTI_BASE:$DebVer
 MULTI_NAME=${Type}_multi_php
 
-if docker ps | grep $MULTI_NAME >/dev/null; then
+if docker ps | grep -q $MULTI_NAME; then
     if [ "$NoRun" ]; then
 	Stop="docker stop $MULTI_NAME >/dev/null\n    "
     else
 	echo "Stopping the running '$MULTI_NAME' container..."
 	docker stop -t 5 $MULTI_NAME >/dev/null
-	while docker ps | grep $MULTI_NAME >/dev/null
+	while docker ps | grep -q $MULTI_NAME
 	do
 	    sleep 1
 	done
     fi
 fi
 #   Safety check, as we always call docker run with --rm
-if docker ps -a | grep $MULTI_NAME >/dev/null; then
+if docker ps -a | grep -q $MULTI_NAME; then
     test "$NoRun" || { echo "Deleting the existing '$MULTI_NAME' container..."; docker rm $MULTI_NAME >/dev/null; }
 fi
 
-if docker images | grep "$MULTI_BASE *$DebVer" >/dev/null; then
+if docker images | grep -q "$MULTI_BASE *$DebVer"; then
     echo "Re-using the existing '$MULTI_IMG' image. Use:\n    docker rmi $MULTI_IMG\nto force a rebuild."
 else
     echo "Building the '$MULTI_IMG' image..."
@@ -217,7 +216,7 @@ else
 COPY ${MulTop}run/$Pkg /tmp
 RUN dpkg -i /tmp/$Pkg; rm -v /tmp/$Pkg"
     # shellcheck disable=SC2154	# Var referenced but not assigned
-    if echo "$APT_SRC" | grep 'http://' >/dev/null; then
+    if echo "$APT_SRC" | grep -q 'http://'; then
 	$BinDir/aptsrv "$debDir" && AptSrv=y
     elif [ "$http_proxy" -a "$https_proxy" ]; then
 	BldArgs="--build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy"

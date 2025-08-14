@@ -35,7 +35,7 @@ if [ ! -x /sbin/runlevel ]; then	# Needed by invoke-rc.d
     echo "#!/bin/sh\necho \"${PREVLEVEL:-N} ${RUNLEVEL:-5}\"" >/sbin/runlevel
     chmod +x /sbin/runlevel
 fi
-test -x /usr/sbin/policy-rc.d && grep 'exit 101' /usr/sbin/policy-rc.d >/dev/null && sed -i 's/exit 101/exit 104/' /usr/sbin/policy-rc.d
+test -x /usr/sbin/policy-rc.d && grep -q 'exit 101' /usr/sbin/policy-rc.d && sed -i 's/exit 101/exit 104/' /usr/sbin/policy-rc.d
 debinfo -a >$Logs/debinfo-a_tests
 chown $Own "$Logs/debinfo-a_tests"
 

@@ -24,7 +24,7 @@ trap cleanup 0
 #   Setup default route
 test "$DBG" && echo "Cmd=\"$Cmd\""
 $Bin/defroute >/dev/null || {
-    sudo -l | grep $Bin/defroute >/dev/null || {
+    sudo -l | grep -q $Bin/defroute || {
 	echo "$Prg: 'sudo defroute' is not configured" >&2
 	exit 2;
     }

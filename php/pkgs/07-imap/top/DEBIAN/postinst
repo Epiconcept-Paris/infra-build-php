@@ -5,7 +5,7 @@ set -e
 ini=/etc/php%MMD%/php.ini
 mod=imap.so
 
-grep "^extension *= *$mod *$" $ini >/dev/null || echo "extension = $mod" >>$ini
+grep -q "^extension *= *$mod *$" $ini || echo "extension = $mod" >>$ini
 if [ -x /etc/init.d/apache2 -o -f /lib/systemd/system/apache2.service ]; then
     service apache2 status >/dev/null && service apache2 restart
 fi

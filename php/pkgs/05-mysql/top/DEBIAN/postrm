@@ -5,7 +5,7 @@ set -e
 ini=/etc/php%MMD%/php.ini
 mod=mysql.so
 
-grep "^extension *= *$mod *$" $ini >/dev/null && sed -i "/^extension *= *$mod *$/d" $ini
+grep -q "^extension *= *$mod *$" $ini && sed -i "/^extension *= *$mod *$/d" $ini
 if [ -x /etc/init.d/apache2 -o -f /lib/systemd/system/apache2.service ]; then
     service apache2 status >/dev/null && service apache2 restart
 fi

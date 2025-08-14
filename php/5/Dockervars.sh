@@ -83,12 +83,12 @@ COPY ${PhpTop}hooks/freetype.sh $BUILD_TOP/hooks"
 BLDCOPY="RUN mkdir $BUILD_TOP/hooks"
 
 echo "Checking $Tbz for OpCache..."
-if grep '/ext/opcache/' $PhpLst >/dev/null; then
+if grep -q '/ext/opcache/' $PhpLst; then
     AddPECL APCu apcu APCu apcu 4.0.11	# Last version to support PHP5
 else
     AddPECL APC APC APC apc
 fi
-if ! grep '/ext/fileinfo/' $PhpLst >/dev/null; then
+if ! grep -q '/ext/fileinfo/' $PhpLst; then
     AddPECL Fileinfo Fileinfo FileInfo fileinfo
     BUILD_REQ="$BUILD_REQ libmagic-dev"
     TESTS_REQ="$TESTS_REQ libmagic1"
