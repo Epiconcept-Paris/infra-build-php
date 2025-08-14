@@ -1,3 +1,28 @@
+2024-09:
+Dans dev/
+    x exec auto install packages nécessités par extension
+x Ajout fichier 'arch' dans une distro Debian obsolete (jessie, stretch) et prise en compte pour install container (commande embarquée arch ?) pour utiliser http://archive.debian.org/debian (fait dans APT_SRC dans debian/{8,9,10}/Dockervars.sh en aout 2025)
+
+2024-03-25:
+x etendre le chmod +x dans php/pkgs/06-dev/install à tous les fichiers contenant '^#!/usr/bin/env php'
+x find $Top -type f|xargs grep -n '^#!/usr/bin/env php'|sed -n 's;:1:#!/usr/bin/env php$;;p'|xargs chmod +x
+x à tester
+
+2023-12-12:
+x Dans README.md:
+    x Ajout ToC
+    x Add Debian 12 doc (?)
+    x dev et prod, savedist.sh, send.sh
+    x update.sh: finish (?) update.log doc
+    x bin/ (aptsrv, chkdebs, defroute, phpcache, run)
+    x Ajout version PHP
+    x Ajout version Debian
+    x Compilation d'extensions: dev/
+    x ubuntu/, docker/, tests/
+
+x Corriger Path absolu dans ubuntu/run
+
+2022-08:
 x install serveur:
     x user php (sudo pour cédric et moi)
     x recup fichiers source non-commités

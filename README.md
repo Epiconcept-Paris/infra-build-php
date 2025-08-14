@@ -823,7 +823,9 @@ Il présente l'intérêt de montrer la mécanique minimale de la fabrication bas
 │   │   │   └── ...
 │   │   ├── 05-mysql/
 │   │   │   └── ...
-│   │   └── 06-dev/
+│   │   ├── 06-dev/
+│   │   │   └── ...
+│   │   └── 07-imap/
 │   │       └── ...
 │   ├── run/
 │   │   ├── build*	# Script pilote du container de build
@@ -854,14 +856,12 @@ Il présente l'intérêt de montrer la mécanique minimale de la fabrication bas
 │   └── debrun*		# Lancement du container après build si nécessaire
 │
 ├── ubuntu/		# Container de tests des paquets Debian 11 sur Ubuntu 20.04 LTS (focal)
-├── docker/apachefpm/	# Essais de CGD avec Apache et FPM
 ├── tests/mypkg/	# Container de tests des dépendances de paquets
-├── attic/		# Vieilleries
+├── attic/		# Vieilleries (pas toutes sans intérêt :-))
 ├── update.log/		# Fichiers de log de l'exécution de update.sh (ci-dessous)
 ├── .gitignore		# Fichiers ignorés par git
 ├── .norun		# Optionnel: docker ne lance pas (run) les containers, mais affiche la commande
 ├── .debug		# Optionnel: build en mode debug (conservant l'arbo. php/ hors du container)
-├── missing.sh		# Ancien script de vérification des dernières versions
 ├── savedist.sh*	# Sauvegarde des paquets Debian de production
 ├── send.sh*		# Envoi au dépôt APT d'Epiconcept
 ├── update.sh*		# Builds automatiques lancés par cron
@@ -869,7 +869,7 @@ Il présente l'intérêt de montrer la mécanique minimale de la fabrication bas
 ```
 </details>
 
-## <a name="hnote"> Notes </a>
+## <a name="hnote"> Notes initiales (pour mémoire)</a>
 
 * voir s'il faut gérer le rotate/reopen des logs de PHP-FPM
 * voir les FAILED tests des make test ?
