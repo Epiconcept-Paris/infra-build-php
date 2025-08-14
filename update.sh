@@ -570,8 +570,8 @@ test -p "$Fifo" || mkfifo "$Fifo"
 exec 3>&1	# Save stdout
 exec >$Log 2>&1
 trap cleanup 0
-date "===== $(now) ===== User: $Usr =====$CR"
-#date "===== $(now) =====" >&3	# DBG
+echo "===== $(now) ===== User: $Usr =====$CR"
+#echo "===== $(now) =====" >&3	# DBG
 
 test "$LANG" || { LANG='C.UTF-8'; echo "Set LANG=\"$LANG\"$CR"; }
 if [ "$LC_ALL" -a "$LC_ALL" != "$LANG" ]; then
@@ -583,7 +583,7 @@ fi
 #	We filter out $2 (PPID) as well as $1 (PID) to eliminate the $() subshell
 #ps -eo pid,ppid,etimes,cmd | grep "$(echo "$Dir/$Prg" | sed -r 's/^(.)/[\1]/')"	# DBG
 PsLog="update.log/ps_$(now _).txt"
-eval "$(ps -eHo pid,ppid,etimes,cmd | awk ' != 2' | tee $PsLog | awk "\$5==\"$Dir/$Prg\" && \$1!=$$ && \$2!=$$ {printf(\"Old=%d Et=%d\",\$1,\$3)}")"
+eval "$(ps -eHo pid,ppid,etimes,cmd | awk '$2 != 2' | tee $PsLog | awk "\$5==\"$Dir/$Prg\" && \$1!=$$ && \$2!=$$ {printf(\"Old=%d Et=%d\",\$1,\$3)}")"
 #echo "Dir=$Dir Prg=$Prg PID=$$ Old=\"$Old\""	# DBG
 test "$Old" && { echo "$Prg: another instance (PID=$Old) is running since $(odate $Et)" >&3; exit 1; }
 rm -f $PsLog
