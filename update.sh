@@ -532,9 +532,12 @@ EOF
 cleanup()
 {
     #global LogDir Log
+    local idle
 
+    idle="$LogDir/.idle"
     if [ $(wc -l <$Log) -eq 1 ]; then
-	cat "$Log" >>"$LogDir/.idle"
+	# Only add to $Log if 1st addition today
+	grep -q "^===== $(date '+%Y-%m-%d') " "$idle" || cat "$Log" >>"$idle"
 	rm "$Log"
     fi
     return 0
@@ -572,23 +575,104 @@ exec 3>&1	# Save stdout
 exec >$Log 2>&1
 trap cleanup 0
 echo "===== $(now) ===== User: $Usr =====$CR"
-#echo "===== $(now) =====" >&3	# DBG
 
-test "$LANG" || { LANG='C.UTF-8'; echo "Set LANG=\"$LANG\"$CR"; }
+test "$LANG" || { LANG='C.UTF-8'; echo "	Set LANG=\"$LANG\"$CR"; }
 if [ "$LC_ALL" -a "$LC_ALL" != "$LANG" ]; then
-    echo "Unset LC_ALL=\"$LC_ALL\" (!= LANG=\"$LANG\")$CR"
+    echo "	Unset LC_ALL=\"$LC_ALL\" (!= LANG=\"$LANG\")$CR"
     unset LC_ALL
 fi
 
-#   Find out if another instance is running
-#	We filter out $2 (PPID) as well as $1 (PID) to eliminate the $() subshell
+#   Find out with ps if another instance of this $Prg script is running
+#
+#   We need of course to eliminate our own instances of the script
+#   It may seem at first that there should be only this script and its child
+#	in the eval "$(ps ...)" below. Here is a sample of what ps normally sees:
+#
+#        PID    PPID ELAPSED CMD
+#    ...
+#        722       1 2019307   /usr/sbin/cron -f -L 7
+#    2963222     722       0     /usr/sbin/CRON -f -L 7
+#    2963223 2963222       0       /bin/sh -c build-php/update.sh | mail -Es "$(hostname) PHP build(s)...
+#    2963224 2963223       0         /bin/sh build-php/update.sh
+#    2963241 2963224       0           /bin/sh build-php/update.sh
+#    2963242 2963241       0             ps -eHo pid,ppid,etimes,cmd
+#    2963243 2963241       0             awk $2 != 2
+#    2963244 2963241       0             tee update.log/ps_2025-10-23_00:15:01.txt
+#    2963245 2963241       0             awk -v pid=2963224 -v cmd=build-php/update.sh  ?BEGIN { ppid=0 ...
+#    2963225 2963223       0         mail -Es binbuilda1 PHP build(s) of new version(s) -a From: ...
+#
+#    So we would just need to exclude the processes with PID 2963224 (our script) and 2963241 (its child)
+#    Note that this child (the $(ps...) process) has 4 children, one for each command of the pipeline
+#    This is standard behaviour of dash (bin/sh in Debian Linux) for pipelines (man dash)
+#
+#    But once in a while (more system load ?), we get from 'ps' something like this:
+#
+#        PID    PPID ELAPSED CMD
+#    ...
+#        722       1 2019187   /usr/sbin/cron -f -L 7
+#    2958259     722       0     /usr/sbin/CRON -f -L 7
+#    2958261 2958259       0       /bin/sh -c build-php/update.sh | mail -Es "$(hostname) PHP build(s)...
+#    2958263 2958261       0         /bin/sh build-php/update.sh
+#    2958289 2958263       0           /bin/sh build-php/update.sh
+#    2958290 2958289       0             ps -eHo pid,ppid,etimes,cmd
+#    2958291 2958289       0             /bin/sh build-php/update.sh
+#    2958292 2958289       0             tee update.log/ps_2025-10-23_15:04:01.txt
+#    2958293 2958289       0             awk -v pid=2958263 -v cmd=build-php/update.sh  ?BEGIN { ppid=0 ...
+#    2958264 2958261       0         mail -Es binbuilda1 PHP build(s) of new version(s) -a From: ...
+#
+#    We can see here that the 'awk $2 != 2' command has not yet appeared as process 2958291,
+#	instead, we just see a fork of the $(ps...) process, which still has 4 children
+#
+#    So it means that we must not only discard our $Prg process and its $(ps...) child, but also the 4
+#    children of the latter (in this debug pipeline; in the production code, there would only be 2 children)
+#
+#    To do this, we save the PID of the $(ps...) process & discard all processes that have it as PPID
+#
 test "$Usr" = 'php' || {
-    #ps -eo pid,ppid,etimes,cmd | grep "$(echo "$Dir/$Prg" | sed -r 's/^(.)/[\1]/')"	# DBG
     PsLog="update.log/ps_$(now _).txt"
-    eval "$(ps -eHo pid,ppid,etimes,cmd | awk '$2 != 2' | tee $PsLog | awk "\$5==\"$Dir/$Prg\" && \$1!=$$ && \$2!=$$ {printf(\"Old=%d Et=%d\",\$1,\$3)}")"
-    #echo "Dir=$Dir Prg=$Prg PID=$$ Old=\"$Old\""	# DBG
-    test "$Old" && { echo "$Prg: another instance (PID=$Old) is running since $(odate $Et)" >&3; exit 1; }
-    rm -f $PsLog
+    # Maximum debug in $BugLog, to trace $Prg when it is started every minute
+    BugLog="update.log/bugLog"		# MDBG
+    echo -n "$(now) " >>$BugLog		# MDBG
+    # We check $5 below because $4 is '/bin/sh'
+    # 'nep' is the number of embryo processes (successfully discarded)
+    #Prod: Out="$(ps -eHo pid,ppid,etimes,cmd | awk -v "pid=$$" -v "cmd=$Dir/$Prg" '
+    Out="$(ps -eHo pid,ppid,etimes,cmd | awk '$2 != 2' | tee $PsLog | awk -v "pid=$$" -v "cmd=$Dir/$Prg" '
+	BEGIN { ppid=0; nep=0
+		printf("PID=%d Cmd=\"%s\" ",pid,cmd) >"/dev/stderr"	# MDBG
+	}
+	$5 == cmd && $1 != pid {
+		if ($2 == pid) ppid = $1
+		else if (ppid > 0 && $2 == ppid) nep++
+		else printf("Oth=%d Et=%d\n",$1,$3)
+	}
+	END { if (nep > 0) printf("Nep=%d\n", nep) }' 2>>$BugLog	# MDBG
+    )"
+    echo "$Out" | sed -n '1p; 2,$s/^/\t/p' >>$BugLog	# MDBG
+    if [ "$Out" ]; then
+	OthLog='update.log/Oth'		# MDBG
+	Nbl=$(echo "$Out" | wc -l)
+	if [ "$Nbl" -eq 1 ]; then
+	    eval "$Out"
+	    if expr "$Out" : 'Nep=' >/dev/null; then
+		echo "	Discarded $Nep embryo process(es)$CR"
+	    else
+		echo "$Prg: another instance (PID=$Oth) is running since $(odate $Et)" >>"$OthLog" #>&3
+	    fi
+	else	# Actually VERY unlikely (defensive programming) because,
+		# if an older instance of $Prg is detected, no other can start
+	    echo "$Prg: $Nbl other instances are already running" >>"$OthLog" # MDBG >&3
+	    echo "$Out" | while read -r line; do
+		eval "$line"
+		if expr "$line" : 'Nep=' >/dev/null; then
+		    echo "	Discarded $Nep embryo process(es)$CR"
+		else
+		    echo "	PID=$Oth running since $(odate $Et)" >>"$OthLog" # MDBG >&3
+		fi
+	    done
+	fi
+	test "$Oth" && exit 1
+    fi
+    test "$(grep -c "/bin/sh $Dir/$Prg" $PsLog)" -eq 2 && rm -f $PsLog	# MDBG
 }
 
 #   Check for environment (scripts and working dir)
