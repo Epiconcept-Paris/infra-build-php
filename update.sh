@@ -631,48 +631,49 @@ fi
 test "$Usr" = 'php' || {
     PsLog="update.log/ps_$(now _).txt"
     # Maximum debug in $BugLog, to trace $Prg when it is started every minute
-    BugLog="update.log/bugLog"		# MDBG
-    echo -n "$(now) " >>$BugLog		# MDBG
+    #BugLog="update.log/bugLog"		# MDBG
+    #echo -n "$(now) " >>$BugLog	# MDBG
+
     # We check $5 below because $4 is '/bin/sh'
     # 'nep' is the number of embryo processes (successfully discarded)
     #Prod: Out="$(ps -eHo pid,ppid,etimes,cmd | awk -v "pid=$$" -v "cmd=$Dir/$Prg" '
+    #MDBG: printf("PID=%d Cmd=\"%s\" ",pid,cmd) >"/dev/stderr"	# Append to BEGIN below
     Out="$(ps -eHo pid,ppid,etimes,cmd | awk '$2 != 2' | tee $PsLog | awk -v "pid=$$" -v "cmd=$Dir/$Prg" '
-	BEGIN { ppid=0; nep=0
-		printf("PID=%d Cmd=\"%s\" ",pid,cmd) >"/dev/stderr"	# MDBG
-	}
+	BEGIN { ppid=0; nep=0 }
 	$5 == cmd && $1 != pid {
 		if ($2 == pid) ppid = $1
 		else if (ppid > 0 && $2 == ppid) nep++
 		else printf("Oth=%d Et=%d\n",$1,$3)
 	}
-	END { if (nep > 0) printf("Nep=%d\n", nep) }' 2>>$BugLog	# MDBG
+	END { if (nep > 0) printf("Nep=%d\n", nep) }'	# MDBG 2>>$BugLog
     )"
-    echo "$Out" | sed -n '1p; 2,$s/^/\t/p' >>$BugLog	# MDBG
+    #MDBG echo "$Out" | sed -n '1p; 2,$s/^/\t/p' >>$BugLog
     if [ "$Out" ]; then
-	OthLog='update.log/Oth'		# MDBG
+	#MDBG OthLog='update.log/Oth'
 	Nbl=$(echo "$Out" | wc -l)
 	if [ "$Nbl" -eq 1 ]; then
 	    eval "$Out"
 	    if expr "$Out" : 'Nep=' >/dev/null; then
 		echo "	Discarded $Nep embryo process(es)$CR"
 	    else
-		echo "$Prg: another instance (PID=$Oth) is running since $(odate $Et)" >>"$OthLog" #>&3
+		echo "$Prg: another instance (PID=$Oth) is running since $(odate $Et)" >&3 #MDBG >>"$OthLog"
 	    fi
 	else	# Actually VERY unlikely (defensive programming) because,
 		# if an older instance of $Prg is detected, no other can start
-	    echo "$Prg: $Nbl other instances are already running" >>"$OthLog" # MDBG >&3
+	    echo "$Prg: $Nbl other instances are already running" >&3	#MDBG >>"$OthLog"
 	    echo "$Out" | while read -r line; do
 		eval "$line"
 		if expr "$line" : 'Nep=' >/dev/null; then
 		    echo "	Discarded $Nep embryo process(es)$CR"
 		else
-		    echo "	PID=$Oth running since $(odate $Et)" >>"$OthLog" # MDBG >&3
+		    echo "	PID=$Oth running since $(odate $Et)" >&3	#MDBG >>"$OthLog"
 		fi
 	    done
 	fi
 	test "$Oth" && exit 1
     fi
-    test "$(grep -c "/bin/sh $Dir/$Prg" $PsLog)" -eq 2 && rm -f $PsLog	# MDBG
+    #MDBG test "$(grep -c "/bin/sh $Dir/$Prg" $PsLog)" -eq 2 && rm -f $PsLog
+    rm -f $PsLog
 }
 
 #   Check for environment (scripts and working dir)
