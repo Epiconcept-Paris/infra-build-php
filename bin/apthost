@@ -28,11 +28,12 @@ test "$(id -un)" = $Usr && Dir="$HOME/" || {
 #   --------------------------------
 #
 test "$DBG" && echo "Dir=\"$Dir\" Cmd=\"$Cmd\"" >&2
+$Cmd test -s $Dir$Cfg || { echo "$Prg: ~$Usr/$Cfg is missing or empty" >&2; exit 3; }
 eval $($Cmd sed -n \
 	-e 's/^[ \t]*Host[ \t][ \t]*/Host=/p' \
 	-e 's/^[ \t]*Hostname[ \t][ \t]*/Name=/p' \
 	-e 's/^[ \t]*User[ \t][ \t]*/User=/p' \
 	$Dir$Cfg 3>/dev/null)
 test "$DBG" && echo "In ~$Usr/$Cfg Host=$Host Hostname=$Name User=$User" >&2
-test "$Host" -a "$Name" -a "$User" || { echo "$Prg: ~$Usr/$Cfg missing or invalid" >&2; exit 3; }
+test "$Host" -a "$Name" -a "$User" || { echo "$Prg: ~$Usr/$Cfg is invalid" >&2; exit 3; }
 echo "$Host"
